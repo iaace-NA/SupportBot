@@ -19,4 +19,13 @@ module.exports = class EmbedGenrator {
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;
 	}
+	detailedSummoner(CONFIG, summoner, ranks) {
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setAuthor(summoner.name);
+		newEmbed.setThumbnail(CONFIG.STATIC.S_ICONS + summoner.profileIconId + ".png");
+		newEmbed.setDescription("Level " + summoner.summonerLevel + "\nSummoner ID: " + summoner.id + "\nAccount ID: " + summoner.accountId);
+		newEmbed.setTimestamp(new Date(summoner.revisionDate));
+		newEmbed.setFooter("Last change detected at ");
+		return newEmbed;
+	}
 }

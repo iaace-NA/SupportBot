@@ -39,4 +39,7 @@ module.exports = class LOLAPI {
 	getSummonerIDFromName(region, username) {
 		return this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {});
 	}
+	getRanks(region, summonerID) {
+		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {});
+	}
 }
