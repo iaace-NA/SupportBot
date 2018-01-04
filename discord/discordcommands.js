@@ -30,11 +30,14 @@ module.exports = function (CONFIG, client, lolapi, msg) {
 			}).catch(console.error);
 		});
 		command([""], true, false, (original, index, parameter) => {
-			lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" ")), false), parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
-				lolapi.getRanks(assert_region(parameter.substring(0, parameter.indexOf(" ")), result.id)).then(result2 => {
-					reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2));
-				}).catch(console.error);
-			}).catch();
+			try {
+				lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" ")), false), parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
+					lolapi.getRanks(assert_region(parameter.substring(0, parameter.indexOf(" ")), false), result.id).then(result2 => {
+						reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2));
+					}).catch(console.error);
+				}).catch();
+			}
+			catch(e) {}
 		});
 	}
 	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) {//respondable server message only
@@ -135,7 +138,7 @@ module.exports = function (CONFIG, client, lolapi, msg) {
 	}
 	function assert_region(test_string, notify = true) {
 		if (!UTILS.exists(CONFIG.REGIONS[test_string.toUpperCase()])) {
-			reply("You need to specify a region.");
+			if (notify) reply("You need to specify a region.");
 			throw new Error("Region not specified");
 		}
 		else {
