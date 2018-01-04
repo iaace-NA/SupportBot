@@ -1,5 +1,6 @@
 "use strict";
 let embedgenerator = new (require("./embedgenerator.js"))();
+let textgenerator = new (require("./textgenerator.js"))();
 const UTILS = new (require("../utils.js"))();
 module.exports = function (CONFIG, client, osuapi, msg) {
 	if (msg.author.bot || msg.author.id === client.user.id) {//ignore all messages from [BOT] users and own messages
@@ -8,7 +9,7 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 
 	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) {//server message, can read and write
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, function (original, index) {
-			reply("pong");
+			reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping "], true, false, function (original, index, parameter) {
 			reply("you said: " + parameter);
@@ -27,7 +28,7 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 	}
 	else {//PM/DM
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, function (original, index) {
-			reply("pong");
+			reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping "], true, false, function (original, index, parameter) {
 			reply("you said: " + parameter);
