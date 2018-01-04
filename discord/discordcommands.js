@@ -4,9 +4,7 @@ let textgenerator = new (require("./textgenerator.js"))();
 let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
 module.exports = function (CONFIG, client, lolapi, msg) {
-	if (msg.author.bot || msg.author.id === client.user.id) {//ignore all messages from [BOT] users and own messages
-		return;
-	}
+	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 
 	if ((UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) || !UTILS.exists(msg.guild)) {//respondable server message or PM
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {
