@@ -119,10 +119,7 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 	}
 	function shutdown() {
 		client.user.setStatus("invisible").then(step2).catch(step2);
-		function step2(e) {
-			if (UTILS.exists(e)) {
-				console.error(e);
-			}
+		function step2() {
 			client.destroy().catch();
 			UTILS.output("reached shutdown point");
 			setTimeout(function () {
