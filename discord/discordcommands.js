@@ -1,6 +1,7 @@
 "use strict";
 let embedgenerator = new (require("./embedgenerator.js"))();
 let textgenerator = new (require("./textgenerator.js"))();
+let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
 module.exports = function (CONFIG, client, osuapi, msg) {
 	if (msg.author.bot || msg.author.id === client.user.id) {//ignore all messages from [BOT] users and own messages
@@ -26,7 +27,7 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 			reply_embed(embedgenerator.test());
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "shutdown"], false, true, () => {
-			reply()
+			reply("shutdown initiated", child_process.spawnSync("pm2", ["stop", "all"]), child_process.spawnSync("pm2", ["stop", "all"]));
 		});
 	}
 	else {//PM/DM
