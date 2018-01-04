@@ -29,6 +29,9 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "shutdown"], false, true, () => {
 			reply("shutdown initiated", shutdown, shutdown);
 		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "restart"], false, true, () => {
+			reply("restart initiated", restart, restart);
+		});
 	}
 	else {//PM/DM
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {
@@ -124,6 +127,16 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 			UTILS.output("reached shutdown point");
 			setTimeout(function () {
 				child_process.spawnSync("pm2", ["stop", "all"]);
+			}, 5000);
+		}
+	}
+	function restart() {
+		client.user.setStatus("invisible").then(step2).catch(step2);
+		function step2() {
+			client.destroy().catch();
+			UTILS.output("reached restart point");
+			setTimeout(function () {
+				child_process.spawnSync("pm2", ["restart", "all"]);
 			}, 5000);
 		}
 	}
