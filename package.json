@@ -9,6 +9,7 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
+    "canvas": "^1.6.9",
     "discord.js": "^11.2.1",
     "request": "^2.83.0"
   }
