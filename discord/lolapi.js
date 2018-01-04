@@ -24,7 +24,7 @@ module.exports = class LOLAPI {
 				}
 				else {
 					try {
-						UTILS.output(body);
+						UTILS.output(url + " : " + body);
 						const answer = JSON.parse(body);
 						resolve(answer);
 					}

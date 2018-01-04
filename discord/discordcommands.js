@@ -30,7 +30,7 @@ module.exports = function (CONFIG, client, lolapi, msg) {
 			}).catch(console.error);
 		});
 		command([""], true, false, (original, index, parameter) => {
-			lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
+			lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" ")), false), parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
 				lolapi.getRanks(assert_region(parameter.substring(0, parameter.indexOf(" ")), result.id)).then(result2 => {
 					reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2));
 				}).catch(console.error);
@@ -133,7 +133,7 @@ module.exports = function (CONFIG, client, lolapi, msg) {
 			UTILS.output("received PM/DM message :: " + basic);
 		}
 	}
-	function assert_region(test_string) {
+	function assert_region(test_string, notify = true) {
 		if (!UTILS.exists(CONFIG.REGIONS[test_string.toUpperCase()])) {
 			reply("You need to specify a region.");
 			throw new Error("Region not specified");
