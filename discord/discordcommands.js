@@ -118,10 +118,15 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 		}
 	}
 	function shutdown() {
-		client.destroy().then(function () {
-			child_process.spawnSync("pm2", ["stop", "all"]);
-		}).catch(function () {
-			child_process.spawnSync("pm2", ["stop", "all"]);
-		});
+		client.destroy().then(step2).catch(step2);
+		function step2(e) {
+			if (UTILS.exists(e)) {
+				console.error(e);
+			}
+			UTILS.output("reached shutdown point");
+			setTimeout(function () {
+				child_process.spawnSync("pm2", ["stop", "all"]);
+			}, 5000);
+		}
 	}
 }
