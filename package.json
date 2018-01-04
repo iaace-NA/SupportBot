@@ -11,7 +11,9 @@
   "dependencies": {
     "canvas": "^1.6.9",
     "discord.js": "^11.2.1",
+    "erlpack": "github:discordapp/erlpack",
     "mongoose": "^5.0.0-rc1",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "zlib-sync": "^0.1.4"
   }
 }
