@@ -8,7 +8,7 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 	}
 
 	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) {//server message, can read and write
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, function (original, index) {
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {
 			reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping "], true, false, function (original, index, parameter) {
@@ -22,18 +22,21 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 				reply("```" + e + "```");
 			}
 		});
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, function (original, index) {
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, () => {
 			reply_embed(embedgenerator.test());
+		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "shutdown"], false, true, () => {
+			reply()
 		});
 	}
 	else {//PM/DM
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, function (original, index) {
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {
 			reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping "], true, false, function (original, index, parameter) {
 			reply("you said: " + parameter);
 		});
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, function (original, index) {
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, () => {
 			reply_embed(embedgenerator.test());
 		});
 	}
