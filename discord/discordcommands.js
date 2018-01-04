@@ -118,7 +118,7 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 		}
 	}
 	function shutdown() {
-		client.setStatus("invisible").then(step2).catch(step2);
+		client.user.setStatus("invisible").then(step2).catch(step2);
 		function step2(e) {
 			if (UTILS.exists(e)) {
 				console.error(e);
