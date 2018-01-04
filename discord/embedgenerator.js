@@ -23,7 +23,10 @@ module.exports = class EmbedGenrator {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name);
 		newEmbed.setThumbnail(CONFIG.STATIC.S_ICONS + summoner.profileIconId + ".png");
-		newEmbed.setDescription("Level " + summoner.summonerLevel + "\nSummoner ID: " + summoner.id + "\nAccount ID: " + summoner.accountId);
+		newEmbed.setDescription("Level " + summoner.summonerLevel);
+		for (let b in ranks) {
+			newEmbed.addField(ranks[b].queueType + ": " + ranks[b].tier + " " + ranks[b].rank + " " + ranks[b].leaguePoints + "LP", (ranks[b].wins + ranks[b].losses) + "G = " + ranks[b].wins + "W + " + ranks[b].losses + "L\nWin Rate: " + UTILS.round(ranks[b].wins / (ranks[b].wins + ranks[b].losses), 2));
+		}
 		newEmbed.setTimestamp(new Date(summoner.revisionDate));
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;

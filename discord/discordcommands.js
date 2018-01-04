@@ -27,7 +27,14 @@ module.exports = function (CONFIG, client, lolapi, msg) {
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "sd ", CONFIG.DISCORD_COMMAND_PREFIX + "summonerdebug "], true, false, (original, index, parameter) => {
 			lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
 				reply_embed(embedgenerator.summoner(CONFIG, result));
-			}).catch(console.error)
+			}).catch(console.error);
+		});
+		command([""], true, false, (original, index, parameter) => {
+			lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
+				lolapi.getRanks(assert_region(parameter.substring(0, parameter.indexOf(" ")), result.id)).then(result2 => {
+					reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2));
+				}).catch(console.error);
+			}).catch();
 		});
 	}
 	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) {//respondable server message only
@@ -55,7 +62,12 @@ module.exports = function (CONFIG, client, lolapi, msg) {
 				}
 				else {
 					if (UTILS.exists(callback)) {
-						callback(trigger_array[i], i, msg.content.trim().substring(trigger_array[i].length));
+						try {
+							callback(trigger_array[i], i, msg.content.trim().substring(trigger_array[i].length));
+						}
+						catch (e) {
+							console.error(e);
+						}
 					}
 					return true;
 				}
@@ -69,7 +81,12 @@ module.exports = function (CONFIG, client, lolapi, msg) {
 				}
 				else {
 					if (UTILS.exists(callback)) {
-						callback(trigger_array[i], i);
+						try {
+							callback(trigger_array[i], i);
+						}
+						catch (e) {
+							console.error(e);
+						}
 					}
 					return true;
 				}
@@ -107,8 +124,8 @@ module.exports = function (CONFIG, client, lolapi, msg) {
 
 	function print_message() {
 		const basic = msg.id + "\ncontent: " + msg.content +
-		"\nauthor: " + msg.author.tag + " :: " + msg.author.id +
-		"\nchannel: " + msg.channel.name + " :: " + msg.channel.id;
+			"\nauthor: " + msg.author.tag + " :: " + msg.author.id +
+			"\nchannel: " + msg.channel.name + " :: " + msg.channel.id;
 		if (UTILS.exists(msg.guild)) {
 			UTILS.output("received server message :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
 		}
