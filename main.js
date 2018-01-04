@@ -22,6 +22,7 @@ const LOLAPI = new (require("./discord/lolapi.js"))(CONFIG);
 
 client.on("ready", function () {
 	UTILS.output("discord user login success");
+	client.setStatus("online").catch(console.error);
 	client.setGame("League of Legends").catch(console.error);
 });
 client.on("disconnect", function () {

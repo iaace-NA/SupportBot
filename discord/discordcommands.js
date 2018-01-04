@@ -118,11 +118,12 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 		}
 	}
 	function shutdown() {
-		client.destroy().then(step2).catch(step2);
+		client.setStatus("invisible").then(step2).catch(step2);
 		function step2(e) {
 			if (UTILS.exists(e)) {
 				console.error(e);
 			}
+			client.destroy().catch();
 			UTILS.output("reached shutdown point");
 			setTimeout(function () {
 				child_process.spawnSync("pm2", ["stop", "all"]);
