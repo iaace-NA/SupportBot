@@ -27,7 +27,7 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 			reply_embed(embedgenerator.test());
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "shutdown"], false, true, () => {
-			reply("shutdown initiated", child_process.spawnSync("pm2", ["stop", "all"]), child_process.spawnSync("pm2", ["stop", "all"]));
+			reply("shutdown initiated", shutdown, shutdown);
 		});
 	}
 	else {//PM/DM
@@ -116,5 +116,12 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 		else {
 			UTILS.output("received PM/DM message :: " + basic);
 		}
+	}
+	function shutdown() {
+		client.destroy().then(function () {
+			child_process.spawnSync("pm2", ["stop", "all"]);
+		}).catch(function () {
+			child_process.spawnSync("pm2", ["stop", "all"]);
+		});
 	}
 }
