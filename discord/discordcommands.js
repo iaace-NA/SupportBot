@@ -48,7 +48,7 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 		callback) {//optional callback only if successful
 		for (let i in trigger_array) {
 			if (parameters_expected && msg.content.trim().toLowerCase().substring(0, trigger_array[i].length) === trigger_array[i].toLowerCase()) {
-				if (elevated_permissions && UTILS.exists(CONFIG.OWNER_DISCORD_IDS[msg.author.id])) {
+				if (elevated_permissions && !UTILS.exists(CONFIG.OWNER_DISCORD_IDS[msg.author.id])) {
 					UTILS.output("insufficient permissions");
 					print_message();
 					msg.channel.send("Owner permissions required. Ask for help.").catch(console.error);
@@ -62,7 +62,7 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 				}
 			}
 			else if (!parameters_expected && msg.content.trim().toLowerCase() === trigger_array[i].toLowerCase()) {
-				if (elevated_permissions && UTILS.exists(CONFIG.OWNER_DISCORD_IDS[msg.author.id])) {
+				if (elevated_permissions && !UTILS.exists(CONFIG.OWNER_DISCORD_IDS[msg.author.id])) {
 					UTILS.output("insufficient permissions");
 					print_message();
 					msg.channel.send("Owner permissions required. Ask for help.").catch(console.error);
