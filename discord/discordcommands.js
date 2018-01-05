@@ -1,5 +1,7 @@
 "use strict";
 let embedgenerator = new (require("./embedgenerator.js"))();
+let textgenerator = new (require("./textgenerator.js"))();
+let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
 module.exports = function (CONFIG, client, osuapi, msg) {
 	if (msg.author.bot || msg.author.id === client.user.id) {//ignore all messages from [BOT] users and own messages
@@ -7,8 +9,8 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 	}
 
 	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) {//server message, can read and write
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, function (original, index) {
-			reply("pong");
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {
+			reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping "], true, false, function (original, index, parameter) {
 			reply("you said: " + parameter);
@@ -21,18 +23,24 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 				reply("```" + e + "```");
 			}
 		});
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, function (original, index) {
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, () => {
 			reply_embed(embedgenerator.test());
+		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "shutdown"], false, true, () => {
+			reply("shutdown initiated", shutdown, shutdown);
+		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "restart"], false, true, () => {
+			reply("restart initiated", restart, restart);
 		});
 	}
 	else {//PM/DM
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, function (original, index) {
-			reply("pong");
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {
+			reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping "], true, false, function (original, index, parameter) {
 			reply("you said: " + parameter);
 		});
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, function (original, index) {
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, () => {
 			reply_embed(embedgenerator.test());
 		});
 	}
@@ -43,7 +51,7 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 		callback) {//optional callback only if successful
 		for (let i in trigger_array) {
 			if (parameters_expected && msg.content.trim().toLowerCase().substring(0, trigger_array[i].length) === trigger_array[i].toLowerCase()) {
-				if (elevated_permissions && UTILS.exists(CONFIG.OWNER_DISCORD_IDS[msg.author.id])) {
+				if (elevated_permissions && !UTILS.exists(CONFIG.OWNER_DISCORD_IDS[msg.author.id])) {
 					UTILS.output("insufficient permissions");
 					print_message();
 					msg.channel.send("Owner permissions required. Ask for help.").catch(console.error);
@@ -57,7 +65,7 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 				}
 			}
 			else if (!parameters_expected && msg.content.trim().toLowerCase() === trigger_array[i].toLowerCase()) {
-				if (elevated_permissions && UTILS.exists(CONFIG.OWNER_DISCORD_IDS[msg.author.id])) {
+				if (elevated_permissions && !UTILS.exists(CONFIG.OWNER_DISCORD_IDS[msg.author.id])) {
 					UTILS.output("insufficient permissions");
 					print_message();
 					msg.channel.send("Owner permissions required. Ask for help.").catch(console.error);
@@ -110,6 +118,26 @@ module.exports = function (CONFIG, client, osuapi, msg) {
 		}
 		else {
 			UTILS.output("received PM/DM message :: " + basic);
+		}
+	}
+	function shutdown() {
+		client.user.setStatus("invisible").then(step2).catch(step2);
+		function step2() {
+			client.destroy().catch();
+			UTILS.output("reached shutdown point");
+			setTimeout(function () {
+				child_process.spawnSync("pm2", ["stop", "all"]);
+			}, 5000);
+		}
+	}
+	function restart() {
+		client.user.setStatus("invisible").then(step2).catch(step2);
+		function step2() {
+			client.destroy().catch();
+			UTILS.output("reached restart point");
+			setTimeout(function () {
+				child_process.spawnSync("pm2", ["restart", "all"]);
+			}, 5000);
 		}
 	}
 }
