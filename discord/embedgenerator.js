@@ -11,6 +11,12 @@ module.exports = class EmbedGenrator {
 		return newEmbed;
 	}
 	summoner(CONFIG, apiobj) {
+		if (!UTILS.exists(summoner.id)) {
+			let newEmbed = new Discord.RichEmbed();
+			newEmbed.setTitle("This summoner does not exist.");
+			newEmbed.setDescription("Please revise your request.");
+			return newEmbed;
+		}
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(apiobj.name);
 		newEmbed.setThumbnail(CONFIG.STATIC.S_ICONS + apiobj.profileIconId + ".png");
@@ -20,6 +26,12 @@ module.exports = class EmbedGenrator {
 		return newEmbed;
 	}
 	detailedSummoner(CONFIG, summoner, ranks) {
+		if (!UTILS.exists(summoner.id)) {
+			let newEmbed = new Discord.RichEmbed();
+			newEmbed.setTitle("This summoner does not exist.");
+			newEmbed.setDescription("Please revise your request.");
+			return newEmbed;
+		}
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name);
 		newEmbed.setThumbnail(CONFIG.STATIC.S_ICONS + summoner.profileIconId + ".png");
