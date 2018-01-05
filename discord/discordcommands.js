@@ -31,9 +31,10 @@ module.exports = function (CONFIG, client, lolapi, msg) {
 		});
 		command([""], true, false, (original, index, parameter) => {
 			try {
-				lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" ")), false), parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
-					lolapi.getRanks(assert_region(parameter.substring(0, parameter.indexOf(" ")), false), result.id).then(result2 => {
-						reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2));
+				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);
+				lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
+					lolapi.getRanks(region, result.id).then(result2 => {
+						reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, parameter.substring(0, parameter.indexOf(" "))));
 					}).catch(console.error);
 				}).catch();
 			}
