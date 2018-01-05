@@ -11,7 +11,7 @@ module.exports = class EmbedGenrator {
 		return newEmbed;
 	}
 	summoner(CONFIG, apiobj) {
-		if (!UTILS.exists(summoner.id)) {
+		if (!UTILS.exists(apiobj.id)) {
 			let newEmbed = new Discord.RichEmbed();
 			newEmbed.setTitle("This summoner does not exist.");
 			newEmbed.setDescription("Please revise your request.");
