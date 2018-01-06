@@ -35,6 +35,27 @@ module.exports = class LOLAPI {
 			});
 		});
 	}
+	getStatic(region, path, options) {//data dragon
+		return new Promise((resolve, reject) => {
+			UTILS.assert(UTILS.exists(region));
+			let url = "https://ddragon.riotgames.com/" + path;
+			this.request(url, function (error, response, body) {
+				if (error != undefined && error != null) {
+					reject(error);
+				}
+				else {
+					try {
+						UTILS.output(url + " : " + body);
+						const answer = JSON.parse(body);
+						resolve(answer);
+					}
+					catch (e) {
+						reject(e);
+					}
+				}
+			});
+		});
+	}
 	//get(path, options) {}
 	getSummonerIDFromName(region, username) {
 		return this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {});
