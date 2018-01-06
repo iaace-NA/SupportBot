@@ -35,7 +35,7 @@ module.exports = class LOLAPI {
 			});
 		});
 	}
-	getStatic(region, path, options) {//data dragon
+	getStatic(path) {//data dragon
 		return new Promise((resolve, reject) => {
 			UTILS.assert(UTILS.exists(region));
 			let url = "https://ddragon.riotgames.com/" + path;
