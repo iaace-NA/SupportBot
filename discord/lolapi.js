@@ -37,7 +37,7 @@ module.exports = class LOLAPI {
 	}
 	getStatic(path) {//data dragon
 		return new Promise((resolve, reject) => {
-			let url = "https://ddragon.riotgames.com/" + path;
+			let url = "https://ddragon.leagueoflegends.com/" + path;
 			this.request(url, function (error, response, body) {
 				if (error != undefined && error != null) {
 					reject(error);
