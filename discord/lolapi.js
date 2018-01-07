@@ -13,20 +13,6 @@ module.exports = class LOLAPI {
 	}
 	get(region, path, options) {
 		return new Promise((resolve, reject) => {
-			region = {
-				"BR": "br1",
-				"EUNE": "eun1",
-				"EUW": "euw1",
-				"JP": "jp1",
-				"KR": "kr",
-				"LAN": "la1",
-				"LAS": "la2",
-				"NA": "na1",
-				"OCE": "oc1",
-				"tr": "tr1",
-				"ru": "ru",
-				"pbe": "pbe1"
-			}[region.toUpperCase()];
 			UTILS.assert(UTILS.exists(region));
 			let url = "https://" + region + ".api.riotgames.com/lol/" + path + "?api_key=" + this.CONFIG.RIOT_API_KEY;
 			for (let i in options) {
@@ -38,6 +24,7 @@ module.exports = class LOLAPI {
 				}
 				else {
 					try {
+						UTILS.output(url + " : " + body);
 						const answer = JSON.parse(body);
 						resolve(answer);
 					}
@@ -47,5 +34,32 @@ module.exports = class LOLAPI {
 				}
 			});
 		});
+	}
+	getStatic(path) {//data dragon
+		return new Promise((resolve, reject) => {
+			let url = "https://ddragon.leagueoflegends.com/" + path;
+			this.request(url, function (error, response, body) {
+				if (error != undefined && error != null) {
+					reject(error);
+				}
+				else {
+					try {
+						UTILS.output(url + " : " + body);
+						const answer = JSON.parse(body);
+						resolve(answer);
+					}
+					catch (e) {
+						reject(e);
+					}
+				}
+			});
+		});
+	}
+	//get(path, options) {}
+	getSummonerIDFromName(region, username) {
+		return this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {});
+	}
+	getRanks(region, summonerID) {
+		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {});
 	}
 }
