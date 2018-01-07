@@ -19,7 +19,7 @@ module.exports = class EmbedGenrator {
 		}
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(apiobj.name);
-		newEmbed.setThumbnail(CONFIG.STATIC.S_ICONS + apiobj.profileIconId + ".png");
+		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + apiobj.profileIconId + ".png");
 		newEmbed.setDescription("Level " + apiobj.summonerLevel + "\nSummoner ID: " + apiobj.id + "\nAccount ID: " + apiobj.accountId);
 		newEmbed.setTimestamp(new Date(apiobj.revisionDate));
 		newEmbed.setFooter("Last change detected at ");
@@ -34,7 +34,7 @@ module.exports = class EmbedGenrator {
 		}
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name);
-		newEmbed.setThumbnail(CONFIG.STATIC.S_ICONS + summoner.profileIconId + ".png");
+		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		newEmbed.setDescription("Level " + summoner.summonerLevel);
 		for (let b in ranks) {
 			newEmbed.addField({

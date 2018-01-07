@@ -19,6 +19,18 @@ catch(e) {
 }
 
 const LOLAPI = new (require("./discord/lolapi.js"))(CONFIG);
+LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
+	UTILS.output("DD STATIC RESOURCES LOADED");
+	CONFIG.STATIC = result;
+	if (process.argv.length === 2) {//production key
+		UTILS.output("PRODUCTION LOGIN");
+		client.login(CONFIG.DISCORD_API_KEY_PRODUCTION).catch(console.error);
+	}
+	else {//non-production key
+		UTILS.output("DEVELOPMENT LOGIN");
+		client.login(CONFIG.DISCORD_API_KEY_DEVELOPMENT).catch(console.error);
+	}
+}).catch(e => { throw e; });
 
 client.on("ready", function () {
 	UTILS.output("discord user login success");
@@ -36,12 +48,5 @@ client.on("message", function (msg) {
 		console.error(e);
 	}
 });
-if (process.argv.length === 2) {//production key
-	UTILS.output("PRODUCTION LOGIN");
-	client.login(CONFIG.DISCORD_API_KEY_PRODUCTION).catch(console.error);
-}
-else {//non-production key
-	UTILS.output("DEVELOPMENT LOGIN");
-	client.login(CONFIG.DISCORD_API_KEY_DEVELOPMENT).catch(console.error);
-}
+
 
