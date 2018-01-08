@@ -46,7 +46,7 @@ module.exports = class EmbedGenrator {
 		let cm_description = [];
 		let cm_total = 0;
 		for (let i = 0; i < championmastery.length; ++i) {
-			if (i < 3) cm_description.push((i + 1) + ". [" + championmastery[i].championLevel + "] " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].name + ": " + championmastery[i].championPoints);
+			if (i < 3) cm_description.push((i + 1) + ". [M" + championmastery[i].championLevel + "] " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].name + ": " + UTILS.numberWithCommas(championmastery[i].championPoints) + "pts");
 			cm_total += championmastery[i].championLevel;
 		}
 		if (cm_description.length > 0) newEmbed.addField("Champion Mastery: " + cm_total, cm_description.join("\n"));
