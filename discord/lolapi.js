@@ -62,4 +62,7 @@ module.exports = class LOLAPI {
 	getRanks(region, summonerID) {
 		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {});
 	}
+	getRanks(region, summonerID) {
+		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, {});
+	}
 }
