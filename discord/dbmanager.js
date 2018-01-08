@@ -15,7 +15,8 @@ module.exports = class DBManager {//mongodb
 			revisionDate: Number,//epoch time
 			id: Number,
 			accountId: Number,
-			lastUpdated: Number
+			lastUpdated: Number,
+			region: String
 		});
 		let that = this;
 		this.userModel = this.namecache.model("SummonerModel", this.userSchema);
@@ -33,8 +34,9 @@ module.exports = class DBManager {//mongodb
 	}
 	addLink(uid, summoner) {
 		return new Promise((resolve, reject) => {
+			if (!UTILS.exists(summoner.region)) reject("Error: region property undefined for summoner object.");
 			this.userModel.findOne({ accountId: summoner.accountId }, (err, doc) => {//see if summoner doc is cached already
-				if (err) reject(err);
+				if (err) return reject(err);
 				if (UTILS.exists(doc)) {//summoner is already cached
 					let new_link = new this.DefaultUser({
 						"uid": uid,
@@ -43,7 +45,15 @@ module.exports = class DBManager {//mongodb
 					new_link.save(e => { e ? reject(e) : resolve() });
 				}
 				else {
-					reject("Error: The summoner could not be found in our database. Please use `<region> <summoner name>`, then rerun this command.");
+					let new_summoner = new this.SummonerModel(summoner);
+					new_summoner.save((e, doc) => {
+						if (e) return reject(e);
+						let new_link = new this.DefaultUser({
+							"uid": uid,
+							userref: doc.id()
+						});
+						new_link.save(e => { e ? reject(e) : resolve() });
+					});
 				}
 			});
 		});
@@ -51,14 +61,14 @@ module.exports = class DBManager {//mongodb
 	getLink(uid) {
 		return new Promise((resolve, reject) => {
 			this.linkModel.findOne({ uid: uid }, (err, doc) => {
-				if (err) reject(err);
+				if (err) return reject(err);
 				if (UTILS.exists(doc)) {
 					this.userModel.findById(doc.id(), (err, doc) => {
-						if (err) reject(err);
+						if (err) return reject(err);
 						if (UTILS.assert(UTILS.exists(doc))) {
-							resolve(doc.toObject);
+							resolve(doc.toObject());
 						}
-				});
+					});
 				}
 			});
 		});
