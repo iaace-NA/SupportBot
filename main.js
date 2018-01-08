@@ -6,7 +6,7 @@ let discordcommands = require("./discord/discordcommands.js");
 
 const UTILS = new (require("./utils.js"))();
 
-const client = new Discord.Client({});
+const client = new Discord.Client({ disabledEvents: ["TYPING_START"] });
 
 let CONFIG;
 try{
