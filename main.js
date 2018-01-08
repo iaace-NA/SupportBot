@@ -22,7 +22,7 @@ const LOLAPI = new (require("./discord/lolapi.js"))(CONFIG);
 LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 	UTILS.output("DD STATIC RESOURCES LOADED");
 	CONFIG.STATIC = result;
-	Promise.all([LOLAPI.get("na1", "static-data/v3/champions", { locale: "en_US", dataById: true })]).then(results => {
+	Promise.all([LOLAPI.get("na1", "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" })]).then(results => {
 		CONFIG.STATIC.CHAMPIONS = results[0].data;
 		UTILS.output("API STATIC RESOURCES LOADED");
 		if (process.argv.length === 2) {//production key
