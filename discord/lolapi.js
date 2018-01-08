@@ -69,7 +69,7 @@ module.exports = class LOLAPI {
 	}
 	getStaticChampions(region) {
 		return new Promise((resolve, reject) => {
-			const path = "../data/static-api-cache/champions" + region + ".json";
+			const path = "./data/static-api-cache/champions" + region + ".json";
 			const exists = fs.existsSync(path);
 			if ((exists && fs.statSync(path).mtime.getTime() < new Date().getTime() - (12 * 3600 * 1000)) ||
 				!exists) {//expired
