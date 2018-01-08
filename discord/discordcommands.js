@@ -37,9 +37,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			}).catch(console.error);
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "gl", CONFIG.DISCORD_COMMAND_PREFIX + "getlink"], false, false, (original, index, parameter) => {
-			console.trace();
 			db.getLink(msg.author.id).then(result => {
-				console.trace();
 				if (UTILS.exists(result)) reply("You're `" + result.name + "`");
 				else reply("No records for " + msg.author.id);
 			}).catch(console.error);
