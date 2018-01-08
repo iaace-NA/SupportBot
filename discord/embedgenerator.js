@@ -25,7 +25,7 @@ module.exports = class EmbedGenrator {
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;
 	}
-	detailedSummoner(CONFIG, summoner, ranks, region) {
+	detailedSummoner(CONFIG, summoner, ranks, championmastery, region) {
 		if (!UTILS.exists(summoner.id)) {
 			let newEmbed = new Discord.RichEmbed();
 			newEmbed.setTitle("This summoner does not exist.");
