@@ -36,6 +36,9 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				db.addLink(msg.author.id, result).then(() => { reply("Your discord account is now linked to " + result.name); }).catch((e) => { reply("Something went wrong."); throw e; });
 			}).catch(console.error);
 		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "unlink "], true, false, (original, index, parameter) => {
+			db.removeLink(msg.author.id).then(result => { reply(result); }).catch(e => { reply("An error has occurred."); throw e; });
+		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "gl", CONFIG.DISCORD_COMMAND_PREFIX + "getlink"], false, false, (original, index, parameter) => {
 			db.getLink(msg.author.id).then(result => {
 				if (UTILS.exists(result)) reply("You're `" + result.name + "`");
