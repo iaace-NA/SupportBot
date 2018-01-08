@@ -64,7 +64,7 @@ module.exports = class DBManager {//mongodb
 			this.linkModel.findOne({ uid: uid }, (err, doc) => {
 				if (err) return reject(err);
 				if (UTILS.exists(doc)) {
-					this.userModel.findById(doc.id(), (err, doc) => {
+					this.userModel.findById(doc.toObject._id, (err, doc) => {
 						if (err) return reject(err);
 						if (UTILS.assert(UTILS.exists(doc))) {
 							resolve(doc.toObject());
