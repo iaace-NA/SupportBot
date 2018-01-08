@@ -52,7 +52,24 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					}).catch(console.error);
 				}).catch();
 			}
-			catch(e) {}
+			catch (e) {
+				try {
+					const region = assert_region(parameter, false);
+					db.getLink(msg.author.id).then(result => {
+						let username = msg.author.username;
+						if (UTILS.exists(result)) {
+							username = result.name;
+						}
+						lolapi.getSummonerIDFromName(region, username).then(result => {
+							result.region = region;
+							lolapi.getRanks(region, result.id).then(result2 => {
+								reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, parameter));
+							}).catch(console.error);
+						}).catch();
+					}).catch(console.error);
+				}
+				catch(e) {}
+			}
 		});
 	}
 	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) {//respondable server message only
