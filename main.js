@@ -17,7 +17,7 @@ catch(e) {
 	console.error(e);
 	process.exit(1);
 }
-
+const DB = new (require("./discord/dbmanager.js"))(CONFIG);
 const LOLAPI = new (require("./discord/lolapi.js"))(CONFIG);
 LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 	UTILS.output("DD STATIC RESOURCES LOADED");
@@ -42,7 +42,7 @@ client.on("disconnect", function () {
 });
 client.on("message", function (msg) {
 	try {
-		discordcommands(CONFIG, client, LOLAPI, msg);
+		discordcommands(CONFIG, client, LOLAPI, msg, DB);
 	}
 	catch (e) {
 		console.error(e);

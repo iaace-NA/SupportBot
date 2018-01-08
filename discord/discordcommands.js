@@ -3,7 +3,7 @@ let embedgenerator = new (require("./embedgenerator.js"))();
 let textgenerator = new (require("./textgenerator.js"))();
 let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
-module.exports = function (CONFIG, client, lolapi, msg) {
+module.exports = function (CONFIG, client, lolapi, msg, db) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 
 	if ((UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) || !UTILS.exists(msg.guild)) {//respondable server message or PM
@@ -29,10 +29,24 @@ module.exports = function (CONFIG, client, lolapi, msg) {
 				reply_embed(embedgenerator.summoner(CONFIG, result));
 			}).catch(console.error);
 		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "link "], true, false, (original, index, parameter) => {
+			let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
+			lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
+				result.region = region;
+				db.addLink(msg.author.id, result).then(() => { reply("Your discord account is now linked to " + result.name); }).catch((e) => { reply("Something went wrong."); throw e; });
+			}).catch(console.error);
+		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "gl", CONFIG.DISCORD_COMMAND_PREFIX + "getlink"], false, false, (original, index, parameter) => {
+			db.getLink(msg.author.id).then(result => {
+				if (UTILS.exists(result)) reply("You're `" + result.name + "`");
+				else reply("No records for " + msg.author.id);
+			}).catch(console.error);
+		});
 		command([""], true, false, (original, index, parameter) => {
 			try {
 				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);
 				lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
+					result.region = region;
 					lolapi.getRanks(region, result.id).then(result2 => {
 						reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, parameter.substring(0, parameter.indexOf(" "))));
 					}).catch(console.error);
