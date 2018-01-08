@@ -46,16 +46,18 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			}).catch(console.error);
 		});
 		command([""], true, false, (original, index, parameter) => {
-			try {
-				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);
+			try {//username provided
+				const region = (parameter.substring(0, parameter.indexOf(" ")), false);
 				lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
 					result.region = region;
 					lolapi.getRanks(region, result.id).then(result2 => {
-						reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, parameter.substring(0, parameter.indexOf(" "))));
+						lolapi.getChampionMastery(region, result.id).then(result3 => {
+							reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter.substring(0, parameter.indexOf(" "))));
+						});
 					}).catch(console.error);
 				}).catch();
 			}
-			catch (e) {
+			catch (e) {//username not provided
 				try {
 					const region = assert_region(parameter, false);
 					db.getLink(msg.author.id).then(result => {
@@ -66,7 +68,9 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 						lolapi.getSummonerIDFromName(region, username).then(result => {
 							result.region = region;
 							lolapi.getRanks(region, result.id).then(result2 => {
-								reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, parameter));
+								lolapi.getChampionMastery(region, result.id).then(result3 => {
+									reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter.substring(0, parameter.indexOf(" "))));
+								});
 							}).catch(console.error);
 						}).catch();
 					}).catch(console.error);
