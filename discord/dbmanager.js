@@ -4,10 +4,10 @@ module.exports = class DBManager {//mongodb
 	constructor(CONFIG) {
 		this.namecache = require("mongoose");
 		this.namecache.connect("mongodb://localhost/namecache");//cache of summoner object name lookups
-		this.namecache.on("error", function (e) { throw e; });
+		this.namecache.connection.on("error", function (e) { throw e; });
 		this.discordlink = require("mongoose");
 		this.discordlink.connect("mongodb://localhost/discordlink");//links discord uids to namecache
-		this.discordlink.on("error", function (e) { throw e; });
+		this.discordlink.connection.on("error", function (e) { throw e; });
 		this.userSchema = new this.namecache.Schema({
 			profileIconId: Number,
 			name: String,
