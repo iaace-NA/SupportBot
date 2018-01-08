@@ -47,7 +47,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		});
 		command([""], true, false, (original, index, parameter) => {
 			try {//username provided
-				const region = (parameter.substring(0, parameter.indexOf(" ")), false);
+				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);
 				lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
 					result.region = region;
 					lolapi.getRanks(region, result.id).then(result2 => {
