@@ -70,6 +70,9 @@ module.exports = class DBManager {//mongodb
 						}
 					});
 				}
+				else {
+					resolve(null);
+				}
 			});
 		});
 	}
