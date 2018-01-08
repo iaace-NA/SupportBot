@@ -41,7 +41,7 @@ module.exports = class DBManager {//mongodb
 				if (UTILS.exists(doc)) {//summoner is already cached
 					let new_link = new that.linkModel({
 						"uid": uid,
-						userref: doc.id()
+						userref: doc.id
 					});
 					new_link.save(e => { e ? reject(e) : resolve() });
 				}
@@ -51,7 +51,7 @@ module.exports = class DBManager {//mongodb
 						if (e) return reject(e);
 						let new_link = new that.linkModel({
 							"uid": uid,
-							userref: doc.id()
+							userref: doc.id
 						});
 						new_link.save(e => { e ? reject(e) : resolve() });
 					});
