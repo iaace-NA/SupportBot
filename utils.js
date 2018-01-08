@@ -35,5 +35,6 @@ module.exports = class UTILS {
 		if (!condition) {
 			throw new Error("assertion false");
 		}
+		return true;
 	}
 }
