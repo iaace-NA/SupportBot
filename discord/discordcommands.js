@@ -69,7 +69,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 							result.region = region;
 							lolapi.getRanks(region, result.id).then(result2 => {
 								lolapi.getChampionMastery(region, result.id).then(result3 => {
-									reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter.substring(0, parameter.indexOf(" "))));
+									reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter));
 								});
 							}).catch(console.error);
 						}).catch();
