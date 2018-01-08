@@ -39,21 +39,29 @@ module.exports = class DBManager {//mongodb
 			this.userModel.findOne({ accountId: summoner.accountId }, (err, doc) => {//see if summoner doc is cached already
 				if (err) return reject(err);
 				if (UTILS.exists(doc)) {//summoner is already cached
-					let new_link = new that.linkModel({
-						"uid": uid,
-						userref: doc.toObject()._id
-					});
-					new_link.save(e => { e ? reject(e) : resolve() });
+					savelink(doc.toObject()._id);
 				}
 				else {
 					let new_summoner = new that.userModel(summoner);
 					new_summoner.save((e, doc) => {
 						if (e) return reject(e);
-						let new_link = new that.linkModel({
-							"uid": uid,
-							userref: doc.toObject()._id
-						});
-						new_link.save(e => { e ? reject(e) : resolve() });
+						savelink(doc.toObject()._id);
+					});
+				}
+				function savelink(id) {
+					that.linkModel.findOne({ uid: uid }, (err, doc) => {
+						if (UTILS.exists(doc)) {//update link records
+							doc.uid = uid;
+							doc.userref = id;
+							doc.save(e => { e ? reject(e) : resolve() });
+						}
+						else {//create new link record
+							let new_link = new that.linkModel({
+								"uid": uid,
+								userref: id
+							});
+							new_link.save(e => { e ? reject(e) : resolve() });
+						}
 					});
 				}
 			});
