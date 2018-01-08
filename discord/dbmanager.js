@@ -33,22 +33,23 @@ module.exports = class DBManager {//mongodb
 		return newEmbed;
 	}
 	addLink(uid, summoner) {
+		let that = this;
 		return new Promise((resolve, reject) => {
 			if (!UTILS.exists(summoner.region)) reject("Error: region property undefined for summoner object.");
 			this.userModel.findOne({ accountId: summoner.accountId }, (err, doc) => {//see if summoner doc is cached already
 				if (err) return reject(err);
 				if (UTILS.exists(doc)) {//summoner is already cached
-					let new_link = new this.DefaultUser({
+					let new_link = new that.DefaultUser({
 						"uid": uid,
 						userref: doc.id()
 					});
 					new_link.save(e => { e ? reject(e) : resolve() });
 				}
 				else {
-					let new_summoner = new this.SummonerModel(summoner);
+					let new_summoner = new that.SummonerModel(summoner);
 					new_summoner.save((e, doc) => {
 						if (e) return reject(e);
-						let new_link = new this.DefaultUser({
+						let new_link = new that.DefaultUser({
 							"uid": uid,
 							userref: doc.id()
 						});
