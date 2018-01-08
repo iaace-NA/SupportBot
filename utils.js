@@ -17,9 +17,7 @@ module.exports = class UTILS {
 			parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 			return parts.join(".");
 		}
-		else {
-			return "";
-		}
+		else return "";
 	}
 	round(num, decimal) {
 		return Math.round(num * Math.pow(10, decimal)) / Math.pow(10, decimal);
