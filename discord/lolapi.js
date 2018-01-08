@@ -46,8 +46,9 @@ module.exports = class LOLAPI {
 				}
 				else {
 					try {
-						UTILS.output(url + " : " + body);
 						const answer = JSON.parse(body);
+						if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
+						else UTILS.output(url);
 						resolve(answer);
 					}
 					catch (e) {
