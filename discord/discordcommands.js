@@ -37,7 +37,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			}).catch(console.error);
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "gl", CONFIG.DISCORD_COMMAND_PREFIX + "getlink"], false, false, (original, index, parameter) => {
-			db.getLink(msg.author.id).then(result => { reply("You're `" + result.name + "`") });
+			db.getLink(msg.author.id).then(result => { reply("You're `" + result.name + "`"); }).catch(console.error);
 		});
 		command([""], true, false, (original, index, parameter) => {
 			try {
