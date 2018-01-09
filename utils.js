@@ -8,12 +8,8 @@ module.exports = class UTILS {
 		}
 	}
 	exists(anyObject) {//general utility function
-		if (anyObject != null && anyObject != undefined) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		if (anyObject != null && anyObject != undefined) return true;
+		else return false;
 	}
 	numberWithCommas(x) {//general utility function
 		if (this.exists(x)) {
@@ -21,20 +17,14 @@ module.exports = class UTILS {
 			parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 			return parts.join(".");
 		}
-		else {
-			return "";
-		}
+		else return "";
 	}
 	round(num, decimal) {
 		return Math.round(num * Math.pow(10, decimal)) / Math.pow(10, decimal);
 	}
 	assert(condition) {
-		if (typeof (condition) != "boolean") {
-			throw new Error("asserting non boolean value: " + typeof(condition));
-		}
-		if (!condition) {
-			throw new Error("assertion false");
-		}
+		if (typeof (condition) != "boolean") throw new Error("asserting non boolean value: " + typeof(condition));
+		if (!condition) throw new Error("assertion false");
 		return true;
 	}
 }

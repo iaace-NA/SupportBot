@@ -6,7 +6,7 @@ let discordcommands = require("./discord/discordcommands.js");
 
 const UTILS = new (require("./utils.js"))();
 
-const client = new Discord.Client({});
+const client = new Discord.Client({ disabledEvents: ["TYPING_START"] });
 
 let CONFIG;
 try{
@@ -22,14 +22,18 @@ const LOLAPI = new (require("./discord/lolapi.js"))(CONFIG);
 LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 	UTILS.output("DD STATIC RESOURCES LOADED");
 	CONFIG.STATIC = result;
-	if (process.argv.length === 2) {//production key
-		UTILS.output("PRODUCTION LOGIN");
-		client.login(CONFIG.DISCORD_API_KEY_PRODUCTION).catch(console.error);
-	}
-	else {//non-production key
-		UTILS.output("DEVELOPMENT LOGIN");
-		client.login(CONFIG.DISCORD_API_KEY_DEVELOPMENT).catch(console.error);
-	}
+	Promise.all([LOLAPI.getStaticChampions("na1")]).then(results => {
+		CONFIG.STATIC.CHAMPIONS = results[0].data;
+		UTILS.output("API STATIC RESOURCES LOADED");
+		if (process.argv.length === 2) {//production key
+			UTILS.output("PRODUCTION LOGIN");
+			client.login(CONFIG.DISCORD_API_KEY_PRODUCTION).catch(console.error);
+		}
+		else {//non-production key
+			UTILS.output("DEVELOPMENT LOGIN");
+			client.login(CONFIG.DISCORD_API_KEY_DEVELOPMENT).catch(console.error);
+		}
+	}).catch(e => { throw e; });
 }).catch(e => { throw e; });
 
 client.on("ready", function () {

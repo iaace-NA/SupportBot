@@ -84,4 +84,17 @@ module.exports = class DBManager {//mongodb
 			});
 		});
 	}
+	removeLink(uid) {
+		return new Promise((resolve, reject) => {
+			this.linkModel.findOne({ uid: uid }, (err, doc) => {
+				if (err) return reject(err);
+				if (UTILS.exists(doc)) {
+					doc.remove(() => { resolve("Link removed."); });
+				}
+				else {
+					resolve("You weren't linked.");
+				}
+			});
+		});
+	}
 }

@@ -1,5 +1,6 @@
 "use strict";
 const UTILS = new (require("../utils.js"))();
+const fs = require("fs");
 module.exports = class LOLAPI {
 	constructor(INIT_CONFIG) {
 		this.CONFIG = INIT_CONFIG;
@@ -24,8 +25,9 @@ module.exports = class LOLAPI {
 				}
 				else {
 					try {
-						UTILS.output(url + " : " + body);
 						const answer = JSON.parse(body);
+						if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
+						else UTILS.output(url);
 						resolve(answer);
 					}
 					catch (e) {
@@ -44,8 +46,9 @@ module.exports = class LOLAPI {
 				}
 				else {
 					try {
-						UTILS.output(url + " : " + body);
 						const answer = JSON.parse(body);
+						if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
+						else UTILS.output(url);
 						resolve(answer);
 					}
 					catch (e) {
@@ -61,5 +64,30 @@ module.exports = class LOLAPI {
 	}
 	getRanks(region, summonerID) {
 		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {});
+	}
+	getChampionMastery(region, summonerID) {
+		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, {});
+	}
+	getStaticChampions(region) {
+		return new Promise((resolve, reject) => {
+			const path = "./data/static-api-cache/champions" + region + ".json";
+			const exists = fs.existsSync(path);
+			if ((exists && fs.statSync(path).mtime.getTime() < new Date().getTime() - (12 * 3600 * 1000)) ||
+				!exists) {//expired
+				this.get(region, "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" }).then((result) => {
+					fs.writeFile(path, JSON.stringify(result), err => {
+						UTILS.output("Cached version of " + region + " champions.json is expired or non-existant.");
+						if (err) throw err;
+						resolve(result);
+					});
+				}).catch(e => { reject(e); });
+			}
+			else {//cached
+				fs.readFile(path, "utf-8", (err, data) => {
+					UTILS.output("Cached version of " + region + " champions.json loaded.");
+					resolve(JSON.parse(data));
+				});
+			}
+		});
 	}
 }
