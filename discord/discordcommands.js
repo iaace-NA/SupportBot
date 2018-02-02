@@ -127,6 +127,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			try {//username provided
 				const region = assert_region(parameter.substring(trigger_array[index].length, parameter.indexOf(" ")), false);//see if there is a region
+				UTILS.output("cGU callback point 1");
 				callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")));
 			}
 			catch (e) {//username not provided
@@ -137,6 +138,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 						if (UTILS.exists(result)) {
 							username = result.name;
 						}
+						UTILS.output("cGU callback point 2");
 						callback(region, username, parameter);
 					}).catch(console.error);
 				}
