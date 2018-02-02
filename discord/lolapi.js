@@ -18,10 +18,10 @@ module.exports = class LOLAPI {
 			data: data,
 			expiration: new Date().getTime() + 120000 //2 min cache expiration time (based on API key limit)
 		}
-		maintainCache();
+		this.maintainCache();
 	}
 	checkCache(url) {//return the data if it exists, otherwise return false
-		maintainCache();
+		this.maintainCache();
 		if (!UTILS.exists(this.cache[url])) {//cache miss
 			return false;
 		}
@@ -49,7 +49,7 @@ module.exports = class LOLAPI {
 			for (let i in options) {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
-			let cache_answer = checkCache(url);//access cache
+			let cache_answer = this.checkCache(url);//access cache
 			if (cache_answer === false) {
 				this.request(url, function (error, response, body) {
 					if (error != undefined && error != null) {
