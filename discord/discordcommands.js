@@ -49,7 +49,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			reply("The cache size is " + lolapi.cacheSize());
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "matchhistory", CONFIG.DISCORD_COMMAND_PREFIX + "mh"])
-		commandGuessUsername([""], false, (region, username) => {
+		commandGuessUsername([""], false, (region, username, parameter) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
 				lolapi.getRanks(region, result.id).then(result2 => {
@@ -59,7 +59,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				}).catch(console.error);
 			}).catch();
 		});
-		commandGuessUsername(["mh "], false, (region, username) => {
+		commandGuessUsername(["mh "], false, (region, username, parameter) => {
 			reply("region: " + region + " username: " + username);
 		});
 	}
@@ -127,7 +127,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			try {//username provided
 				const region = assert_region(parameter.substring(trigger_array[index].length, parameter.indexOf(" ")), false);//see if there is a region
-				callback(region, parameter.substring(parameter.indexOf(" ") + 1));
+				callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")));
 			}
 			catch (e) {//username not provided
 				try {
@@ -137,7 +137,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 						if (UTILS.exists(result)) {
 							username = result.name;
 						}
-						callback(region, username);
+						callback(region, username, parameter);
 					}).catch(console.error);
 				}
 				catch (e) { }
