@@ -11,30 +11,69 @@ module.exports = class LOLAPI {
 			throw new Error("config.json RIOT_API_KEY required to access riot api.");
 		}
 		this.request = require("request");
+		this.cache = {};
+	}
+	addCache(url, data) {//add data to api cache
+		this.cache[url] = {
+			data: data,
+			expiration: new Date().getTime() + 120000 //2 min cache expiration time (based on API key limit)
+		}
+		this.maintainCache();
+	}
+	checkCache(url) {//return the data if it exists, otherwise return false
+		this.maintainCache();
+		if (!UTILS.exists(this.cache[url])) {//cache miss
+			return false;
+		}
+		else {
+			return this.cache[url].data;
+		}
+	}
+	maintainCache() {//prune old values
+		const now = new Date().getTime();
+		for (let b in this.cache) {
+			if (this.cache[b].expiration < now) {
+				delete this.cache[b];
+			}
+		}
+	}
+	cacheSize() {//check size of cache
+		let size = 0;
+		for (let b in this.cache) ++size;
+		return size;
 	}
 	get(region, path, options) {
+		let that = this;
 		return new Promise((resolve, reject) => {
 			UTILS.assert(UTILS.exists(region));
 			let url = "https://" + region + ".api.riotgames.com/lol/" + path + "?api_key=" + this.CONFIG.RIOT_API_KEY;
 			for (let i in options) {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
-			this.request(url, function (error, response, body) {
-				if (error != undefined && error != null) {
-					reject(error);
-				}
-				else {
-					try {
-						const answer = JSON.parse(body);
-						if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
-						else UTILS.output(url);
-						resolve(answer);
+			let cache_answer = this.checkCache(url);//access cache
+			if (cache_answer === false) {
+				this.request(url, function (error, response, body) {
+					if (error != undefined && error != null) {
+						reject(error);
 					}
-					catch (e) {
-						reject(e);
+					else {
+						try {
+							const answer = JSON.parse(body);
+							if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
+							else UTILS.output("cache miss: " + url);
+							that.addCache(url, answer);
+							resolve(answer);
+						}
+						catch (e) {
+							reject(e);
+						}
 					}
-				}
-			});
+				});
+			}
+			else {
+				UTILS.output("cache hit: " + url);
+				resolve(cache_answer);
+			}
 		});
 	}
 	getStatic(path) {//data dragon

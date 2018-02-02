@@ -1,1 +1,3 @@
 config.json
+/node_modules/
+/data/static-api-cache/
