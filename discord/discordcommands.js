@@ -127,7 +127,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			try {//username provided
 				const region = assert_region(parameter.substring(trigger_array[index].length, parameter.indexOf(" ")), false);//see if there is a region
-				callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(trigger_array[index].length, parameter.indexOf(" ")));
+				callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")));
 			}
 			catch (e) {//username not provided
 				try {
