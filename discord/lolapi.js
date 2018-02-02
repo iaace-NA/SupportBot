@@ -60,6 +60,7 @@ module.exports = class LOLAPI {
 							const answer = JSON.parse(body);
 							if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
 							else UTILS.output("cache miss: " + url);
+							this.addCache(url, answer);
 							resolve(answer);
 						}
 						catch (e) {
