@@ -43,6 +43,7 @@ module.exports = class LOLAPI {
 		return size;
 	}
 	get(region, path, options) {
+		let that = this;
 		return new Promise((resolve, reject) => {
 			UTILS.assert(UTILS.exists(region));
 			let url = "https://" + region + ".api.riotgames.com/lol/" + path + "?api_key=" + this.CONFIG.RIOT_API_KEY;
@@ -60,7 +61,7 @@ module.exports = class LOLAPI {
 							const answer = JSON.parse(body);
 							if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
 							else UTILS.output("cache miss: " + url);
-							this.addCache(url, answer);
+							that.addCache(url, answer);
 							resolve(answer);
 						}
 						catch (e) {
