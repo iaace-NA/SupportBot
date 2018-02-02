@@ -125,6 +125,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		elevated_permissions,//requires owner permissions
 		callback) {//optional callback only if successful
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
+			UTILS.output("parameter is " + parameter);
 			try {//username provided
 				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
 				UTILS.output("cGU callback point 1");
