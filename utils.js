@@ -1,4 +1,5 @@
 "use strict";
+let ta = require("time-ago")();
 module.exports = class UTILS {
 	output(t) {//general utility function
 		if (this.exists(t)) {
@@ -26,5 +27,8 @@ module.exports = class UTILS {
 		if (typeof (condition) != "boolean") throw new Error("asserting non boolean value: " + typeof(condition));
 		if (!condition) throw new Error("assertion false");
 		return true;
+	}
+	ago(text) {
+		return ta.ago(text);
 	}
 }
