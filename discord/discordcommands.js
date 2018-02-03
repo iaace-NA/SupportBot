@@ -60,7 +60,6 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			}).catch();
 		});
 		commandGuessUsername(["mh "], false, (region, username, parameter) => {
-			reply("region: " + region + " username: " + username);
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
 				lolapi.getRecentGames(region, result.accountId).then(matches => {
