@@ -1,6 +1,5 @@
 "use strict";
 const Discord = require("discord.js");
-//let ta = require("time-ago")();
 const UTILS = new (require("../utils.js"))();
 module.exports = class EmbedGenrator {
 	constructor() { }
@@ -11,13 +10,12 @@ module.exports = class EmbedGenrator {
 		return newEmbed;
 	}
 	summoner(CONFIG, apiobj) {
+		let newEmbed = new Discord.RichEmbed();
 		if (!UTILS.exists(apiobj.id)) {
-			let newEmbed = new Discord.RichEmbed();
 			newEmbed.setTitle("This summoner does not exist.");
 			newEmbed.setDescription("Please revise your request.");
 			return newEmbed;
 		}
-		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(apiobj.name);
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + apiobj.profileIconId + ".png");
 		newEmbed.setDescription("Level " + apiobj.summonerLevel + "\nSummoner ID: " + apiobj.id + "\nAccount ID: " + apiobj.accountId);
@@ -26,13 +24,12 @@ module.exports = class EmbedGenrator {
 		return newEmbed;
 	}
 	detailedSummoner(CONFIG, summoner, ranks, championmastery, region) {
+		let newEmbed = new Discord.RichEmbed();
 		if (!UTILS.exists(summoner.id)) {
-			let newEmbed = new Discord.RichEmbed();
 			newEmbed.setTitle("This summoner does not exist.");
 			newEmbed.setDescription("Please revise your request.");
 			return newEmbed;
 		}
-		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name);
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		newEmbed.setDescription("Level " + summoner.summonerLevel);
@@ -55,4 +52,13 @@ module.exports = class EmbedGenrator {
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;
 	}
+	match(CONFIG, summoner, match_meta) {
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setTitle("Basic Match Information");
+		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
+		newEmbed.setDescription(CONFIG.STATIC.CHAMPIONS[match_meta.champion].name + " " + match_meta.role + " " + match_meta.lane);
+		setTimestamp(new Date(match_meta.timestamp));
+		return newEmbed;
+	}
+	detailedMatch(CONFIG, summoner, match_meta, match_info) {}
 }

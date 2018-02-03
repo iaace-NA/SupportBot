@@ -28,7 +28,7 @@ module.exports = class UTILS {
 		if (!condition) throw new Error("assertion false");
 		return true;
 	}
-	ago(text) {
-		return ta.ago(text);
+	ago(date) {
+		return ta.ago(date);
 	}
 }

@@ -129,4 +129,10 @@ module.exports = class LOLAPI {
 			}
 		});
 	}
+	getRecentGames(region, accountID) {
+		return this.get(region, "match/v3/matchlists/by-account/" + accountID + "/recent", {});
+	}
+	getMatchInformation(region, gameID) {
+		return this.get(region, "match/v3/matches/" + gameID, {});
+	}
 }
