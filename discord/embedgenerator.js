@@ -57,7 +57,7 @@ module.exports = class EmbedGenrator {
 		newEmbed.setTitle("Basic Match Information");
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		newEmbed.setDescription(CONFIG.STATIC.CHAMPIONS[match_meta.champion].name + " " + match_meta.role + " " + match_meta.lane);
-		setTimestamp(new Date(match_meta.timestamp));
+		newEmbed.setTimestamp(new Date(match_meta.timestamp));
 		return newEmbed;
 	}
 	detailedMatch(CONFIG, summoner, match_meta, match_info) {}
