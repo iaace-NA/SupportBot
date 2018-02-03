@@ -1,5 +1,5 @@
 "use strict";
-let ta = require("time-ago")();
+let ta = require("./time-ago.js")();
 module.exports = class UTILS {
 	output(t) {//general utility function
 		if (this.exists(t)) {
