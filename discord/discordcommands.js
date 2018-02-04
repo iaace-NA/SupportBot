@@ -48,7 +48,6 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "cs", CONFIG.DISCORD_COMMAND_PREFIX + "cachesize"], false, false, (original, index) => {
 			reply("The cache size is " + lolapi.cacheSize());
 		});
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "matchhistory", CONFIG.DISCORD_COMMAND_PREFIX + "mh"])
 		commandGuessUsername([""], false, (region, username, parameter) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
@@ -59,7 +58,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				}).catch(console.error);
 			}).catch();
 		});
-		commandGuessUsername(["mh "], false, (region, username, parameter) => {
+		commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
 				lolapi.getRecentGames(region, result.accountId).then(matchhistory => {
