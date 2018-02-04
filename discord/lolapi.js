@@ -60,7 +60,7 @@ module.exports = class LOLAPI {
 						try {
 							const answer = JSON.parse(body);
 							if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
-							else UTILS.output("cache miss: " + url.replace(this.CONFIG.RIOT_API_KEY, ""));
+							else UTILS.output("cache miss: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
 							that.addCache(url, answer);
 							resolve(answer);
 						}
@@ -71,7 +71,7 @@ module.exports = class LOLAPI {
 				});
 			}
 			else {
-				UTILS.output("cache hit: " + url.replace(this.CONFIG.RIOT_API_KEY, ""));
+				UTILS.output("cache hit: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
 				resolve(cache_answer);
 			}
 		});
