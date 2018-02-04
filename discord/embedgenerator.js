@@ -1,6 +1,47 @@
 "use strict";
 const Discord = require("discord.js");
 const UTILS = new (require("../utils.js"))();
+const queues = {
+	"0": "Custom",
+	"70": "SR One for All",
+	"72": "HA 1v1 Snowdown Showdown",
+	"73": "HA 2v2 Snowdown Showdown",
+	"75": "SR 6v6 Hexakill",
+	"76": "SR URF",
+	"78": "HA One For All: Mirror",
+	"83": "SR Co-op vs AI URF",
+	"98": "TT 6v6 Hexakill",
+	"100": "BB 5v5 ARAM",
+	"310": "SR Nemesis",
+	"313": "SR Black Market Brawlers",
+	"317": "CS Definitely Not Dominion",
+	"325": "SR All Random",
+	"400": "SR Draft",
+	"420": "SR Ranked Solo", 
+	"430": "SR Blind",
+	"440": "SR Ranked Flex",
+	"450": "HA ARAM",
+	"460": "TT Blind",
+	"470": "TT Ranked Flex",
+	"600": "SR Blood Hunt",
+	"610": "CR Dark Star: Singularity",
+	"800": "TT Co-op vs AI Intermediate",
+	"810": "TT Co-op vs AI Intro",
+	"820": "TT Co-op vs AI Beginner",
+	"830": "SR Co-op vs AI Intro",
+	"840": "SR Co-op vs AI Beginner",
+	"850": "SR Co-op vs AI Intermediate",
+	"900": "SR ARURF",
+	"910": "CS Ascension",
+	"920": "HA Legend of the Poro King",
+	"940": "SR Nexus Siege",
+	"950": "SR Doom Bots Voting",
+	"960": "SR Doom Bots Standard",
+	"980": "VCP Star Guardian Invasion: Normal",
+	"990": "VCP Star Guardian Invasion: Onslaught",
+	"1000": "O Project: Hunters",
+	"1010": "SR Snow ARURF"
+};
 module.exports = class EmbedGenrator {
 	constructor() { }
 	test() {
@@ -60,10 +101,10 @@ module.exports = class EmbedGenrator {
 		for (let i = 0; i < match_meta.length && i < 5; ++i) {
 			const KDA = UTILS.KDA(summoner.id, matches[i]);
 			const stats = UTILS.stats(summoner.id, matches[i]);
-			newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "WIN" : "LOSS") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " " + (UTILS.english(match_meta[i].role) == "None" ? "" : UTILS.english(match_meta[i].role)) + " " + UTILS.english(match_meta[i].lane), "lv. `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\tKDA:`" + (UTILS.round(KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KDA, 2)) + "`\tcs:`" + stats.totalMinionsKilled + "`\tg:`" + UTILS.gold(stats.goldEarned) + "`\n`" + UTILS.standardTimestamp(matches[i].gameDuration) + "`\t" + UTILS.ago(new Date(match_meta[i].timestamp)));
+			newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "WIN" : "LOSS") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " " + (UTILS.english(match_meta[i].role) == "None" ? "" : UTILS.english(match_meta[i].role)) + " " + UTILS.english(match_meta[i].lane), "lv. `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\tKDA:`" + (UTILS.round(KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KDA, 2)) + "`\tcs:`" + stats.totalMinionsKilled + "`\tg:`" + UTILS.gold(stats.goldEarned) + "`\n`" + queues[matches[i].queueId + ""] + "\t" + UTILS.standardTimestamp(matches[i].gameDuration) + "`\t" + UTILS.ago(new Date(match_meta[i].timestamp)));
 			// champion
 			// match result
-			//queue
+			// queue
 			// level
 			//[items]
 			// KDA
