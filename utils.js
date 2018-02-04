@@ -41,7 +41,8 @@ module.exports = class UTILS {
 		return {
 			K: stats.kills,
 			D: stats.deaths,
-			A: stats.assists
+			A: stats.assists,
+			KDA: (stats.kills + stats.assists) / stats.deaths
 		};
 	}
 	determineWin(summonerID, match) {
