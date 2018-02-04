@@ -48,38 +48,26 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "cs", CONFIG.DISCORD_COMMAND_PREFIX + "cachesize"], false, false, (original, index) => {
 			reply("The cache size is " + lolapi.cacheSize());
 		});
-		command([""], true, false, (original, index, parameter) => {
-			try {//username provided
-				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);
-				lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
-					result.region = region;
-					lolapi.getRanks(region, result.id).then(result2 => {
-						lolapi.getChampionMastery(region, result.id).then(result3 => {
-							reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter.substring(0, parameter.indexOf(" "))));
-						});
-					}).catch(console.error);
-				}).catch();
-			}
-			catch (e) {//username not provided
-				try {
-					const region = assert_region(parameter, false);
-					db.getLink(msg.author.id).then(result => {
-						let username = msg.author.username;
-						if (UTILS.exists(result)) {
-							username = result.name;
-						}
-						lolapi.getSummonerIDFromName(region, username).then(result => {
-							result.region = region;
-							lolapi.getRanks(region, result.id).then(result2 => {
-								lolapi.getChampionMastery(region, result.id).then(result3 => {
-									reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter));
-								});
-							}).catch(console.error);
-						}).catch();
-					}).catch(console.error);
-				}
-				catch(e) {}
-			}
+		commandGuessUsername([""], false, (region, username, parameter) => {
+			lolapi.getSummonerIDFromName(region, username).then(result => {
+				result.region = region;
+				lolapi.getRanks(region, result.id).then(result2 => {
+					lolapi.getChampionMastery(region, result.id).then(result3 => {
+						reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter));
+					});
+				}).catch(console.error);
+			}).catch();
+		});
+		commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter) => {
+			lolapi.getSummonerIDFromName(region, username).then(result => {
+				result.region = region;
+				lolapi.getRecentGames(region, result.accountId).then(matchhistory => {
+					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) reply("No recent matches found for `" + username + "`.");
+					lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => { return m.gameId; }).slice(0, 5)).then(matches => {
+						reply_embed(embedgenerator.match(CONFIG, result, matchhistory.matches, matches));
+					});
+				});
+			});
 		});
 	}
 	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) {//respondable server message only
@@ -138,6 +126,30 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			}
 		}
 		return false;
+	}
+
+	function commandGuessUsername(trigger_array,//array of command aliases, prefix needs to be included
+		elevated_permissions,//requires owner permissions
+		callback) {//optional callback only if successful
+		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
+			try {//username provided
+				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
+				callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")));
+			}
+			catch (e) {//username not provided
+				try {
+					const region = assert_region(parameter, false);
+					db.getLink(msg.author.id).then(result => {
+						let username = msg.author.username;
+						if (UTILS.exists(result)) {
+							username = result.name;
+						}
+						callback(region, username, parameter);
+					}).catch(console.error);
+				}
+				catch (e) { }
+			}
+		});
 	}
 
 	function reply(reply_text, callback, error_callback) {

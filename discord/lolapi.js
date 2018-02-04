@@ -60,7 +60,7 @@ module.exports = class LOLAPI {
 						try {
 							const answer = JSON.parse(body);
 							if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
-							else UTILS.output("cache miss: " + url);
+							else UTILS.output("cache miss: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
 							that.addCache(url, answer);
 							resolve(answer);
 						}
@@ -71,7 +71,7 @@ module.exports = class LOLAPI {
 				});
 			}
 			else {
-				UTILS.output("cache hit: " + url);
+				UTILS.output("cache hit: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
 				resolve(cache_answer);
 			}
 		});
@@ -128,5 +128,16 @@ module.exports = class LOLAPI {
 				});
 			}
 		});
+	}
+	getRecentGames(region, accountID) {
+		return this.get(region, "match/v3/matchlists/by-account/" + accountID + "/recent", {});
+	}
+	getMatchInformation(region, gameID) {
+		return this.get(region, "match/v3/matches/" + gameID, {});
+	}
+	getMultipleMatchInformation(region, gameIDs) {
+		let requests = [];
+		for (let i in gameIDs) requests.push(this.getMatchInformation(region, gameIDs[i]));
+		return Promise.all(requests);
 	}
 }
