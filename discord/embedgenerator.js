@@ -58,20 +58,20 @@ module.exports = class EmbedGenrator {
 		newEmbed.setTitle("Recent Games");
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		for (let i = 0; i < match_meta.length && i < 5; ++i) {
-			
-			newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "WIN" : "LOSS") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " " + UTILS.english(match_meta[i].role) + " " + UTILS.english(match_meta[i].lane));
+			const KDA = UTILS.KDA(summoner.id, matches[i]);
+			newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "WIN" : "LOSS") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " " + UTILS.english(match_meta[i].role) + " " + UTILS.english(match_meta[i].lane), KDA.K + "/" + KDA.D + "/" + KDA.A + "\n" + UTILS.standardTimestamp(matches[i].gameDuration) + " " + UTILS.ago(new Date(match_meta[i].timestamp)));
 			// champion
 			// match result
 			//queue
 			//level
 			//[items]
-			//KDA
+			// KDA
 			//cs
 			//gold
-			//length
-			//time
-			//lane
-			//role
+			// length
+			// time
+			// lane
+			// role
 		}
 		return newEmbed;
 	}

@@ -31,13 +31,37 @@ module.exports = class UTILS {
 	ago(date) {
 		return ta.ago(date);
 	}
+	KDA(summonerID, match) {
+		const participantID = match.participantIdentities.find(pI => { return pI.player.summonerId == summonerID; }).participantId;
+		const stats = match.participants.find(p => { return p.participantId == participantID; }).stats;
+		return {
+			K: stats.kills,
+			D: stats.deaths,
+			A: stats.assists
+		};
+	}
 	determineWin(summonerID, match) {
-		//this.output(summonerID + ", " + match.participantIdentities[0].player.summonerId + match.participantIdentities[0].participantId);
 		const participantID = match.participantIdentities.find(pI => { return pI.player.summonerId == summonerID; }).participantId;
 		const teamID = match.participants.find(p => { return p.participantId == participantID; }).teamId;
 		return match.teams.find(t => { return t.teamId == teamID; }).win == "Win";
 	}
 	english(text) {
 		return text.split("_").map(t => { return t.substring(0, 1).toUpperCase() + t.substring(1).toLowerCase(); }).join(" ");
+	}
+	standardTimestamp(sec) {
+		let mins = Math.floor(parseInt(sec) / 60);
+		let hours = Math.floor(parseInt(mins) / 60);
+		mins = mins % 60;
+		let secs = Math.floor(parseInt(sec) % 60);
+		if (secs < 10) {
+			secs = "0" + secs;
+		}
+		if (mins < 10) {
+			mins = "0" + mins;
+		}
+		if (hours < 10) {
+			hours = "0" + hours
+		}
+		return hours + ":" + mins + ":" + secs;
 	}
 }
