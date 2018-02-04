@@ -31,9 +31,13 @@ module.exports = class UTILS {
 	ago(date) {
 		return ta.ago(date);
 	}
-	KDA(summonerID, match) {
+	stats(summonerID, match) {
 		const participantID = match.participantIdentities.find(pI => { return pI.player.summonerId == summonerID; }).participantId;
 		const stats = match.participants.find(p => { return p.participantId == participantID; }).stats;
+		return stats;
+	}
+	KDA(summonerID, match) {
+		const stats = this.stats(summonerID, match);
 		return {
 			K: stats.kills,
 			D: stats.deaths,
@@ -64,4 +68,12 @@ module.exports = class UTILS {
 		}
 		return hours + ":" + mins + ":" + secs;
 	}
+	gold(number) {
+		number /= 1000;
+		return this.round(number, 1) + "k";
+	}
+	level(summonerID, match) {
+		return this.stats(summonerID, match).championLevel;
+	}
+	
 }
