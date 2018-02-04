@@ -32,7 +32,7 @@ module.exports = class UTILS {
 		return ta.ago(date);
 	}
 	determineWin(summonerID, match) {
-		this.output(summonerID + ", " + match.participantIdentities[0].player.summonerId + match.participantIdentities[0].participantId);
+		//this.output(summonerID + ", " + match.participantIdentities[0].player.summonerId + match.participantIdentities[0].participantId);
 		const participantID = match.participantIdentities.find(pI => { return pI.player.summonerId == summonerID; }).participantId;
 		const teamID = match.participants.find(p => { return p.participantId == participantID; }).teamId;
 		return match.teams.find(t => { return t.teamId == teamID; }).win == "Win";
