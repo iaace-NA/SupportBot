@@ -52,7 +52,7 @@ module.exports = class EmbedGenrator {
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;
 	}
-	match(CONFIG, summoner, match_meta) {
+	match(CONFIG, summoner, match_meta) {//should show 5 most recent games
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Basic Match Information");
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
@@ -60,5 +60,7 @@ module.exports = class EmbedGenrator {
 		newEmbed.setTimestamp(new Date(match_meta.timestamp));
 		return newEmbed;
 	}
-	detailedMatch(CONFIG, summoner, match_meta, match_info) {}
+	detailedMatch(CONFIG, summoner, match_meta, match_info) {//should show detailed information about 1 game
+
+	}
 }
