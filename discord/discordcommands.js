@@ -65,6 +65,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				lolapi.getRecentGames(region, result.accountId).then(matchhistory => {
 					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) reply("No recent matches found for `" + username + "`.");
 					lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => { return m.gameId; }).slice(0, 5)).then(matches => {
+						UTILS.assert(UTILS.exists(result.summonerId));
 						reply_embed(embedgenerator.match(CONFIG, result, matchhistory.matches, matches));
 					});
 				});
