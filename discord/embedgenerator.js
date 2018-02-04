@@ -60,7 +60,7 @@ module.exports = class EmbedGenrator {
 		for (let i = 0; i < match_meta.length && i < 5; ++i) {
 			const KDA = UTILS.KDA(summoner.id, matches[i]);
 			const stats = UTILS.stats(summoner.id, matches[i]);
-			newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "WIN" : "LOSS") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " lv." + stats.champLevel + " " + UTILS.english(match_meta[i].role) + " " + UTILS.english(match_meta[i].lane), KDA.K + "/" + KDA.D + "/" + KDA.A + "\tcs:" + stats.totalMinionsKilled + "\tg:" + UTILS.gold(stats.goldEarned) + "\n" + UTILS.standardTimestamp(matches[i].gameDuration) + " " + UTILS.ago(new Date(match_meta[i].timestamp)));
+			newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "WIN" : "LOSS") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " " + UTILS.english(match_meta[i].role) + " " + UTILS.english(match_meta[i].lane), "lv. `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\tcs:`" + stats.totalMinionsKilled + "`\tg:`" + UTILS.gold(stats.goldEarned) + "`\n" + UTILS.standardTimestamp(matches[i].gameDuration) + "\t" + UTILS.ago(new Date(match_meta[i].timestamp)));
 			// champion
 			// match result
 			//queue
