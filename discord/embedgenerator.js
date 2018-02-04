@@ -59,7 +59,7 @@ module.exports = class EmbedGenrator {
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		for (let i = 0; i < match_meta.length && i < 5; ++i) {
 			
-			newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "WIN" : "LOSS") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " " + UTILS.english(match_meta[i].role) + " " + UTILS.english(match_meta.lane));
+			newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "WIN" : "LOSS") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " " + UTILS.english(match_meta[i].role) + " " + UTILS.english(match_meta[i].lane));
 			// champion
 			// match result
 			//queue
