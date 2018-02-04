@@ -140,8 +140,8 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				try {
 					const region = assert_region(parameter, false);
 					db.getLink(msg.author.id).then(result => {
-						let username = msg.author.username;
-						if (UTILS.exists(result)) {
+						let username = msg.author.username;//suppose the link doesn't exist in the database
+						if (UTILS.exists(result)) {//link exists
 							username = result.name;
 						}
 						callback(region, username, parameter);
