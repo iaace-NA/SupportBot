@@ -67,7 +67,12 @@ module.exports = class UTILS {
 		if (hours < 10) {
 			hours = "0" + hours
 		}
-		return hours + ":" + mins + ":" + secs;
+		if (hours == "00") {
+			return mins + ":" + secs;
+		}
+		else {
+			return hours + ":" + mins + ":" + secs;
+		}
 	}
 	gold(number) {
 		number /= 1000;
