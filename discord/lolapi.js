@@ -135,4 +135,9 @@ module.exports = class LOLAPI {
 	getMatchInformation(region, gameID) {
 		return this.get(region, "match/v3/matches/" + gameID, {});
 	}
+	getMultipleMatchInformation(region, gameIDs) {
+		let requests = [];
+		for (let i in gameIDs) requests.push(this.getMatchInformation(region, gameIDs[i]));
+		return Promise.all(requests);
+	}
 }

@@ -24,11 +24,19 @@ module.exports = class UTILS {
 		return Math.round(num * Math.pow(10, decimal)) / Math.pow(10, decimal);
 	}
 	assert(condition) {
-		if (typeof (condition) != "boolean") throw new Error("asserting non boolean value: " + typeof(condition));
+		if (typeof (condition) != "boolean") throw new Error("asserting non boolean value: " + typeof (condition));
 		if (!condition) throw new Error("assertion false");
 		return true;
 	}
 	ago(date) {
 		return ta.ago(date);
+	}
+	determineWin(summonerID, match) {
+		const participantID = match.participantIdentities.find(pI => { return pI.player.summonerId == summonerID; }).participantId;
+		const teamID = match.participants.find(p => { return p.participantId == participantID; }).teamId;
+		return match.teams.find(t => { return t.teamId == teamID; }).win == "Win";
+	}
+	english(text) {
+		return text.split("_").map(t => { return t.substring(0, 1).toUpperCase() + t.substring(1).toLowerCase(); }).join(" ");
 	}
 }

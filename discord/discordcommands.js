@@ -62,10 +62,11 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		commandGuessUsername(["mh "], false, (region, username, parameter) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
-				lolapi.getRecentGames(region, result.accountId).then(matches => {
-					let most_recent = matches.matches[0];
-					if (!UTILS.exists(most_recent)) reply("No recent matches found for `" + username + "`.");
-					reply_embed(embedgenerator.match(CONFIG, result, most_recent));
+				lolapi.getRecentGames(region, result.accountId).then(matchhistory => {
+					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) reply("No recent matches found for `" + username + "`.");
+					lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => { return m.gameId; }).slice(0, 5)).then(matches => {
+						reply_embed(embedgenerator.match(CONFIG, result, matchhistory.matches, matches));
+					});
 				});
 			});
 		});

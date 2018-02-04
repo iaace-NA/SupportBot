@@ -52,12 +52,27 @@ module.exports = class EmbedGenrator {
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;
 	}
-	match(CONFIG, summoner, match_meta) {//should show 5 most recent games
+	match(CONFIG, summoner, match_meta, matches) {//should show 5 most recent games
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setTitle("Basic Match Information");
+
+		newEmbed.setTitle("Recent Games");
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
-		newEmbed.setDescription(CONFIG.STATIC.CHAMPIONS[match_meta.champion].name + " " + match_meta.role + " " + match_meta.lane);
-		newEmbed.setTimestamp(new Date(match_meta.timestamp));
+		for (let i = 0; i < match_meta.length && i < 5; ++i) {
+			
+			newEmbed.addField((UTILS.determineWin(summoner.summonerId, matches[i]) ? "WIN" : "LOSS") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " " + UTILS.english(match_meta[i].role) + " " + UTILS.english(match_meta.lane));
+			// champion
+			// match result
+			//queue
+			//level
+			//[items]
+			//KDA
+			//cs
+			//gold
+			//length
+			//time
+			//lane
+			//role
+		}
 		return newEmbed;
 	}
 	detailedMatch(CONFIG, summoner, match_meta, match_info) {//should show detailed information about 1 game
