@@ -1,0 +1,24 @@
+{
+	"DISCORD_API_KEY_PRODUCTION": "",
+	"DISCORD_API_KEY_DEVELOPMENT": "",
+	"RIOT_API_KEY": "",
+	"OWNER_DISCORD_IDS": {
+		"109894307070083072": true,
+		"333384744483946508": true
+	},
+	"DISCORD_COMMAND_PREFIX": "l",
+	"REGIONS": {
+		"BR": "br1",
+		"EUNE": "eun1",
+		"EUW": "euw1",
+		"JP": "jp1",
+		"KR": "kr",
+		"LAN": "la1",
+		"LAS": "la2",
+		"NA": "na1",
+		"OCE": "oc1",
+		"TR": "tr1",
+		"RU": "ru",
+		"PBE": "pbe1"
+	}
+}
