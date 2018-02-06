@@ -1,3 +1,4 @@
 config.json
 /node_modules/
-/data/static-api-cache/
+/data/static-api-cache/*
+!data/static-api-cache/.gitkeep 
