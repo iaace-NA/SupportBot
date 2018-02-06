@@ -108,24 +108,35 @@ module.exports = class LOLAPI {
 		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, {});
 	}
 	getStaticChampions(region) {
+		let that = this;
 		return new Promise((resolve, reject) => {
 			const path = "./data/static-api-cache/champions" + region + ".json";
 			const exists = fs.existsSync(path);
 			if ((exists && fs.statSync(path).mtime.getTime() < new Date().getTime() - (12 * 3600 * 1000)) ||
 				!exists) {//expired
-				this.get(region, "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" }).then((result) => {
+				refresh();
+			}
+			else {//cached
+				fs.readFile(path, "utf-8", (err, data) => {
+					UTILS.output("Cached version of " + region + " champions.json loaded.");
+					try {
+						data = JSON.parse(data)
+						resolve(data);
+					}
+					catch (e) {
+						UTILS.output(e);
+						refresh();
+					}
+				});
+			}
+			function refresh() {
+				that.get(region, "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" }).then((result) => {
 					fs.writeFile(path, JSON.stringify(result), err => {
 						UTILS.output("Cached version of " + region + " champions.json is expired or non-existant.");
 						if (err) throw err;
 						resolve(result);
 					});
 				}).catch(e => { reject(e); });
-			}
-			else {//cached
-				fs.readFile(path, "utf-8", (err, data) => {
-					UTILS.output("Cached version of " + region + " champions.json loaded.");
-					resolve(JSON.parse(data));
-				});
 			}
 		});
 	}
