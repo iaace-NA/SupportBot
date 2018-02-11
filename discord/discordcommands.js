@@ -69,6 +69,14 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				});
 			});
 		});
+		commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {
+			lolapi.getSummonerIDFromName(region, username).then(result => {
+				result.region = region;
+				lolapi.getLiveMatch(region, result.id).then(match => {
+					reply_embed(embedgenerator.liveMatch(CONFIG, result, match));
+				});
+			});
+		});
 	}
 	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) {//respondable server message only
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "shutdown"], false, true, () => {

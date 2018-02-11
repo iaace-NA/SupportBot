@@ -55,6 +55,7 @@ module.exports = class EmbedGenrator {
 		if (!UTILS.exists(apiobj.id)) {
 			newEmbed.setTitle("This summoner does not exist.");
 			newEmbed.setDescription("Please revise your request.");
+			newEmbed.setColor([255, 0, 0]);
 			return newEmbed;
 		}
 		newEmbed.setAuthor(apiobj.name);
@@ -69,6 +70,7 @@ module.exports = class EmbedGenrator {
 		if (!UTILS.exists(summoner.id)) {
 			newEmbed.setTitle("This summoner does not exist.");
 			newEmbed.setDescription("Please revise your request.");
+			newEmbed.setColor([255, 0, 0]);
 			return newEmbed;
 		}
 		newEmbed.setAuthor(summoner.name);
@@ -119,5 +121,43 @@ module.exports = class EmbedGenrator {
 	}
 	detailedMatch(CONFIG, summoner, match_meta, match_info) {//should show detailed information about 1 game
 
+	}
+	liveMatch(CONFIG, summoner, match) {//show current match information
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setAuthor(summoner.name);
+		if (UTILS.exists(match.status)) {
+			newEmbed.setTitle("This summoner is currently not in a match.");
+			newEmbed.setColor([255, 0, 0]);
+			return newEmbed;
+		}
+		newEmbed.setTitle(queues[match.gameQueueConfigId]);
+		newEmbed.setDescription("Match Time: " + UTILS.standardTimestamp(match.gameLength < 0 ? 0 : match.gameLength));
+		let teams = {};
+		for (let b in match.participants) {
+			if (!UTILS.exists(teams[match.participants[b].teamId])) {
+				teams[match.participants[b].teamId] = [];
+			}
+			teams[match.participants[b].teamId].push(match.participants[b]);
+		}
+		let team_count = 1;
+		let player_count = 0;
+		for (let b in teams) {
+			let team_description = "";
+			let ban_description = [];
+			for (let c in teams[b]) {
+				team_description += "__" + teams[b][c].summonerName;
+				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
+				team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
+				if (UTILS.exists(match.bannedChampions[player_count])) {
+					ban_description.push(CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].name);
+				}
+				team_description += "\n";
+				++player_count;
+			}
+			team_description += "Bans: " + ban_description.join(", ");
+			newEmbed.addField("Team " + team_count, team_description);
+			++team_count;
+		}
+		return newEmbed;
 	}
 }
