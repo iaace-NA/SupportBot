@@ -151,4 +151,7 @@ module.exports = class LOLAPI {
 		for (let i in gameIDs) requests.push(this.getMatchInformation(region, gameIDs[i]));
 		return Promise.all(requests);
 	}
+	getLiveMatch(region, summonerID) {
+		return this.get(region, "spectator/v3/active-games/by-summoner/" + summonerID, {});
+	}
 }
