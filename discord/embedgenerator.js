@@ -131,7 +131,7 @@ module.exports = class EmbedGenrator {
 			return newEmbed;
 		}
 		newEmbed.setTitle(queues[match.gameQueueConfigId]);
-		newEmbed.setDescription("Match Time: " + UTILS.standardTimestamp(match.gameLength < 0 ? match.gameLength : 0));
+		newEmbed.setDescription("Match Time: " + UTILS.standardTimestamp(match.gameLength < 0 ? 0 : match.gameLength));
 		let teams = {};
 		for (let b in match.participants) {
 			if (!UTILS.exists(teams[match.participants[b].teamId])) {
