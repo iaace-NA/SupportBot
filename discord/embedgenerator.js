@@ -145,9 +145,9 @@ module.exports = class EmbedGenrator {
 			let team_description = "";
 			for (let c in teams[b]) {
 				team_description += "__" + teams[b][c].summonerName;
-				team_description += "__ as " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId];
+				team_description += "__ as " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
 				if (UTILS.exists(match.bannedChampions[player_count])) {
-					team_description += ", banning " + CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId];
+					team_description += ", banning " + CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].name;
 				}
 				team_description += "\n";
 			}
