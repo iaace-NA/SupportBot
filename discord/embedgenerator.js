@@ -149,6 +149,7 @@ module.exports = class EmbedGenrator {
 				if (UTILS.exists(match.bannedChampions[player_count])) {
 					team_description += ", banning " + CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId];
 				}
+				team_description += "\n";
 			}
 			newEmbed.addField("Team " + team_count, team_description);
 			++team_count;
