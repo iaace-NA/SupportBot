@@ -150,10 +150,10 @@ module.exports = class EmbedGenrator {
 					team_description += ", banning " + CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].name;
 				}
 				team_description += "\n";
+				++player_count;
 			}
 			newEmbed.addField("Team " + team_count, team_description);
 			++team_count;
-			++player_count;
 		}
 		return newEmbed;
 	}
