@@ -139,7 +139,7 @@ module.exports = class EmbedGenrator {
 			}
 			teams[match.participants[b].teamId].push(match.participants[b]);
 		}
-		let team_count = 0;
+		let team_count = 1;
 		let player_count = 0;
 		for (let b in teams) {
 			let team_description = "";
