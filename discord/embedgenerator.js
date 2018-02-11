@@ -143,16 +143,18 @@ module.exports = class EmbedGenrator {
 		let player_count = 0;
 		for (let b in teams) {
 			let team_description = "";
+			let ban_description = [];
 			for (let c in teams[b]) {
 				team_description += "__" + teams[b][c].summonerName;
 				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
 				team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
 				if (UTILS.exists(match.bannedChampions[player_count])) {
-					team_description += "\t ban:" + CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].name;
+					ban_description.push(CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].name);
 				}
 				team_description += "\n";
 				++player_count;
 			}
+			team_description += "Bans: " + ban_description.join(", ");
 			newEmbed.addField("Team " + team_count, team_description);
 			++team_count;
 		}
