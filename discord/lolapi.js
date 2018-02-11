@@ -140,6 +140,39 @@ module.exports = class LOLAPI {
 			}
 		});
 	}
+	getStaticSummonerSpells(region) {
+		let that = this;
+		return new Promise((resolve, reject) => {
+			const path = "./data/static-api-cache/spells" + region + ".json";
+			const exists = fs.existsSync(path);
+			if ((exists && fs.statSync(path).mtime.getTime() < new Date().getTime() - (12 * 3600 * 1000)) ||
+				!exists) {//expired
+				refresh();
+			}
+			else {//cached
+				fs.readFile(path, "utf-8", (err, data) => {
+					UTILS.output("Cached version of " + region + " spells.json loaded.");
+					try {
+						data = JSON.parse(data)
+						resolve(data);
+					}
+					catch (e) {
+						UTILS.output(e);
+						refresh();
+					}
+				});
+			}
+			function refresh() {
+				that.get(region, "static-data/v3/summoner-spells", { locale: "en_US", dataById: true, spellListData: "all", tags: "all" }).then((result) => {
+					fs.writeFile(path, JSON.stringify(result), err => {
+						UTILS.output("Cached version of " + region + " spells.json is expired or non-existant.");
+						if (err) throw err;
+						resolve(result);
+					});
+				}).catch(e => { reject(e); });
+			}
+		});
+	}
 	getRecentGames(region, accountID) {
 		return this.get(region, "match/v3/matchlists/by-account/" + accountID + "/recent", {});
 	}

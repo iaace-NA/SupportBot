@@ -146,6 +146,7 @@ module.exports = class EmbedGenrator {
 			for (let c in teams[b]) {
 				team_description += "__" + teams[b][c].summonerName;
 				team_description += "__ as " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
+				team_description += ", taking " + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + " and " + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name;
 				if (UTILS.exists(match.bannedChampions[player_count])) {
 					team_description += ", banning " + CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].name;
 				}
