@@ -81,5 +81,7 @@ module.exports = class UTILS {
 	level(summonerID, match) {
 		return this.stats(summonerID, match).championLevel;
 	}
-	
+	indexOfInstance(string, subString, index) {
+		return string.split(subString, index).join(subString).length;
+	}
 }
