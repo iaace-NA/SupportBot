@@ -17,7 +17,7 @@ const queues = {
 	"317": "CS Definitely Not Dominion",
 	"325": "SR All Random",
 	"400": "SR Draft",
-	"420": "SR Ranked Solo", 
+	"420": "SR Ranked Solo",
 	"430": "SR Blind",
 	"440": "SR Ranked Flex",
 	"450": "HA ARAM",
@@ -120,7 +120,42 @@ module.exports = class EmbedGenrator {
 		return newEmbed;
 	}
 	detailedMatch(CONFIG, summoner, match_meta, match_info) {//should show detailed information about 1 game
-
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setAuthor(summoner.name);
+		if (UTILS.exists(match.status)) {
+			newEmbed.setTitle("This summoner has no recent matches.");
+			newEmbed.setColor([255, 0, 0]);
+			return newEmbed;
+		}
+		newEmbed.setTitle(queues[match.gameQueueConfigId]);
+		newEmbed.setDescription("Match Time: " + UTILS.standardTimestamp(match.gameLength < 0 ? 0 : match.gameLength));
+		let teams = {};
+		for (let b in match.participants) {
+			if (!UTILS.exists(teams[match.participants[b].teamId])) {
+				teams[match.participants[b].teamId] = [];
+			}
+			teams[match.participants[b].teamId].push(match.participants[b]);
+		}
+		let team_count = 1;
+		let player_count = 0;
+		for (let b in teams) {
+			let team_description = "";
+			let ban_description = [];
+			for (let c in teams[b]) {
+				team_description += "__" + teams[b][c].summonerName;
+				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
+				team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
+				if (UTILS.exists(match.bannedChampions[player_count])) {
+					ban_description.push(CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].name);
+				}
+				team_description += "\n";
+				++player_count;
+			}
+			team_description += "Bans: " + ban_description.join(", ");
+			newEmbed.addField("Team " + team_count, team_description);
+			++team_count;
+		}
+		return newEmbed;
 	}
 	liveMatch(CONFIG, summoner, match) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
