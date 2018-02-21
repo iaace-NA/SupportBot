@@ -81,7 +81,12 @@ module.exports = class UTILS {
 	level(summonerID, match) {
 		return this.stats(summonerID, match).championLevel;
 	}
-	indexOfInstance(string, subString, index) {
-		return string.split(subString, index).join(subString).length;
+	indexOfInstance(string, searchString, index) {
+		let answer = -1;
+		for (let i = 0, count = 0; i < string.length - searchString.length; ++i) {
+			if (string.substring(i, searchString.length) == searchString) ++count;
+			if (count == index) answer = i;
+		}
+		return answer;
 	}
 }
