@@ -172,6 +172,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			try {//username provided
 				UTILS.output("testing region: " + parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)));
 				const region = assert_region(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
+				UTILS.output("username explicitly stated");
 				callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number);
 			}
 			catch (e) {//username not provided
@@ -182,6 +183,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 						if (UTILS.exists(result)) {//link exists
 							username = result.name;
 						}
+						UTILS.output("username implicit");
 						callback(region, username, number);
 					}).catch(console.error);
 				}
