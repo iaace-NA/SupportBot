@@ -170,6 +170,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			const number = parseInt(parameter.substring(0, parameter.indexOf(" ")));
 			if (isNaN(number)) return;
 			try {//username provided
+				UTILS.output("testing region: " + parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)));
 				const region = assert_region(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
 				callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number);
 			}
