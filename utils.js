@@ -84,8 +84,10 @@ module.exports = class UTILS {
 	indexOfInstance(string, searchString, index) {
 		let answer = -1;
 		for (let i = 0, count = 0; i < string.length - searchString.length; ++i) {
-			if (string.substring(i, i + searchString.length) == searchString) ++count;
-			if (count == index) answer = i;
+			if (string.substring(i, i + searchString.length) == searchString) {
+				++count;
+				if (count == index) answer = i;
+			}
 		}
 		return answer;
 	}
