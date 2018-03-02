@@ -88,7 +88,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 						return;
 					}
 					lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId).then(match => {
-						reply_embed(embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches, match));
+						reply_embed(embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match));
 					});
 				});
 			});
