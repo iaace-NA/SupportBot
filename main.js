@@ -9,10 +9,10 @@ const UTILS = new (require("./utils.js"))();
 const client = new Discord.Client({ disabledEvents: ["TYPING_START"] });
 
 let CONFIG;
-try{
+try {
 	CONFIG = JSON.parse(fs.readFileSync("./config.json", "utf-8"));
 }
-catch(e) {
+catch (e) {
 	console.log("something's wrong with config.json");
 	console.error(e);
 	process.exit(1);
@@ -26,15 +26,18 @@ LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 	for (let i in CONFIG.REGIONS) temp_regions.push(CONFIG.REGIONS[i]);
 	Promise.all(temp_regions.map(tr => { return LOLAPI.getStaticChampions(tr); })).then(results => {
 		CONFIG.STATIC.CHAMPIONS = results[0].data;
-		UTILS.output("API STATIC RESOURCES LOADED");
-		if (process.argv.length === 2) {//production key
-			UTILS.output("PRODUCTION LOGIN");
-			client.login(CONFIG.DISCORD_API_KEY_PRODUCTION).catch(console.error);
-		}
-		else {//non-production key
-			UTILS.output("DEVELOPMENT LOGIN");
-			client.login(CONFIG.DISCORD_API_KEY_DEVELOPMENT).catch(console.error);
-		}
+		LOLAPI.getStaticSummonerSpells("na1").then(result => {
+			CONFIG.STATIC.SUMMONERSPELLS = result.data;
+			UTILS.output("API STATIC RESOURCES LOADED");
+			if (process.argv.length === 2) {//production key
+				UTILS.output("PRODUCTION LOGIN");
+				client.login(CONFIG.DISCORD_API_KEY_PRODUCTION).catch(console.error);
+			}
+			else {//non-production key
+				UTILS.output("DEVELOPMENT LOGIN");
+				client.login(CONFIG.DISCORD_API_KEY_DEVELOPMENT).catch(console.error);
+			}
+		});
 	}).catch(e => { throw e; });
 }).catch(e => { throw e; });
 
