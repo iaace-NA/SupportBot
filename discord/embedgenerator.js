@@ -119,7 +119,7 @@ module.exports = class EmbedGenrator {
 		}
 		return newEmbed;
 	}
-	detailedMatch(CONFIG, summoner, match_meta, match_info) {//should show detailed information about 1 game
+	detailedMatch(CONFIG, summoner, match_meta, match) {//should show detailed information about 1 game
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name);
 		if (UTILS.exists(match.status)) {

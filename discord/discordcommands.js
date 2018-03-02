@@ -79,6 +79,19 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		});
 		commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number) => {
 			reply("region: " + region + " username: " + username + " number: " + number);
+			if (number < 1 || number > 20 || !UTILS.exists(matchhistory.matches[number - 1])) {
+				reply(":x: This number is out of range.");
+				return;
+			}
+			lolapi.getSummonerIDFromName(region, username).then(result => {
+				result.region = region;
+				lolapi.getRecentGames(region, result.accountId).then(matchhistory => {
+					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) reply("No recent matches found for `" + username + "`.");
+					lolapi.getMatchInformation(region, matchhistory.matches[number - 1]).then(match => {
+						reply_embed(embedgenerator.match(CONFIG, result, matchhistory.matches, match));
+					});
+				});
+			});
 		});
 	}
 	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) {//respondable server message only
