@@ -22,7 +22,9 @@ const LOLAPI = new (require("./discord/lolapi.js"))(CONFIG);
 LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 	UTILS.output("DD STATIC RESOURCES LOADED");
 	CONFIG.STATIC = result;
-	Promise.all([LOLAPI.getStaticChampions("na1")]).then(results => {
+	let temp_regions = [];
+	for (let i in CONFIG.REGIONS) temp_regions.push(CONFIG.REGIONS[i]);
+	Promise.all(temp_regions.map(tr => { return LOLAPI.getStaticChampions(tr); })).then(results => {
 		CONFIG.STATIC.CHAMPIONS = results[0].data;
 		LOLAPI.getStaticSummonerSpells("na1").then(result => {
 			CONFIG.STATIC.SUMMONERSPELLS = result.data;
