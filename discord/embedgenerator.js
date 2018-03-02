@@ -127,8 +127,10 @@ module.exports = class EmbedGenrator {
 			newEmbed.setColor([255, 0, 0]);
 			return newEmbed;
 		}
-		newEmbed.setTitle(queues[match.gameQueueConfigId]);
-		newEmbed.setDescription("Match Time: " + UTILS.standardTimestamp(match.gameLength < 0 ? 0 : match.gameLength));
+		newEmbed.setTitle(queues[match.queueId]);
+		newEmbed.setDescription("Match Length: " + UTILS.standardTimestamp(match.gameDuration));
+		newEmbed.setTimestamp(new Date(match_meta.timestamp));
+		newEmbed.setFooter("Match played " + UTILS.ago(new Date(match_meta.timestamp)) + " at: ");
 		let teams = {};
 		for (let b in match.participants) {
 			if (!UTILS.exists(teams[match.participants[b].teamId])) {
@@ -136,25 +138,25 @@ module.exports = class EmbedGenrator {
 			}
 			teams[match.participants[b].teamId].push(match.participants[b]);
 		}
-		let team_count = 1;
-		let player_count = 0;
+		let team_count = 0;
 		for (let b in teams) {
-			let team_description = "";
-			let ban_description = [];
-			for (let c in teams[b]) {
-				team_description += "__" + teams[b][c].summonerName;
-				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
-				team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
-				if (UTILS.exists(match.bannedChampions[player_count])) {
-					ban_description.push(CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].name);
-				}
-				team_description += "\n";
-				++player_count;
-			}
-			team_description += "Bans: " + ban_description.join(", ");
-			newEmbed.addField("Team " + team_count, team_description);
 			++team_count;
+			newEmbed.addField("Team " + team_count, teams[b].reduce((total, increment) => { return total + UTILS.KDA(increment).K; }) + "/" + teams[b].reduce((total, increment) => { return total + UTILS.KDA(increment).D; }) + "/" + teams[b].reduce((total, increment) => { return total + UTILS.KDA(increment).A; }));
 		}
+		//champion
+		//match result
+		// queue
+		//level
+		//[items]
+		//KDA
+		//cs
+		//gold
+		// length
+		// time
+		//lane
+		//role
+		//team KDA
+		//team CS
 		return newEmbed;
 	}
 	liveMatch(CONFIG, summoner, match) {//show current match information
