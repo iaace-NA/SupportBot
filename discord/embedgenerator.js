@@ -141,7 +141,7 @@ module.exports = class EmbedGenrator {
 		let team_count = 0;
 		for (let b in teams) {
 			++team_count;
-			newEmbed.addField("Team " + team_count, teams[b].reduce((total, increment) => { return total + UTILS.KDA(increment).K; }) + "/" + teams[b].reduce((total, increment) => { return total + UTILS.KDA(increment).D; }) + "/" + teams[b].reduce((total, increment) => { return total + UTILS.KDA(increment).A; }));
+			newEmbed.addField("Team " + team_count, teams[b].reduce((total, increment) => { return total + increment.stats.kills; }) + "/" + teams[b].reduce((total, increment) => { return total + increment.stats.deaths; }) + "/" + teams[b].reduce((total, increment) => { return total + increment.stats.assists; }));
 		}
 		//champion
 		//match result
