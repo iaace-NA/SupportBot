@@ -87,7 +87,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 						reply(":x: This number is out of range.");
 						return;
 					}
-					lolapi.getMatchInformation(region, matchhistory.matches[number - 1]).then(match => {
+					lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId).then(match => {
 						reply_embed(embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches, match));
 					});
 				});
