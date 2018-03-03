@@ -143,7 +143,7 @@ module.exports = class EmbedGenrator {
 			++team_count;
 			newEmbed.addField((match.teams.find(t => { return teams[b][0].teamId == t.teamId; }).win == "Win" ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + "Team " + team_count, "`" + teams[b].reduce((total, increment) => { return total + increment.stats.kills; }, 0) + "/" + teams[b].reduce((total, increment) => { return total + increment.stats.deaths; }, 0) + "/" + teams[b].reduce((total, increment) => { return total + increment.stats.assists; }, 0) + "`");
 			for (let c in teams[b]) {
-				newEmbed.addField(match.participantIdentities.find(pI => { return pI.participantId == teams[b][c].participantId; }).player.summonerName, "x/x/x");
+				newEmbed.addField(match.participantIdentities.find(pI => { return pI.participantId == teams[b][c].participantId; }).player.summonerName, "`" + teams[b][c].kills + "/" + teams[b][c].deaths + "/" + teams[b][c].assists + "`");
 			}
 		}
 		//champion
@@ -151,7 +151,7 @@ module.exports = class EmbedGenrator {
 		// queue
 		//level
 		//[items]
-		//KDA
+		// KDA
 		//cs
 		//gold
 		// length
