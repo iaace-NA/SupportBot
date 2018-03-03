@@ -121,7 +121,7 @@ module.exports = class EmbedGenrator {
 	}
 	detailedMatch(CONFIG, summoner, match_meta, match) {//should show detailed information about 1 game
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name);
+		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) {
 			newEmbed.setTitle("This summoner has no recent matches.");
 			newEmbed.setColor([255, 0, 0]);
@@ -164,7 +164,7 @@ module.exports = class EmbedGenrator {
 	}
 	liveMatch(CONFIG, summoner, match) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name);
+		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) {
 			newEmbed.setTitle("This summoner is currently not in a match.");
 			newEmbed.setColor([255, 0, 0]);
