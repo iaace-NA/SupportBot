@@ -121,7 +121,7 @@ module.exports = class EmbedGenrator {
 	}
 	detailedMatch(CONFIG, summoner, match_meta, match) {//should show detailed information about 1 game
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name);
+		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) {
 			newEmbed.setTitle("This summoner has no recent matches.");
 			newEmbed.setColor([255, 0, 0]);
@@ -143,7 +143,7 @@ module.exports = class EmbedGenrator {
 			++team_count;
 			newEmbed.addField((match.teams.find(t => { return teams[b][0].teamId == t.teamId; }).win == "Win" ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + "Team " + team_count, "`" + teams[b].reduce((total, increment) => { return total + increment.stats.kills; }, 0) + "/" + teams[b].reduce((total, increment) => { return total + increment.stats.deaths; }, 0) + "/" + teams[b].reduce((total, increment) => { return total + increment.stats.assists; }, 0) + "`");
 			for (let c in teams[b]) {
-				newEmbed.addField(match.participantIdentities.find(pI => { return pI.participantId == teams[b][c].participantId; }).player.summonerName, "`" + teams[b][c].stats.kills + "/" + teams[b][c].stats.deaths + "/" + teams[b][c].stats.assists + "`");
+				newEmbed.addField(match.participantIdentities.find(pI => { return pI.participantId == teams[b][c].participantId; }).player.summonerName, "lv. `" + teams[b][c].stats.champLevel + "`\t`" + teams[b][c].stats.kills + "/" + teams[b][c].stats.deaths + "/" + teams[b][c].stats.assists + "`");
 			}
 		}
 		//champion
@@ -164,7 +164,7 @@ module.exports = class EmbedGenrator {
 	}
 	liveMatch(CONFIG, summoner, match) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name);
+		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) {
 			newEmbed.setTitle("This summoner is currently not in a match.");
 			newEmbed.setColor([255, 0, 0]);
