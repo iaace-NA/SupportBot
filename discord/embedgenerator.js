@@ -141,7 +141,7 @@ module.exports = class EmbedGenrator {
 		let team_count = 0;
 		for (let b in teams) {
 			++team_count;
-			newEmbed.addField("Team " + team_count, (match.teams.find(t => { return teams[b][0].teamId == t.teamId; }).win == "Win" ? "Victory" : "Defeat") + "\n" + teams[b].reduce((total, increment) => { return total + increment.stats.kills; }, 0) + "/" + teams[b].reduce((total, increment) => { return total + increment.stats.deaths; }, 0) + "/" + teams[b].reduce((total, increment) => { return total + increment.stats.assists; }, 0));
+			newEmbed.addField("Team " + team_count, (match.teams.find(t => { return teams[b][0].teamId == t.teamId; }).win == "Win" ? "<:win:409617613161758741>Victory" : "<:loss:409618158165688320>Defeat") + "\n" + teams[b].reduce((total, increment) => { return total + increment.stats.kills; }, 0) + "/" + teams[b].reduce((total, increment) => { return total + increment.stats.deaths; }, 0) + "/" + teams[b].reduce((total, increment) => { return total + increment.stats.assists; }, 0));
 			for (let c in teams[b]) {
 				newEmbed.addField(match.participantIdentities.find(pI => { return pI.participantId == teams[b][c].participantId; }).player.summonerName, "x/x/x");
 			}
