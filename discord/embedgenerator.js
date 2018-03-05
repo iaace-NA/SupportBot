@@ -141,7 +141,7 @@ module.exports = class EmbedGenrator {
 		let team_count = 0;
 		for (let b in teams) {
 			++team_count;
-			newEmbed.addField((match.teams.find(t => { return teams[b][0].teamId == t.teamId; }).win == "Win" ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + "Team " + team_count, "`" + teams[b].reduce((total, increment) => { return total + increment.stats.kills; }, 0) + "/" + teams[b].reduce((total, increment) => { return total + increment.stats.deaths; }, 0) + "/" + teams[b].reduce((total, increment) => { return total + increment.stats.assists; }, 0) + "`");
+			newEmbed.addField((match.teams.find(t => { return teams[b][0].teamId == t.teamId; }).win == "Win" ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + "Team " + team_count, "Σlv.`" + teams[b].reduce((total, increment) => { return total + increment.stats.champLevel; }, 0) + "`\t`" + teams[b].reduce((total, increment) => { return total + increment.stats.kills; }, 0) + "/" + teams[b].reduce((total, increment) => { return total + increment.stats.deaths; }, 0) + "/" + teams[b].reduce((total, increment) => { return total + increment.stats.assists; }, 0) + "`");
 			for (let c in teams[b]) {
 				let p = teams[b][c];
 				newEmbed.addField(match.participantIdentities.find(pI => { return pI.participantId == p.participantId; }).player.summonerName + ": " + CONFIG.STATIC.CHAMPIONS[p.championId].name + " " + (UTILS.english(p.timeline.role) == "None" ? "" : UTILS.english(p.timeline.role)) + " " + UTILS.english(p.timeline.lane), "lv. `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\tKDA:`" + (UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2) == "Infinity" ? "Perfect" : UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2)) + "`\tcs:`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(p.stats.goldEarned) + "`");
@@ -153,13 +153,13 @@ module.exports = class EmbedGenrator {
 		//level
 		//[items]
 		// KDA
-		//cs
-		//gold
+		// cs
+		// gold
 		// length
 		// time
 		// lane
 		// role
-		//team KDA
+		// team KDA
 		//team CS
 		return newEmbed;
 	}
