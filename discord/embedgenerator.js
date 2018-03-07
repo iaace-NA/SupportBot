@@ -103,7 +103,7 @@ module.exports = class EmbedGenrator {
 		for (let i = 0; i < match_meta.length && i < 5; ++i) {
 			const KDA = UTILS.KDA(summoner.id, matches[i]);
 			const stats = UTILS.stats(summoner.id, matches[i]);
-			newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " " + (UTILS.english(match_meta[i].role) == "None" ? "" : UTILS.english(match_meta[i].role)) + " " + UTILS.english(match_meta[i].lane), "lv. `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\tKDA:`" + (UTILS.round(KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KDA, 2)) + "`\tcs:`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(stats.goldEarned) + "`\n" + queues[matches[i].queueId + ""] + "\t`" + UTILS.standardTimestamp(matches[i].gameDuration) + "`\t" + UTILS.ago(new Date(match_meta[i].timestamp)));
+			newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " " + (UTILS.english(match_meta[i].role) == "None" ? "" : UTILS.english(match_meta[i].role)) + " " + UTILS.english(match_meta[i].lane), "lv. `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\tKDA:`" + (UTILS.round(KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KDA, 2)) + "`\tcs:`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(stats.goldEarned) + "`\n" + queues[matches[i].queueId + ""] + "\t`" + UTILS.standardTimestamp(matches[i].gameDuration) + "`\t" + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))));
 			// champion
 			// match result
 			// queue
@@ -119,12 +119,56 @@ module.exports = class EmbedGenrator {
 		}
 		return newEmbed;
 	}
-	detailedMatch(CONFIG, summoner, match_meta, match_info) {//should show detailed information about 1 game
-
+	detailedMatch(CONFIG, summoner, match_meta, match) {//should show detailed information about 1 game
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
+		if (UTILS.exists(match.status)) {
+			newEmbed.setTitle("This summoner has no recent matches.");
+			newEmbed.setColor([255, 0, 0]);
+			return newEmbed;
+		}
+		newEmbed.setTitle(queues[match.queueId]);
+		newEmbed.setDescription("Match Length: " + UTILS.standardTimestamp(match.gameDuration));
+		newEmbed.setTimestamp(new Date(match_meta.timestamp + (match.gameDuration * 1000)));
+		newEmbed.setFooter("Match played " + UTILS.ago(new Date(match_meta.timestamp + (match.gameDuration * 1000))) + " at: ");
+		let teams = {};
+		for (let b in match.participants) {
+			if (!UTILS.exists(teams[match.participants[b].teamId])) {
+				teams[match.participants[b].teamId] = [];
+			}
+			teams[match.participants[b].teamId].push(match.participants[b]);
+		}
+		let team_count = 0;
+		for (let b in teams) {
+			++team_count;
+			const tK = teams[b].reduce((total, increment) => { return total + increment.stats.kills; }, 0);
+			const tD = teams[b].reduce((total, increment) => { return total + increment.stats.deaths; }, 0);
+			const tA = teams[b].reduce((total, increment) => { return total + increment.stats.assists; }, 0);
+			newEmbed.addField((match.teams.find(t => { return teams[b][0].teamId == t.teamId; }).win == "Win" ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + "Team " + team_count, "Σlv.`" + teams[b].reduce((total, increment) => { return total + increment.stats.champLevel; }, 0) + "`\t`" + tK + "/" + tD + "/" + tA + "`\tKDA:`" + (UTILS.round(((tK + tA) / tD), 2) == "Infinity" ? "Perfect" : UTILS.round(((tK + tA) / tD), 2)) + "`\tΣcs:`" + teams[b].reduce((total, increment) => { return total + increment.stats.totalMinionsKilled + increment.stats.neutralMinionsKilled; }, 0) + "`\tΣg:`" + UTILS.gold(teams[b].reduce((total, increment) => { return total + increment.stats.goldEarned; }, 0)) + "`");
+			for (let c in teams[b]) {
+				let p = teams[b][c];
+				newEmbed.addField("__" + match.participantIdentities.find(pI => { return pI.participantId == p.participantId; }).player.summonerName + "__: " + CONFIG.STATIC.CHAMPIONS[p.championId].name + " " + (UTILS.english(p.timeline.role) == "None" ? "" : UTILS.english(p.timeline.role)) + " " + UTILS.english(p.timeline.lane), "lv. `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\tKDA:`" + (UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2) == "Infinity" ? "Perfect" : UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2)) + "`\tcs:`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(p.stats.goldEarned) + "`");
+			}
+		}
+		// champion
+		// match result
+		// queue
+		//level
+		//[items]
+		// KDA
+		// cs
+		// gold
+		// length
+		// time
+		// lane
+		// role
+		// team KDA
+		// team CS
+		return newEmbed;
 	}
 	liveMatch(CONFIG, summoner, match) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name);
+		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) {
 			newEmbed.setTitle("This summoner is currently not in a match.");
 			newEmbed.setColor([255, 0, 0]);

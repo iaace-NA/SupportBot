@@ -77,6 +77,21 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				});
 			});
 		});
+		commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number) => {
+			lolapi.getSummonerIDFromName(region, username).then(result => {
+				result.region = region;
+				lolapi.getRecentGames(region, result.accountId).then(matchhistory => {
+					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) reply("No recent matches found for `" + username + "`.");
+					if (number < 1 || number > 20 || !UTILS.exists(matchhistory.matches[number - 1])) {
+						reply(":x: This number is out of range.");
+						return;
+					}
+					lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId).then(match => {
+						reply_embed(embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match));
+					});
+				});
+			});
+		});
 	}
 	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) {//respondable server message only
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "shutdown"], false, true, () => {
@@ -153,6 +168,32 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 							username = result.name;
 						}
 						callback(region, username, parameter);
+					}).catch(console.error);
+				}
+				catch (e) { }
+			}
+		});
+	}
+
+	function commandGuessUsernameNumber(trigger_array,//array of command aliases, prefix needs to be included
+		elevated_permissions,//requires owner permissions
+		callback) {//optional callback only if successful
+		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
+			const number = parseInt(parameter.substring(0, parameter.indexOf(" ")));
+			if (isNaN(number)) return;
+			try {//username provided
+				const region = assert_region(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
+				callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number);
+			}
+			catch (e) {//username not provided
+				try {
+					const region = assert_region(parameter.substring(parameter.indexOf(" ") + 1), false);
+					db.getLink(msg.author.id).then(result => {
+						let username = msg.author.username;//suppose the link doesn't exist in the database
+						if (UTILS.exists(result)) {//link exists
+							username = result.name;
+						}
+						callback(region, username, number);
 					}).catch(console.error);
 				}
 				catch (e) { }
