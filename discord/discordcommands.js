@@ -101,7 +101,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			reply("restart initiated", restart, restart);
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "refresh", CONFIG.DISCORD_COMMAND_PREFIX + "clearcache"], false, true, () => {
-			reply("restart initiated + clearing cache", );
+			reply("restart initiated + clearing cache", step2, step2);
 			function step2() {
 				lolapi.clearCache();
 				restart();
