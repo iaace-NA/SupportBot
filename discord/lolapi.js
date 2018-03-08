@@ -112,7 +112,7 @@ module.exports = class LOLAPI {
 		return new Promise((resolve, reject) => {
 			const path = "./data/static-api-cache/champions" + region + ".json";
 			const exists = fs.existsSync(path);
-			if ((exists && fs.statSync(path).mtime.getTime() < new Date().getTime() - (12 * 3600 * 1000)) ||
+			if ((exists && fs.statSync(path).mtime.getTime() < new Date().getTime() - (6 * 3600 * 1000)) ||
 				!exists) {//expired
 				refresh();
 			}
@@ -145,7 +145,7 @@ module.exports = class LOLAPI {
 		return new Promise((resolve, reject) => {
 			const path = "./data/static-api-cache/spells" + region + ".json";
 			const exists = fs.existsSync(path);
-			if ((exists && fs.statSync(path).mtime.getTime() < new Date().getTime() - (12 * 3600 * 1000)) ||
+			if ((exists && fs.statSync(path).mtime.getTime() < new Date().getTime() - (6 * 3600 * 1000)) ||
 				!exists) {//expired
 				refresh();
 			}
@@ -186,5 +186,11 @@ module.exports = class LOLAPI {
 	}
 	getLiveMatch(region, summonerID) {
 		return this.get(region, "spectator/v3/active-games/by-summoner/" + summonerID, {});
+	}
+	clearCache() {
+		const filenames = fs.readdirSync("./data/static-api-cache/");
+		for (let b in filenames) {
+			fs.unlinkSync("./data/static-api-cache/" + filenames[b]);
+		}
 	}
 }
