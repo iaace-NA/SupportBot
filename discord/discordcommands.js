@@ -48,6 +48,9 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "cs", CONFIG.DISCORD_COMMAND_PREFIX + "cachesize"], false, false, (original, index) => {
 			reply("The cache size is " + lolapi.cacheSize());
 		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "invite"], false, false, (original, index) => {
+			reply("This is the link to add SupportBot to other servers: <https://discordapp.com/api/oauth2/authorize?client_id=398355288123506689&permissions=0&scope=bot>\nAdding it requires the \"Manage Server\" permission.");
+		});
 		commandGuessUsername([""], false, (region, username, parameter) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
