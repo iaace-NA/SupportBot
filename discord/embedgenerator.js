@@ -58,12 +58,12 @@ module.exports = class EmbedGenrator {
 		newEmbed.addField(CONFIG.DISCORD_COMMAND_PREFIX + "invite", "Provides information on how to add SupportBot to a different server.");
 		newEmbed.addField(CONFIG.DISCORD_COMMAND_PREFIX + "ping", "Checks SupportBot response time.");
 		newEmbed.addField(CONFIG.DISCORD_COMMAND_PREFIX + "link <region> <username>", "If your LoL ign is different from your discord username, you can set your LoL ign using this command, and SupportBot will remember it.");
-		newEmbed.addField(CONFIG.DISCORD_COMMAND_PREFIX + "getlink", "Aliases:\n`" + CONFIG.DISCORD_COMMAND_PREFIX + "gl`\nTells you what LoL username you currently have registered with SupportBot.");
-		newEmbed.addField(CONFIG.DISCORD_COMMAND_PREFIX + "unlink", "Aliases:\n`" + CONFIG.DISCORD_COMMAND_PREFIX + "removelink`\nSupportBot forgets your preferred username and region.");
+		newEmbed.addField(CONFIG.DISCORD_COMMAND_PREFIX + "getlink", "Aliases:\n`" + CONFIG.DISCORD_COMMAND_PREFIX + "gl`\n\nTells you what LoL username you currently have registered with SupportBot.");
+		newEmbed.addField(CONFIG.DISCORD_COMMAND_PREFIX + "unlink", "Aliases:\n`" + CONFIG.DISCORD_COMMAND_PREFIX + "removelink`\n\nSupportBot forgets your preferred username and region.");
 		newEmbed.addField("<region> [username]", "Displays summoner information.");
-		newEmbed.addField("matchhistory <region> [username]", "Aliases:\n`" + CONFIG.DISCORD_COMMAND_PREFIX + "mh <region> [username]`Displays basic information about the 5 most recent games played.");
-		newEmbed.addField("matchhistory<number> <region> [username]", "Aliases:\n`mh<number> <region> [username]`\nDisplays detailed information about one of your most recently played games.");
-		newEmbed.addField("livegame <region> [username]", "Aliases:\n`lg <region> [username]`\n`currentgame <region> [username]`\n`cg <region> [username]`\n`livematch <region> [username]`\n`lm <region> [username]`\n`currentmatch <region> [username]`\n`cm <region> [username]`");
+		newEmbed.addField("matchhistory <region> [username]", "Aliases:\n`mh <region> [username]`Displays basic information about the 5 most recent games played.");
+		newEmbed.addField("matchhistory<number> <region> [username]", "Aliases:\n`mh<number> <region> [username]`\n\nDisplays detailed information about one of your most recently played games.");
+		newEmbed.addField("livegame <region> [username]", "Aliases:\n`lg <region> [username]`\n`currentgame <region> [username]`\n`cg <region> [username]`\n`livematch <region> [username]`\n`lm <region> [username]`\n`currentmatch <region> [username]`\n`cm <region> [username]`\n\nShows information about a game currently being played.");
 		return newEmbed;
 	}
 	summoner(CONFIG, apiobj) {
