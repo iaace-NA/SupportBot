@@ -64,6 +64,7 @@ module.exports = class EmbedGenrator {
 		newEmbed.addField("matchhistory <region> [username]", "Aliases:\n`mh <region> [username]`\n\nDisplays basic information about the 5 most recent games played.");
 		newEmbed.addField("matchhistory<number> <region> [username]", "Aliases:\n`mh<number> <region> [username]`\n\nDisplays detailed information about one of your most recently played games.");
 		newEmbed.addField("livegame <region> [username]", "Aliases:\n`lg <region> [username]`\n`currentgame <region> [username]`\n`cg <region> [username]`\n`livematch <region> [username]`\n`lm <region> [username]`\n`currentmatch <region> [username]`\n`cm <region> [username]`\n\nShows information about a game currently being played.");
+		newEmbed.setFooter("SupportBot " + CONFIG.VERSION);
 		return newEmbed;
 	}
 	summoner(CONFIG, apiobj) {
