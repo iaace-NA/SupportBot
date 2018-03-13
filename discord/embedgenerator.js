@@ -53,7 +53,7 @@ module.exports = class EmbedGenrator {
 	help(CONFIG) {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Discord Commands");
-		newEmbed.setDescription("For management concerns, please contact `iaace#0647`\n<required parameter> [optional parameter]");
+		newEmbed.setDescription("Terms of Service:\n- Don't be a bot on a user account and use SupportBot.\n- Don't abuse bugs. If you find a bug, please report it to us.\n- Don't spam useless feedback\n- If you do not want to use SupportBot, let us know and we'll opt you out of our services.\n- We reserve the right to ban users and servers from using SupportBot at our discretion.\nFor management concerns, please contact `iaace#0647`\n<required parameter> [optional parameter]");
 		newEmbed.addField(CONFIG.DISCORD_COMMAND_PREFIX + "help", "Displays this information card.");
 		newEmbed.addField(CONFIG.DISCORD_COMMAND_PREFIX + "invite", "Provides information on how to add SupportBot to a different server.");
 		newEmbed.addField(CONFIG.DISCORD_COMMAND_PREFIX + "ping", "Checks SupportBot response time.");
@@ -64,6 +64,7 @@ module.exports = class EmbedGenrator {
 		newEmbed.addField("matchhistory <region> [username]", "Aliases:\n`mh <region> [username]`\n\nDisplays basic information about the 5 most recent games played.");
 		newEmbed.addField("matchhistory<number> <region> [username]", "Aliases:\n`mh<number> <region> [username]`\n\nDisplays detailed information about one of your most recently played games.");
 		newEmbed.addField("livegame <region> [username]", "Aliases:\n`lg <region> [username]`\n`currentgame <region> [username]`\n`cg <region> [username]`\n`livematch <region> [username]`\n`lm <region> [username]`\n`currentmatch <region> [username]`\n`cm <region> [username]`\n\nShows information about a game currently being played.");
+		newEmbed.setFooter("SupportBot " + CONFIG.VERSION);
 		return newEmbed;
 	}
 	summoner(CONFIG, apiobj) {
