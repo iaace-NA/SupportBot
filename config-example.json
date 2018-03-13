@@ -20,5 +20,6 @@
 		"TR": "tr1",
 		"RU": "ru",
 		"PBE": "pbe1"
-	}
+	},
+	"HELP_SERVER_INVITE_LINK": "https://discord.gg/"
 }
