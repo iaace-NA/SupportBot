@@ -53,7 +53,7 @@ module.exports = class EmbedGenrator {
 	help(CONFIG) {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Discord Commands");
-		newEmbed.setDescription("Terms of Service:\n- Don't be a bot on a user account and use SupportBot.\n- Don't abuse bugs. If you find a bug, please report it to us.\n- Don't spam useless feedback\n- If you do not want to use SupportBot, let us know and we'll opt you out of our services.\n- We reserve the right to ban users and servers from using SupportBot at our discretion.\nFor management concerns, please contact `iaace#0647`\n<required parameter> [optional parameter]");
+		newEmbed.setDescription("Terms of Service:\n- Don't be a bot on a user account and use SupportBot.\n- Don't abuse bugs. If you find a bug, please report it to us.\n- Don't spam useless feedback\n- If you do not want to use SupportBot, let us know and we'll opt you out of our services.\n- We reserve the right to ban users and servers from using SupportBot at our discretion.\nFor additional help, please visit <" + CONFIG.HELP_SERVER_INVITE_LINK + ">\n<required parameter> [optional parameter]");
 		newEmbed.addField(CONFIG.DISCORD_COMMAND_PREFIX + "help", "Displays this information card.");
 		newEmbed.addField(CONFIG.DISCORD_COMMAND_PREFIX + "invite", "Provides information on how to add SupportBot to a different server.");
 		newEmbed.addField(CONFIG.DISCORD_COMMAND_PREFIX + "ping", "Checks SupportBot response time.");
