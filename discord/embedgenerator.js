@@ -213,7 +213,12 @@ module.exports = class EmbedGenrator {
 				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
 				team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
 				if (UTILS.exists(match.bannedChampions[player_count])) {
-					ban_description.push(CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].name);
+					try {
+						ban_description.push(CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].name);
+					}
+					catch (e) {
+						UTILS.output("Champion lookup failed for champion id " + match.bannedChampions[player_count].championId);
+					}
 				}
 				team_description += "\n";
 				++player_count;
