@@ -187,6 +187,9 @@ module.exports = class LOLAPI {
 	getLiveMatch(region, summonerID) {
 		return this.get(region, "spectator/v3/active-games/by-summoner/" + summonerID, {});
 	}
+	getMMR(region, summonerID) {
+		return this.get(region, "league/v3/mmr-af/by-summoner/" + summonerID, {});
+	}
 	clearCache() {
 		const filenames = fs.readdirSync("./data/static-api-cache/");
 		for (let b in filenames) {

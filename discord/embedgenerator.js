@@ -229,4 +229,20 @@ module.exports = class EmbedGenrator {
 		}
 		return newEmbed;
 	}
+	mmr(CONFIG, summoner, mmr) {
+		let newEmbed = new Discord.RichEmbed();
+		if (!UTILS.exists(summoner.id)) {
+			newEmbed.setTitle("This summoner does not exist.");
+			newEmbed.setDescription("Please revise your request.");
+			newEmbed.setColor([255, 0, 0]);
+			return newEmbed;
+		}
+		newEmbed.setAuthor(summoner.name);
+		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
+		newEmbed.setDescription("Level " + summoner.summonerLevel);
+		newEmbed.addField("Official MMR data: " + UTILS.english(mmr.tier), );
+		newEmbed.setTimestamp(new Date(summoner.revisionDate));
+		newEmbed.setFooter("Last change detected at ");
+		return newEmbed;
+	}
 }

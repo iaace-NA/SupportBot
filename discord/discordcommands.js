@@ -98,6 +98,14 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				});
 			});
 		});
+		commandGuessUsername(["mmr "], false, (region, username, parameter) => {
+			lolapi.getSummonerIDFromName(region, username).then(result => {
+				result.region = region;
+				lolapi.getMMR(region, result.id).then(mmr => {
+					reply_embed(embedgenerator.mmr(CONFIG, result, mmr));
+				}).catch();
+			});
+		});
 	}
 	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) {//respondable server message only
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "shutdown"], false, true, () => {
