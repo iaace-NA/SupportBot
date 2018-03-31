@@ -40,7 +40,8 @@ const queues = {
 	"980": "VCP Star Guardian Invasion: Normal",
 	"990": "VCP Star Guardian Invasion: Onslaught",
 	"1000": "O Project: Hunters",
-	"1010": "SR Snow ARURF"
+	"1010": "SR Snow ARURF",
+	"1020": "SR One for All"
 };
 const RANK_ORDER = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "CHALLENGER"];
 const RANK_COLOR = [[153, 51, 0], [179, 179, 179], [255, 214, 51], [102, 255, 204], [179, 240, 255], [255, 153, 255], [255, 0, 0]];
