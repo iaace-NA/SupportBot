@@ -245,9 +245,9 @@ module.exports = class EmbedGenrator {
 		newEmbed.setAuthor(summoner.name);
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		newEmbed.setDescription("Level " + summoner.summonerLevel);
-		newEmbed.addField("Official MMR data: " + UTILS.english(mmr.tier), );
-		newEmbed.setTimestamp(new Date(summoner.revisionDate));
-		newEmbed.setFooter("Last change detected at ");
+		newEmbed.addField("Official MMR Data", "Tier: " + UTILS.english(mmr.tier) + "\nMMR: `" + mmr.mmr + "`\n" + mmr.analysis);
+		if (RANK_ORDER.indexOf(mmr.tier) != -1) newEmbed.setColor(RANK_COLOR[RANK_ORDER.indexOf(mmr.tier)]);
+		newEmbed.setFooter("This information is subject to very frequent change.");
 		return newEmbed;
 	}
 }
