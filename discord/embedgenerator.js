@@ -42,6 +42,8 @@ const queues = {
 	"1000": "O Project: Hunters",
 	"1010": "SR Snow ARURF"
 };
+const RANK_ORDER = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "CHALLENGER"];
+const RANK_COLOR = [[153, 51, 0], [179, 179, 179], [255, 214, 51], [102, 255, 204], [179, 240, 255], [255, 153, 255], [255, 0, 0]];
 module.exports = class EmbedGenrator {
 	constructor() { }
 	test() {
@@ -93,13 +95,16 @@ module.exports = class EmbedGenrator {
 		newEmbed.setAuthor(summoner.name);
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		newEmbed.setDescription("Level " + summoner.summonerLevel);
+		let highest_rank = -1;
 		for (let b in ranks) {
 			newEmbed.addField({
 				"RANKED_FLEX_SR": "Flex 5v5",
 				"RANKED_SOLO_5x5": "Solo 5v5",
 				"RANKED_FLEX_TT": "Flex 3v3"
 			}[ranks[b].queueType] + ": " + ranks[b].tier.substring(0, 1) + ranks[b].tier.substring(1).toLowerCase() + " " + ranks[b].rank + " " + ranks[b].leaguePoints + "LP", (ranks[b].wins + ranks[b].losses) + "G = " + ranks[b].wins + "W + " + ranks[b].losses + "L\nWin Rate: " + UTILS.round(100 * ranks[b].wins / (ranks[b].wins + ranks[b].losses), 2) + "%", true);
+			highest_rank = (RANK_ORDER.indexOf(ranks[b].tier) > highest_rank ? RANK_ORDER.indexOf(ranks[b].tier) : highest_rank);
 		}
+		if (highest_rank > -1) newEmbed.setColor(RANK_COLOR[highest_rank]);
 		let cm_description = [];
 		let cm_total = 0;
 		for (let i = 0; i < championmastery.length; ++i) {
