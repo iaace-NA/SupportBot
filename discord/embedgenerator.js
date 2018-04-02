@@ -100,7 +100,7 @@ module.exports = class EmbedGenrator {
 		for (let b in ranks) {
 			let description = (ranks[b].wins + ranks[b].losses) + "G = " + ranks[b].wins + "W + " + ranks[b].losses + "L\nWin Rate: " + UTILS.round(100 * ranks[b].wins / (ranks[b].wins + ranks[b].losses), 2) + "%";
 			if (UTILS.exists(ranks[b].miniSeries)) {
-				description += "\nSeries in Progress: " + ranks[b].miniSeries.progress.replaceAll("N", "_");
+				description += "\nSeries in Progress: `" + ranks[b].miniSeries.progress.replaceAll("N", "_") + "`";
 			}
 			newEmbed.addField({
 				"RANKED_FLEX_SR": "Flex 5v5",
