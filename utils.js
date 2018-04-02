@@ -1,5 +1,9 @@
 "use strict";
 let ta = require("./timeago.js");
+String.prototype.replaceAll = function(search, replacement) {
+	var target = this;
+	return target.replace(new RegExp(search, 'g'), replacement);
+};
 module.exports = class UTILS {
 	output(t) {//general utility function
 		if (this.exists(t)) {
