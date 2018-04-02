@@ -185,9 +185,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					const region = assert_region(parameter, false);
 					db.getLink(msg.author.id).then(result => {
 						let username = msg.author.username;//suppose the link doesn't exist in the database
-						if (UTILS.exists(result)) {//link exists
-							username = result.name;
-						}
+						if (UTILS.exists(result)) username = result.name;//link exists
 						callback(region, username, parameter);
 					}).catch(console.error);
 				}
@@ -211,9 +209,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					const region = assert_region(parameter.substring(parameter.indexOf(" ") + 1), false);
 					db.getLink(msg.author.id).then(result => {
 						let username = msg.author.username;//suppose the link doesn't exist in the database
-						if (UTILS.exists(result)) {//link exists
-							username = result.name;
-						}
+						if (UTILS.exists(result)) username = result.name;//link exists
 						callback(region, username, number);
 					}).catch(console.error);
 				}
@@ -253,9 +249,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		const basic = msg.id + "\ncontent: " + msg.content +
 			"\nauthor: " + msg.author.tag + " :: " + msg.author.id +
 			"\nchannel: " + msg.channel.name + " :: " + msg.channel.id;
-		if (UTILS.exists(msg.guild)) {
-			UTILS.output("received server message :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
-		}
+		if (UTILS.exists(msg.guild)) UTILS.output("received server message :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
 		else {
 			UTILS.output("received PM/DM message :: " + basic);
 		}
