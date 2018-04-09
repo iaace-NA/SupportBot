@@ -35,10 +35,13 @@ module.exports = class UTILS {
 	ago(date) {
 		return ta.ago(date);
 	}
-	stats(summonerID, match) {
+	teamParticipant(summonerID, match) {
 		const participantID = match.participantIdentities.find(pI => { return pI.player.summonerId == summonerID; }).participantId;
-		const stats = match.participants.find(p => { return p.participantId == participantID; }).stats;
+		const stats = match.participants.find(p => { return p.participantId == participantID; });
 		return stats;
+	}
+	stats(summonerID, match) {
+		return teamParticipant(summonerID, match).stats;
 	}
 	KDA(summonerID, match) {
 		const stats = this.stats(summonerID, match);
