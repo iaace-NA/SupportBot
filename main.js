@@ -49,7 +49,7 @@ client.on("ready", function () {
 	UTILS.output("discord user login success");
 	client.user.setStatus("online").catch(console.error);
 	client.user.setGame("League of Legends").catch(console.error);
-	client.channels.get(CLIENT.LOG_CHANNEL_ID).send(":repeat:Bot started: mode: " + mode);
+	client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Bot started: mode: " + mode);
 });
 client.on("disconnect", function () {
 	UTILS.output("discord disconnected");
@@ -63,11 +63,11 @@ client.on("message", function (msg) {
 	}
 });
 client.on("guildCreate", function (guild) {
-	client.channels.get(CLIENT.LOG_CHANNEL_ID).send(":white_check_mark:Server Joined: `" + guild.id + "` :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag).catch(e => console.error(e));
+	client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":white_check_mark:Server Joined: `" + guild.id + "` :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag).catch(e => console.error(e));
 	guild.owner.send("SupportBot has joined your server: " + guild.name + "\nUse `Lhelp` for information on how to use SupportBot.").catch();
 	let candidate = UTILS.preferredTextChannel(client, guild.channels, "text", ["general", "bot", "bots", "bot-commands", "botcommands", "lol", "league", "spam"], "SEND_MESSAGES");
 	if (UTILS.exists(candidate)) candidate.send("Use `Lhelp` for information on how to use SupportBot.").catch();
 });
 client.on("guildDelete", function(guild) {
-	client.channels.get(CLIENT.LOG_CHANNEL_ID).send(":x:Server Left: `" + guild.id + "` :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag).catch(e => console.error(e));
+	client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":x:Server Left: `" + guild.id + "` :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag).catch(e => console.error(e));
 });
