@@ -22,5 +22,6 @@
 		"PBE": "pbe1"
 	},
 	"HELP_SERVER_INVITE_LINK": "https://discord.gg/",
-	"LOG_CHANNEL_ID": "insert discord channel id here"
+	"LOG_CHANNEL_ID": "insert discord channel id here",
+	"BOT_ADD_LINK": ""
 }

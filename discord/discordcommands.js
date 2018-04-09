@@ -49,7 +49,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			reply("The cache size is " + lolapi.cacheSize());
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "invite"], false, false, (original, index) => {
-			reply("This is the link to add SupportBot to other servers: <https://discordapp.com/api/oauth2/authorize?client_id=398355288123506689&permissions=0&scope=bot>\nAdding it requires the \"Manage Server\" permission.");
+			reply("This is the link to add SupportBot to other servers: <" + CONFIG.BOT_ADD_LINK + ">\nAdding it requires the \"Manage Server\" permission.");
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "help"], false, false, (original, index) =>{
 			reply_embed(embedgenerator.help(CONFIG));
