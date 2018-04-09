@@ -104,7 +104,7 @@ module.exports = class UTILS {
 			let candidate = collection.find(ch => {
 				if (ch.type === type && ch.name.toLowerCase() === names[i].toLowerCase() && ch.permissionsFor(client.user).has(permissions)) return true;
 			});
-			if (UTILS.exists(candidate)) return candidate;
+			if (this.exists(candidate)) return candidate;
 		}
 		return collection.find(ch => { if (ch.type === type && ch.permissionsFor(client.user).has(permissions)) return true; });
 	}
