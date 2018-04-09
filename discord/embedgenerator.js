@@ -129,9 +129,9 @@ module.exports = class EmbedGenrator {
 			const KDA = UTILS.KDA(summoner.id, matches[i]);
 			const stats = UTILS.stats(summoner.id, matches[i]);
 			let teams = {};
-			for (let b in match[i].participants) {
-				if (!UTILS.exists(teams[match[i].participants[b].teamId])) teams[match[i].participants[b].teamId] = [];
-				teams[match[i].participants[b].teamId].push(match[i].participants[b]);
+			for (let b in matches[i].participants) {
+				if (!UTILS.exists(teams[matches[i].participants[b].teamId])) teams[matches[i].participants[b].teamId] = [];
+				teams[matches[i].participants[b].teamId].push(matches[i].participants[b]);
 			}
 			const tK = teams[b].reduce((total, increment) => { return total + increment.stats.kills; }, 0);
 			const tD = teams[b].reduce((total, increment) => { return total + increment.stats.deaths; }, 0);
