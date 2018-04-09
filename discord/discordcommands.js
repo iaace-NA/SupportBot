@@ -179,7 +179,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			try {//username provided
 				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
-				callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")));
+				if (parameter.substring(parameter.indexOf(" ") + 1).length < 35) callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")));
 			}
 			catch (e) {//username not provided
 				try {
@@ -203,7 +203,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			if (isNaN(number)) return;
 			try {//username provided
 				const region = assert_region(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
-				callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number);
+				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number);
 			}
 			catch (e) {//username not provided
 				try {
