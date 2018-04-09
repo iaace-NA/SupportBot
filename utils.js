@@ -49,7 +49,8 @@ module.exports = class UTILS {
 			K: stats.kills,
 			D: stats.deaths,
 			A: stats.assists,
-			KDA: (stats.kills + stats.assists) / stats.deaths
+			KDA: (stats.kills + stats.assists) / stats.deaths,
+			KD: stats.kills / stats.deaths
 		};
 	}
 	determineWin(summonerID, match) {
