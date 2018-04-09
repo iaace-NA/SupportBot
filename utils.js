@@ -99,4 +99,13 @@ module.exports = class UTILS {
 		}
 		return answer;
 	}
+	preferredTextChannel(client, collection, type, names, permissions) {
+		for (let i = 0; i < names.length; ++i) {
+			let candidate = collection.find(ch => {
+				if (ch.type === type && ch.name.toLowerCase() === names[i].toLowerCase() && ch.permissionsFor(client.user).has(permissions)) return true;
+			});
+			if (UTILS.exists(candidate)) return candidate;
+		}
+		return collection.find(ch => { if (ch.type === type && ch.permissionsFor(client.user).has(permissions)) return true; });
+	}
 }
