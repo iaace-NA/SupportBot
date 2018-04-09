@@ -265,7 +265,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		}
 	}
 	function shutdown() {
-		client.channels.get(CLIENT.LOG_CHANNEL_ID).send(":x:Shutdown initiated.").catch(console.error);
+		client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":x:Shutdown initiated.").catch(console.error);
 		client.user.setStatus("invisible").then(step2).catch(step2);
 		function step2() {
 			client.destroy().catch();
@@ -276,7 +276,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		}
 	}
 	function restart() {
-		client.channels.get(CLIENT.LOG_CHANNEL_ID).send(":repeat:Restart initiated.").catch(console.error);
+		client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Restart initiated.").catch(console.error);
 		client.user.setStatus("invisible").then(step2).catch(step2);
 		function step2() {
 			client.destroy().catch();
