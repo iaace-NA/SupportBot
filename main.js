@@ -49,7 +49,7 @@ client.on("ready", function () {
 	UTILS.output("discord user login success");
 	client.user.setStatus("online").catch(console.error);
 	client.user.setGame("League of Legends").catch(console.error);
-	client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Bot started: mode: " + mode);
+	client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Bot started: version: " + CONFIG.VERSION + " mode: " + mode);
 });
 client.on("disconnect", function () {
 	UTILS.output("discord disconnected");
