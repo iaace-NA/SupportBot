@@ -20,6 +20,7 @@ catch (e) {
 }
 const DB = new (require("./discord/dbmanager.js"))(CONFIG);
 const LOLAPI = new (require("./discord/lolapi.js"))(CONFIG);
+let mode = "N/A";
 LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 	UTILS.output("DD STATIC RESOURCES LOADED");
 	CONFIG.STATIC = result;
@@ -31,10 +32,12 @@ LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 			CONFIG.STATIC.SUMMONERSPELLS = result.data;
 			UTILS.output("API STATIC RESOURCES LOADED");
 			if (process.argv.length === 2) {//production key
+				mode = "PRODUCTION:warning:";
 				UTILS.output("PRODUCTION LOGIN");
 				client.login(CONFIG.DISCORD_API_KEY_PRODUCTION).catch(console.error);
 			}
 			else {//non-production key
+				mode = "DEVELOPMENT"
 				UTILS.output("DEVELOPMENT LOGIN");
 				client.login(CONFIG.DISCORD_API_KEY_DEVELOPMENT).catch(console.error);
 			}
@@ -46,6 +49,7 @@ client.on("ready", function () {
 	UTILS.output("discord user login success");
 	client.user.setStatus("online").catch(console.error);
 	client.user.setGame("League of Legends").catch(console.error);
+	client.channels.get(CLIENT.LOG_CHANNEL_ID).send(":repeat:Bot started: mode: " + mode);
 });
 client.on("disconnect", function () {
 	UTILS.output("discord disconnected");
