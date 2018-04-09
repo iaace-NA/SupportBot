@@ -41,7 +41,7 @@ module.exports = class UTILS {
 		return stats;
 	}
 	stats(summonerID, match) {
-		return teamParticipant(summonerID, match).stats;
+		return this.teamParticipant(summonerID, match).stats;
 	}
 	KDA(summonerID, match) {
 		const stats = this.stats(summonerID, match);
