@@ -224,12 +224,12 @@ module.exports = class EmbedGenrator {
 			let team_description = "";
 			let ban_description = [];
 			for (let c in teams[b]) {
-				team_description += "__" + teams[b][c].summonerName;
-				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name + "\t";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id];
 				else team_description += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
 				else team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
+				team_description += "\t__" + teams[b][c].summonerName;
+				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
 				if (UTILS.exists(match.bannedChampions[player_count])) {
 					try {
 						ban_description.push(CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].name);
