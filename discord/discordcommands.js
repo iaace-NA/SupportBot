@@ -24,7 +24,8 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "notify "], true, true, (original, index, parameter) => {
 			client.guilds.forEach((g) => {
 				let candidate = UTILS.preferredTextChannel(client, g.channels, "text", ["general", "bot", "bots", "bot-commands", "botcommands", "lol", "league", "spam"], ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
-				if (UTILS.exists(candidate)) candidate.send("", { embed: embedgenerator.notify(CONFIG, parameter, msg.author) }).catch();
+				const notification = embedgenerator.notify(CONFIG, parameter, msg.author);
+				if (UTILS.exists(candidate)) candidate.send("", notification).catch();
 			});
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, () => {
