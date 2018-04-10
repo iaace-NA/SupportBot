@@ -139,6 +139,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					return false;
 				}
 				else {
+					if (elevated_permissions) client.channels.get(CONFIG.LOG_CHANNEL_ID).send(msg.author.tag + " used " + msg.cleanContent).catch(console.error);
 					if (UTILS.exists(callback)) {
 						try {
 							callback(trigger_array[i], i, msg.content.trim().substring(trigger_array[i].length));
@@ -158,6 +159,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					return false;
 				}
 				else {
+					if (elevated_permissions) client.channels.get(CONFIG.LOG_CHANNEL_ID).send(msg.author.tag + " used " + msg.cleanContent).catch(console.error);
 					if (UTILS.exists(callback)) {
 						try {
 							callback(trigger_array[i], i);
