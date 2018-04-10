@@ -282,5 +282,6 @@ module.exports = class EmbedGenrator {
 		newEmbed.setDescription(content);
 		newEmbed.setTimestamp();
 		newEmbed.setFooter("Message sent ");
+		return newEmbed;
 	}
 }
