@@ -21,6 +21,12 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				reply("```" + e + "```");
 			}
 		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "notify "], true, true, (original, index, parameter) => {
+			client.guilds.forEach((g) => {
+				let candidate = UTILS.preferredTextChannel(client, guild.channels, "text", ["general", "bot", "bots", "bot-commands", "botcommands", "lol", "league", "spam"], ["SEND_MESSAGES", "EMBED_LINKS"]);
+				if (UTILS.exists(candidate)) candidate.send("", { embed: embedgenerator.notify(CONFIG, parameter, msg.author) }).catch();
+			});
+		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, () => {
 			reply_embed(embedgenerator.test());
 		});
