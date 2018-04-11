@@ -61,6 +61,20 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "help"], false, false, (original, index) => {
 			reply_embed(embedgenerator.help(CONFIG));
 		});
+		command(["http://"], true, false, (original, index, parameter) => {
+			const region = assert_region(parameter.substring(0, parameter.indexOf(".")), false);
+			if (parameter.substring(parameter.indexOf(".") + 1, parameter.indexOf(".") + 6) == "op.gg") {
+				let username = decodeURIComponent(msg.content.substring(msg.content.indexOf("userName=") + "userName=".length));
+				lolapi.getSummonerIDFromName(region, username).then(result => {
+					result.region = region;
+					lolapi.getRanks(region, result.id).then(result2 => {
+						lolapi.getChampionMastery(region, result.id).then(result3 => {
+							reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter));
+						});
+					}).catch(console.error);
+				}).catch();
+			}
+		});
 		command(["service status ", "servicestatus ", "ss ", "status "], true, false, (original, index, parameter) => {
 			let region = assert_region(parameter);
 			lolapi.getStatus(region).then((status_object) => {
