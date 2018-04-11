@@ -1,5 +1,3 @@
-import { start } from "repl";
-
 "use strict";
 const start_time = new Date().getTime();
 const fs = require("fs");
