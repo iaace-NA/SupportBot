@@ -182,7 +182,7 @@ module.exports = class EmbedGenrator {
 			const tK = teams[b].reduce((total, increment) => { return total + increment.stats.kills; }, 0);
 			const tD = teams[b].reduce((total, increment) => { return total + increment.stats.deaths; }, 0);
 			const tA = teams[b].reduce((total, increment) => { return total + increment.stats.assists; }, 0);
-			const tKP = UTILS.round((tA * 100) / (tK * (teams[b].length - 1)), 0);
+			const tKP = UTILS.round(100 * (tK + tA) / (tK * teams[b].length), 0);
 			newEmbed.addField((match.teams.find(t => { return teams[b][0].teamId == t.teamId; }).win == "Win" ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + "Team " + team_count, "Σlv.`" + teams[b].reduce((total, increment) => { return total + increment.stats.champLevel; }, 0) + "`\t`" + tK + "/" + tD + "/" + tA + "`\tKDR:`" + (UTILS.round((tK / tD), 2) == "Infinity" ? "Perfect" : UTILS.round((tK / tD), 2)) + "`\tKDA:`" + (UTILS.round(((tK + tA) / tD), 2) == "Infinity" ? "Perfect" : UTILS.round(((tK + tA) / tD), 2)) + "` `" + tKP + "%`\tΣcs:`" + teams[b].reduce((total, increment) => { return total + increment.stats.totalMinionsKilled + increment.stats.neutralMinionsKilled; }, 0) + "`\tΣg:`" + UTILS.gold(teams[b].reduce((total, increment) => { return total + increment.stats.goldEarned; }, 0)) + "`");
 			for (let c in teams[b]) {
 				let p = teams[b][c];
