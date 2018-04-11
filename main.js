@@ -1,5 +1,7 @@
-"use strict";
+import { start } from "repl";
 
+"use strict";
+const start_time = new Date().getTime();
 const fs = require("fs");
 const Discord = require("discord.js");
 let discordcommands = require("./discord/discordcommands.js");
@@ -49,7 +51,7 @@ client.on("ready", function () {
 	UTILS.output("discord user login success");
 	client.user.setStatus("online").catch(console.error);
 	client.user.setActivity("League of Legends").catch(console.error);
-	client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Bot started: version: " + CONFIG.VERSION + " mode: " + mode + " servers: " + client.guilds.size);
+	client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Bot started in " + UTILS.round((new Date().getTime() - start_time) / 1000, 0) + "s: version: " + CONFIG.VERSION + " mode: " + mode + " servers: " + client.guilds.size);
 });
 client.on("disconnect", function () {
 	UTILS.output("discord disconnected");
