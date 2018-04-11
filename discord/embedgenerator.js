@@ -300,8 +300,8 @@ module.exports = class EmbedGenrator {
 		for (let b in status_object.services) {
 			let service_description = "";
 			if (status_object.services[b].incidents.length > 0) {
-				service_description += status_object.services[b].incidents.reduce((str, value) => {
-					if (incident.updates.length > 0) return str + value.updates.map(update => { return update.serverity + ": " + update.content }).join("\n") + "\n";
+				service_description += status_object.services[b].incidents.reduce((str, incident) => {
+					if (incident.updates.length > 0) return str + incident.updates.map(update => { return update.serverity + ": " + update.content }).join("\n") + "\n";
 					else return str;
 				}, "");
 			}
