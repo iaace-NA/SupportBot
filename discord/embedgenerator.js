@@ -284,4 +284,31 @@ module.exports = class EmbedGenrator {
 		newEmbed.setFooter("Message sent ");
 		return newEmbed;
 	}
+	status(status_object) {
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setTitle(status_object.name);//region
+		newEmbed.setURL("http://status.leagueoflegends.com/#" + status_object.slug);
+		let status_color = [0, 255, 0];//green
+		for (let b in status_object.services) {
+			if (status_object.services[b].status !== "online") status_color = [255, 255, 0];
+			if (status_object.services[b].status === "offline") {
+				status_color = [255, 0, 0];
+				break;
+			}
+		}
+		newEmbed.setColor(status_color);
+		for (let b in status_object.services) {
+			let service_description = "";
+			if (status_object.services[b].incidents.length > 0) {
+				service_description += status_object.services[b].incidents.reduce((str, value) => {
+					if (incident.updates.length > 0) return str + value.updates.map(update => { return update.serverity + ": " + update.content }).join("\n") + "\n";
+					else return str;
+				}, "");
+			}
+			if (service_description === "") service_description = "No incidents to report";
+			newEmbed.addField(status_object.services[b].name + ": " + status_object.services[b].status, service_description);
+		}
+		newEmbed.setTimestamp();
+		return newEmbed;
+	}
 }

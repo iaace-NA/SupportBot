@@ -190,6 +190,9 @@ module.exports = class LOLAPI {
 	getMMR(region, summonerID) {
 		return this.get(region, "league/v3/mmr-af/by-summoner/" + summonerID, {});
 	}
+	getStatus(region) {
+		return this.get(region, "status/v3/shard-data", {});
+	}
 	clearCache() {
 		const filenames = fs.readdirSync("./data/static-api-cache/");
 		for (let b in filenames) {

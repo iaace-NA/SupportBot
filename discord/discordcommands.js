@@ -58,8 +58,14 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "invite"], false, false, (original, index) => {
 			reply("This is the link to add SupportBot to other servers: <" + CONFIG.BOT_ADD_LINK + ">\nAdding it requires the \"Manage Server\" permission.");
 		});
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "help"], false, false, (original, index) =>{
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "help"], false, false, (original, index) => {
 			reply_embed(embedgenerator.help(CONFIG));
+		});
+		command(["service status ", "servicestatus ", "ss ", "status "], true, false, (original, index, parameter) => {
+			let region = assert_region(parameter);
+			lolapi.getStatus(region).then((status_object) => {
+				reply_embed(embedgenerator.status(status_object));
+			}).catch(console.error);
 		});
 		commandGuessUsername([""], false, (region, username, parameter) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
