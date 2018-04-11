@@ -70,9 +70,9 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					lolapi.getRanks(region, result.id).then(result2 => {
 						lolapi.getChampionMastery(region, result.id).then(result3 => {
 							reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter));
-						});
+						}).catch(console.error);
 					}).catch(console.error);
-				}).catch();
+				}).catch(console.error);
 			}
 		});
 		command(["service status ", "servicestatus ", "ss ", "status "], true, false, (original, index, parameter) => {
