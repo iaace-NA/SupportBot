@@ -310,6 +310,7 @@ module.exports = class EmbedGenrator {
 			newEmbed.addField(status_object.services[b].name + ": " + status_object.services[b].status, service_description);
 		}
 		newEmbed.setTimestamp();
+		newEmbed.setThumbnail("https://cdn.discordapp.com/attachments/423261885262069771/433465885420945409/cby4p-fp0aj-0.png");
 		return newEmbed;
 	}
 }
