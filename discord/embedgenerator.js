@@ -301,11 +301,11 @@ module.exports = class EmbedGenrator {
 			let service_description = "";
 			if (status_object.services[b].incidents.length > 0) {
 				service_description += status_object.services[b].incidents.reduce((str, incident) => {
-					if (incident.updates.length > 0) return str + incident.updates.map(update => { return update.severity + ": " + update.content }).join("\n") + "\n";
+					if (incident.updates.length > 0) return str + incident.updates.map(update => { return "**" + update.severity + "**: " + update.content }).join("\n") + "\n";
 					else return str;
 				}, "");
 			}
-			if (service_description === "") service_description = "No incidents to report";
+			if (service_description === "") service_description = "*No incidents to report.*";
 			newEmbed.addField(status_object.services[b].name + ": " + status_object.services[b].status, service_description);
 		}
 		newEmbed.setTimestamp();
