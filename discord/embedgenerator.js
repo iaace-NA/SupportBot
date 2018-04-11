@@ -239,7 +239,7 @@ module.exports = class EmbedGenrator {
 				else team_description += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
 				else team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
-				team_description += "\t__" + teams[b][c].summonerName;
+				team_description += "\t__[" + teams[b][c].summonerName + "](http://" + CONFIG.REGIONS_REVERSE[summoner.region] + ".op.gg/summoner/userName=" + encodeURIComponent(teams[b][c].summonerName) + ")";
 				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
 				if (UTILS.exists(match.bannedChampions[player_count])) {
 					try {
