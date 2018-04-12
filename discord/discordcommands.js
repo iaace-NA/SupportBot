@@ -113,7 +113,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				lolapi.getLiveMatch(region, result.id).then(match => {
 					reply_embed(embedgenerator.liveMatch(CONFIG, result, match));
 				});
-			});
+			}).catch(console.error);
 		});
 		commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
@@ -129,7 +129,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 						reply_embed(embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match));
 					});
 				});
-			});
+			}).catch(console.error);
 		});
 		/*
 		commandGuessUsername(["mmr "], false, (region, username, parameter) => {
