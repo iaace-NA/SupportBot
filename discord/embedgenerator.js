@@ -70,9 +70,10 @@ module.exports = class EmbedGenrator {
 		newEmbed.setFooter("SupportBot " + CONFIG.VERSION);
 		return newEmbed;
 	}
-	summoner(CONFIG, apiobj) {
+	summoner(CONFIG, apiobj) {//lsd command
 		let newEmbed = new Discord.RichEmbed();
 		if (!UTILS.exists(apiobj.id)) {
+			newEmbed.setAuthor(apiobj.guess);
 			newEmbed.setTitle("This summoner does not exist.");
 			newEmbed.setDescription("Please revise your request.");
 			newEmbed.setColor([255, 0, 0]);
@@ -85,9 +86,10 @@ module.exports = class EmbedGenrator {
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;
 	}
-	detailedSummoner(CONFIG, summoner, ranks, championmastery, region) {
+	detailedSummoner(CONFIG, summoner, ranks, championmastery, region) {//region username command
 		let newEmbed = new Discord.RichEmbed();
 		if (!UTILS.exists(summoner.id)) {
+			newEmbed.setAuthor(summoner.guess);
 			newEmbed.setTitle("This summoner does not exist.");
 			newEmbed.setDescription("Please revise your request.");
 			newEmbed.setColor([255, 0, 0]);
@@ -163,6 +165,7 @@ module.exports = class EmbedGenrator {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) {
+			newEmbed.setAuthor(summoner.guess);
 			newEmbed.setTitle("This summoner has no recent matches.");
 			newEmbed.setColor([255, 0, 0]);
 			return newEmbed;
@@ -216,6 +219,7 @@ module.exports = class EmbedGenrator {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) {
+			newEmbed.setAuthor(summoner.guess);
 			newEmbed.setTitle("This summoner is currently not in a match.");
 			newEmbed.setColor([255, 0, 0]);
 			return newEmbed;

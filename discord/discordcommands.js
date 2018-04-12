@@ -33,6 +33,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "sd ", CONFIG.DISCORD_COMMAND_PREFIX + "summonerdebug "], true, false, (original, index, parameter) => {
 			lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
+				result.guess = parameter.substring(parameter.indexOf(" ") + 1);
 				reply_embed(embedgenerator.summoner(CONFIG, result));
 			}).catch(console.error);
 		});
@@ -40,6 +41,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
 			lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
 				result.region = region;
+				result.guess = parameter.substring(parameter.indexOf(" ") + 1);
 				db.addLink(msg.author.id, result).then(() => { reply("Your discord account is now linked to " + result.name); }).catch((e) => { reply("Something went wrong."); throw e; });
 			}).catch(console.error);
 		});
@@ -67,6 +69,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				let username = decodeURIComponent(msg.content.substring(msg.content.indexOf("userName=") + "userName=".length));
 				lolapi.getSummonerIDFromName(region, username).then(result => {
 					result.region = region;
+					result.guess = username;
 					lolapi.getRanks(region, result.id).then(result2 => {
 						lolapi.getChampionMastery(region, result.id).then(result3 => {
 							reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter.substring(0, parameter.indexOf("."))));
@@ -84,6 +87,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		commandGuessUsername([""], false, (region, username, parameter) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
+				result.guess = username;
 				lolapi.getRanks(region, result.id).then(result2 => {
 					lolapi.getChampionMastery(region, result.id).then(result3 => {
 						reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter));
@@ -105,6 +109,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
+				result.guess = username;
 				lolapi.getLiveMatch(region, result.id).then(match => {
 					reply_embed(embedgenerator.liveMatch(CONFIG, result, match));
 				});
@@ -113,6 +118,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
+				result.guess = username;
 				lolapi.getRecentGames(region, result.accountId).then(matchhistory => {
 					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) reply("No recent matches found for `" + username + "`.");
 					if (number < 1 || number > 20 || !UTILS.exists(matchhistory.matches[number - 1])) {
