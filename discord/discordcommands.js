@@ -99,7 +99,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
 				lolapi.getRecentGames(region, result.accountId).then(matchhistory => {
-					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) reply("No recent matches found for `" + username + "`.");
+					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`.");
 					lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => { return m.gameId; }).slice(0, 5)).then(matches => {
 						reply_embed(embedgenerator.match(CONFIG, result, matchhistory.matches, matches));
 					}).catch(console.error);
@@ -120,11 +120,8 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				result.region = region;
 				result.guess = username;
 				lolapi.getRecentGames(region, result.accountId).then(matchhistory => {
-					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) reply("No recent matches found for `" + username + "`.");
-					if (number < 1 || number > 20 || !UTILS.exists(matchhistory.matches[number - 1])) {
-						reply(":x: This number is out of range.");
-						return;
-					}
+					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`.");
+					if (number < 1 || number > 20 || !UTILS.exists(matchhistory.matches[number - 1])) return reply(":x: This number is out of range.");
 					lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId).then(match => {
 						reply_embed(embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match));
 					}).catch(console.error);
