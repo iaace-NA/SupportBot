@@ -70,6 +70,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				lolapi.getSummonerIDFromName(region, username).then(result => {
 					result.region = region;
 					result.guess = username;
+					if (!UTILS.exists(result.id)) return;
 					lolapi.getRanks(region, result.id).then(result2 => {
 						lolapi.getChampionMastery(region, result.id).then(result3 => {
 							reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter.substring(0, parameter.indexOf("."))));
@@ -88,6 +89,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
 				result.guess = username;
+				if (!UTILS.exists(result.id)) return reply("No results for `" + username + "`. Please revise your request.");
 				lolapi.getRanks(region, result.id).then(result2 => {
 					lolapi.getChampionMastery(region, result.id).then(result3 => {
 						reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter));
@@ -111,7 +113,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
 				result.guess = username;
-				if (!UTILS.exists(result.id)) return reply("No recent matches found for `" + username + "`.");
+				if (!UTILS.exists(result.id)) return reply("No current matches found for `" + username + "`.");
 				lolapi.getLiveMatch(region, result.id).then(match => {
 					reply_embed(embedgenerator.liveMatch(CONFIG, result, match));
 				}).catch(console.error);
