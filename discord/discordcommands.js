@@ -102,9 +102,9 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) reply("No recent matches found for `" + username + "`.");
 					lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => { return m.gameId; }).slice(0, 5)).then(matches => {
 						reply_embed(embedgenerator.match(CONFIG, result, matchhistory.matches, matches));
-					});
-				});
-			});
+					}).catch(console.error);
+				}).catch(console.error);
+			}).catch(console.error);
 		});
 		commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
@@ -112,7 +112,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				result.guess = username;
 				lolapi.getLiveMatch(region, result.id).then(match => {
 					reply_embed(embedgenerator.liveMatch(CONFIG, result, match));
-				});
+				}).catch(console.error);
 			}).catch(console.error);
 		});
 		commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number) => {
@@ -127,8 +127,8 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					}
 					lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId).then(match => {
 						reply_embed(embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match));
-					});
-				});
+					}).catch(console.error);
+				}).catch(console.error);
 			}).catch(console.error);
 		});
 		/*
