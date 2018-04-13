@@ -44,36 +44,7 @@ module.exports = class LOLAPI {
 			});
 		});
 	}
-	addCache(url, data) {//add data to api cache
-		this.cache[url] = {
-			data: data,
-			expiration: new Date().getTime() + 120000 //2 min cache expiration time (based on API key limit)
-		}
-		this.maintainCache();
-	}
-	checkCache(url) {//return the data if it exists, otherwise return false
-		this.maintainCache();
-		if (!UTILS.exists(this.cache[url])) {//cache miss
-			return false;
-		}
-		else {
-			return this.cache[url].data;
-		}
-	}
-	maintainCache() {//prune old values
-		const now = new Date().getTime();
-		for (let b in this.cache) {
-			if (this.cache[b].expiration < now) {
-				delete this.cache[b];
-			}
-		}
-	}
-	cacheSize() {//check size of cache
-		let size = 0;
-		for (let b in this.cache) ++size;
-		return size;
-	}
-	get(region, path, options) {
+	get(region, path, options, cachetime, maxage) {
 		let that = this;
 		return new Promise((resolve, reject) => {
 			UTILS.assert(UTILS.exists(region));
@@ -81,30 +52,22 @@ module.exports = class LOLAPI {
 			for (let i in options) {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
-			let cache_answer = this.checkCache(url);//access cache
-			if (cache_answer === false) {
-				this.request(url, function (error, response, body) {
-					if (UTILS.exists(error)) {
-						reject(error);
+			this.request(this.address + ":" + this.port + "/lol/" + cachetime + "/" + maxage + "/?url=" + encodeURIComponent(url), (error, response, body) => {
+				if (UTILS.exists(error)) {
+					reject(error);
+				}
+				else {
+					try {
+						const answer = JSON.parse(body);
+						if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
+						else UTILS.output("IAPI req: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
+						resolve(answer);
 					}
-					else {
-						try {
-							const answer = JSON.parse(body);
-							if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
-							else UTILS.output("cache miss: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
-							that.addCache(url, answer);
-							resolve(answer);
-						}
-						catch (e) {
-							reject(e);
-						}
+					catch (e) {
+						reject(e);
 					}
-				});
-			}
-			else {
-				UTILS.output("cache hit: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
-				resolve(cache_answer);
-			}
+				}
+			});
 		});
 	}
 	getStatic(path) {//data dragon
@@ -129,14 +92,14 @@ module.exports = class LOLAPI {
 		});
 	}
 	//get(path, options) {}
-	getSummonerIDFromName(region, username) {
-		return this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {});
+	getSummonerIDFromName(region, username, maxage) {
+		return this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {}, 86400, maxage);
 	}
-	getRanks(region, summonerID) {
-		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {});
+	getRanks(region, summonerID, maxage) {
+		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {}, 86400, maxage);
 	}
-	getChampionMastery(region, summonerID) {
-		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, {});
+	getChampionMastery(region, summonerID, maxage) {
+		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, {}, 86400, maxage);
 	}
 	getStaticChampions(region) {
 		let that = this;
@@ -204,25 +167,25 @@ module.exports = class LOLAPI {
 			}
 		});
 	}
-	getRecentGames(region, accountID) {
-		return this.get(region, "match/v3/matchlists/by-account/" + accountID + "/recent", {});
+	getRecentGames(region, accountID, maxage) {
+		return this.get(region, "match/v3/matchlists/by-account/" + accountID + "/recent", {}, 1800, maxage);
 	}
-	getMatchInformation(region, gameID) {
-		return this.get(region, "match/v3/matches/" + gameID, {});
+	getMatchInformation(region, gameID, maxage) {
+		return this.get(region, "match/v3/matches/" + gameID, {}, 604800, maxage);
 	}
-	getMultipleMatchInformation(region, gameIDs) {
+	getMultipleMatchInformation(region, gameIDs, maxage) {
 		let requests = [];
-		for (let i in gameIDs) requests.push(this.getMatchInformation(region, gameIDs[i]));
+		for (let i in gameIDs) requests.push(this.getMatchInformation(region, gameIDs[i], maxage));
 		return Promise.all(requests);
 	}
-	getLiveMatch(region, summonerID) {
-		return this.get(region, "spectator/v3/active-games/by-summoner/" + summonerID, {});
+	getLiveMatch(region, summonerID, maxage) {
+		return this.get(region, "spectator/v3/active-games/by-summoner/" + summonerID, {}, 60, maxage);
 	}
-	getMMR(region, summonerID) {
-		return this.get(region, "league/v3/mmr-af/by-summoner/" + summonerID, {});
+	getMMR(region, summonerID, maxage) {
+		return this.get(region, "league/v3/mmr-af/by-summoner/" + summonerID, {}, 120, maxage);
 	}
-	getStatus(region) {
-		return this.get(region, "status/v3/shard-data", {});
+	getStatus(region, maxage) {
+		return this.get(region, "status/v3/shard-data", {}, 60, maxage);
 	}
 	clearCache() {
 		const filenames = fs.readdirSync("./data/static-api-cache/");
