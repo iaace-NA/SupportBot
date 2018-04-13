@@ -38,7 +38,7 @@ let api_doc_model = apicache.model("api_doc_model", api_doc);
 let shortcut_doc = new apicache.Schema({
 	uid: String,
 	shortcuts: apicache.Schema.Types.Mixed
-});
+}, { minimize: false });
 let shortcut_doc_model = apicache.model("shortcut_doc_model", shortcut_doc);
 ready();
 function ready() {
