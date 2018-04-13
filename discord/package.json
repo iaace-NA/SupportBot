@@ -1,13 +1,13 @@
 {
   "name": "supportbot",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
-  "main": "./discord/main.js",
+  "main": "./main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "UNLICENSED",
+  "author": "iaace",
+  "license": "MIT",
   "dependencies": {
     "discord.js": "^11.3.2",
     "erlpack": "github:discordapp/erlpack",
