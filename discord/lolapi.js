@@ -85,6 +85,9 @@ module.exports = class LOLAPI {
 				if (UTILS.exists(error)) {
 					reject(error);
 				}
+				else if (response.statusCode !== 200) {
+					reject(response.statusCode);
+				}
 				else {
 					try {
 						const answer = JSON.parse(body);
