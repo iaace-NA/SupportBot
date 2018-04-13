@@ -20,15 +20,17 @@ let http = require('http');
 
 const express = require("express");
 const website = express();
+const UTILS = require("../utils.js");
 
-output("modules loaded");
+UTILS.output("Modules loaded.");
 ready();
 function ready() {
-	output("ready");
 	if (process.argv.length === 2) {//production key
+		UTILS.output("Ready and listening on port " + CONFIG.API_PORT_PRODUCTION);
 		website.listen(CONFIG.API_PORT_PRODUCTION);
 	}
 	else {//non-production key
+		UTILS.output("Ready and listening on port " + CONFIG.API_PORT_DEVELOPOMENT);
 		website.listen(CONFIG.API_PORT_DEVELOPOMENT);
 	}
 	
@@ -37,9 +39,11 @@ function ready() {
 		return next();
 	});
 	//https.createServer({ key: fs.readFileSync("./privkey.pem"), cert: fs.readFileSync("./fullchain.pem") }, website).listen(443);
-	
+	serveWebRequest("/ping", function (req, res, next) {
+		res.send(JSON.stringify({ received: new Date().getTime() }));
+	});
 	serveWebRequest("/", function (req, res, next) {
-		res.sendFile(__dirname + "/static/index.htm");
+		res.send("You have reached the online api's testing page.");
 	});
 	serveWebRequest("*", function (req, res, next) {
 		res.status(404).end();
@@ -47,25 +51,18 @@ function ready() {
 	function serveWebRequest(branch, callback) {
 		if (typeof(branch) == "string") {
 			website.get(branch, function (req, res, next) {
-				output("request served: " + req.originalUrl);
+				UTILS.output("request served: " + req.originalUrl);
 				callback(req, res, next);
 			});
 		}
 		else {
 			for (let b in branch) {
 				website.get(branch[b], function(req, res, next){
-					output("request served: " + req.originalUrl);
+					UTILS.output("request served: " + req.originalUrl);
 					callback(req, res, next);
 				});
 			}
 		}
-	}
-}
-function output(t) {//general utility function
-	if (exists(t)) {
-		let d = new Date();
-		let n = d.toUTCString();
-		console.log(n + " : " + t);
 	}
 }
 function exists(anyObject) {//general utility function
