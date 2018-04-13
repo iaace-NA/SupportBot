@@ -18,9 +18,9 @@ catch (e) {
 	console.error(e);
 	process.exit(1);
 }
+let mode = process.argv.length === 2 ? "PRODUCTION:warning:" : "DEVELOPMENT";
 const DB = new (require("./dbmanager.js"))(CONFIG);
 const LOLAPI = new (require("./lolapi.js"))(CONFIG);
-let mode = "N/A";
 LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 	UTILS.output("DD STATIC RESOURCES LOADED");
 	CONFIG.STATIC = result;
@@ -32,12 +32,10 @@ LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 			CONFIG.STATIC.SUMMONERSPELLS = result.data;
 			UTILS.output("API STATIC RESOURCES LOADED");
 			if (process.argv.length === 2) {//production key
-				mode = "PRODUCTION:warning:";
 				UTILS.output("PRODUCTION LOGIN");
 				client.login(CONFIG.DISCORD_API_KEY_PRODUCTION).catch(console.error);
 			}
 			else {//non-production key
-				mode = "DEVELOPMENT"
 				UTILS.output("DEVELOPMENT LOGIN");
 				client.login(CONFIG.DISCORD_API_KEY_DEVELOPMENT).catch(console.error);
 			}
