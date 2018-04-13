@@ -65,14 +65,14 @@ function ready() {
 		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
 			if (err) {
 				console.error(err);
-				return res.status(500);
+				return res.status(500).end();
 			}
 			if (UTILS.exists(doc)) {
 				doc.shortcuts[req.query.from] = req.query.to;
 				doc.save(e => {
 					if (e) {
 						console.error(err);
-						return res.status(500);
+						return res.status(500).end();
 					}
 					else {
 						res.send("{\"success\":true}");
@@ -88,7 +88,7 @@ function ready() {
 				new_document.save((e, doc) => {
 					if (e) {
 						console.error(err);
-						return res.status(500);
+						return res.status(500).end();
 					}
 					else {
 						res.send("{\"success\":true}");
@@ -101,14 +101,14 @@ function ready() {
 		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
 			if (err) {
 				console.error(err);
-				return res.status(500);
+				return res.status(500).end();
 			}
 			if (UTILS.exists(doc)) {
 				delete doc.shortcuts[req.query.from];
 				doc.save(e => {
 					if (e) {
 						console.error(err);
-						return res.status(500);
+						return res.status(500).end();
 					}
 					else {
 						res.send("{\"success\":true}");
@@ -124,7 +124,7 @@ function ready() {
 		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
 			if (err) {
 				console.error(err);
-				return res.status(500);
+				return res.status(500).end();
 			}
 			if (UTILS.exists(doc)) {
 				if (UTILS.exists(doc.shortcuts[req.query.from])) {
@@ -132,10 +132,10 @@ function ready() {
 					answer[req.query.from] = doc.shortcuts[req.query.from];
 					res.send(JSON.stringify(answer));
 				}
-				else res.status(404);
+				else res.status(404).end();
 			}
 			else {
-				res.status(404);
+				res.status(404).end();
 			}
 		});
 	});
@@ -145,7 +145,7 @@ function ready() {
 			if (err) {
 				UTILS.output("2");
 				console.error(err);
-				return res.status(500);
+				return res.status(500).end();
 			}
 			if (UTILS.exists(doc)) {
 				UTILS.output("3");
@@ -153,7 +153,7 @@ function ready() {
 			}
 			else {
 				UTILS.output("4");
-				res.status(404);
+				res.status(404).end();
 			}
 		});
 	});
