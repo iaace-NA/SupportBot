@@ -107,6 +107,7 @@ function ready() {
 			}
 			if (UTILS.exists(doc)) {
 				delete doc.shortcuts[req.query.from];
+				doc.markModified("shortcuts");
 				doc.save(e => {
 					if (e) {
 						console.error(e);
