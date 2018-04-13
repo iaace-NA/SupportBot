@@ -71,6 +71,7 @@ function ready() {
 				UTILS.output("dpr");
 				doc.shortcuts[req.query.from] = req.query.to;
 				doc.validate(console.error);
+				UTILS.assert(doc.shortcuts[req.query.from] == req.query.to);
 				doc.save(e => {
 					if (e) {
 						console.error(err);
