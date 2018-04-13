@@ -11,7 +11,7 @@ module.exports = class TextGenerator {
 	shortcuts(obj) {
 		if (!UTILS.exists(obj.shortcuts) || Object.keys(obj.shortcuts).length == 0) return "";
 		let answer = "```";
-		for (let b in obj.shortcuts) answer += b + " -> " + obj.shortcuts[b];
+		for (let b in obj.shortcuts) answer += "$" + b + " -> " + obj.shortcuts[b];
 		return answer + "```";
 	}
 }
