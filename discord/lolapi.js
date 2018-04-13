@@ -127,6 +127,9 @@ module.exports = class LOLAPI {
 	getSummonerIDFromName(region, username, maxage) {
 		return this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {}, 86400, maxage);
 	}
+	getSummonerFromSummonerID(region, id, maxage) {
+		return this.get(region, "summoner/v3/summoners/" + id, {}, 86400, maxage);
+	}
 	getRanks(region, summonerID, maxage) {
 		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {}, 86400, maxage);
 	}

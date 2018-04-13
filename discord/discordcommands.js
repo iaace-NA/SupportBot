@@ -136,13 +136,31 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				}).catch(console.error);
 			}).catch(console.error);
 		});
-		commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {
+		/*commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {//old no premade detection
 			lolapi.getSummonerIDFromName(region, username, 3600).then(result => {
 				result.region = region;
 				result.guess = username;
 				if (!UTILS.exists(result.id)) return reply("No current matches found for `" + username + "`.");
 				lolapi.getLiveMatch(region, result.id).then(match => {
 					reply_embed(embedgenerator.liveMatch(CONFIG, result, match));
+				}, 60).catch(console.error);
+			}).catch(console.error);
+		});*/
+		commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {//new
+			lolapi.getSummonerIDFromName(region, username, 3600).then(result => {
+				result.region = region;
+				result.guess = username;
+				if (!UTILS.exists(result.id)) return reply("No current matches found for `" + username + "`.");
+				lolapi.getLiveMatch(region, result.id).then(match => {
+					Promise.all(match.participants.map(p => { return lolapi.getSummonerFromSummonerID(region, p.summonerId, 86400); })).then(pSA => {//participant summoner array
+						Promise.all(pSA.map(pS => { return lolapi.getRecentGames(region, pS.accountId, 1800); })).then(mhA => {//matchhistory array
+							let mIDA = [];//match id array;
+							for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
+							lolapi.getMultipleMatchInformation(region, mIDA, 604800).then(matches => {
+								reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches));
+							});
+						}).catch(console.error);
+					}).catch(console.error);
 				}, 60).catch(console.error);
 			}).catch(console.error);
 		});
