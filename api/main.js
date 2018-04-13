@@ -66,14 +66,6 @@ function ready() {
 		}
 	}
 }
-function exists(anyObject) {//general utility function
-	if (anyObject != null && anyObject != undefined) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
 function changeBaseTo62(number) {
 	number = parseInt(number);//convert to string
 	const dictionary = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -93,9 +85,4 @@ function changeBaseTo55(number) {
 		number = (number - (number % 55)) / 55;
 	}
 	return answer;
-}
-function assert(value) {
-	if (value !== true) {
-		throw new Error("Assertion failed");
-	}
 }
