@@ -24,6 +24,16 @@ const UTILS = new (require("../utils.js"))();
 UTILS.assert(UTILS.exists(CONFIG.API_PORT_PRODUCTION));
 UTILS.assert(UTILS.exists(CONFIG.API_PORT_DEVELOPMENT));
 UTILS.output("Modules loaded.");
+let apicache = require("mongoose");
+apicache.connect("mongodb://localhost/apicache");//cache of summoner object name lookups
+apicache.connection.on("error", function (e) { throw e; });
+let api_doc = new apicache.Schema({
+	url: String,
+	response: apicache.Schema.Mixed,
+	expireAt: Date
+});
+api_doc.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
+let api_doc_model = apicache.model("api_doc_model", api_doc);
 ready();
 function ready() {
 	if (process.argv.length === 2) {//production key
@@ -38,6 +48,12 @@ function ready() {
 	website.use(function (req, res, next) {
 		res.removeHeader("X-Powered-By");
 		return next();
+	});
+	serveWebRequest("/lol/:cachetime/", function (req, res, next) {
+		get(req.query.url, parseInt(req.params.cachetime)).then(result => res.send(JSON.stringify(result))).catch(e => {
+			console.error(e);
+			res.status(500);
+		});
 	});
 	//https.createServer({ key: fs.readFileSync("./privkey.pem"), cert: fs.readFileSync("./fullchain.pem") }, website).listen(443);
 	serveWebRequest("/ping", function (req, res, next) {
@@ -85,4 +101,73 @@ function changeBaseTo55(number) {
 		number = (number - (number % 55)) / 55;
 	}
 	return answer;
+}
+function checkCache(url, maxage) {
+	return new Promise((resolve, reject) => {
+		api_doc_model.findOne({ url }, (err, doc) => {
+			if (err) return reject(err);
+			if (UTILS.exists(doc)) {
+				if (UTILS.exists(maxage) && apicache.Types.ObjectId(doc.id).toTimestamp().getTime() < new Date().getTime() - (maxage * 1000)) {//if expired
+					UTILS.output("maxage expired url: " + url);
+					doc.remove(() => {});
+					reject(null);
+				}
+				else resolve(doc.toObject().response);
+			}
+			else {
+				reject(null);
+			}
+		});
+	});
+}
+function addCache(url, response, cachetime) {
+	let new_document = new api_doc_model({ url: url, response: response, expireAt: new Date(new Date().getTime() + (cachetime * 1000)) });
+	new_document.save((e, doc) => {
+		if (e) console.error(e);
+	});
+}
+function get(url, cachetime, maxage) {//cachetime in seconds, maxage in seconds
+	let that = this;
+	return new Promise((resolve, reject) => {
+		UTILS.assert(UTILS.exists(region));
+		if (cachetime != 0) {
+			checkCache(url, maxage).then((cached_result) => {
+				UTILS.output("cache hit: " + url.replace(CONFIG.RIOT_API_KEY, ""));
+				res.send(JSON.stringify(cached_result));
+			}).catch((e) => {
+				if (UTILS.exists(e)) console.error(e);
+				request(url, (error, response, body) => {
+					if (UTILS.exists(error)) {
+						reject(error);
+					}
+					else {
+						try {
+							const answer = JSON.parse(body);
+							UTILS.output("cache miss: " + url.replace(CONFIG.RIOT_API_KEY, ""));
+							addCache(url, answer, cachetime);
+							resolve(answer);
+						}
+						catch (e) {
+							reject(e);
+						}
+					}
+				});
+			});
+		}
+		else {
+			request(url, (error, response, body) => {
+				if (UTILS.exists(error)) reject(error);
+				else {
+					try {
+						const answer = JSON.parse(body);
+						UTILS.output("uncached: " + url.replace(CONFIG.RIOT_API_KEY, ""));
+						resolve(answer);
+					}
+					catch (e) {
+						reject(e);
+					}
+				}
+			});
+		}
+	});
 }
