@@ -22,24 +22,26 @@ module.exports = class LOLAPI {
 		}
 	}
 	ping() {
-		const now = new Date().getTime();
-		let url = this.address + ":" + this.port + "/ping";
-		this.request(url, function (error, response, body) {
-			if (UTILS.exists(error)) {
-				reject(error);
-			}
-			else {
-				try {
-					const answer = JSON.parse(body);
-					UTILS.output("cache miss: " + url);
-					answer.started = now;
-					answer.ended = new Date().getTime();
-					resolve(answer);
+		return new Promise((resolve, reject) => {
+			const now = new Date().getTime();
+			let url = this.address + ":" + this.port + "/ping";
+			this.request(url, function (error, response, body) {
+				if (UTILS.exists(error)) {
+					reject(error);
 				}
-				catch (e) {
-					reject(e);
+				else {
+					try {
+						const answer = JSON.parse(body);
+						UTILS.output("cache miss: " + url);
+						answer.started = now;
+						answer.ended = new Date().getTime();
+						resolve(answer);
+					}
+					catch (e) {
+						reject(e);
+					}
 				}
-			}
+			});
 		});
 	}
 	addCache(url, data) {//add data to api cache
