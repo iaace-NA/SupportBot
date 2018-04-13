@@ -143,10 +143,11 @@ module.exports = class EmbedGenrator {
 			let teams = {};
 			for (let b in matches[i].participants) {
 				if (!UTILS.exists(teams[matches[i].participants[b].teamId])) teams[matches[i].participants[b].teamId] = [];
-				if (UTILS.findParticipantIdentityFromPID(matches[i], matches[i].participants[b].participantId).summonerId !== summoner.id) teams[matches[i].participants[b].teamId].push(matches[i].participants[b]);
+				teams[matches[i].participants[b].teamId].push(matches[i].participants[b]);
 			}
 			for (let b in teams[teamParticipant.teamId]) {
 				const tmPI = UTILS.findParticipantIdentityFromPID(matches[i], teams[teamParticipant.teamId][b].participantId);
+				if (UTILS.findParticipantIdentityFromPID(matches[i], matches[i].participants[b].participantId).summonerId === summoner.id) continue;
 				if (!UTILS.exists(common_teammates[tmPI.player.summonerName])) common_teammates[tmPI.player.summonerName] = { w: 0, l: 0 };
 				if (UTILS.determineWin(summoner.id, matches[i])) common_teammates[tmPI.player.summonerName].w += 1;
 				else common_teammates[tmPI.player.summonerName].l += 1;
