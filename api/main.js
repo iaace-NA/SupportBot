@@ -50,8 +50,8 @@ function ready() {
 		res.removeHeader("X-Powered-By");
 		return next();
 	});
-	serveWebRequest("/lol/:cachetime/", function (req, res, next) {
-		get(req.query.url, parseInt(req.params.cachetime)).then(result => res.send(JSON.stringify(result))).catch(e => {
+	serveWebRequest("/lol/:cachetime/:maxage/", function (req, res, next) {
+		get(req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage)).then(result => res.send(JSON.stringify(result))).catch(e => {
 			console.error(e);
 			res.status(500);
 		});
