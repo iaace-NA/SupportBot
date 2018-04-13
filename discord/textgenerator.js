@@ -9,6 +9,7 @@ module.exports = class TextGenerator {
 		return "Time to internal api: " + (times.received - times.started) + " ms. Time to return: " + (times.ended - times.received) + " ms.";
 	}
 	shortcuts(obj) {
+		if (Object.keys(obj).length == 0 ) return "";
 		let answer = "```";
 		for (let b in obj) answer += b + " -> " + obj;
 		return answer + "```";
