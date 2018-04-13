@@ -69,7 +69,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "setshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "ss ", CONFIG.DISCORD_COMMAND_PREFIX + "createshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "cs ", CONFIG.DISCORD_COMMAND_PREFIX + "addshortcut "], true, false, (original, index, parameter) => {
 			if (parameter[0] !== "$") return reply(":x: The shortcut must begin with an `$`. Please try again.");
 			if (parameter.indexOf(" ") === -1) return reply(":x: The shortcut word and the username must be separated by a space. Please try again.");
-			const from = parameter.substring(0, parameter.indexOf(" ")).toLowerCase();
+			const from = parameter.substring(1, parameter.indexOf(" ")).toLowerCase();
 			if (from.length === 0) return reply(":x: The shortcut name was not specified. Please try again.");
 			const to = parameter.substring(parameter.indexOf(" ") + 1);
 			if (to.length === 0) return reply(":x: The username was not specified. Please try again.");
@@ -79,7 +79,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "removeshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "rs ", CONFIG.DISCORD_COMMAND_PREFIX + "deleteshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "ds "], true, false, (original, index, parameter) => {
 			if (parameter[0] !== "$") return reply(":x: The shortcut must begin with an `$`. Please try again.");
-			const from = parameter.substring(0, parameter.indexOf(" ")).toLowerCase();
+			const from = parameter.substring(1, parameter.indexOf(" ")).toLowerCase();
 			if (from.length === 0) return reply(":x: The shortcut name was not specified. Please try again.");
 			lolapi.removeShortcut(msg.author.id, from).then(result => {
 				if (result.success) reply(":white_check_mark: `" + from + "` removed.");
@@ -246,8 +246,8 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
 				if (parameter.substring(parameter.indexOf(" ") + 1).length < 35) {
 					if (parameter.substring(parameter.indexOf(" ") + 1)[0] == "$") {
-						lolapi.getShortcut(msg.author.id, parameter.substring(parameter.indexOf(" ") + 1).toLowerCase()).then(result => {
-							callback(region, result[parameter.substring(parameter.indexOf(" ") + 1).toLowerCase()], parameter.substring(0, parameter.indexOf(" ")));
+						lolapi.getShortcut(msg.author.id, parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)).then(result => {
+							callback(region, result[parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)], parameter.substring(0, parameter.indexOf(" ")));
 						}).catch(e => {
 							if (e) reply("An error has occurred. The shortcut may not exist.");
 						});
@@ -281,8 +281,8 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) {
 					
 					if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1)[0] == "$") {
-						lolapi.getShortcut(msg.author.id, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase()).then(result => {
-							callback(region, result[parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase()], number);
+						lolapi.getShortcut(msg.author.id, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)).then(result => {
+							callback(region, result[parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)], number);
 						}).catch(e => {
 							if (e) reply("An error has occurred. The shortcut may not exist.");
 						});
