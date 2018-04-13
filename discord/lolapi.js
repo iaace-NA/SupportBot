@@ -21,6 +21,28 @@ module.exports = class LOLAPI {
 			this.port = this.CONFIG.API_PORT_PRODUCTION;
 		}
 	}
+	ping() {
+		const now = new Date().getTime();
+		UTILS.assert(UTILS.exists(region));
+		let url = this.address + ":" + this.port + "/ping";
+		this.request(url, function (error, response, body) {
+			if (UTILS.exists(error)) {
+				reject(error);
+			}
+			else {
+				try {
+					const answer = JSON.parse(body);
+					UTILS.output("cache miss: " + url);
+					answer.started = now;
+					answer.ended = new Date().getTime();
+					resolve(answer);
+				}
+				catch (e) {
+					reject(e);
+				}
+			}
+		});
+	}
 	addCache(url, data) {//add data to api cache
 		this.cache[url] = {
 			data: data,
@@ -61,7 +83,7 @@ module.exports = class LOLAPI {
 			let cache_answer = this.checkCache(url);//access cache
 			if (cache_answer === false) {
 				this.request(url, function (error, response, body) {
-					if (error != undefined && error != null) {
+					if (UTILS.exists(error)) {
 						reject(error);
 					}
 					else {
