@@ -108,7 +108,7 @@ function checkCache(url, maxage) {
 		api_doc_model.findOne({ url }, (err, doc) => {
 			if (err) return reject(err);
 			if (UTILS.exists(doc)) {
-				if (UTILS.exists(maxage) && apicache.Types.ObjectId(doc.id).toTimestamp().getTime() < new Date().getTime() - (maxage * 1000)) {//if expired
+				if (UTILS.exists(maxage) && apicache.Types.ObjectId(doc.id).getTimestamp().getTime() < new Date().getTime() - (maxage * 1000)) {//if expired
 					UTILS.output("maxage expired url: " + url);
 					doc.remove(() => {});
 					reject(null);
