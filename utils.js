@@ -13,7 +13,7 @@ module.exports = class UTILS {
 		}
 	}
 	exists(anyObject) {//general utility function
-		if (anyObject != null && anyObject != undefined) return true;
+		if (anyObject !== null && anyObject !== undefined) return true;
 		else return false;
 	}
 	numberWithCommas(x) {//general utility function
