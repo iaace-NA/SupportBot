@@ -1,7 +1,7 @@
 {
 	"apps": [
 		{
-			"name": "main",
+			"name": "maindev",
 			"script": "./discord/main.js",
 			"watch": false,
 			"min_uptime": 3000,
@@ -16,7 +16,7 @@
 			"node_args": "--trace-deprecation"
 		},
 		{
-			"name": "api",
+			"name": "apidev",
 			"script": "./api/main.js",
 			"watch": false,
 			"min_uptime": 3000,
