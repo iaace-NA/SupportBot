@@ -29,7 +29,7 @@ apicache.connect("mongodb://localhost/apicache");//cache of summoner object name
 apicache.connection.on("error", function (e) { throw e; });
 let api_doc = new apicache.Schema({
 	url: String,
-	response: apicache.Schema.Mixed,
+	response: apicache.Schema.Types.Mixed,
 	expireAt: Date
 });
 api_doc.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
