@@ -74,7 +74,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			const to = parameter.substring(parameter.indexOf(" ") + 1);
 			if (to.length === 0) return reply(":x: The username was not specified. Please try again.");
 			lolapi.createShortcut(msg.author.id, from, to).then(result => {
-				if (result.success) reply(":white_check_mark: `" + from + "` will now point to `" + to + "`.");
+				if (result.success) reply(":white_check_mark: `$" + from + "` will now point to `" + to + "`.");
 			}).catch(console.error);
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "removeshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "rs ", CONFIG.DISCORD_COMMAND_PREFIX + "deleteshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "ds "], true, false, (original, index, parameter) => {
@@ -82,7 +82,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			const from = parameter.substring(1, parameter.indexOf(" ")).toLowerCase();
 			if (from.length === 0) return reply(":x: The shortcut name was not specified. Please try again.");
 			lolapi.removeShortcut(msg.author.id, from).then(result => {
-				if (result.success) reply(":white_check_mark: `" + from + "` removed.");
+				if (result.success) reply(":white_check_mark: `$" + from + "` removed.");
 			}).catch(console.error);
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "shortcuts", CONFIG.DISCORD_COMMAND_PREFIX + "shortcut"], false, false, (original, index) => {
