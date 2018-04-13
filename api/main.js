@@ -15,8 +15,8 @@ let path = require('path');
 let crypto = require("crypto");
 let https = require('https');
 let http = require('http');
-const aes256 = require("aes256");
-let cipher = aes256.createCipher(fs.readFileSync("./aes256.key", "utf-8"));
+//const aes256 = require("aes256");
+//let cipher = aes256.createCipher(fs.readFileSync("./aes256.key", "utf-8"));
 
 const express = require("express");
 const website = express();
