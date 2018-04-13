@@ -147,9 +147,9 @@ module.exports = class EmbedGenrator {
 			}
 			for (let b in teams[teamParticipant.teamId]) {
 				const tmPI = UTILS.findParticipantIdentityFromPID(matches[i], teams[teamParticipant.teamId][b].participantId);
-				if (!UTILS.exists(common_teammates[tmPI.player.summonerName])) common_teammates[teams[teamParticipant.teamId][b]] = { w: 0, l: 0 };
-				if (UTILS.determineWin(summoner.id, matches[i])) common_teammates[teams[teamParticipant.teamId][b]].w += 1;
-				else common_teammates[teams[teamParticipant.teamId][b]].l += 1;
+				if (!UTILS.exists(common_teammates[tmPI.player.summonerName])) common_teammates[tmPI.player.summonerName] = { w: 0, l: 0 };
+				if (UTILS.determineWin(summoner.id, matches[i])) common_teammates[tmPI.player.summonerName].w += 1;
+				else common_teammates[tmPI.player.summonerName].l += 1;
 			}
 			if (i < 5) {//printing limit
 				const tK = teams[teamParticipant.teamId].reduce((total, increment) => { return total + increment.stats.kills; }, 0);
@@ -178,6 +178,7 @@ module.exports = class EmbedGenrator {
 		}
 		let rpw = [];
 		for (let b in common_teammates) if (common_teammates[b].w + common_teammates[b].l > 1) rpw.push(b + ": " + common_teammates[b].w + "W + " + common_teammates[b].l + "L");
+		if (rpw.length == 0) rpw.push("No one")
 		newEmbed.addField("Recently Played With", rpw.join("\n"));
 		return newEmbed;
 	}
