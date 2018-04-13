@@ -20,7 +20,7 @@ catch (e) {
 }
 let mode = process.argv.length === 2 ? "PRODUCTION:warning:" : "DEVELOPMENT";
 const DB = new (require("./dbmanager.js"))(CONFIG);
-const LOLAPI = new (require("./lolapi.js"))(CONFIG);
+const LOLAPI = new (require("./lolapi.js"))(CONFIG, mode);
 LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 	UTILS.output("DD STATIC RESOURCES LOADED");
 	CONFIG.STATIC = result;
