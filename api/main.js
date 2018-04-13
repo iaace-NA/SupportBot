@@ -133,7 +133,7 @@ function get(url, cachetime, maxage) {//cachetime in seconds, maxage in seconds
 		if (cachetime != 0) {
 			checkCache(url, maxage).then((cached_result) => {
 				UTILS.output("cache hit: " + url.replace(CONFIG.RIOT_API_KEY, ""));
-				res.send(JSON.stringify(cached_result));
+				resolve(cached_result);
 			}).catch((e) => {
 				if (UTILS.exists(e)) console.error(e);
 				request(url, (error, response, body) => {
