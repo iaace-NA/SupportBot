@@ -72,7 +72,7 @@ function ready() {
 				doc.markModified("shortcuts");
 				doc.save(e => {
 					if (e) {
-						console.error(err);
+						console.error(e);
 						return res.status(500).end();
 					}
 					else {
@@ -89,7 +89,7 @@ function ready() {
 				let new_document = new shortcut_doc_model(new_shortcuts);
 				new_document.save((e, doc) => {
 					if (e) {
-						console.error(err);
+						console.error(e);
 						return res.status(500).end();
 					}
 					else {
@@ -109,7 +109,7 @@ function ready() {
 				delete doc.shortcuts[req.query.from];
 				doc.save(e => {
 					if (e) {
-						console.error(err);
+						console.error(e);
 						return res.status(500).end();
 					}
 					else {
