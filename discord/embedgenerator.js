@@ -180,7 +180,7 @@ module.exports = class EmbedGenrator {
 		for (let b in common_teammates) rpw.push([b, common_teammates[b].w, common_teammates[b].l]);
 		rpw.sort((a, b) => { return a[1] + a[2] - b[1] - b[2]; });
 		let rpws = [];
-		for (let i = 0; i < rpw.length; ++i) if (rpw[i][1] + rpw[i][2] > 1) rpws.push(b + ": " + rpw[i][1] + "W + " + rpw[i][2] + "L");
+		for (let i = 0; i < rpw.length; ++i) if (rpw[i][1] + rpw[i][2] > 1) rpws.push(rpw[i][0] + ": " + rpw[i][1] + "W + " + rpw[i][2] + "L");
 		if (rpws.length == 0) rpws.push("No one")
 		newEmbed.addField("Recently Played With", rpws.join("\n"));
 		return newEmbed;
