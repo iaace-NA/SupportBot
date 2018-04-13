@@ -14,7 +14,8 @@
 			"env_production": {
 				"NODE_ENV": "production"
 			},
-			"node_args": "--trace-deprecation"
+			"node_args": "--trace-deprecation",
+			"args": "dev"
 		},
 		{
 			"name": "apidev",
@@ -30,7 +31,8 @@
 			"env_production": {
 				"NODE_ENV": "production"
 			},
-			"node_args": "--trace-deprecation"
+			"node_args": "--trace-deprecation",
+			"args": "dev"
 		}
 	]
 }
