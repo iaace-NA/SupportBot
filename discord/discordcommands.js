@@ -87,7 +87,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "shortcuts", CONFIG.DISCORD_COMMAND_PREFIX + "shortcut"], false, false, (original, index) => {
 			lolapi.getShortcuts(msg.author.id).then(result => {
-				reply(textgenerator.shortcuts(result.shortcuts) + "To add a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "setshortcut $<shortcut name> <username>`\nTo remove a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "removeshortcut $<shortcut name>`");
+				reply(textgenerator.shortcuts(result) + "To add a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "setshortcut $<shortcut name> <username>`\nTo remove a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "removeshortcut $<shortcut name>`");
 			}).catch(console.error);
 		});
 		command(["http://"], true, false, (original, index, parameter) => {
