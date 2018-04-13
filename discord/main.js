@@ -2,15 +2,15 @@
 const start_time = new Date().getTime();
 const fs = require("fs");
 const Discord = require("discord.js");
-let discordcommands = require("./discord/discordcommands.js");
+let discordcommands = require("./discordcommands.js");
 
-const UTILS = new (require("./utils.js"))();
+const UTILS = new (require("../utils.js"))();
 
 const client = new Discord.Client({ disabledEvents: ["TYPING_START"] });
 
 let CONFIG;
 try {
-	CONFIG = JSON.parse(fs.readFileSync("./config.json", "utf-8"));
+	CONFIG = JSON.parse(fs.readFileSync("../config.json", "utf-8"));
 	CONFIG.VERSION = "v1.1.0";//b for non-release (in development)
 }
 catch (e) {
@@ -18,8 +18,8 @@ catch (e) {
 	console.error(e);
 	process.exit(1);
 }
-const DB = new (require("./discord/dbmanager.js"))(CONFIG);
-const LOLAPI = new (require("./discord/lolapi.js"))(CONFIG);
+const DB = new (require("./dbmanager.js"))(CONFIG);
+const LOLAPI = new (require("./lolapi.js"))(CONFIG);
 let mode = "N/A";
 LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 	UTILS.output("DD STATIC RESOURCES LOADED");
