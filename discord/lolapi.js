@@ -70,6 +70,33 @@ module.exports = class LOLAPI {
 			});
 		});
 	}
+	getIAPI(path, options) {//get internal API
+		let that = this;
+		return new Promise((resolve, reject) => {
+			let url = this.address + ":" + this.port + "/" + path;
+			let paramcount = 0;
+			for (let i in options) {
+				if (paramcount == 0) url += "?" + i + "=" + encodeURIComponent(options[i]);
+				else url += "&" + i + "=" + encodeURIComponent(options[i]);
+				++paramcount;
+			}
+			this.request(url, (error, response, body) => {
+				if (UTILS.exists(error)) {
+					reject(error);
+				}
+				else {
+					try {
+						const answer = JSON.parse(body);
+						UTILS.output("IAPI req: " + url);
+						resolve(answer);
+					}
+					catch (e) {
+						reject(e);
+					}
+				}
+			});
+		});
+	}
 	getStatic(path) {//data dragon
 		return new Promise((resolve, reject) => {
 			let url = "https://ddragon.leagueoflegends.com/" + path;
@@ -192,5 +219,17 @@ module.exports = class LOLAPI {
 		for (let b in filenames) {
 			fs.unlinkSync("./data/static-api-cache/" + filenames[b]);
 		}
+	}
+	createShortcut(uid, from, to) {
+		return this.getIAPI("createshortcut/" + uid, { from, to });
+	}
+	removeShortcut(uid, from) {
+		return this.getIAPI("removeshortcut/" + uid, { from });
+	}
+	getShortcut(uid, from) {
+		return this.getIAPI("getshortcut/" + uid, { from });
+	}
+	getShortcuts(uid) {
+		return this.getIAPI("getshortcuts/" + uid, {});
 	}
 }

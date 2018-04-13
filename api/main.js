@@ -35,6 +35,11 @@ let api_doc = new apicache.Schema({
 });
 api_doc.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 let api_doc_model = apicache.model("api_doc_model", api_doc);
+let shortcut_doc = new apicache.Schema({
+	uid: String,
+	shortcuts: apicache.Schema.Types.Mixed
+});
+let shortcut_doc_model = apicache.model("shortcut_doc_model", shortcut_doc);
 ready();
 function ready() {
 	if (process.argv.length === 2) {//production key
@@ -54,6 +59,98 @@ function ready() {
 		get(req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage)).then(result => res.send(JSON.stringify(result))).catch(e => {
 			console.error(e);
 			res.status(500);
+		});
+	});
+	serveWebRequest("/createshortcut/:uid", function(req, res, next) {
+		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
+			if (err) {
+				console.error(err);
+				return res.status(500);
+			}
+			if (UTILS.exists(doc)) {
+				doc.shortcuts[req.query.from] = req.query.to;
+				doc.save(e => {
+					if (e) {
+						console.error(err);
+						return res.status(500);
+					}
+					else {
+						res.send("{\"success\":true}");
+					}
+				});
+			}
+			else {
+				let new_shortcuts = {
+					uid: req.params.uid
+				}
+				new_shortcuts[req.query.from] = req.query.to;
+				let new_document = new shortcut_doc_model(new_shortcuts);
+				new_document.save((e, doc) => {
+					if (e) {
+						console.error(err);
+						return res.status(500);
+					}
+					else {
+						res.send("{\"success\":true}");
+					}
+				});
+			}
+		});
+	});
+	serveWebRequest("/removeshortcut/:uid", function(req, res, next) {
+		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
+			if (err) {
+				console.error(err);
+				return res.status(500);
+			}
+			if (UTILS.exists(doc)) {
+				delete doc.shortcuts[req.query.from];
+				doc.save(e => {
+					if (e) {
+						console.error(err);
+						return res.status(500);
+					}
+					else {
+						res.send("{\"success\":true}");
+					}
+				});
+			}
+			else {
+				res.send("{\"success\":true}");
+			}
+		});
+	});
+	serveWebRequest("/getshortcut/:uid", function(req, res, next) {
+		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
+			if (err) {
+				console.error(err);
+				return res.status(500);
+			}
+			if (UTILS.exists(doc)) {
+				if (UTILS.exists(doc.shortcuts[req.query.from])) {
+					let answer = {};
+					answer[req.query.from] = doc.shortcuts[req.query.from];
+					res.send(JSON.stringify(answer));
+				}
+				else res.status(404);
+			}
+			else {
+				res.status(404);
+			}
+		});
+	});
+	serveWebRequest("/getshortcuts/:uid", function(req, res, next) {
+		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
+			if (err) {
+				console.error(err);
+				return res.status(500);
+			}
+			if (UTILS.exists(doc)) {
+				res.send(JSON.stringify(doc.toObject()));
+			}
+			else {
+				res.status(404);
+			}
 		});
 	});
 	//https.createServer({ key: fs.readFileSync("./privkey.pem"), cert: fs.readFileSync("./fullchain.pem") }, website).listen(443);

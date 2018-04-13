@@ -8,4 +8,9 @@ module.exports = class TextGenerator {
 	internal_ping(times) {
 		return "Time to internal api: " + (times.received - times.started) + " ms. Time to return: " + (times.ended - times.received) + " ms.";
 	}
+	shortcuts(obj) {
+		let answer = "```";
+		for (let b in obj) answer += b + " -> " + obj;
+		return answer + "```";
+	}
 }

@@ -66,6 +66,30 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "help"], false, false, (original, index) => {
 			reply_embed(embedgenerator.help(CONFIG));
 		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "setshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "ss ", CONFIG.DISCORD_COMMAND_PREFIX + "createshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "cs "], true, false, (original, index, parameter) => {
+			if (parameter[0] !== "$") return reply(":x: The shortcut must begin with an `$`. Please try again.");
+			if (parameter.indexOf(" ") === -1) return reply(":x: The shortcut word and the username must be separated by a space. Please try again.");
+			const from = parameter.substring(1, parameter.indexOf(" ")).toLowerCase();
+			if (from.length === 0) return reply(":x: The shortcut name was not specified. Please try again.");
+			const to = parameter.substring(parameter.indexOf(" ") + 1);
+			if (to.length === 0) return reply(":x: The username was not specified. Please try again.");
+			lolapi.createShortcut(msg.author.id, from, to).then(result => {
+				if (result.success) reply(":white_check_mark: `" + from + "` will now point to `" + to + "`.");
+			}).catch(console.error);
+		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "removeshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "rs ", CONFIG.DISCORD_COMMAND_PREFIX + "deleteshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "ds "], true, false, (original, index, parameter) => {
+			if (parameter[0] !== "$") return reply(":x: The shortcut must begin with an `$`. Please try again.");
+			const from = parameter.substring(1, parameter.indexOf(" ")).toLowerCase();
+			if (from.length === 0) return reply(":x: The shortcut name was not specified. Please try again.");
+			lolapi.removeShortcut(msg.author.id, from).then(result => {
+				if (result.success) reply(":white_check_mark: `" + from + "` removed.");
+			}).catch(console.error);
+		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "shortcuts", CONFIG.DISCORD_COMMAND_PREFIX + "shortcut"], false, false, (original, index) => {
+			lolapi.getShortcuts(msg.author.id).then(result => {
+				reply(textgenerator.shortcuts(result) + "To add a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "setshortcut $<shortcut name> <username>`\nTo remove a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "removeshortcut $<shortcut name>`");
+			}).catch(console.error);
+		});
 		command(["http://"], true, false, (original, index, parameter) => {
 			const region = assert_region(parameter.substring(0, parameter.indexOf(".")), false);
 			if (parameter.substring(parameter.indexOf(".") + 1, parameter.indexOf(".") + 6) == "op.gg") {
@@ -216,10 +240,20 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 	function commandGuessUsername(trigger_array,//array of command aliases, prefix needs to be included
 		elevated_permissions,//requires owner permissions
 		callback) {//optional callback only if successful
+			//returns (region, username, parameter)
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			try {//username provided
 				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
-				if (parameter.substring(parameter.indexOf(" ") + 1).length < 35) callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")));
+				if (parameter.substring(parameter.indexOf(" ") + 1).length < 35) {
+					if (parameter.substring(parameter.indexOf(" ") + 1)[0] == "$") {
+						lolapi.getShortcut(msg.author.id, parameter.substring(parameter.indexOf(" ") + 1).toLowerCase()).then(result => {
+							callback(region, result[parameter.substring(parameter.indexOf(" ") + 1).toLowerCase()], parameter.substring(0, parameter.indexOf(" ")));
+						}).catch(e => {
+							if (e) reply("An error has occurred. The shortcut may not exist.");
+						});
+					}
+					else callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")));
+				}
 			}
 			catch (e) {//username not provided
 				try {
@@ -238,12 +272,23 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 	function commandGuessUsernameNumber(trigger_array,//array of command aliases, prefix needs to be included
 		elevated_permissions,//requires owner permissions
 		callback) {//optional callback only if successful
+			//returns (region, username, number)
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			const number = parseInt(parameter.substring(0, parameter.indexOf(" ")));
 			if (isNaN(number)) return;
 			try {//username provided
 				const region = assert_region(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
-				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number);
+				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) {
+					
+					if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1)[0] == "$") {
+						lolapi.getShortcut(msg.author.id, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase()).then(result => {
+							callback(region, result[parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase()], number);
+						}).catch(e => {
+							if (e) reply("An error has occurred. The shortcut may not exist.");
+						});
+					}
+					else callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number);
+				}
 			}
 			catch (e) {//username not provided
 				try {
