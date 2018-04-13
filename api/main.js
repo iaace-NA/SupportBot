@@ -68,10 +68,8 @@ function ready() {
 				return res.status(500).end();
 			}
 			if (UTILS.exists(doc)) {
-				UTILS.output("dpr");
 				doc.shortcuts[req.query.from] = req.query.to;
-				doc.validate(console.error);
-				UTILS.assert(doc.shortcuts[req.query.from] == req.query.to);
+				doc.markModified("shortcuts");
 				doc.save(e => {
 					if (e) {
 						console.error(err);
