@@ -6,7 +6,7 @@ const UTILS = new (require("../utils.js"))();
 module.exports = function (CONFIG, client, lolapi, msg, db) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 
-	if ((UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) || !UTILS.exists(msg.guild)) {//respondable server message or PM
+	if ((UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) || !UTILS.exists(msg.guild)) {//respondable server message or PM
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {
 			reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
 		});
@@ -143,7 +143,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			});
 		});*/
 	}
-	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) {//respondable server message only
+	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) {//respondable server message only
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "shutdown"], false, true, () => {
 			reply("shutdown initiated", shutdown, shutdown);
 		});
