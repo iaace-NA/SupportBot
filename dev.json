@@ -3,6 +3,7 @@
 		{
 			"name": "maindev",
 			"script": "./discord/main.js",
+			"cwd": "./discord/",
 			"watch": false,
 			"min_uptime": 3000,
 			"max_restarts": 15,
@@ -18,6 +19,7 @@
 		{
 			"name": "apidev",
 			"script": "./api/main.js",
+			"cwd": "./api/",
 			"watch": false,
 			"min_uptime": 3000,
 			"max_restarts": 15,
