@@ -149,7 +149,7 @@ function ready() {
 				res.send(JSON.stringify(doc.toObject()));
 			}
 			else {
-				res.status(404).end();
+				res.send("{}");
 			}
 		});
 	});
