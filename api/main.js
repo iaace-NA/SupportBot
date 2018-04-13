@@ -21,7 +21,8 @@ let http = require('http');
 const express = require("express");
 const website = express();
 const UTILS = new (require("../utils.js"))();
-
+UTILS.assert(UTILS.exists(CONFIG.API_PORT_PRODUCTION));
+UTILS.assert(UTILS.exists(CONFIG.API_PORT_DEVELOPOMENT));
 UTILS.output("Modules loaded.");
 ready();
 function ready() {
