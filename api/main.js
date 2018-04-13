@@ -81,9 +81,10 @@ function ready() {
 			}
 			else {
 				let new_shortcuts = {
-					uid: req.params.uid
+					uid: req.params.uid,
+					shortcuts: {}
 				}
-				new_shortcuts[req.query.from] = req.query.to;
+				new_shortcuts.shortcuts[req.query.from] = req.query.to;
 				let new_document = new shortcut_doc_model(new_shortcuts);
 				new_document.save((e, doc) => {
 					if (e) {
