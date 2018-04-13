@@ -23,7 +23,6 @@ module.exports = class LOLAPI {
 	}
 	ping() {
 		const now = new Date().getTime();
-		UTILS.assert(UTILS.exists(region));
 		let url = this.address + ":" + this.port + "/ping";
 		this.request(url, function (error, response, body) {
 			if (UTILS.exists(error)) {
