@@ -127,10 +127,12 @@ function addCache(url, response, cachetime) {
 		if (e) console.error(e);
 	});
 }
-function get(url, cachetime, maxage) {//cachetime in seconds, maxage in seconds
+function get(url, cachetime, maxage) {
+	//cachetime in seconds, if cachetime is 0, do not cache
+	//maxage in seconds, if maxage is 0, force refresh
 	let that = this;
 	return new Promise((resolve, reject) => {
-		if (cachetime != 0) {
+		if (cachetime != 0) {//cache
 			checkCache(url, maxage).then((cached_result) => {
 				UTILS.output("cache hit: " + url.replace(CONFIG.RIOT_API_KEY, ""));
 				resolve(cached_result);
@@ -154,7 +156,7 @@ function get(url, cachetime, maxage) {//cachetime in seconds, maxage in seconds
 				});
 			});
 		}
-		else {
+		else {//don't cache
 			request(url, (error, response, body) => {
 				if (UTILS.exists(error)) reject(error);
 				else {
