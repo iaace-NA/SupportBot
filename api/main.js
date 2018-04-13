@@ -1,4 +1,5 @@
 "use strict";
+const fs = require("fs");
 let CONFIG;
 try {
 	CONFIG = JSON.parse(fs.readFileSync("../config.json", "utf-8"));
@@ -9,7 +10,6 @@ catch (e) {
 	console.error(e);
 	process.exit(1);
 }
-const fs = require("fs");
 
 let path = require('path');
 let crypto = require("crypto");
