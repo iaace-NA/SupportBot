@@ -69,14 +69,14 @@ function ready() {
 	function serveWebRequest(branch, callback) {
 		if (typeof(branch) == "string") {
 			website.get(branch, function (req, res, next) {
-				UTILS.output("request served: " + req.originalUrl);
+				UTILS.output("request received: " + req.originalUrl);
 				callback(req, res, next);
 			});
 		}
 		else {
 			for (let b in branch) {
 				website.get(branch[b], function(req, res, next){
-					UTILS.output("request served: " + req.originalUrl);
+					UTILS.output("request received: " + req.originalUrl);
 					callback(req, res, next);
 				});
 			}
@@ -109,7 +109,7 @@ function checkCache(url, maxage) {
 			if (err) return reject(err);
 			if (UTILS.exists(doc)) {
 				if (UTILS.exists(maxage) && apicache.Types.ObjectId(doc.id).getTimestamp().getTime() < new Date().getTime() - (maxage * 1000)) {//if expired
-					UTILS.output("maxage expired url: " + url);
+					UTILS.output("\tmaxage expired url: " + url);
 					doc.remove(() => {});
 					reject(null);
 				}
@@ -134,7 +134,7 @@ function get(url, cachetime, maxage) {
 	return new Promise((resolve, reject) => {
 		if (cachetime != 0) {//cache
 			checkCache(url, maxage).then((cached_result) => {
-				UTILS.output("cache hit: " + url.replace(CONFIG.RIOT_API_KEY, ""));
+				UTILS.output("\tcache hit: " + url.replace(CONFIG.RIOT_API_KEY, ""));
 				resolve(cached_result);
 			}).catch((e) => {
 				if (UTILS.exists(e)) console.error(e);
@@ -145,7 +145,7 @@ function get(url, cachetime, maxage) {
 					else {
 						try {
 							const answer = JSON.parse(body);
-							UTILS.output("cache miss: " + url.replace(CONFIG.RIOT_API_KEY, ""));
+							UTILS.output("\tcache miss: " + url.replace(CONFIG.RIOT_API_KEY, ""));
 							addCache(url, answer, cachetime);
 							resolve(answer);
 						}
@@ -162,7 +162,7 @@ function get(url, cachetime, maxage) {
 				else {
 					try {
 						const answer = JSON.parse(body);
-						UTILS.output("uncached: " + url.replace(CONFIG.RIOT_API_KEY, ""));
+						UTILS.output("\tuncached: " + url.replace(CONFIG.RIOT_API_KEY, ""));
 						resolve(answer);
 					}
 					catch (e) {
