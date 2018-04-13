@@ -177,9 +177,12 @@ module.exports = class EmbedGenrator {
 			// KP
 		}
 		let rpw = [];
-		for (let b in common_teammates) if (common_teammates[b].w + common_teammates[b].l > 1) rpw.push(b + ": " + common_teammates[b].w + "W + " + common_teammates[b].l + "L");
-		if (rpw.length == 0) rpw.push("No one")
-		newEmbed.addField("Recently Played With", rpw.join("\n"));
+		for (let b in common_teammates) rpw.push([b, common_teammates[b].w, common_teammates[b].l]);
+		rpw.sort((a, b) => { return a[1] + a[2] - b[1] - b[2]; });
+		let rpws = [];
+		for (let i = 0; i < rpw.length; ++i) if (rpw[i][1] + rpw[i][2] > 1) rpws.push(b + ": " + rpw[i][1] + "W + " + rpw[i][2] + "L");
+		if (rpws.length == 0) rpws.push("No one")
+		newEmbed.addField("Recently Played With", rpws.join("\n"));
 		return newEmbed;
 	}
 	detailedMatch(CONFIG, summoner, match_meta, match) {//should show detailed information about 1 game
