@@ -2,7 +2,7 @@
 const UTILS = new (require("../utils.js"))();
 const fs = require("fs");
 module.exports = class LOLAPI {
-	constructor(INIT_CONFIG, MODE) {
+	constructor(INIT_CONFIG) {
 		this.CONFIG = INIT_CONFIG;
 		if (!UTILS.exists(this.CONFIG)) {
 			throw new Error("config.json required to access riot api.");
@@ -12,14 +12,6 @@ module.exports = class LOLAPI {
 		}
 		this.request = require("request");
 		this.cache = {};
-		if (MODE == "DEVELOPMENT") {
-			this.address = this.CONFIG.API_ADDRESS_DEVELOPMENT;
-			this.port = this.CONFIG.API_PORT_DEVELOPMENT;
-		}
-		else {
-			this.address = this.CONFIG.API_ADDRESS_PRODUCTION;
-			this.port = this.CONFIG.API_PORT_PRODUCTION;
-		}
 	}
 	addCache(url, data) {//add data to api cache
 		this.cache[url] = {

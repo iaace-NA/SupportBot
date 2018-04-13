@@ -1,0 +1,34 @@
+{
+	"apps": [
+		{
+			"name": "main",
+			"script": "./discord/main.js",
+			"watch": false,
+			"min_uptime": 3000,
+			"max_restarts": 15,
+			"restart_delay": 2500,
+			"env": {
+				"NODE_ENV": "development"
+			},
+			"env_production": {
+				"NODE_ENV": "production"
+			},
+			"node_args": "--trace-deprecation"
+		},
+		{
+			"name": "api",
+			"script": "./api/main.js",
+			"watch": false,
+			"min_uptime": 3000,
+			"max_restarts": 15,
+			"restart_delay": 2500,
+			"env": {
+				"NODE_ENV": "development"
+			},
+			"env_production": {
+				"NODE_ENV": "production"
+			},
+			"node_args": "--trace-deprecation"
+		}
+	]
+}

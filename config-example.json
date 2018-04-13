@@ -55,5 +55,10 @@
 		"op.gg": "<:opgg:433455497044295681>",
 		"win": "<:win:409617613161758741>",
 		"loss": "<:loss:409618158165688320>"
-	}
+	},
+	"API_PORT_PRODUCTION": 56830,
+	"API_PORT_DEVELOPMENT": 56831,
+	"API_ADDRESS_PRODUCTION": "127.0.0.1",
+	"API_ADDRESS_DEVELOPMENT": "127.0.0.1",
+	"API_KEY": "insert random hex string here"
 }
