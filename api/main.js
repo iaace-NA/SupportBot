@@ -129,7 +129,6 @@ function addCache(url, response, cachetime) {
 function get(url, cachetime, maxage) {//cachetime in seconds, maxage in seconds
 	let that = this;
 	return new Promise((resolve, reject) => {
-		UTILS.assert(UTILS.exists(region));
 		if (cachetime != 0) {
 			checkCache(url, maxage).then((cached_result) => {
 				UTILS.output("cache hit: " + url.replace(CONFIG.RIOT_API_KEY, ""));
