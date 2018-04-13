@@ -31,8 +31,8 @@ function ready() {
 		website.listen(CONFIG.API_PORT_PRODUCTION);
 	}
 	else {//non-production key
-		UTILS.output("Ready and listening on port " + CONFIG.API_PORT_DEVELOPOMENT);
-		website.listen(CONFIG.API_PORT_DEVELOPOMENT);
+		UTILS.output("Ready and listening on port " + CONFIG.API_PORT_DEVELOPMENT);
+		website.listen(CONFIG.API_PORT_DEVELOPMENT);
 	}
 	
 	website.use(function (req, res, next) {
