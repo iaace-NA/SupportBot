@@ -127,7 +127,16 @@ module.exports = class EmbedGenrator {
 
 		newEmbed.setTitle("Recent Games");
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
-		for (let i = 0; i < match_meta.length && i < 5; ++i) {
+		let common_teammates = {};
+		/*
+		{
+			"name": {
+				w: 0,
+				l: 0
+			}
+		}
+		*/
+		for (let i = 0; i < match_meta.length && i < 20; ++i) {
 			const KDA = UTILS.KDA(summoner.id, matches[i]);
 			const stats = UTILS.stats(summoner.id, matches[i]);
 			const teamParticipant = UTILS.teamParticipant(summoner.id, matches[i]);
@@ -136,15 +145,23 @@ module.exports = class EmbedGenrator {
 				if (!UTILS.exists(teams[matches[i].participants[b].teamId])) teams[matches[i].participants[b].teamId] = [];
 				teams[matches[i].participants[b].teamId].push(matches[i].participants[b]);
 			}
-			const tK = teams[teamParticipant.teamId].reduce((total, increment) => { return total + increment.stats.kills; }, 0);
-			const tD = teams[teamParticipant.teamId].reduce((total, increment) => { return total + increment.stats.deaths; }, 0);
-			const tA = teams[teamParticipant.teamId].reduce((total, increment) => { return total + increment.stats.assists; }, 0);
-			let summoner_spells = "";
-			if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell1Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell1Id];
-			else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell1Id].name + "`";
-			if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id];
-			else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell2Id].name + "`";
-			newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + summoner_spells + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " " + (UTILS.english(match_meta[i].role) == "None" ? "" : UTILS.english(match_meta[i].role)) + " " + UTILS.english(match_meta[i].lane), "lv. `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\tKDR:`" + (UTILS.round(KDA.KD, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KD, 2)) + "`\tKDA:`" + (UTILS.round(KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KDA, 2)) + "` `" + UTILS.round((100 * (KDA.A + KDA.K)) / tK, 0) + "%`\tcs:`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(stats.goldEarned) + "`\n" + queues[matches[i].queueId + ""] + "\t`" + UTILS.standardTimestamp(matches[i].gameDuration) + "`\t" + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))));
+			for (let b in teams[teamParticipant.teamId]) {
+				const tmPI = UTILS.findParticipantIdentityFromPID(match[i], teams[teamParticipant.teamId][b].participantId);
+				if (!UTILS.exists(common_teammates[tmPI.player.summonerName])) common_teammates[teams[teamParticipant.teamId][b]] = { w: 0, l: 0 };
+				if (UTILS.determineWin(summoner.id, matches[i])) common_teammates[teams[teamParticipant.teamId][b]].w += 1;
+				else common_teammates[teams[teamParticipant.teamId][b]].l += 1;
+			}
+			if (i < 5) {//printing limit
+				const tK = teams[teamParticipant.teamId].reduce((total, increment) => { return total + increment.stats.kills; }, 0);
+				const tD = teams[teamParticipant.teamId].reduce((total, increment) => { return total + increment.stats.deaths; }, 0);
+				const tA = teams[teamParticipant.teamId].reduce((total, increment) => { return total + increment.stats.assists; }, 0);
+				let summoner_spells = "";
+				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell1Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell1Id];
+				else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell1Id].name + "`";
+				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id];
+				else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell2Id].name + "`";
+				newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + summoner_spells + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " " + (UTILS.english(match_meta[i].role) == "None" ? "" : UTILS.english(match_meta[i].role)) + " " + UTILS.english(match_meta[i].lane), "lv. `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\tKDR:`" + (UTILS.round(KDA.KD, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KD, 2)) + "`\tKDA:`" + (UTILS.round(KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KDA, 2)) + "` `" + UTILS.round((100 * (KDA.A + KDA.K)) / tK, 0) + "%`\tcs:`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(stats.goldEarned) + "`\n" + queues[matches[i].queueId + ""] + "\t`" + UTILS.standardTimestamp(matches[i].gameDuration) + "`\t" + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))));
+			}
 			// champion
 			// match result
 			// queue
@@ -159,6 +176,9 @@ module.exports = class EmbedGenrator {
 			// role
 			// KP
 		}
+		let rpw = [];
+		for (let b in common_teammates) if (common_teammates[b].w + common_teammates[b].l > 1) rpw.push(b + ": " + common_teammates[b].w + "W + " + common_teammates[b].l + "L");
+		newEmbed.addField("Recently Played With", rpw.join("\n"));
 		return newEmbed;
 	}
 	detailedMatch(CONFIG, summoner, match_meta, match) {//should show detailed information about 1 game

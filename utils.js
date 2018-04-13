@@ -40,6 +40,9 @@ module.exports = class UTILS {
 		const stats = match.participants.find(p => { return p.participantId == participantID; });
 		return stats;
 	}
+	findParticipantIdentityFromPID(match, pid) {
+		return match.participantIdentities.find(pI => { return pI.participantId == pid; });
+	}
 	stats(summonerID, match) {
 		return this.teamParticipant(summonerID, match).stats;
 	}
