@@ -20,7 +20,7 @@ let http = require('http');
 
 const express = require("express");
 const website = express();
-const UTILS = require("../utils.js");
+const UTILS = new (require("../utils.js"))();
 
 UTILS.output("Modules loaded.");
 ready();
