@@ -11,7 +11,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
 		});
 		command(["iping"], false, false, () => {
-			lolapi.ping().then(times => reply(textgenerator.internal_ping())).catch(console.error);
+			lolapi.ping().then(times => reply(textgenerator.internal_ping(times))).catch(console.error);
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping "], true, false, function (original, index, parameter) {
 			reply("you said: " + parameter);
