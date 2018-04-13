@@ -81,7 +81,6 @@ module.exports = class LOLAPI {
 				++paramcount;
 			}
 			this.request(url, (error, response, body) => {
-				UTILS.output(JSON.stringify(response, null, "\t"));
 				if (UTILS.exists(error)) {
 					reject(error);
 				}
