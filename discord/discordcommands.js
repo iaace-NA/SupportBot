@@ -69,7 +69,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "setshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "ss ", CONFIG.DISCORD_COMMAND_PREFIX + "createshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "cs "], true, false, (original, index, parameter) => {
 			if (parameter[0] !== "$") return reply(":x: The shortcut must begin with an `$`. Please try again.");
 			if (parameter.indexOf(" ") === -1) return reply(":x: The shortcut word and the username must be separated by a space. Please try again.");
-			const from = parameter.substring(1, parameter.indexOf(" ")).toLowerCase();
+			const from = parameter.substring(0, parameter.indexOf(" ")).toLowerCase();
 			if (from.length === 0) return reply(":x: The shortcut name was not specified. Please try again.");
 			const to = parameter.substring(parameter.indexOf(" ") + 1);
 			if (to.length === 0) return reply(":x: The username was not specified. Please try again.");
@@ -79,7 +79,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "removeshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "rs ", CONFIG.DISCORD_COMMAND_PREFIX + "deleteshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "ds "], true, false, (original, index, parameter) => {
 			if (parameter[0] !== "$") return reply(":x: The shortcut must begin with an `$`. Please try again.");
-			const from = parameter.substring(1, parameter.indexOf(" ")).toLowerCase();
+			const from = parameter.substring(0, parameter.indexOf(" ")).toLowerCase();
 			if (from.length === 0) return reply(":x: The shortcut name was not specified. Please try again.");
 			lolapi.removeShortcut(msg.author.id, from).then(result => {
 				if (result.success) reply(":white_check_mark: `" + from + "` removed.");
