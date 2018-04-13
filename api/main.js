@@ -141,14 +141,18 @@ function ready() {
 	});
 	serveWebRequest("/getshortcuts/:uid", function(req, res, next) {
 		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
+			UTILS.output("1");
 			if (err) {
+				UTILS.output("2");
 				console.error(err);
 				return res.status(500);
 			}
 			if (UTILS.exists(doc)) {
+				UTILS.output("3");
 				res.send(JSON.stringify(doc.toObject()));
 			}
 			else {
+				UTILS.output("4");
 				res.status(404);
 			}
 		});
