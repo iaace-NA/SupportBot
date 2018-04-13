@@ -156,7 +156,7 @@ module.exports = class LOLAPI {
 				});
 			}
 			function refresh() {
-				that.get(region, "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" }).then((result) => {
+				that.get(region, "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" }, 0, 0).then((result) => {
 					fs.writeFile(path, JSON.stringify(result), err => {
 						UTILS.output("Cached version of " + region + " champions.json is expired or non-existant.");
 						if (err) throw err;
@@ -189,7 +189,7 @@ module.exports = class LOLAPI {
 				});
 			}
 			function refresh() {
-				that.get(region, "static-data/v3/summoner-spells", { locale: "en_US", dataById: true, spellListData: "all", tags: "all" }).then((result) => {
+				that.get(region, "static-data/v3/summoner-spells", { locale: "en_US", dataById: true, spellListData: "all", tags: "all" }, 0, 0).then((result) => {
 					fs.writeFile(path, JSON.stringify(result), err => {
 						UTILS.output("Cached version of " + region + " spells.json is expired or non-existant.");
 						if (err) throw err;
