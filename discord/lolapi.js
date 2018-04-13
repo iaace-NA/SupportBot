@@ -118,7 +118,7 @@ module.exports = class LOLAPI {
 	getStaticChampions(region) {
 		let that = this;
 		return new Promise((resolve, reject) => {
-			const path = "./data/static-api-cache/champions" + region + ".json";
+			const path = "../data/static-api-cache/champions" + region + ".json";
 			const exists = fs.existsSync(path);
 			if ((exists && fs.statSync(path).mtime.getTime() < new Date().getTime() - (6 * 3600 * 1000)) ||
 				!exists) {//expired
@@ -151,7 +151,7 @@ module.exports = class LOLAPI {
 	getStaticSummonerSpells(region) {
 		let that = this;
 		return new Promise((resolve, reject) => {
-			const path = "./data/static-api-cache/spells" + region + ".json";
+			const path = "../data/static-api-cache/spells" + region + ".json";
 			const exists = fs.existsSync(path);
 			if ((exists && fs.statSync(path).mtime.getTime() < new Date().getTime() - (6 * 3600 * 1000)) ||
 				!exists) {//expired
