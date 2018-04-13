@@ -130,7 +130,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				if (!UTILS.exists(result.accountId)) return reply("No recent matches found for `" + username + "`.");
 				lolapi.getRecentGames(region, result.accountId, 120).then(matchhistory => {
 					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`.");
-					lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => { return m.gameId; }, 604800).slice(0, 5)).then(matches => {
+					lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => { return m.gameId; }).slice(0, 5), 604800).then(matches => {
 						reply_embed(embedgenerator.match(CONFIG, result, matchhistory.matches, matches));
 					}).catch(console.error);
 				}).catch(console.error);
