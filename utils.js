@@ -1,5 +1,9 @@
 "use strict";
 let ta = require("./timeago.js");
+String.prototype.replaceAll = function(search, replacement) {
+	var target = this;
+	return target.replace(new RegExp(search, 'g'), replacement);
+};
 module.exports = class UTILS {
 	output(t) {//general utility function
 		if (this.exists(t)) {
@@ -31,10 +35,13 @@ module.exports = class UTILS {
 	ago(date) {
 		return ta.ago(date);
 	}
-	stats(summonerID, match) {
+	teamParticipant(summonerID, match) {
 		const participantID = match.participantIdentities.find(pI => { return pI.player.summonerId == summonerID; }).participantId;
-		const stats = match.participants.find(p => { return p.participantId == participantID; }).stats;
+		const stats = match.participants.find(p => { return p.participantId == participantID; });
 		return stats;
+	}
+	stats(summonerID, match) {
+		return this.teamParticipant(summonerID, match).stats;
 	}
 	KDA(summonerID, match) {
 		const stats = this.stats(summonerID, match);
@@ -42,7 +49,8 @@ module.exports = class UTILS {
 			K: stats.kills,
 			D: stats.deaths,
 			A: stats.assists,
-			KDA: (stats.kills + stats.assists) / stats.deaths
+			KDA: (stats.kills + stats.assists) / stats.deaths,
+			KD: stats.kills / stats.deaths
 		};
 	}
 	determineWin(summonerID, match) {
@@ -90,5 +98,14 @@ module.exports = class UTILS {
 			}
 		}
 		return answer;
+	}
+	preferredTextChannel(client, collection, type, names, permissions) {
+		for (let i = 0; i < names.length; ++i) {
+			let candidate = collection.find(ch => {
+				if (ch.type === type && ch.name.toLowerCase() === names[i].toLowerCase() && ch.permissionsFor(client.user).has(permissions)) return true;
+			});
+			if (this.exists(candidate)) return candidate;
+		}
+		return collection.find(ch => { if (ch.type === type && ch.permissionsFor(client.user).has(permissions)) return true; });
 	}
 }

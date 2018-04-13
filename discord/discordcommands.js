@@ -6,7 +6,7 @@ const UTILS = new (require("../utils.js"))();
 module.exports = function (CONFIG, client, lolapi, msg, db) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 
-	if ((UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) || !UTILS.exists(msg.guild)) {//respondable server message or PM
+	if ((UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) || !UTILS.exists(msg.guild)) {//respondable server message or PM
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {
 			reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
 		});
@@ -21,11 +21,19 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				reply("```" + e + "```");
 			}
 		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "notify "], true, true, (original, index, parameter) => {
+			const notification = embedgenerator.notify(CONFIG, parameter, msg.author);
+			client.guilds.forEach((g) => {
+				let candidate = UTILS.preferredTextChannel(client, g.channels, "text", ["general", "bot", "bots", "bot-commands", "botcommands", "lol", "league", "spam"], ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
+				if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).catch(console.error);
+			});
+		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, () => {
 			reply_embed(embedgenerator.test());
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "sd ", CONFIG.DISCORD_COMMAND_PREFIX + "summonerdebug "], true, false, (original, index, parameter) => {
 			lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
+				result.guess = parameter.substring(parameter.indexOf(" ") + 1);
 				reply_embed(embedgenerator.summoner(CONFIG, result));
 			}).catch(console.error);
 		});
@@ -33,6 +41,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
 			lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1)).then(result => {
 				result.region = region;
+				result.guess = parameter.substring(parameter.indexOf(" ") + 1);
 				db.addLink(msg.author.id, result).then(() => { reply("Your discord account is now linked to " + result.name); }).catch((e) => { reply("Something went wrong."); throw e; });
 			}).catch(console.error);
 		});
@@ -49,14 +58,38 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			reply("The cache size is " + lolapi.cacheSize());
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "invite"], false, false, (original, index) => {
-			reply("This is the link to add SupportBot to other servers: <https://discordapp.com/api/oauth2/authorize?client_id=398355288123506689&permissions=0&scope=bot>\nAdding it requires the \"Manage Server\" permission.");
+			reply("This is the link to add SupportBot to other servers: <" + CONFIG.BOT_ADD_LINK + ">\nAdding it requires the \"Manage Server\" permission.");
 		});
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "help"], false, false, (original, index) =>{
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "help"], false, false, (original, index) => {
 			reply_embed(embedgenerator.help(CONFIG));
+		});
+		command(["http://"], true, false, (original, index, parameter) => {
+			const region = assert_region(parameter.substring(0, parameter.indexOf(".")), false);
+			if (parameter.substring(parameter.indexOf(".") + 1, parameter.indexOf(".") + 6) == "op.gg") {
+				let username = decodeURIComponent(msg.content.substring(msg.content.indexOf("userName=") + "userName=".length));
+				lolapi.getSummonerIDFromName(region, username).then(result => {
+					result.region = region;
+					result.guess = username;
+					if (!UTILS.exists(result.id)) return;
+					lolapi.getRanks(region, result.id).then(result2 => {
+						lolapi.getChampionMastery(region, result.id).then(result3 => {
+							reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter.substring(0, parameter.indexOf("."))));
+						}).catch(console.error);
+					}).catch(console.error);
+				}).catch(console.error);
+			}
+		});
+		command(["service status ", "servicestatus ", "ss ", "status "], true, false, (original, index, parameter) => {
+			let region = assert_region(parameter);
+			lolapi.getStatus(region).then((status_object) => {
+				reply_embed(embedgenerator.status(status_object));
+			}).catch(console.error);
 		});
 		commandGuessUsername([""], false, (region, username, parameter) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
+				result.guess = username;
+				if (!UTILS.exists(result.id)) return reply("No results for `" + username + "`. Please revise your request.");
 				lolapi.getRanks(region, result.id).then(result2 => {
 					lolapi.getChampionMastery(region, result.id).then(result3 => {
 						reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter));
@@ -67,39 +100,50 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
+				if (!UTILS.exists(result.accountId)) return reply("No recent matches found for `" + username + "`.");
 				lolapi.getRecentGames(region, result.accountId).then(matchhistory => {
-					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) reply("No recent matches found for `" + username + "`.");
+					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`.");
 					lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => { return m.gameId; }).slice(0, 5)).then(matches => {
 						reply_embed(embedgenerator.match(CONFIG, result, matchhistory.matches, matches));
-					});
-				});
-			});
+					}).catch(console.error);
+				}).catch(console.error);
+			}).catch(console.error);
 		});
 		commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
+				result.guess = username;
+				if (!UTILS.exists(result.id)) return reply("No current matches found for `" + username + "`.");
 				lolapi.getLiveMatch(region, result.id).then(match => {
 					reply_embed(embedgenerator.liveMatch(CONFIG, result, match));
-				});
-			});
+				}).catch(console.error);
+			}).catch(console.error);
 		});
 		commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number) => {
 			lolapi.getSummonerIDFromName(region, username).then(result => {
 				result.region = region;
+				result.guess = username;
+				if (!UTILS.exists(result.accountId)) return reply("No recent matches found for `" + username + "`.");
 				lolapi.getRecentGames(region, result.accountId).then(matchhistory => {
-					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) reply("No recent matches found for `" + username + "`.");
-					if (number < 1 || number > 20 || !UTILS.exists(matchhistory.matches[number - 1])) {
-						reply(":x: This number is out of range.");
-						return;
-					}
+					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`.");
+					if (number < 1 || number > 20 || !UTILS.exists(matchhistory.matches[number - 1])) return reply(":x: This number is out of range.");
 					lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId).then(match => {
 						reply_embed(embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match));
-					});
-				});
-			});
+					}).catch(console.error);
+				}).catch(console.error);
+			}).catch(console.error);
 		});
+		/*
+		commandGuessUsername(["mmr "], false, (region, username, parameter) => {
+			lolapi.getSummonerIDFromName(region, username).then(result => {
+				result.region = region;
+				lolapi.getMMR(region, result.id).then(mmr => {
+					reply_embed(embedgenerator.mmr(CONFIG, result, mmr));
+				}).catch();
+			});
+		});*/
 	}
-	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["READ_MESSAGES", "SEND_MESSAGES"])) {//respondable server message only
+	if (UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) {//respondable server message only
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "shutdown"], false, true, () => {
 			reply("shutdown initiated", shutdown, shutdown);
 		});
@@ -130,6 +174,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					return false;
 				}
 				else {
+					if (elevated_permissions) client.channels.get(CONFIG.LOG_CHANNEL_ID).send(msg.author.tag + " used " + msg.cleanContent).catch(console.error);
 					if (UTILS.exists(callback)) {
 						try {
 							callback(trigger_array[i], i, msg.content.trim().substring(trigger_array[i].length));
@@ -149,6 +194,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					return false;
 				}
 				else {
+					if (elevated_permissions) client.channels.get(CONFIG.LOG_CHANNEL_ID).send(msg.author.tag + " used " + msg.cleanContent).catch(console.error);
 					if (UTILS.exists(callback)) {
 						try {
 							callback(trigger_array[i], i);
@@ -170,16 +216,14 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			try {//username provided
 				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
-				callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")));
+				if (parameter.substring(parameter.indexOf(" ") + 1).length < 35) callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")));
 			}
 			catch (e) {//username not provided
 				try {
 					const region = assert_region(parameter, false);
 					db.getLink(msg.author.id).then(result => {
 						let username = msg.author.username;//suppose the link doesn't exist in the database
-						if (UTILS.exists(result)) {//link exists
-							username = result.name;
-						}
+						if (UTILS.exists(result)) username = result.name;//link exists
 						callback(region, username, parameter);
 					}).catch(console.error);
 				}
@@ -196,16 +240,14 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			if (isNaN(number)) return;
 			try {//username provided
 				const region = assert_region(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
-				callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number);
+				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number);
 			}
 			catch (e) {//username not provided
 				try {
 					const region = assert_region(parameter.substring(parameter.indexOf(" ") + 1), false);
 					db.getLink(msg.author.id).then(result => {
 						let username = msg.author.username;//suppose the link doesn't exist in the database
-						if (UTILS.exists(result)) {//link exists
-							username = result.name;
-						}
+						if (UTILS.exists(result)) username = result.name;//link exists
 						callback(region, username, number);
 					}).catch(console.error);
 				}
@@ -245,9 +287,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		const basic = msg.id + "\ncontent: " + msg.content +
 			"\nauthor: " + msg.author.tag + " :: " + msg.author.id +
 			"\nchannel: " + msg.channel.name + " :: " + msg.channel.id;
-		if (UTILS.exists(msg.guild)) {
-			UTILS.output("received server message :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
-		}
+		if (UTILS.exists(msg.guild)) UTILS.output("received server message :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
 		else {
 			UTILS.output("received PM/DM message :: " + basic);
 		}
@@ -262,6 +302,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		}
 	}
 	function shutdown() {
+		client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":x:Shutdown initiated.").catch(console.error);
 		client.user.setStatus("invisible").then(step2).catch(step2);
 		function step2() {
 			client.destroy().catch();
@@ -272,6 +313,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		}
 	}
 	function restart() {
+		client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Restart initiated.").catch(console.error);
 		client.user.setStatus("invisible").then(step2).catch(step2);
 		function step2() {
 			client.destroy().catch();
