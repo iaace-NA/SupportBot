@@ -1,21 +1,15 @@
 "use strict";
 let ta = require("./timeago.js");
 String.prototype.replaceAll = function(search, replacement) {
-	var target = this;
+	let target = this;
 	return target.replace(new RegExp(search, 'g'), replacement);
 };
 Promise.prototype.sequential = function (tasks) {
-	return new Promise((resolve, reject) => {
-		tasks.reduce((promiseChain, currentTask) => {
-			return promiseChain.then(chainResults =>
-				currentTask.then(currentResult =>
-					[...chainResults, currentResult]
-				)
-			);
-		}, Promise.resolve([])).then(arrayOfResults => {
-			resolve(arrayOfResults);
-		});
-	});
+	let current = Promise.cast(), results = [];
+	for (let k = 0; k < tasks.length; ++k) {
+		results.push(current = current.thenReturn().then(tasks[k]));
+	}
+	return Promise.all(results);
 }
 module.exports = class UTILS {
 	output(t) {//general utility function
