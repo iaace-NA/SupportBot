@@ -141,9 +141,9 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				result.region = region;
 				result.guess = username;
 				if (!UTILS.exists(result.id)) return reply("No current matches found for `" + username + "`.");
-				lolapi.getLiveMatch(region, result.id).then(match => {
+				lolapi.getLiveMatch(region, result.id, 60).then(match => {
 					reply_embed(embedgenerator.liveMatch(CONFIG, result, match));
-				}, 60).catch(console.error);
+				}).catch(console.error);
 			}).catch(console.error);
 		});*/
 		commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {//new
@@ -151,7 +151,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				result.region = region;
 				result.guess = username;
 				if (!UTILS.exists(result.id)) return reply("No current matches found for `" + username + "`.");
-				lolapi.getLiveMatch(region, result.id).then(match => {
+				lolapi.getLiveMatch(region, result.id, 60).then(match => {
 					Promise.all(match.participants.map(p => { return lolapi.getSummonerFromSummonerID(region, p.summonerId, 86400); })).then(pSA => {//participant summoner array
 						Promise.all(pSA.map(pS => { return lolapi.getRecentGames(region, pS.accountId, 1800); })).then(mhA => {//matchhistory array
 							let mIDA = [];//match id array;
