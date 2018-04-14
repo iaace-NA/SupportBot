@@ -128,11 +128,11 @@ module.exports = class UTILS {
 		return new Promise((resolve, reject) => {
 			let answer = await sequential_internal(tasks);
 			resolve(answer);
+			async function sequential_internal(tasks) {
+				let answer = [];
+				for (let b in tasks) await answer.push(tasks());
+				return answer;
+			}
 		});
-	}
-	async sequential_internal(tasks) {
-		let answer = [];
-		for (let b in tasks) await answer.push(tasks());
-		return answer;
 	}
 }
