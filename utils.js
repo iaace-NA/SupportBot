@@ -4,7 +4,7 @@ String.prototype.replaceAll = function(search, replacement) {
 	var target = this;
 	return target.replace(new RegExp(search, 'g'), replacement);
 };
-Promise.prototype.sequential() = function (tasks) {
+Promise.prototype.sequential = function (tasks) {
 	return new Promise((resolve, reject) => {
 		tasks.reduce((promiseChain, currentTask) => {
 			return promiseChain.then(chainResults =>
