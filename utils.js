@@ -112,10 +112,11 @@ module.exports = class UTILS {
 		return collection.find(ch => { if (ch.type === type && ch.permissionsFor(client.user).has(permissions)) return true; });
 	}
 	getGroup(candidate, graph, visited = {}) {//traverse graph
+		this.output("candidate: " + candidate);
 		for (let b in graph[candidate]) {
 			if (!this.exists(visited[graph[candidate][b]])) {
 				visited[b] = true;
-				this.getGroup(graph[graph[candidate][b]], graph, visited);
+				this.getGroup(b, graph, visited);
 			}
 		}
 		let answer = [];
