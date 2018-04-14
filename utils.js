@@ -131,6 +131,5 @@ module.exports = class UTILS {
 				return values;
 			});
 		}, []);
-		};
 	}
 }
