@@ -114,7 +114,7 @@ module.exports = class UTILS {
 	getGroup(candidate, graph, visited = {}) {//traverse graph
 		for (let b in graph[candidate]) {
 			if (!this.exists(visited[graph[candidate][b]])) {
-				visited[graph[candidate][b]] = true;
+				visited[b] = true;
 				this.getGroup(graph[graph[candidate][b]], graph, visited);
 			}
 		}
