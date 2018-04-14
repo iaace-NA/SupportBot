@@ -125,10 +125,12 @@ module.exports = class UTILS {
 		return answer;
 	}
 	sequential(tasks) {
-		let current = Promise.cast(), results = [];
-		for (let k = 0; k < tasks.length; ++k) {
-			results.push(current = current.thenReturn().then(tasks[k]));
-		}
-		return Promise.all(results);
+		return Promise.reduce(tasks, (values, promise) => {
+			return promise().then((result) => {
+				values.push(result);
+				return values;
+			});
+		}, []);
+		};
 	}
 }
