@@ -209,8 +209,9 @@ module.exports = class LOLAPI {
 		return this.get(region, "match/v3/matches/" + gameID, {}, 604800, maxage);
 	}
 	getMultipleMatchInformation(region, gameIDs, maxage) {
+		let that = this;
 		let requests = [];
-		for (let i in gameIDs) requests.push(function () { return this.getMatchInformation(region, gameIDs[i], maxage); });
+		for (let i in gameIDs) requests.push(function () { return that.getMatchInformation(region, gameIDs[i], maxage); });
 		return UTILS.sequential(requests);
 	}
 	getLiveMatch(region, summonerID, maxage) {
