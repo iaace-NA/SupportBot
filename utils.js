@@ -126,7 +126,7 @@ module.exports = class UTILS {
 	}
 	sequential(tasks) {
 		return new Promise((resolve, reject) => {
-			let answer = await this.sequential_internal(tasks);
+			let answer = await sequential_internal(tasks);
 			resolve(answer);
 		});
 	}
