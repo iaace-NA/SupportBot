@@ -126,7 +126,7 @@ module.exports = class UTILS {
 	}
 	async sequential(tasks) {
 		let answer = [];
-		for (let b in tasks) await answer.push(tasks());
+		for (let b in tasks) await answer.push(tasks[b]());
 		return answer;
 	}
 }
