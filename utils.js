@@ -125,11 +125,14 @@ module.exports = class UTILS {
 		return answer;
 	}
 	sequential(tasks) {
-		return Promise.reduce(tasks, (values, promise) => {
-			return promise().then((result) => {
-				values.push(result);
-				return values;
-			});
-		}, []);
+		return new Promise((resolve, reject) => {
+			let answer = await this.sequential_internal(tasks);
+			resolve(answer);
+		});
+	}
+	async sequential_internal(tasks) {
+		let answer = [];
+		for (let b in tasks) await answer.push(tasks());
+		return answer;
 	}
 }
