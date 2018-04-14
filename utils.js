@@ -119,7 +119,7 @@ module.exports = class UTILS {
 			}
 		}
 		let answer = [];
-		for (let b in visited) answer.push(visited[b]);
+		for (let b in visited) answer.push(b);
 		return answer;
 	}
 }
