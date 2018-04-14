@@ -253,9 +253,7 @@ module.exports = class EmbedGenrator {
 		newEmbed.setDescription("Match Time: " + UTILS.standardTimestamp(match.gameLength + 180));
 		let teams = {};
 		for (let b in match.participants) {
-			if (!UTILS.exists(teams[match.participants[b].teamId])) {
-				teams[match.participants[b].teamId] = [];
-			}
+			if (!UTILS.exists(teams[match.participants[b].teamId])) teams[match.participants[b].teamId] = [];
 			teams[match.participants[b].teamId].push(match.participants[b]);
 		}
 		let team_count = 1;
@@ -306,6 +304,7 @@ module.exports = class EmbedGenrator {
 		}*/
 		let teams = {};
 		for (let b in match.participants) {
+			if (!UTILS.exists(teams[match.participants[b].teamId])) teams[match.participants[b].teamId] = [];
 			teams[match.participants[b].teamId].push(match.participants[b]);
 			common_teammates[match.participants[b].summonerName] = {};
 		}
