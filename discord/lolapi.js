@@ -210,7 +210,7 @@ module.exports = class LOLAPI {
 	}
 	getMultipleMatchInformation(region, gameIDs, maxage) {
 		let requests = [];
-		for (let i in gameIDs) requests.push(() => { this.getMatchInformation(region, gameIDs[i], maxage) });
+		for (let i in gameIDs) requests.push(function () { this.getMatchInformation(region, gameIDs[i], maxage) });
 		return UTILS.sequential(requests);
 	}
 	getLiveMatch(region, summonerID, maxage) {
