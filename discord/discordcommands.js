@@ -147,23 +147,25 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			}).catch(console.error);
 		});*/
 		commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {//new
-			lolapi.getSummonerIDFromName(region, username, 3600).then(result => {
-				result.region = region;
-				result.guess = username;
-				if (!UTILS.exists(result.id)) return reply("No username found for `" + username + "`.");
-				lolapi.getLiveMatch(region, result.id, 60).then(match => {
-					if (UTILS.exists(match.status)) return reply("No current matches found for `" + username + "`.");
-					Promise.all(match.participants.map(p => { return lolapi.getSummonerFromSummonerID(region, p.summonerId, 86400); })).then(pSA => {//participant summoner array
-						Promise.all(pSA.map(pS => { return lolapi.getRecentGames(region, pS.accountId, 1800); })).then(mhA => {//matchhistory array
-							let mIDA = [];//match id array;
-							for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
-							lolapi.getMultipleMatchInformation(region, mIDA, 604800).then(matches => {
-								reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches));
-							});
+			reply(":warning:We are processing the latest information for your command: if this message does not update within 2 minutes, try the same command again. Thank you for your patience.", nMsg => {
+				lolapi.getSummonerIDFromName(region, username, 3600).then(result => {
+					result.region = region;
+					result.guess = username;
+					if (!UTILS.exists(result.id)) return reply("No username found for `" + username + "`.");
+					lolapi.getLiveMatch(region, result.id, 60).then(match => {
+						if (UTILS.exists(match.status)) return reply("No current matches found for `" + username + "`.");
+						Promise.all(match.participants.map(p => { return lolapi.getSummonerFromSummonerID(region, p.summonerId, 86400); })).then(pSA => {//participant summoner array
+							Promise.all(pSA.map(pS => { return lolapi.getRecentGames(region, pS.accountId, 1800); })).then(mhA => {//matchhistory array
+								let mIDA = [];//match id array;
+								for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
+								lolapi.getMultipleMatchInformation(region, mIDA, 604800).then(matches => {
+									nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches) });
+								});
+							}).catch(console.error);
 						}).catch(console.error);
-					}).catch(console.error);
-				}, 60).catch(console.error);
-			}).catch(console.error);
+					}, 60).catch(console.error);
+				}).catch(console.error);
+			});
 		});
 		commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number) => {
 			lolapi.getSummonerIDFromName(region, username, 3600).then(result => {
