@@ -155,6 +155,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					lolapi.getLiveMatch(region, result.id, 60).then(match => {
 						if (UTILS.exists(match.status)) return nMsg.edit("No current matches found for `" + username + "`.").catch();
 						UTILS.sequential(match.participants.map(p => { return () => { lolapi.getSummonerFromSummonerID(region, p.summonerId, 86400); } })).then(pSA => {//participant summoner array
+							console.log(pSA);
 							UTILS.sequential(pSA.map(pS => { return () => { lolapi.getRecentGames(region, pS.accountId, 1800); } })).then(mhA => {//matchhistory array
 								let mIDA = [];//match id array;
 								for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
