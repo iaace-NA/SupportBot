@@ -337,7 +337,6 @@ module.exports = class EmbedGenrator {
 				}
 				else premade_letter[premade_str[c]] += 1;
 			}
-			JSON.output(JSON.stringify())
 			let premade_number = 1;
 			for (let c in premade_letter) {
 				if (premade_letter[c] == 1) premade_letter[c] = 0;
