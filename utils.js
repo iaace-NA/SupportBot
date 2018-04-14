@@ -4,13 +4,6 @@ String.prototype.replaceAll = function(search, replacement) {
 	let target = this;
 	return target.replace(new RegExp(search, 'g'), replacement);
 };
-Promise.prototype.sequential = function (tasks) {
-	let current = Promise.cast(), results = [];
-	for (let k = 0; k < tasks.length; ++k) {
-		results.push(current = current.thenReturn().then(tasks[k]));
-	}
-	return Promise.all(results);
-}
 module.exports = class UTILS {
 	output(t) {//general utility function
 		if (this.exists(t)) {
@@ -130,5 +123,12 @@ module.exports = class UTILS {
 		for (let b in visited) answer.push(b);
 		answer.sort();
 		return answer;
+	}
+	sequential(tasks) {
+		let current = Promise.cast(), results = [];
+		for (let k = 0; k < tasks.length; ++k) {
+			results.push(current = current.thenReturn().then(tasks[k]));
+		}
+		return Promise.all(results);
 	}
 }
