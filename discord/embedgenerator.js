@@ -324,15 +324,19 @@ module.exports = class EmbedGenrator {
 		}
 		let team_count = 1;
 		let player_count = 0;
-		for (let b in teams) {
+		for (let b in teams) {//team
 			let team_description = "";
 			let ban_description = [];
-			for (let c in teams[b]) {
+			let networks = [];
+			for (let c in teams[b]) networks.push(UTILS.getGroup(teams[b][c].summonerName, common_teammates));
+			for (let c in teams[b]) {//player on team
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id];
 				else team_description += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
 				else team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
-				team_description += "\t__[" + teams[b][c].summonerName + "](http://" + CONFIG.REGIONS_REVERSE[summoner.region] + ".op.gg/summoner/userName=" + encodeURIComponent(teams[b][c].summonerName) + ")";
+				team_description += "\t__";
+				if (networks.indexOf)
+				team_description += "[" + teams[b][c].summonerName + "](http://" + CONFIG.REGIONS_REVERSE[summoner.region] + ".op.gg/summoner/userName=" + encodeURIComponent(teams[b][c].summonerName) + ")";
 				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
 				if (UTILS.exists(match.bannedChampions[player_count])) {
 					try {

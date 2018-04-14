@@ -121,6 +121,7 @@ module.exports = class UTILS {
 		}
 		let answer = [];
 		for (let b in visited) answer.push(b);
+		answer.sort();
 		return answer;
 	}
 }
