@@ -1,5 +1,6 @@
 "use strict";
 let ta = require("./timeago.js");
+let seq = require("promise-sequential");
 String.prototype.replaceAll = function(search, replacement) {
 	let target = this;
 	return target.replace(new RegExp(search, 'g'), replacement);
@@ -124,11 +125,7 @@ module.exports = class UTILS {
 		answer.sort();
 		return answer;
 	}
-	async sequential(tasks) {
-		let answer = [];
-		for (let b in tasks) {
-			answer.push(await tasks[b]());
-		}
-		return answer;
+	sequential(tasks) {
+		return seq(tasks);
 	}
 }
