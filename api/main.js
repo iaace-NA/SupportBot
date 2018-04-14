@@ -59,7 +59,7 @@ function ready() {
 		return next();
 	});
 	serveWebRequest("/lol/:region/:cachetime/:maxage/", function (req, res, next) {
-		region_limiters[req.params.region].schedule(() => get(req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage))).then(result => res.send(JSON.stringify(result))).catch(e => {
+		get(req.params.region, req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage)).then(result => res.send(JSON.stringify(result))).catch(e => {
 			console.error(e);
 			res.status(500);
 		});
@@ -230,7 +230,7 @@ function addCache(url, response, cachetime) {
 		if (e) console.error(e);
 	});
 }
-function get(url, cachetime, maxage) {
+function get(region, url, cachetime, maxage) {
 	//cachetime in seconds, if cachetime is 0, do not cache
 	//maxage in seconds, if maxage is 0, force refresh
 	let that = this;
@@ -241,7 +241,7 @@ function get(url, cachetime, maxage) {
 				resolve(cached_result);
 			}).catch((e) => {
 				if (UTILS.exists(e)) console.error(e);
-				request(url, (error, response, body) => {
+				region_limiters[region].submit(request, url, (error, response, body) => {
 					if (UTILS.exists(error)) {
 						reject(error);
 					}
@@ -260,7 +260,7 @@ function get(url, cachetime, maxage) {
 			});
 		}
 		else {//don't cache
-			request(url, (error, response, body) => {
+			region_limiters[region].submit(request, url, (error, response, body) => {
 				if (UTILS.exists(error)) reject(error);
 				else {
 					try {
