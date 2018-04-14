@@ -40,6 +40,9 @@ let shortcut_doc = new apicache.Schema({
 	shortcuts: { type: apicache.Schema.Types.Mixed, default: {} }
 }, { minimize: false });
 let shortcut_doc_model = apicache.model("shortcut_doc_model", shortcut_doc);
+let region_limiters = {};
+let limiter = require("bottleneck");
+for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({ maxConcurrent: 1, minTime: 1500 });
 ready();
 function ready() {
 	if (process.argv.length === 2) {//production key
@@ -55,8 +58,8 @@ function ready() {
 		res.removeHeader("X-Powered-By");
 		return next();
 	});
-	serveWebRequest("/lol/:cachetime/:maxage/", function (req, res, next) {
-		get(req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage)).then(result => res.send(JSON.stringify(result))).catch(e => {
+	serveWebRequest("/lol/:region/:cachetime/:maxage/", function (req, res, next) {
+		region_limiters[req.params.region].schedule(() => get(req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage))).then(result => res.send(JSON.stringify(result))).catch(e => {
 			console.error(e);
 			res.status(500);
 		});

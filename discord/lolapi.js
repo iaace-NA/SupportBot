@@ -54,7 +54,7 @@ module.exports = class LOLAPI {
 			for (let i in options) {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
-			this.request(this.address + ":" + this.port + "/lol/" + cachetime + "/" + maxage + "/?url=" + encodeURIComponent(url), (error, response, body) => {
+			this.request(this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/?url=" + encodeURIComponent(url), (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);
 				}
