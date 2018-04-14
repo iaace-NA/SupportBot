@@ -159,7 +159,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 								let mIDA = [];//match id array;
 								for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
 								lolapi.getMultipleMatchInformation(region, mIDA, 604800).then(matches => {
-									nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches) });
+									nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches) }).catch();
 								});
 							}).catch(console.error);
 						}).catch(console.error);
