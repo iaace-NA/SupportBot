@@ -111,4 +111,15 @@ module.exports = class UTILS {
 		}
 		return collection.find(ch => { if (ch.type === type && ch.permissionsFor(client.user).has(permissions)) return true; });
 	}
+	getGroup(candidate, graph, visited = {}) {//traverse graph
+		for (let b in graph[candidate]) {
+			if (!this.exists(visited[graph[candidate][b]])) {
+				visited[graph[candidate][b]] = true;
+				this.getGroup(graph[graph[candidate][b]], graph, visited);
+			}
+		}
+		let answer = [];
+		for (let b in visited) answer.push(visited[b]);
+		return answer;
+	}
 }

@@ -311,13 +311,12 @@ module.exports = class EmbedGenrator {
 			let teams_p = {};
 			for (let c in matches[b].participantIdentities) {
 				const tC = matches[b].participantIdentities[c];
-				if (UTILS.exists(common_teammates[tC.player.summonerName])) {
-					for (let d in matches[b].participantIdentities) {
-						const tD = matches[b].participantIdentities[d];
-						if (tC.player.summonerId != tD.player.summonerId) { //same guy check
-							 if (!UTILS.exists(common_teammates[tC.player.summonerName][tD.player.summonerName])) common_teammates[tC.player.summonerName][tD.player.summonerName] = 1;
-							 else common_teammates[tC.player.summonerName][tD.player.summonerName] += 1;
-						}
+				if (!UTILS.exists(common_teammates[tC.player.summonerName])) common_teammates[tC.player.summonerName] = {};
+				for (let d in matches[b].participantIdentities) {
+					const tD = matches[b].participantIdentities[d];
+					if (tC.player.summonerId != tD.player.summonerId) { //same guy check
+						if (!UTILS.exists(common_teammates[tC.player.summonerName][tD.player.summonerName])) common_teammates[tC.player.summonerName][tD.player.summonerName] = 1;
+						else common_teammates[tC.player.summonerName][tD.player.summonerName] += 1;
 					}
 				}
 			}
