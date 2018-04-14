@@ -147,7 +147,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			}).catch(console.error);
 		});*/
 		commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {//new
-			reply(":warning:We are processing the latest information for your command: if this message does not update within 2 minutes, try the same command again. Thank you for your patience.", nMsg => {
+			reply(":warning:We are processing the latest information for your command: if this message does not update within 5 minutes, try the same command again. Thank you for your patience.", nMsg => {
 				lolapi.getSummonerIDFromName(region, username, 3600).then(result => {
 					result.region = region;
 					result.guess = username;
