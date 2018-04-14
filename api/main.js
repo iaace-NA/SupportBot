@@ -42,7 +42,7 @@ let shortcut_doc = new apicache.Schema({
 let shortcut_doc_model = apicache.model("shortcut_doc_model", shortcut_doc);
 let region_limiters = {};
 let limiter = require("bottleneck");
-for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({ maxConcurrent: 1, minTime: 1500 });
+for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({ maxConcurrent: 1, minTime: 1300 });
 let req_num = 0;
 ready();
 function ready() {
