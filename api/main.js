@@ -43,6 +43,7 @@ let shortcut_doc_model = apicache.model("shortcut_doc_model", shortcut_doc);
 let region_limiters = {};
 let limiter = require("bottleneck");
 for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({ maxConcurrent: 1, minTime: 1500 });
+let req_num = 0;
 ready();
 function ready() {
 	if (process.argv.length === 2) {//production key
@@ -172,14 +173,16 @@ function ready() {
 	function serveWebRequest(branch, callback) {
 		if (typeof(branch) == "string") {
 			website.get(branch, function (req, res, next) {
-				UTILS.output("request received: " + req.originalUrl);
+				UTILS.output("request received #" + req_num + ": " + req.originalUrl);
+				++req_num;
 				callback(req, res, next);
 			});
 		}
 		else {
 			for (let b in branch) {
 				website.get(branch[b], function(req, res, next){
-					UTILS.output("request received: " + req.originalUrl);
+					UTILS.output("request received #" + req_num + ": " + req.originalUrl);
+					++req_num;
 					callback(req, res, next);
 				});
 			}

@@ -54,6 +54,7 @@ module.exports = class LOLAPI {
 			for (let i in options) {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
+			UTILS.output("IAPI req: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
 			this.request(this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/?url=" + encodeURIComponent(url), (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);
@@ -62,7 +63,6 @@ module.exports = class LOLAPI {
 					try {
 						const answer = JSON.parse(body);
 						if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
-						else UTILS.output("IAPI req: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
 						resolve(answer);
 					}
 					catch (e) {
