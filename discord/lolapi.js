@@ -211,7 +211,7 @@ module.exports = class LOLAPI {
 	getMultipleMatchInformation(region, gameIDs, maxage) {
 		let requests = [];
 		for (let i in gameIDs) requests.push(this.getMatchInformation(region, gameIDs[i], maxage));
-		return Promise.all(requests);
+		return Promise.sequential(requests);
 	}
 	getLiveMatch(region, summonerID, maxage) {
 		return this.get(region, "spectator/v3/active-games/by-summoner/" + summonerID, {}, 60, maxage);

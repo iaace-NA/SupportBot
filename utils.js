@@ -4,6 +4,19 @@ String.prototype.replaceAll = function(search, replacement) {
 	var target = this;
 	return target.replace(new RegExp(search, 'g'), replacement);
 };
+Promise.prototype.sequential() = function (tasks) {
+	return new Promise((resolve, reject) => {
+		tasks.reduce((promiseChain, currentTask) => {
+			return promiseChain.then(chainResults =>
+				currentTask.then(currentResult =>
+					[...chainResults, currentResult]
+				)
+			);
+		}, Promise.resolve([])).then(arrayOfResults => {
+			resolve(arrayOfResults);
+		});
+	});
+}
 module.exports = class UTILS {
 	output(t) {//general utility function
 		if (this.exists(t)) {

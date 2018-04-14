@@ -154,8 +154,8 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					if (!UTILS.exists(result.id)) return nMsg.edit("No username found for `" + username + "`.").catch();
 					lolapi.getLiveMatch(region, result.id, 60).then(match => {
 						if (UTILS.exists(match.status)) return nMsg.edit("No current matches found for `" + username + "`.").catch();
-						Promise.all(match.participants.map(p => { return lolapi.getSummonerFromSummonerID(region, p.summonerId, 86400); })).then(pSA => {//participant summoner array
-							Promise.all(pSA.map(pS => { return lolapi.getRecentGames(region, pS.accountId, 1800); })).then(mhA => {//matchhistory array
+						Promise.sequential(match.participants.map(p => { return lolapi.getSummonerFromSummonerID(region, p.summonerId, 86400); })).then(pSA => {//participant summoner array
+							Promise.sequential(pSA.map(pS => { return lolapi.getRecentGames(region, pS.accountId, 1800); })).then(mhA => {//matchhistory array
 								let mIDA = [];//match id array;
 								for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
 								lolapi.getMultipleMatchInformation(region, mIDA, 604800).then(matches => {
@@ -261,7 +261,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 	function commandGuessUsername(trigger_array,//array of command aliases, prefix needs to be included
 		elevated_permissions,//requires owner permissions
 		callback) {//optional callback only if successful
-			//returns (region, username, parameter)
+		//returns (region, username, parameter)
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			try {//username provided
 				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
@@ -293,7 +293,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 	function commandGuessUsernameNumber(trigger_array,//array of command aliases, prefix needs to be included
 		elevated_permissions,//requires owner permissions
 		callback) {//optional callback only if successful
-			//returns (region, username, number)
+		//returns (region, username, number)
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			const number = parseInt(parameter.substring(0, parameter.indexOf(" ")));
 			if (isNaN(number)) return;
