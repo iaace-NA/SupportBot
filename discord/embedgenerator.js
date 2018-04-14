@@ -25,6 +25,7 @@ const queues = {
 	"470": "TT Ranked Flex",
 	"600": "SR Blood Hunt",
 	"610": "CR Dark Star: Singularity",
+	"700": "SR Clash",
 	"800": "TT Co-op vs AI Intermediate",
 	"810": "TT Co-op vs AI Intro",
 	"820": "TT Co-op vs AI Beginner",
