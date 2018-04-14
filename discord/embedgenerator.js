@@ -341,7 +341,7 @@ module.exports = class EmbedGenrator {
 			for (let c in premade_letter) {
 				if (premade_letter[c] == 1) premade_letter[c] = 0;
 				else {
-					premade_number = premade_number;
+					premade_letter[c] = premade_number;
 					premade_number++;
 				}
 			}
