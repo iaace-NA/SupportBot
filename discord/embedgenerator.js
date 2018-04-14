@@ -46,6 +46,7 @@ const queues = {
 };
 const RANK_ORDER = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "CHALLENGER"];
 const RANK_COLOR = [[153, 51, 0], [179, 179, 179], [255, 214, 51], [102, 255, 204], [179, 240, 255], [255, 153, 255], [255, 0, 0]];
+const PREMADE_EMOJIS = ["", ":regional_indicator_a:", ":b:", ":regional_indicator_c:"];
 module.exports = class EmbedGenrator {
 	constructor() { }
 	test() {
@@ -329,13 +330,28 @@ module.exports = class EmbedGenrator {
 			let ban_description = [];
 			let networks = [];
 			for (let c in teams[b]) networks.push(UTILS.getGroup(teams[b][c].summonerName, common_teammates));
+			let premade_str = networks.map(g => { return g.join(","); });
+			let premade_letter = {};
+			for (let c in premade_str){ 
+				if (!UTILS.exists(premade_letter[premade_str[c]])) {
+					premade_letter[premade_str[c]] = 1;
+				}
+				else premade_letter[premade_str[c]] += 1;
+			}
+			let premade_number = 1;
+			for (let c in premade_letter) {
+				if (premade_letter[c] == 1) premade_letter[c] = 0;
+				else {
+					premade_number = premade_number;
+					premade_number++;
+				}
+			}
 			for (let c in teams[b]) {//player on team
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id];
 				else team_description += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
 				else team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
-				team_description += "\t__";
-				if (networks.indexOf)
+				team_description += "\t__" + PREMADE_EMOJIS[premade_number];
 				team_description += "[" + teams[b][c].summonerName + "](http://" + CONFIG.REGIONS_REVERSE[summoner.region] + ".op.gg/summoner/userName=" + encodeURIComponent(teams[b][c].summonerName) + ")";
 				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
 				if (UTILS.exists(match.bannedChampions[player_count])) {
