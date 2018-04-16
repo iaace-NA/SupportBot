@@ -250,7 +250,8 @@ module.exports = class EmbedGenrator {
 			return newEmbed;
 		}
 		newEmbed.setTitle(queues[match.gameQueueConfigId]);
-		newEmbed.setDescription("Match Time: " + UTILS.standardTimestamp(match.gameLength + 180));
+		if (match.gameStartTime != 0) newEmbed.setDescription("Match Time: " + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000));
+		else newEmbed.setDescription("Match not started.");
 		let teams = {};
 		for (let b in match.participants) {
 			if (!UTILS.exists(teams[match.participants[b].teamId])) teams[match.participants[b].teamId] = [];
@@ -295,7 +296,8 @@ module.exports = class EmbedGenrator {
 			return newEmbed;
 		}
 		newEmbed.setTitle(queues[match.gameQueueConfigId]);
-		newEmbed.setDescription("Match Time: " + UTILS.standardTimestamp(match.gameLength + 180));
+		if (match.gameStartTime != 0) newEmbed.setDescription("Match Time: " + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000));
+		else newEmbed.setDescription("Match not started.");
 		let common_teammates = {};
 		/*{
 			"username1": {
