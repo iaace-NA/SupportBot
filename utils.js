@@ -137,4 +137,7 @@ module.exports = class UTILS {
 		else if (lane == "MIDDLE" || lane == "MID") return 3;
 		else return 0;
 	}
+	opgg(region, username) {
+		return "http://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
+	}
 }
