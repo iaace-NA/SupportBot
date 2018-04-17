@@ -47,7 +47,7 @@ const queues = {
 const RANK_ORDER = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "CHALLENGER"];
 const RANK_COLOR = [[153, 51, 0], [179, 179, 179], [255, 214, 51], [102, 255, 204], [179, 240, 255], [255, 153, 255], [255, 0, 0]];
 const PREMADE_EMOJIS = ["", ":regional_indicator_a:", ":b:", ":regional_indicator_c:"];
-module.exports = class EmbedGenrator {
+module.exports = class EmbedGenerator {
 	constructor() { }
 	test() {
 		let newEmbed = new Discord.RichEmbed();
