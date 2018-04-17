@@ -136,6 +136,7 @@ module.exports = class EmbedGenrator {
 				l: 0
 			}
 		}*/
+		let all_results = [];
 		for (let i = 0; i < match_meta.length && i < 20; ++i) {
 			const KDA = UTILS.KDA(summoner.id, matches[i]);
 			const stats = UTILS.stats(summoner.id, matches[i]);
@@ -163,6 +164,7 @@ module.exports = class EmbedGenrator {
 				else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell2Id].name + "`";
 				newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + summoner_spells + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " " + (UTILS.english(match_meta[i].role) == "None" ? "" : UTILS.english(match_meta[i].role)) + " " + UTILS.english(match_meta[i].lane), "lv. `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\tKDR:`" + (UTILS.round(KDA.KD, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KD, 2)) + "`\tKDA:`" + (UTILS.round(KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KDA, 2)) + "` `" + UTILS.round((100 * (KDA.A + KDA.K)) / tK, 0) + "%`\tcs:`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(stats.goldEarned) + "`\n" + queues[matches[i].queueId + ""] + "\t`" + UTILS.standardTimestamp(matches[i].gameDuration) + "`\t" + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))));
 			}
+			all_results.push(UTILS.determineWin(summoner.id, matches[i]));
 			// champion
 			// match result
 			// queue
@@ -177,12 +179,15 @@ module.exports = class EmbedGenrator {
 			// role
 			// KP
 		}
-		let rpw = [];
+		const total_wins = all_results.reduce((total, increment) => { return total + (increment ? 1 : 0); }, 0);
+		const total_losses = all_results.reduce((total, increment) => { return total + (increment ? 0 : 1); }, 0);
+		newEmbed.setDescription(all_results.map(r => { return r ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss; }).join("") + "\n" + all_results.length + "G = " + total_wins + "W + " + total_losses + "L\nWin Rate: " + UTILS.round(100 * total_wins / (total_wins + total_losses), 2) + "%");
+		let rpw = [];//recently played with
 		for (let b in common_teammates) rpw.push([b, common_teammates[b].w, common_teammates[b].l]);
 		rpw.sort((a, b) => { return b[1] + b[2] - a[1] - a[2]; });
-		let rpws = [];
+		let rpws = [];//recently played with string
 		for (let i = 0; i < rpw.length; ++i) if (rpw[i][1] + rpw[i][2] > 1) rpws.push("__" + rpw[i][0] + "__: " + rpw[i][1] + "W + " + rpw[i][2] + "L");
-		if (rpws.length == 0) rpws.push("No one")
+		if (rpws.length == 0) rpws.push("No one");
 		newEmbed.addField("Recently Played With", rpws.join("\n"));
 		return newEmbed;
 	}
