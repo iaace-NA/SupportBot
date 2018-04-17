@@ -127,4 +127,14 @@ module.exports = class UTILS {
 	sequential(tasks) {
 		return seq(tasks);
 	}
+	inferLane(role, lane, spell1Id, spell2Id) {//top=1, jungle=2, mid=3, support=4, bot=5
+		if (spell1Id == 11 || spell2Id == 11 || lane == "JUNGLE") return 2;
+		else if (lane == "BOTTOM") {
+			if (role == "DUO_SUPPORT") return 4;
+			else return 5;
+		}
+		else if (lane == "TOP") return 1;
+		else if (lane == "MIDDLE" || lane == "MID") return 3;
+		else return 0;
+	}
 }
