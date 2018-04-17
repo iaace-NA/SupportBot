@@ -189,7 +189,7 @@ module.exports = class EmbedGenrator {
 		}
 		const total_wins = all_results.reduce((total, increment) => { return total + (increment ? 1 : 0); }, 0);
 		const total_losses = all_results.reduce((total, increment) => { return total + (increment ? 0 : 1); }, 0);
-		all_KDA.KDA = KDA.K + KDA.A / KDA.D;
+		all_KDA.KDA = all_KDA.K + all_KDA.A / all_KDA.D;
 		if (all_results.length > 5) newEmbed.addField("Older Match Results", all_results.map(r => { return r ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss; }).join(""));
 		newEmbed.setDescription(all_results.length + "G = " + total_wins + "W + " + total_losses + "L\nWin Rate: " + UTILS.round(100 * total_wins / (total_wins + total_losses), 2) + "%\nKDA:`" + (UTILS.round(all_KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(all_KDA.KDA, 2)) + "`");
 		let rpw = [];//recently played with
