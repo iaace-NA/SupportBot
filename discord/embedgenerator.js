@@ -89,7 +89,7 @@ module.exports = class EmbedGenrator {
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;
 	}
-	detailedSummoner(CONFIG, summoner, ranks, championmastery, region) {//region username command
+	detailedSummoner(CONFIG, summoner, ranks, championmastery, region, match) {//region username command
 		let newEmbed = new Discord.RichEmbed();
 		if (!UTILS.exists(summoner.id)) {
 			newEmbed.setAuthor(summoner.guess);
@@ -100,7 +100,9 @@ module.exports = class EmbedGenrator {
 		}
 		newEmbed.setAuthor(summoner.name);
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
-		newEmbed.setDescription("Level " + summoner.summonerLevel);
+		if (UTILS.exists(match.status)) newEmbed.setDescription("Level " + summoner.summonerLevel);
+		else if (match.gameStartTime != 0) newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Match in Progress:**__ " + queues[match.gameQueueConfigId] + " `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "` " + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => { return p.summonerId == summoner.id; }).championId].name);
+		else newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Match in Progress:**__ " + queues[match.gameQueueConfigId] + " `LOADING` " + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => { return p.summonerId == summoner.id; }).championId].name);
 		let highest_rank = -1;
 		for (let b in ranks) {
 			let description = (ranks[b].wins + ranks[b].losses) + "G = " + ranks[b].wins + "W + " + ranks[b].losses + "L\nWin Rate: " + UTILS.round(100 * ranks[b].wins / (ranks[b].wins + ranks[b].losses), 2) + "%";

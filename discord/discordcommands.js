@@ -101,7 +101,9 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					if (!UTILS.exists(result.id)) return;
 					lolapi.getRanks(region, result.id, 120).then(result2 => {
 						lolapi.getChampionMastery(region, result.id, 600).then(result3 => {
-							reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter.substring(0, parameter.indexOf("."))));
+							lolapi.getLiveMatch(region, result.id, 60).then(result4 => {
+								reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter.substring(0, parameter.indexOf(".")), result4));
+							}).catch(console.error);
 						}).catch(console.error);
 					}).catch(console.error);
 				}).catch(console.error);
@@ -120,7 +122,9 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				if (!UTILS.exists(result.id)) return reply("No results for `" + username + "`. Please revise your request.");
 				lolapi.getRanks(region, result.id, 120).then(result2 => {
 					lolapi.getChampionMastery(region, result.id, 600).then(result3 => {
-						reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter));
+						lolapi.getLiveMatch(region, result.id, 60).then(result4 => {
+							reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter, result4));
+						}).catch(console.error);
 					});
 				}).catch(console.error);
 			}).catch();
