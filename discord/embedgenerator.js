@@ -314,7 +314,7 @@ module.exports = class EmbedGenrator {
 			return newEmbed;
 		}
 		newEmbed.setTitle(queues[match.gameQueueConfigId]);
-		if (match.gameStartTime != 0) newEmbed.setDescription("Match Time: " + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000));
+		if (match.gameStartTime != 0) newEmbed.setDescription("Match Time: `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
 		else newEmbed.setDescription("Match not started.");
 		let common_teammates = {};
 		/*{
