@@ -8,8 +8,7 @@ String.prototype.replaceAll = function(search, replacement) {
 module.exports = class UTILS {
 	output(t) {//general utility function
 		if (this.exists(t)) {
-			let d = new Date();
-			let n = d.toUTCString();
+			let n = new Date().toISOString().slice(0, 19).replace('T', ' ');;
 			console.log(n + " : " + t);
 		}
 	}
