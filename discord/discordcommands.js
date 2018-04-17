@@ -61,7 +61,8 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			reply("This is the link to add SupportBot to other servers: <" + CONFIG.BOT_ADD_LINK + ">\nAdding it requires the \"Manage Server\" permission.");
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "help"], false, false, (original, index) => {
-			reply_embed(embedgenerator.help(CONFIG));
+			reply("A PM has been sent to you with information on how to use SupportBot.");
+			reply_embed_to_author(embedgenerator.help(CONFIG));
 		});
 		command(["http://"], true, false, (original, index, parameter) => {
 			const region = assert_region(parameter.substring(0, parameter.indexOf(".")), false);
@@ -267,6 +268,17 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		});
 	}
 
+	function reply_to_author(reply_text, callback, error_callback) {
+		print_message();
+		console.log("reply to author: " + reply_text + "\n");
+		msg.author.send(reply_text, { split: true }).then((nMsg) => {
+			if (UTILS.exists(callback)) callback(nMsg);
+		}).catch((e) => {
+			console.error(e);
+			if (UTILS.exists(error_callback)) error_callback(e);
+		});
+	}
+
 	function reply_embed(reply_embed, callback, error_callback) {
 		if (UTILS.exists(msg.guild) && !msg.channel.permissionsFor(client.user).has(["EMBED_LINKS"])) {//doesn't have permission to embed links in server
 			reply("I cannot respond to your request without the \"embed links\" permission.");
@@ -281,6 +293,17 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				if (UTILS.exists(error_callback)) error_callback(e);
 			});
 		}
+	}
+
+	function reply_embed_to_author(reply_embed, callback, error_callback) {
+		print_message();
+		console.log("reply embedded to author\n");
+		msg.author.send("", { embed: reply_embed }).then((nMsg) => {
+			if (UTILS.exists(callback)) callback(nMsg);
+		}).catch((e) => {
+			console.error(e);
+			if (UTILS.exists(error_callback)) error_callback(e);
+		});
 	}
 
 	function print_message() {
