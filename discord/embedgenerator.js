@@ -137,6 +137,11 @@ module.exports = class EmbedGenrator {
 			}
 		}*/
 		let all_results = [];
+		let all_KDA = {
+			K: 0,
+			D: 0,
+			A: 0
+		};
 		for (let i = 0; i < match_meta.length && i < 20; ++i) {
 			const KDA = UTILS.KDA(summoner.id, matches[i]);
 			const stats = UTILS.stats(summoner.id, matches[i]);
@@ -165,6 +170,9 @@ module.exports = class EmbedGenrator {
 				newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + summoner_spells + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name + " " + (UTILS.english(match_meta[i].role) == "None" ? "" : UTILS.english(match_meta[i].role)) + " " + UTILS.english(match_meta[i].lane), "lv. `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\tKDR:`" + (UTILS.round(KDA.KD, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KD, 2)) + "`\tKDA:`" + (UTILS.round(KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KDA, 2)) + "` `" + UTILS.round((100 * (KDA.A + KDA.K)) / tK, 0) + "%`\tcs:`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(stats.goldEarned) + "`\n" + queues[matches[i].queueId + ""] + "\t`" + UTILS.standardTimestamp(matches[i].gameDuration) + "`\t" + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))));
 			}
 			all_results.push(UTILS.determineWin(summoner.id, matches[i]));
+			all_KDA.K += KDA.K;
+			all_KDA.D += KDA.D;
+			all_KDA.A += KDA.A;
 			// champion
 			// match result
 			// queue
@@ -181,7 +189,9 @@ module.exports = class EmbedGenrator {
 		}
 		const total_wins = all_results.reduce((total, increment) => { return total + (increment ? 1 : 0); }, 0);
 		const total_losses = all_results.reduce((total, increment) => { return total + (increment ? 0 : 1); }, 0);
-		newEmbed.setDescription(all_results.map(r => { return r ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss; }).join("") + "\n" + all_results.length + "G = " + total_wins + "W + " + total_losses + "L\nWin Rate: " + UTILS.round(100 * total_wins / (total_wins + total_losses), 2) + "%");
+		all_KDA.KDA = KDA.K + KDA.A / KDA.D;
+		if (all_results.length > 5) newEmbed.addField("Older Match Results", all_results.map(r => { return r ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss; }).join(""));
+		newEmbed.setDescription(all_results.length + "G = " + total_wins + "W + " + total_losses + "L\nWin Rate: " + UTILS.round(100 * total_wins / (total_wins + total_losses), 2) + "%\nKDA:`" + (UTILS.round(all_KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(all_KDA.KDA, 2)) + "`");
 		let rpw = [];//recently played with
 		for (let b in common_teammates) rpw.push([b, common_teammates[b].w, common_teammates[b].l]);
 		rpw.sort((a, b) => { return b[1] + b[2] - a[1] - a[2]; });
