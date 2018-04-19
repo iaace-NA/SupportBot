@@ -140,4 +140,31 @@ module.exports = class UTILS {
 	opgg(region, username) {
 		return "http://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
 	}
+	shortRank(info) {
+		//G W___
+		//G2 +00
+		//G2 +56
+		//G2P L_
+
+		let answer = "`";
+		answer += info.tier.substring(0, 1);
+		if (UTILS.exists(info.miniSeries)) {
+			if (info.miniSeries.length == 5) {//BO5
+				answer += " " + info.miniSeries(0, info.miniSeries.length - 1).replaceAll("N", "_");
+			}
+			else {//BO3
+				answer += info.rank + "P " + info.miniSeries(0, info.miniSeries.length - 1).replaceAll("N", "_");
+			}
+		}
+		else {
+			answer += info.rank;
+			let LP = info.leaguePoints;
+			if (LP < 0) answer += " -";
+			else answer += " +"
+			LP = Math.abs(LP);
+			if (LP >= 10) answer += LP;
+			else answer += "0" + LP;
+		}
+		return answer + "`";
+	}
 }
