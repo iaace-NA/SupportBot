@@ -148,7 +148,7 @@ module.exports = class UTILS {
 
 		let answer = "`";
 		answer += info.tier.substring(0, 1);
-		if (UTILS.exists(info.miniSeries)) {
+		if (this.exists(info.miniSeries)) {
 			if (info.miniSeries.length == 5) {//BO5
 				answer += " " + info.miniSeries(0, info.miniSeries.length - 1).replaceAll("N", "_");
 			}
