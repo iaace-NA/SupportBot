@@ -15,9 +15,11 @@ let path = require('path');
 let crypto = require("crypto");
 let https = require('https');
 let http = require('http');
+let LoadAverage = require("../loadaverage.js");
 //const aes256 = require("aes256");
 //let cipher = aes256.createCipher(fs.readFileSync("./aes256.key", "utf-8"));
-
+let response_type = ["Total", "Uncachable", "Cache hit", "Cache hit expired", "Cache miss"];
+const load_average = [new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60)];
 const express = require("express");
 const website = express();
 const UTILS = new (require("../utils.js"))();
@@ -171,6 +173,7 @@ function ready() {
 		res.status(404).end();
 	});
 	function serveWebRequest(branch, callback) {
+		load_average[0].add();
 		if (typeof(branch) == "string") {
 			website.get(branch, function (req, res, next) {
 				UTILS.output("request received #" + req_num + ": " + req.originalUrl);
@@ -216,12 +219,14 @@ function checkCache(url, maxage) {
 			if (UTILS.exists(doc)) {
 				if (UTILS.exists(maxage) && apicache.Types.ObjectId(doc.id).getTimestamp().getTime() < new Date().getTime() - (maxage * 1000)) {//if expired
 					UTILS.output("\tmaxage expired url: " + url);
+					load_average[3].add();
 					doc.remove(() => {});
 					reject(null);
 				}
 				else resolve(doc.toObject().response);
 			}
 			else {
+				load_average[4].add();
 				reject(null);
 			}
 		});
@@ -241,6 +246,7 @@ function get(region, url, cachetime, maxage) {
 		if (cachetime != 0) {//cache
 			checkCache(url, maxage).then((cached_result) => {
 				UTILS.output("\tcache hit: " + url.replace(CONFIG.RIOT_API_KEY, ""));
+				load_average[2].add();
 				resolve(cached_result);
 			}).catch((e) => {
 				if (UTILS.exists(e)) console.error(e);
@@ -269,6 +275,7 @@ function get(region, url, cachetime, maxage) {
 					try {
 						const answer = JSON.parse(body);
 						UTILS.output("\tuncached: " + url.replace(CONFIG.RIOT_API_KEY, ""));
+						load_average[1].add();
 						resolve(answer);
 					}
 					catch (e) {
