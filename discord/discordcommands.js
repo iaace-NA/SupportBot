@@ -112,12 +112,12 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			}).catch(() => { reply("No results for `" + username + "`. Please revise your request."); });
 		});
 		commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter) => {
-			lolapi.getSummonerIDFromName(region, username, 3600).then(result => {
+			lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.MH.SUMMONER_ID).then(result => {
 				result.region = region;
 				if (!UTILS.exists(result.accountId)) return reply("No recent matches found for `" + username + "`.");
-				lolapi.getRecentGames(region, result.accountId, 120).then(matchhistory => {
+				lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.MH.RECENT_GAMES).then(matchhistory => {
 					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`.");
-					lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => { return m.gameId; }), 604800).then(matches => {
+					lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => { return m.gameId; }), CONFIG.API_MAXAGE.MULTIPLE_MATCH).then(matches => {
 						reply_embed(embedgenerator.match(CONFIG, result, matchhistory.matches, matches));
 					}).catch(console.error);
 				}).catch(console.error);
@@ -135,34 +135,34 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		});*/
 		commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {//new
 			reply(":warning:We are processing the latest information for your command: if this message does not update within 5 minutes, try the same command again. Thank you for your patience.", nMsg => {
-				lolapi.getSummonerIDFromName(region, username, 3600).then(result => {
+				lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.LG.SUMMONER_ID).then(result => {
 					result.region = region;
 					result.guess = username;
 					if (!UTILS.exists(result.id)) return nMsg.edit("No username found for `" + username + "`.").catch();
-					lolapi.getLiveMatch(region, result.id, 60).then(match => {
+					lolapi.getLiveMatch(region, result.id, CONFIG.API_MAXAGE.LG.LIVE_MATCH).then(match => {
 						if (UTILS.exists(match.status)) return nMsg.edit("No current matches found for `" + username + "`.").catch();
-						UTILS.sequential(match.participants.map(p => { return function () { return lolapi.getSummonerFromSummonerID(region, p.summonerId, 86400); } })).then(pSA => {//participant summoner array
-							UTILS.sequential(pSA.map(pS => { return function () { return lolapi.getRecentGames(region, pS.accountId, 1800); } })).then(mhA => {//matchhistory array
+						UTILS.sequential(match.participants.map(p => { return function () { return lolapi.getSummonerFromSummonerID(region, p.summonerId, CONFIG.API_MAXAGE.LG.OTHER_SUMMONER_ID); } })).then(pSA => {//participant summoner array
+							UTILS.sequential(pSA.map(pS => { return function () { return lolapi.getRecentGames(region, pS.accountId, CONFIG.API_MAXAGE.LG.RECENT_GAMES); } })).then(mhA => {//matchhistory array
 								let mIDA = [];//match id array;
 								for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
-								lolapi.getMultipleMatchInformation(region, mIDA, 604800).then(matches => {
+								lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.MULTIPLE_MATCH).then(matches => {
 									nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches) }).catch();
 								});
 							}).catch(console.error);
 						}).catch(console.error);
-					}, 60).catch(console.error);
+					}).catch(console.error);
 				}).catch(console.error);
 			});
 		});
 		commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number) => {
-			lolapi.getSummonerIDFromName(region, username, 3600).then(result => {
+			lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.DMH.SUMMONER_ID).then(result => {
 				result.region = region;
 				result.guess = username;
 				if (!UTILS.exists(result.accountId)) return reply("No recent matches found for `" + username + "`.");
-				lolapi.getRecentGames(region, result.accountId, 120).then(matchhistory => {
+				lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.DMH.RECENT_GAMES).then(matchhistory => {
 					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`.");
 					if (number < 1 || number > 20 || !UTILS.exists(matchhistory.matches[number - 1])) return reply(":x: This number is out of range.");
-					lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId, 604800).then(match => {
+					lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId, CONFIG.API_MAXAGE.DMH.MATCH_INFORMATION).then(match => {
 						reply_embed(embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match));
 					}).catch(console.error);
 				}).catch(console.error);
