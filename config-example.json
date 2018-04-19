@@ -77,5 +77,15 @@
 		"GET_LIVE_MATCH": 60,
 		"GET_MMR": 120,
 		"GET_STATUS": 60
+	},
+	"API_MAXAGE": {
+		"SD": 60,
+		"LINK": 60,
+		"SUMMONER_CARD": {
+			"SUMMONER_ID": 3600,
+			"RANKS": 180,
+			"CHAMPION_MASTERY": 600,
+			"LIVE_MATCH": 60
+		}
 	}
 }

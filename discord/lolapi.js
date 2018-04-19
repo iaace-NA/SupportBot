@@ -223,6 +223,23 @@ module.exports = class LOLAPI {
 	getStatus(region, maxage) {
 		return this.get(region, "status/v3/shard-data", {}, this.CONFIG.API_CACHETIME.GET_STATUS, maxage);
 	}
+	getSummonerCard(region, username) {
+		const that = this;
+		return new Promise((resolve, reject) => {
+			lolapi.getSummonerIDFromName(region, username, this.CONFIG.API_MAXAGE.SUMMONER_CARD.SUMMONER_ID).then(result => {
+				result.region = region;
+				result.guess = username;
+				if (!UTILS.exists(result.id)) reject();
+				that.getRanks(region, result.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RANKS).then(result2 => {
+					that.getChampionMastery(region, result.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHAMPION_MASTERY).then(result3 => {
+						that.getLiveMatch(region, result.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.LIVE_MATCH).then(result4 => {
+							resolve([result, result2, result3, result4]);
+						}).catch(reject);
+					}).catch(reject);
+				}).catch(reject);
+			}).catch(reject);
+		});
+	}
 	clearCache() {
 		const filenames = fs.readdirSync("./data/static-api-cache/");
 		for (let b in filenames) {

@@ -35,14 +35,14 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			reply_embed(embedgenerator.test());
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "sd ", CONFIG.DISCORD_COMMAND_PREFIX + "summonerdebug "], true, false, (original, index, parameter) => {
-			lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1), 60).then(result => {
+			lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.SD).then(result => {
 				result.guess = parameter.substring(parameter.indexOf(" ") + 1);
 				reply_embed(embedgenerator.summoner(CONFIG, result));
 			}).catch(console.error);
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "link "], true, false, (original, index, parameter) => {
 			let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
-			lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1), 60).then(result => {
+			lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.LINK).then(result => {
 				result.region = region;
 				result.guess = parameter.substring(parameter.indexOf(" ") + 1);
 				db.addLink(msg.author.id, result).then(() => { reply("Your discord account is now linked to " + result.name); }).catch((e) => { reply("Something went wrong."); throw e; });
@@ -95,18 +95,9 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			const region = assert_region(parameter.substring(0, parameter.indexOf(".")), false);
 			if (parameter.substring(parameter.indexOf(".") + 1, parameter.indexOf(".") + 6) == "op.gg") {
 				let username = decodeURIComponent(msg.content.substring(msg.content.indexOf("userName=") + "userName=".length));
-				lolapi.getSummonerIDFromName(region, username, 3600).then(result => {
-					result.region = region;
-					result.guess = username;
-					if (!UTILS.exists(result.id)) return;
-					lolapi.getRanks(region, result.id, 120).then(result2 => {
-						lolapi.getChampionMastery(region, result.id, 600).then(result3 => {
-							lolapi.getLiveMatch(region, result.id, 60).then(result4 => {
-								reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter.substring(0, parameter.indexOf(".")), result4));
-							}).catch(console.error);
-						}).catch(console.error);
-					}).catch(console.error);
-				}).catch(console.error);
+				lolapi.getSummonerCard(region, username).then(result => {
+					reply_embed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter.substring(0, parameter.indexOf(".")), result[3]));
+				}).catch();
 			}
 		});
 		command(["service status ", "servicestatus ", "ss ", "status "], true, false, (original, index, parameter) => {
@@ -116,18 +107,9 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 			}).catch(console.error);
 		});
 		commandGuessUsername([""], false, (region, username, parameter) => {
-			lolapi.getSummonerIDFromName(region, username, 3600).then(result => {
-				result.region = region;
-				result.guess = username;
-				if (!UTILS.exists(result.id)) return reply("No results for `" + username + "`. Please revise your request.");
-				lolapi.getRanks(region, result.id, 120).then(result2 => {
-					lolapi.getChampionMastery(region, result.id, 600).then(result3 => {
-						lolapi.getLiveMatch(region, result.id, 60).then(result4 => {
-							reply_embed(embedgenerator.detailedSummoner(CONFIG, result, result2, result3, parameter, result4));
-						}).catch(console.error);
-					});
-				}).catch(console.error);
-			}).catch();
+			lolapi.getSummonerCard(region, username).then(result => {
+				reply_embed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter, result[3]));
+			}).catch(() => { reply("No results for `" + username + "`. Please revise your request."); });
 		});
 		commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter) => {
 			lolapi.getSummonerIDFromName(region, username, 3600).then(result => {
