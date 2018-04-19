@@ -125,16 +125,16 @@ module.exports = class LOLAPI {
 	}
 	//get(path, options) {}
 	getSummonerIDFromName(region, username, maxage) {
-		return this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {}, 86400, maxage);
+		return this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage);
 	}
 	getSummonerFromSummonerID(region, id, maxage) {
-		return this.get(region, "summoner/v3/summoners/" + id, {}, 86400, maxage);
+		return this.get(region, "summoner/v3/summoners/" + id, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_FROM_SUMMONER_ID, maxage);
 	}
 	getRanks(region, summonerID, maxage) {
-		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {}, 86400, maxage);
+		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_RANKS, maxage);
 	}
 	getChampionMastery(region, summonerID, maxage) {
-		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, {}, 86400, maxage);
+		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_CHAMPION_MASTERY, maxage);
 	}
 	getStaticChampions(region) {
 		let that = this;
@@ -203,10 +203,10 @@ module.exports = class LOLAPI {
 		});
 	}
 	getRecentGames(region, accountID, maxage) {
-		return this.get(region, "match/v3/matchlists/by-account/" + accountID + "/recent", {}, 1800, maxage);
+		return this.get(region, "match/v3/matchlists/by-account/" + accountID + "/recent", {}, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage);
 	}
 	getMatchInformation(region, gameID, maxage) {
-		return this.get(region, "match/v3/matches/" + gameID, {}, 604800, maxage);
+		return this.get(region, "match/v3/matches/" + gameID, {}, this.CONFIG.API_CACHETIME.GET_MATCH_INFORMATION, maxage);
 	}
 	getMultipleMatchInformation(region, gameIDs, maxage) {
 		let that = this;
@@ -215,13 +215,13 @@ module.exports = class LOLAPI {
 		return UTILS.sequential(requests);
 	}
 	getLiveMatch(region, summonerID, maxage) {
-		return this.get(region, "spectator/v3/active-games/by-summoner/" + summonerID, {}, 60, maxage);
+		return this.get(region, "spectator/v3/active-games/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_LIVE_MATCH, maxage);
 	}
 	getMMR(region, summonerID, maxage) {
-		return this.get(region, "league/v3/mmr-af/by-summoner/" + summonerID, {}, 120, maxage);
+		return this.get(region, "league/v3/mmr-af/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_MMR, maxage);
 	}
 	getStatus(region, maxage) {
-		return this.get(region, "status/v3/shard-data", {}, 60, maxage);
+		return this.get(region, "status/v3/shard-data", {}, this.CONFIG.API_CACHETIME.GET_STATUS, maxage);
 	}
 	clearCache() {
 		const filenames = fs.readdirSync("./data/static-api-cache/");
