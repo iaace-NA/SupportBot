@@ -39,6 +39,18 @@ module.exports = class LoadAverage {
 		}
 		return ans / minutes;
 	}
+	minx_count(minutes) {//count by minute
+		if (minutes > this.maxMinutes) throw new Error("Cannot request data beyond " + this.maxMinutes + " old.");
+		this.cleanup();
+		const prev = new Date().getTime() - (minutes * 60000);
+		let ans = 0;
+		for (let i in this.recent) {
+			if (i >= prev && i < prev + 60000) {
+				ans += this.recent[i];
+			}
+		}
+		return ans / minutes;
+	}
 	total_rate() {//rate by minute
 		this.cleanup();
 		return this.total_count() / ((new Date().getTime() - this.startTime) / 60000);

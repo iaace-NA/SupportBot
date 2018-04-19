@@ -188,11 +188,11 @@ function ready() {
 		res.status(404).end();
 	});
 	function serveWebRequest(branch, callback) {
-		load_average[0].add();
 		if (typeof(branch) == "string") {
 			website.get(branch, function (req, res, next) {
 				UTILS.output("request received #" + req_num + ": " + req.originalUrl);
 				++req_num;
+				load_average[0].add();
 				callback(req, res, next);
 			});
 		}
@@ -201,6 +201,7 @@ function ready() {
 				website.get(branch[b], function(req, res, next){
 					UTILS.output("request received #" + req_num + ": " + req.originalUrl);
 					++req_num;
+					load_average[0].add();
 					callback(req, res, next);
 				});
 			}
