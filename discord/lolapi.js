@@ -137,7 +137,7 @@ module.exports = class LOLAPI {
 		let that = this;
 		let requests = [];
 		for (let i in summonerIDs) requests.push(function () { return that.getRanks(region, summonerIDs[i], maxage); });
-		return UTILS.sequential(requests);
+		return Promise.all(requests);
 	}
 	getChampionMastery(region, summonerID, maxage) {
 		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_CHAMPION_MASTERY, maxage);
