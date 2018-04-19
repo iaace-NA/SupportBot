@@ -109,7 +109,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		commandGuessUsername([""], false, (region, username, parameter) => {
 			lolapi.getSummonerCard(region, username).then(result => {
 				reply_embed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter, result[3]));
-			}).catch(() => { reply("No results for `" + username + "`. Please revise your request."); });
+			}).catch((e) => { reply("No results for `" + username + "`. Please revise your request."); console.error(e); });
 		});
 		commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter) => {
 			lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.MH.SUMMONER_ID).then(result => {
