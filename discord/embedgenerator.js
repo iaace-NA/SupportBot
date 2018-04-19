@@ -333,7 +333,7 @@ module.exports = class EmbedGenerator {
 			const divs = { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" };
 			if (UTILS.exists(flex_5)) match.participants[b].flex5 = "`" + flex_5.tier.substring(0, 1) + divs[flex_5.rank] + (flex_5.leaguePoints >= 0 ? "+" : "-") + flex_5.leaguePoints + "`";
 			else match.participants[b].flex5 = "`XX-XX`";
-			if (UTILS.exists(flex_3)) match.participants[b].flex_3 = "`" + flex_3.tier.substring(0, 1) + divs[flex_3.rank] + (flex_3.leaguePoints >= 0 ? "+" : "-") + flex_3.leaguePoints + "`";
+			if (UTILS.exists(flex_3)) match.participants[b].flex3 = "`" + flex_3.tier.substring(0, 1) + divs[flex_3.rank] + (flex_3.leaguePoints >= 0 ? "+" : "-") + flex_3.leaguePoints + "`";
 			else match.participants[b].flex3 = "`XX-XX`";
 			if (UTILS.exists(solo)) match.participants[b].solo = "`" + solo.tier.substring(0, 1) + divs[solo.rank] + (solo.leaguePoints >= 0 ? "+" : "-") + solo.leaguePoints + "`";
 			else match.participants[b].solo = "`XX-XX`";
@@ -380,8 +380,8 @@ module.exports = class EmbedGenerator {
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id];
 				else team_description += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
-				else team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`\t";
-				team_description += teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3;
+				else team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
+				team_description += "\t" + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3;
 				team_description += " __" + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
 				team_description += "[" + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")";
 				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
