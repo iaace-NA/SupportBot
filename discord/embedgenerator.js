@@ -376,7 +376,7 @@ module.exports = class EmbedGenerator {
 					premade_number++;
 				}
 			}
-			team_description += ":x::x:\t`SOLOQ` `FLEX5` `FLEX3`";
+			team_description += ":x::x:\t`SOLOQ` `FLEX5` `FLEX3`\n";
 			for (let c in teams[b]) {//player on team
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id];
 				else team_description += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
