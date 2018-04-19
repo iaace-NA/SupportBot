@@ -145,7 +145,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 							UTILS.sequential(pSA.map(pS => { return function () { return lolapi.getRecentGames(region, pS.accountId, CONFIG.API_MAXAGE.LG.RECENT_GAMES); } })).then(mhA => {//matchhistory array
 								let mIDA = [];//match id array;
 								for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
-								lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.MULTIPLE_MATCH).then(matches => {
+								lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.LG.MULTIPLE_MATCH).then(matches => {
 									nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches) }).catch();
 								});
 							}).catch(console.error);

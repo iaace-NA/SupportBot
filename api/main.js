@@ -49,11 +49,11 @@ let req_num = 0;
 ready();
 function ready() {
 	if (process.argv.length === 2) {//production key
-		UTILS.output("Ready and listening on port " + CONFIG.API_PORT_PRODUCTION);
+		UTILS.output("IAPI ready and listening on port " + CONFIG.API_PORT_PRODUCTION);
 		website.listen(CONFIG.API_PORT_PRODUCTION);
 	}
 	else {//non-production key
-		UTILS.output("Ready and listening on port " + CONFIG.API_PORT_DEVELOPMENT);
+		UTILS.output("IAPI and listening on port " + CONFIG.API_PORT_DEVELOPMENT);
 		website.listen(CONFIG.API_PORT_DEVELOPMENT);
 	}
 	
