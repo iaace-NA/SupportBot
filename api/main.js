@@ -190,7 +190,7 @@ function ready() {
 	function serveWebRequest(branch, callback) {
 		if (typeof(branch) == "string") {
 			website.get(branch, function (req, res, next) {
-				UTILS.output("request received #" + req_num + ": " + req.originalUrl);
+				UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
 				++req_num;
 				load_average[0].add();
 				callback(req, res, next);
@@ -199,7 +199,7 @@ function ready() {
 		else {
 			for (let b in branch) {
 				website.get(branch[b], function(req, res, next){
-					UTILS.output("request received #" + req_num + ": " + req.originalUrl);
+					UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
 					++req_num;
 					load_average[0].add();
 					callback(req, res, next);

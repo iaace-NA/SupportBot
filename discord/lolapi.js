@@ -54,7 +54,7 @@ module.exports = class LOLAPI {
 			for (let i in options) {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
-			UTILS.output("IAPI req: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
+			UTILS.output("IAPI req sent: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
 			this.request(this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/?url=" + encodeURIComponent(url), (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);
