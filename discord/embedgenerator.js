@@ -332,11 +332,11 @@ module.exports = class EmbedGenerator {
 			const solo = ranks[b].find(r => { return r.queueType === "RANKED_SOLO_5x5"; });
 			const divs = { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" };
 			if (UTILS.exists(flex_5)) match.participants[b].flex5 = UTILS.shortRank(flex_5);
-			else match.participants[b].flex5 = "`_____`";
+			else match.participants[b].flex5 = "`______`";
 			if (UTILS.exists(flex_3)) match.participants[b].flex3 = UTILS.shortRank(flex_3);
-			else match.participants[b].flex3 = "`_____`";
+			else match.participants[b].flex3 = "`______`";
 			if (UTILS.exists(solo)) match.participants[b].solo = UTILS.shortRank(solo);
-			else match.participants[b].solo = "`_____`";
+			else match.participants[b].solo = "`______`";
 			teams[match.participants[b].teamId].push(match.participants[b]);
 			common_teammates[match.participants[b].summonerName] = {};
 		}
@@ -376,7 +376,7 @@ module.exports = class EmbedGenerator {
 					premade_number++;
 				}
 			}
-			team_description += ":x::x:\t`SOLOQ` `FLEX5` `FLEX3`\n";
+			team_description += ":x::x:\t`SOLO Q` `FLEX 5` `FLEX 3`\n";
 			for (let c in teams[b]) {//player on team
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id];
 				else team_description += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
