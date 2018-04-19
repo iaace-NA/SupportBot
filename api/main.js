@@ -62,7 +62,7 @@ function ready() {
 		return next();
 	});
 	serveWebRequest("/lol/:region/:cachetime/:maxage/", function (req, res, next) {
-		get(req.params.region, req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage)).then(result => res.send(JSON.stringify(result))).catch(e => {
+		get(req.params.region, req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage)).then(result => res.json(result)).catch(e => {
 			console.error(e);
 			res.status(500);
 		});
@@ -82,7 +82,7 @@ function ready() {
 						return res.status(500).end();
 					}
 					else {
-						res.send("{\"success\":true}");
+						res.json({ success: true });
 					}
 				});
 			}
@@ -99,7 +99,7 @@ function ready() {
 						return res.status(500).end();
 					}
 					else {
-						res.send("{\"success\":true}");
+						res.json({ success: true });
 					}
 				});
 			}
@@ -120,12 +120,12 @@ function ready() {
 						return res.status(500).end();
 					}
 					else {
-						res.send("{\"success\":true}");
+						res.json({ success: true });
 					}
 				});
 			}
 			else {
-				res.send("{\"success\":true}");
+				res.json({ success: true });
 			}
 		});
 	});
@@ -139,7 +139,7 @@ function ready() {
 				if (UTILS.exists(doc.shortcuts[req.query.from])) {
 					let answer = {};
 					answer[req.query.from] = doc.shortcuts[req.query.from];
-					res.send(JSON.stringify(answer));
+					res.json(answer);
 				}
 				else res.status(404).end();
 			}
@@ -155,7 +155,7 @@ function ready() {
 				return res.status(500).end();
 			}
 			if (UTILS.exists(doc)) {
-				res.send(JSON.stringify(doc.toObject()));
+				res.json(doc.toObject());
 			}
 			else {
 				res.send("{}");
@@ -164,7 +164,7 @@ function ready() {
 	});
 	//https.createServer({ key: fs.readFileSync("./privkey.pem"), cert: fs.readFileSync("./fullchain.pem") }, website).listen(443);
 	serveWebRequest("/ping", function (req, res, next) {
-		res.send(JSON.stringify({ received: new Date().getTime() }));
+		res.json({ received: new Date().getTime() });
 	});
 	serveWebRequest("/stats", function (req, res, next) {
 		let answer = {};
@@ -179,7 +179,7 @@ function ready() {
 			answer[i + ""].total_rate = load_average[i].total_rate();
 			answer[i + ""].total_count = load_average[i].total_count();
 		}
-		res.send(JSON.stringify(answer, null, "\t"));
+		res.json(answer);
 	});
 	serveWebRequest("/", function (req, res, next) {
 		res.send("You have reached the online api's testing page.");
