@@ -136,7 +136,7 @@ module.exports = class LOLAPI {
 	getMultipleRanks(region, summonerIDs, maxage) {
 		let that = this;
 		let requests = [];
-		for (let i in summonerIDs) requests.push(function () { return that.getRanks(region, summonerIDs[i], maxage); });
+		for (let i in summonerIDs) requests.push(that.getRanks(region, summonerIDs[i], maxage));
 		return Promise.all(requests);
 	}
 	getChampionMastery(region, summonerID, maxage) {
