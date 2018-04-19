@@ -327,9 +327,9 @@ module.exports = class EmbedGenerator {
 		let teams = {};
 		for (let b in match.participants) {
 			if (!UTILS.exists(teams[match.participants[b].teamId])) teams[match.participants[b].teamId] = [];
-			const flex_5 = ranks.find(r => { return r.queueType === "RANKED_FLEX_SR"; });
-			const flex_3 = ranks.find(r => { return r.queueType === "RANKED_FLEX_TT"; });
-			const solo = ranks.find(r => { return r.queueType === "RANKED_SOLO_5x5"; });
+			const flex_5 = ranks[b].find(r => { return r.queueType === "RANKED_FLEX_SR"; });
+			const flex_3 = ranks[b].find(r => { return r.queueType === "RANKED_FLEX_TT"; });
+			const solo = ranks[b].find(r => { return r.queueType === "RANKED_SOLO_5x5"; });
 			const divs = { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" };
 			if (UTILS.exists(flex_5)) match.participants[b].flex5 = "`" + flex_5.tier.substring(0, 1) + divs[flex_5.rank] + (flex_5.leaguePoints >= 0 ? "+" : "-") + flex_5.leaguePoints + "`";
 			else match.participants[b].flex5 = "`XX-XX`";
