@@ -32,7 +32,7 @@ apicache.connect("mongodb://localhost/apicache");//cache of summoner object name
 apicache.connection.on("error", function (e) { throw e; });
 let api_doc = new apicache.Schema({
 	url: String,
-	response: apicache.Schema.Types.Mixed,
+	response: String,
 	expireAt: Date
 });
 api_doc.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
@@ -263,7 +263,7 @@ function get(region, url, cachetime, maxage) {
 			checkCache(url, maxage).then((cached_result) => {
 				UTILS.output("\tcache hit: " + url.replace(CONFIG.RIOT_API_KEY, ""));
 				load_average[2].add();
-				resolve(cached_result);
+				resolve(JSON.parse(cached_result));
 			}).catch((e) => {
 				if (UTILS.exists(e)) console.error(e);
 				region_limiters[region].submit(request, url, (error, response, body) => {
@@ -274,7 +274,7 @@ function get(region, url, cachetime, maxage) {
 						try {
 							const answer = JSON.parse(body);
 							UTILS.output("\tcache miss: " + url.replace(CONFIG.RIOT_API_KEY, ""));
-							addCache(url, answer, cachetime);
+							addCache(url, body, cachetime);
 							resolve(answer);
 						}
 						catch (e) {
