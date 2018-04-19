@@ -146,7 +146,9 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 								let mIDA = [];//match id array;
 								for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
 								lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.LG.MULTIPLE_MATCH).then(matches => {
-									nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches) }).catch();
+									lolapi.getMultipleRanks(region, pSA.map(p => { return p.id; }), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS).then(ranks => {
+										nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks) }).catch();
+									}).catch();
 								});
 							}).catch(console.error);
 						}).catch(console.error);

@@ -133,6 +133,12 @@ module.exports = class LOLAPI {
 	getRanks(region, summonerID, maxage) {
 		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_RANKS, maxage);
 	}
+	getMultipleRanks(region, summonerIDs, maxage) {
+		let that = this;
+		let requests = [];
+		for (let i in summonerIDs) requests.push(function () { return that.getRanks(region, summonerIDs[i], maxage); });
+		return UTILS.sequential(requests);
+	}
 	getChampionMastery(region, summonerID, maxage) {
 		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_CHAMPION_MASTERY, maxage);
 	}
