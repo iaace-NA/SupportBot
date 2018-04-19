@@ -332,11 +332,11 @@ module.exports = class EmbedGenerator {
 			const solo = ranks[b].find(r => { return r.queueType === "RANKED_SOLO_5x5"; });
 			const divs = { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" };
 			if (UTILS.exists(flex_5)) match.participants[b].flex5 = "`" + flex_5.tier.substring(0, 1) + divs[flex_5.rank] + (flex_5.leaguePoints >= 0 ? "+" : "-") + ((flex_5.leaguePoints < 10 || flex_5.leaguePoints == 100) ? (flex_5.leaguePoints < 10 ? "0" + flex_5.leaguePoints : "PS") : flex_5.leaguePoints) + "`";
-			else match.participants[b].flex5 = "`_____`";
+			else match.participants[b].flex5 = "`FLEX5`";
 			if (UTILS.exists(flex_3)) match.participants[b].flex3 = "`" + flex_3.tier.substring(0, 1) + divs[flex_3.rank] + (flex_3.leaguePoints >= 0 ? "+" : "-") + ((flex_3.leaguePoints < 10 || flex_3.leaguePoints == 100) ? (flex_3.leaguePoints < 10 ? "0" + flex_3.leaguePoints : "PS") : flex_3.leaguePoints) + "`";
-			else match.participants[b].flex3 = "`_____`";
+			else match.participants[b].flex3 = "`FLEX3`";
 			if (UTILS.exists(solo)) match.participants[b].solo = "`" + solo.tier.substring(0, 1) + divs[solo.rank] + (solo.leaguePoints >= 0 ? "+" : "-") + ((solo.leaguePoints < 10 || solo.leaguePoints == 100) ? (solo.leaguePoints < 10 ? "0" + solo.leaguePoints : "PS") : solo.leaguePoints) + "`";
-			else match.participants[b].solo = "`_____`";
+			else match.participants[b].solo = "`SOLOQ`";
 			teams[match.participants[b].teamId].push(match.participants[b]);
 			common_teammates[match.participants[b].summonerName] = {};
 		}
