@@ -18,7 +18,7 @@ let http = require('http');
 let LoadAverage = require("../loadaverage.js");
 //const aes256 = require("aes256");
 //let cipher = aes256.createCipher(fs.readFileSync("./aes256.key", "utf-8"));
-let response_type = ["Total", "Uncachable", "Cache hit", "Cache hit expired", "Cache miss"];
+const response_type = ["Total", "Uncachable", "Cache hit", "Cache hit expired", "Cache miss"];
 const load_average = [new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60)];
 const express = require("express");
 const website = express();
@@ -165,6 +165,21 @@ function ready() {
 	//https.createServer({ key: fs.readFileSync("./privkey.pem"), cert: fs.readFileSync("./fullchain.pem") }, website).listen(443);
 	serveWebRequest("/ping", function (req, res, next) {
 		res.send(JSON.stringify({ received: new Date().getTime() }));
+	});
+	serveWebRequest("/stats", function (req, res, next) {
+		let answer = {};
+		for (let i in load_average) {
+			answer[i + ""] = {};
+			answer[i + ""].description = response_type[i];
+			answer[i + ""].min1 = load_average[i].min1();
+			answer[i + ""].min5 = load_average[i].min5();
+			answer[i + ""].min15 = load_average[i].min15();
+			answer[i + ""].min30 = load_average[i].min30();
+			answer[i + ""].min60 = load_average[i].min60();
+			answer[i + ""].total_rate = load_average[i].total_rate();
+			answer[i + ""].total_count = load_average[i].total_count();
+		}
+		res.send(JSON.stringify(answer, null, "\t"));
 	});
 	serveWebRequest("/", function (req, res, next) {
 		res.send("You have reached the online api's testing page.");
