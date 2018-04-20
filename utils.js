@@ -150,10 +150,10 @@ module.exports = class UTILS {
 		answer += info.tier.substring(0, 1);
 		if (this.exists(info.miniSeries)) {
 			if (info.miniSeries.progress.length == 5) {//BO5
-				answer += " " + info.miniSeries.progress.substring(0, info.miniSeries.length - 1).replaceAll("N", "_");
+				answer += " " + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "_");
 			}
 			else {//BO3
-				answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank] + "P " + info.miniSeries.progress.substring(0, info.miniSeries.length - 1).replaceAll("N", "_");
+				answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank] + "P " + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "_");
 			}
 		}
 		else {
