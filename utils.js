@@ -141,10 +141,11 @@ module.exports = class UTILS {
 		return "http://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
 	}
 	shortRank(info) {
-		//G W___
-		//G2 +00
-		//G2 +56
-		//G2P L_
+		//██████ unranked
+		//G W--- Gold promotion, 1 win
+		//G2 +00 Gold 2, 0 LP
+		//G2 +56 Gold 2, 56LP
+		//G2P L_ Gold 2 promotion, 1 loss
 		if (!this.exists(info)) return "`██████`";
 		let answer = "`";
 		answer += info.tier.substring(0, 1);

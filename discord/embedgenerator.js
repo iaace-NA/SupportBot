@@ -342,12 +342,9 @@ module.exports = class EmbedGenerator {
 			const flex_3 = ranks[b].find(r => { return r.queueType === "RANKED_FLEX_TT"; });
 			const solo = ranks[b].find(r => { return r.queueType === "RANKED_SOLO_5x5"; });
 			const divs = { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" };
-			if (UTILS.exists(flex_5)) match.participants[b].flex5 = UTILS.shortRank(flex_5);
-			else match.participants[b].flex5 = "`______`";
-			if (UTILS.exists(flex_3)) match.participants[b].flex3 = UTILS.shortRank(flex_3);
-			else match.participants[b].flex3 = "`______`";
-			if (UTILS.exists(solo)) match.participants[b].solo = UTILS.shortRank(solo);
-			else match.participants[b].solo = "`______`";
+			match.participants[b].flex5 = UTILS.shortRank(flex_5);
+			match.participants[b].flex3 = UTILS.shortRank(flex_3);
+			match.participants[b].solo = UTILS.shortRank(solo);
 			teams[match.participants[b].teamId].push(match.participants[b]);
 			common_teammates[match.participants[b].summonerName] = {};
 		}
