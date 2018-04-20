@@ -149,12 +149,18 @@ module.exports = class UTILS {
 		let answer = "`";
 		answer += info.tier.substring(0, 1);
 		if (this.exists(info.miniSeries)) {
+			try{
 			if (info.miniSeries.length == 5) {//BO5
 				answer += " " + info.miniSeries.substring(0, info.miniSeries.length - 1).replaceAll("N", "_");
 			}
 			else {//BO3
 				answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank] + "P " + info.miniSeries.substring(0, info.miniSeries.length - 1).replaceAll("N", "_");
 			}
+		}
+		catch(e) {
+			console.error(e);
+			console.log(JSON.stringify(info, null, "\t"))
+		}
 		}
 		else {
 			answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank];
