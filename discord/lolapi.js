@@ -142,6 +142,12 @@ module.exports = class LOLAPI {
 	getChampionMastery(region, summonerID, maxage) {
 		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_CHAMPION_MASTERY, maxage);
 	}
+	getMultipleChampionMastery(region, summonerIDs, maxage) {
+		let that = this;
+		let requests = [];
+		for (let i in summonerIDs) requests.push(that.getChampionMastery(region, summonerIDs[i], maxage));
+		return Promise.all(requests);
+	}
 	getStaticChampions(region) {
 		let that = this;
 		return new Promise((resolve, reject) => {
