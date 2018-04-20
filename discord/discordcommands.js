@@ -168,8 +168,9 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					if (number < 1 || number > 20 || !UTILS.exists(matchhistory.matches[number - 1])) return reply(":x: This number is out of range.");
 					lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId, CONFIG.API_MAXAGE.DMH.MATCH_INFORMATION).then(match => {
 						lolapi.getMultipleRanks(region, match.participantIdentities.map(pI => { return pI.player.summonerId; }), CONFIG.API_MAXAGE.DMH.MULTIPLE_RANKS).then(ranks => {
-							lolapi.getMultipleChampionMastery(region, match.participantIdentities.map(pI => { return pI.player.summonerId; }), CONFIG.API_MAXAGE.DMH.MULTIPLE_MASTERIES)
-							reply_embed(embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match, ranks));
+							lolapi.getMultipleChampionMastery(region, match.participantIdentities.map(pI => { return pI.player.summonerId; }), CONFIG.API_MAXAGE.DMH.MULTIPLE_MASTERIES).then(masteries => {
+								reply_embed(embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match, ranks));
+							});
 						}).catch();
 					}).catch(console.error);
 				}).catch(console.error);
