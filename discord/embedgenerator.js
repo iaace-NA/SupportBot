@@ -205,7 +205,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.addField("Recently Played With", rpws.join("\n"));
 		return newEmbed;
 	}
-	detailedMatch(CONFIG, summoner, match_meta, match, ranks) {//should show detailed information about 1 game
+	detailedMatch(CONFIG, summoner, match_meta, match, ranks, masteries) {//should show detailed information about 1 game
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) {
@@ -316,7 +316,7 @@ module.exports = class EmbedGenerator {
 		}
 		return newEmbed;
 	}
-	liveMatchPremade(CONFIG, summoner, match, matches, ranks) {//show current match information
+	liveMatchPremade(CONFIG, summoner, match, matches, ranks, masteries) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) {
@@ -360,6 +360,7 @@ module.exports = class EmbedGenerator {
 				}
 			}
 		}
+		UTILS.trim(common_teammates);
 		let team_count = 1;
 		let player_count = 0;
 		for (let b in teams) {//team
