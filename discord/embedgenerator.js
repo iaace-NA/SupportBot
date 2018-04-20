@@ -53,6 +53,7 @@ module.exports = class EmbedGenerator {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Test");
 		newEmbed.setDescription("description");
+		newEmbed.addField("`j` test", "nothing");
 		return newEmbed;
 	}
 	help(CONFIG) {
