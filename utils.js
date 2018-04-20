@@ -173,4 +173,7 @@ module.exports = class UTILS {
 		}
 		return answer + "`";
 	}
+	getSingleChampionMastery(all, singleID) {
+		return this.exists(all.find(cmi => { return cmi.championId == singleID; })) ? all.find(cmi => { return cmi.championId == singleID; }).championLevel : 0;
+	}
 }

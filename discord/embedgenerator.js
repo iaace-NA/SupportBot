@@ -220,12 +220,14 @@ module.exports = class EmbedGenerator {
 		newEmbed.setFooter("Match played " + UTILS.ago(new Date(match_meta.timestamp + (match.gameDuration * 1000))) + " at: ");
 		let teams = {};
 		for (let b in match.participantIdentities) {
+			const pI = match.participantIdentities[b];
 			const flex_5 = ranks[b].find(r => { return r.queueType === "RANKED_FLEX_SR"; });
 			const flex_3 = ranks[b].find(r => { return r.queueType === "RANKED_FLEX_TT"; });
 			const solo = ranks[b].find(r => { return r.queueType === "RANKED_SOLO_5x5"; });
-			match.participantIdentities[b].flex5 = UTILS.shortRank(flex_5);
-			match.participantIdentities[b].flex3 = UTILS.shortRank(flex_3);
-			match.participantIdentities[b].solo = UTILS.shortRank(solo);
+			pI.flex5 = UTILS.shortRank(flex_5);
+			pI.flex3 = UTILS.shortRank(flex_3);
+			pI.solo = UTILS.shortRank(solo);
+			pI.mastery = UTILS.getSingleChampionMastery(masteries[b], match.participants.find(p => { return p.participantId == pI.participantId; }).championId);
 		}
 		for (let b in match.participants) {
 			if (!UTILS.exists(teams[match.participants[b].teamId])) teams[match.participants[b].teamId] = [];
@@ -250,7 +252,7 @@ module.exports = class EmbedGenerator {
 				else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[p.spell2Id].name + "`";
 				const username = pI.player.summonerName;
 				const lane = CONFIG.EMOJIS.lanes[UTILS.inferLane(p.timeline.role, p.timeline.lane, p.spell1Id, p.spell2Id)];
-				newEmbed.addField(summoner_spells + " " + lane + " " + pI.solo + " " + pI.flex5 + " " + pI.flex3 + " __" + username + "__:  " + CONFIG.STATIC.CHAMPIONS[p.championId].name, "[" + CONFIG.EMOJIS["op.gg"] + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ")" + "lv. `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\tKDR:`" + (UTILS.round(p.stats.kills / p.stats.deaths, 2) == "Infinity" ? "Perfect" : UTILS.round(p.stats.kills / p.stats.deaths, 2)) + "`\tKDA:`" + (UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2) == "Infinity" ? "Perfect" : UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2)) + "` `" + UTILS.round((100 * (p.stats.assists + p.stats.kills)) / tK, 0) + "%`\tcs:`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(p.stats.goldEarned) + "`");
+				newEmbed.addField(summoner_spells + " " + lane + "`M" + pI.mastery + "` " + pI.solo + " " + pI.flex5 + " " + pI.flex3 + " __" + username + "__:  " + CONFIG.STATIC.CHAMPIONS[p.championId].name, "[" + CONFIG.EMOJIS["op.gg"] + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ")" + "lv. `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\tKDR:`" + (UTILS.round(p.stats.kills / p.stats.deaths, 2) == "Infinity" ? "Perfect" : UTILS.round(p.stats.kills / p.stats.deaths, 2)) + "`\tKDA:`" + (UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2) == "Infinity" ? "Perfect" : UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2)) + "` `" + UTILS.round((100 * (p.stats.assists + p.stats.kills)) / tK, 0) + "%`\tcs:`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(p.stats.goldEarned) + "`");
 			}
 		}
 		// champion
@@ -344,6 +346,7 @@ module.exports = class EmbedGenerator {
 			match.participants[b].flex5 = UTILS.shortRank(flex_5);
 			match.participants[b].flex3 = UTILS.shortRank(flex_3);
 			match.participants[b].solo = UTILS.shortRank(solo);
+			match.participants[b].mastery = UTILS.getSingleChampionMastery(masteries[b], match.participants[b].championId);
 			teams[match.participants[b].teamId].push(match.participants[b]);
 			common_teammates[match.participants[b].summonerName] = {};
 		}
@@ -384,13 +387,14 @@ module.exports = class EmbedGenerator {
 					premade_number++;
 				}
 			}
-			team_description += ":x::x:\t`SOLO Q` `FLEX 5` `FLEX 3`\n";
+			team_description += ":x::x:\t`SOLO Q` `FLEX 5` `FLEX 3` `M_`\n";
 			for (let c in teams[b]) {//player on team
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id];
 				else team_description += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
 				else team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
 				team_description += "\t" + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3;
+				team_description += " `M" + teams[b][c].mastery + "`";
 				team_description += " __" + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
 				team_description += "[" + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")";
 				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
