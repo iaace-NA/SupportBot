@@ -243,15 +243,15 @@ module.exports = class EmbedGenerator {
 			teams[b].sort((a, b) => { return UTILS.inferLane(a.timeline.role, a.timeline.lane, a.spell1Id, a.spell2Id) - UTILS.inferLane(b.timeline.role, b.timeline.lane, b.spell1Id, b.spell2Id); });
 			for (let c in teams[b]) {
 				let p = teams[b][c];
+				let pI = match.participantIdentities.find(pI => { return pI.participantId == p.participantId; });
 				let summoner_spells = "";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[p.spell1Id])) summoner_spells += CONFIG.SPELL_EMOJIS[p.spell1Id];
 				else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[p.spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[p.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[p.spell2Id];
 				else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[p.spell2Id].name + "`";
-				const username = match.participantIdentities.find(pI => { return pI.participantId == p.participantId; }).player.summonerName;
-				const rank = match.participantIdentities.find(pI => { return pI.participantId == p.participantId; })
+				const username = pI.find(pI => { return pI.participantId == p.participantId; }).player.summonerName;
 				const lane = CONFIG.EMOJIS.lanes[UTILS.inferLane(p.timeline.role, p.timeline.lane, p.spell1Id, p.spell2Id)];
-				newEmbed.addField(summoner_spells + " " + lane + " " + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3 + "__" + username + "__:  " + CONFIG.STATIC.CHAMPIONS[p.championId].name, "[" + CONFIG.EMOJIS["op.gg"] + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ")" + "lv. `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\tKDR:`" + (UTILS.round(p.stats.kills / p.stats.deaths, 2) == "Infinity" ? "Perfect" : UTILS.round(p.stats.kills / p.stats.deaths, 2)) + "`\tKDA:`" + (UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2) == "Infinity" ? "Perfect" : UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2)) + "` `" + UTILS.round((100 * (p.stats.assists + p.stats.kills)) / tK, 0) + "%`\tcs:`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(p.stats.goldEarned) + "`");
+				newEmbed.addField(summoner_spells + " " + lane + " " + pI.solo + " " + pI.flex5 + " " + pI.flex3 + "__" + username + "__:  " + CONFIG.STATIC.CHAMPIONS[p.championId].name, "[" + CONFIG.EMOJIS["op.gg"] + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ")" + "lv. `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\tKDR:`" + (UTILS.round(p.stats.kills / p.stats.deaths, 2) == "Infinity" ? "Perfect" : UTILS.round(p.stats.kills / p.stats.deaths, 2)) + "`\tKDA:`" + (UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2) == "Infinity" ? "Perfect" : UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2)) + "` `" + UTILS.round((100 * (p.stats.assists + p.stats.kills)) / tK, 0) + "%`\tcs:`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(p.stats.goldEarned) + "`");
 			}
 		}
 		// champion
@@ -370,7 +370,7 @@ module.exports = class EmbedGenerator {
 			for (let c in teams[b]) networks.push(UTILS.getGroup(teams[b][c].summonerName, common_teammates));
 			let premade_str = networks.map(g => { return g.join(","); });
 			let premade_letter = {};
-			for (let c in premade_str){ 
+			for (let c in premade_str){
 				if (!UTILS.exists(premade_letter[premade_str[c]])) {
 					premade_letter[premade_str[c]] = 1;
 				}
