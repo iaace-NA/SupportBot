@@ -153,7 +153,7 @@ module.exports = class UTILS {
 				answer += " " + info.miniSeries(0, info.miniSeries.length - 1).replaceAll("N", "_");
 			}
 			else {//BO3
-				answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank] + "P " + info.miniSeries(0, info.miniSeries.length - 1).replaceAll("N", "_");
+				answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank] + "P " + info.miniSeries.substring(0, info.miniSeries.length - 1).replaceAll("N", "_");
 			}
 		}
 		else {
