@@ -205,7 +205,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.addField("Recently Played With", rpws.join("\n"));
 		return newEmbed;
 	}
-	detailedMatch(CONFIG, summoner, match_meta, match) {//should show detailed information about 1 game
+	detailedMatch(CONFIG, summoner, match_meta, match, ranks) {//should show detailed information about 1 game
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) {
@@ -219,6 +219,15 @@ module.exports = class EmbedGenerator {
 		newEmbed.setTimestamp(new Date(match_meta.timestamp + (match.gameDuration * 1000)));
 		newEmbed.setFooter("Match played " + UTILS.ago(new Date(match_meta.timestamp + (match.gameDuration * 1000))) + " at: ");
 		let teams = {};
+		for (let b in match.participantIdentities) {
+			const flex_5 = ranks[b].find(r => { return r.queueType === "RANKED_FLEX_SR"; });
+			const flex_3 = ranks[b].find(r => { return r.queueType === "RANKED_FLEX_TT"; });
+			const solo = ranks[b].find(r => { return r.queueType === "RANKED_SOLO_5x5"; });
+			const divs = { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" };
+			match.participants[b].flex5 = UTILS.shortRank(flex_5);
+			match.participants[b].flex3 = UTILS.shortRank(flex_3);
+			match.participants[b].solo = UTILS.shortRank(solo);
+		}
 		for (let b in match.participants) {
 			if (!UTILS.exists(teams[match.participants[b].teamId])) teams[match.participants[b].teamId] = [];
 			teams[match.participants[b].teamId].push(match.participants[b]);
@@ -240,8 +249,9 @@ module.exports = class EmbedGenerator {
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[p.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[p.spell2Id];
 				else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[p.spell2Id].name + "`";
 				const username = match.participantIdentities.find(pI => { return pI.participantId == p.participantId; }).player.summonerName;
+				const rank = match.participantIdentities.find(pI => { return pI.participantId == p.participantId; })
 				const lane = CONFIG.EMOJIS.lanes[UTILS.inferLane(p.timeline.role, p.timeline.lane, p.spell1Id, p.spell2Id)];
-				newEmbed.addField(summoner_spells + " " + lane + "__" + username + "__:  " + CONFIG.STATIC.CHAMPIONS[p.championId].name, "[" + CONFIG.EMOJIS["op.gg"] + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ")" + "lv. `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\tKDR:`" + (UTILS.round(p.stats.kills / p.stats.deaths, 2) == "Infinity" ? "Perfect" : UTILS.round(p.stats.kills / p.stats.deaths, 2)) + "`\tKDA:`" + (UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2) == "Infinity" ? "Perfect" : UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2)) + "` `" + UTILS.round((100 * (p.stats.assists + p.stats.kills)) / tK, 0) + "%`\tcs:`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(p.stats.goldEarned) + "`");
+				newEmbed.addField(summoner_spells + " " + lane + " " + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3 + "__" + username + "__:  " + CONFIG.STATIC.CHAMPIONS[p.championId].name, "[" + CONFIG.EMOJIS["op.gg"] + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ")" + "lv. `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\tKDR:`" + (UTILS.round(p.stats.kills / p.stats.deaths, 2) == "Infinity" ? "Perfect" : UTILS.round(p.stats.kills / p.stats.deaths, 2)) + "`\tKDA:`" + (UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2) == "Infinity" ? "Perfect" : UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2)) + "` `" + UTILS.round((100 * (p.stats.assists + p.stats.kills)) / tK, 0) + "%`\tcs:`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(p.stats.goldEarned) + "`");
 			}
 		}
 		// champion
