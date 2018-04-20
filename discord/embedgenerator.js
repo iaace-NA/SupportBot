@@ -223,10 +223,9 @@ module.exports = class EmbedGenerator {
 			const flex_5 = ranks[b].find(r => { return r.queueType === "RANKED_FLEX_SR"; });
 			const flex_3 = ranks[b].find(r => { return r.queueType === "RANKED_FLEX_TT"; });
 			const solo = ranks[b].find(r => { return r.queueType === "RANKED_SOLO_5x5"; });
-			const divs = { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" };
-			match.participants[b].flex5 = UTILS.shortRank(flex_5);
-			match.participants[b].flex3 = UTILS.shortRank(flex_3);
-			match.participants[b].solo = UTILS.shortRank(solo);
+			match.participantIdentities[b].flex5 = UTILS.shortRank(flex_5);
+			match.participantIdentities[b].flex3 = UTILS.shortRank(flex_3);
+			match.participantIdentities[b].solo = UTILS.shortRank(solo);
 		}
 		for (let b in match.participants) {
 			if (!UTILS.exists(teams[match.participants[b].teamId])) teams[match.participants[b].teamId] = [];
