@@ -160,7 +160,8 @@ module.exports = class UTILS {
 			answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank];
 			let LP = info.leaguePoints;
 			if (LP < 0) answer += " -";
-			else answer += " +"
+			else if (LP < 100) answer += " +"
+			else answer += "+"
 			LP = Math.abs(LP);
 			if (LP >= 10) answer += LP;
 			else answer += "0" + LP;
