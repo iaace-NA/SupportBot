@@ -150,7 +150,7 @@ module.exports = class UTILS {
 		//G2 +00 Gold 2, 0 LP
 		//G2 +56 Gold 2, 56LP
 		//G2P L_ Gold 2 promotion, 1 loss
-		if (!this.exists(info)) return "`██████`";
+		if (!this.exists(info)) return "`******`";
 		let answer = "`";
 		answer += info.tier.substring(0, 1);
 		if (this.exists(info.miniSeries)) {
