@@ -207,7 +207,7 @@ module.exports = class EmbedGenerator {
 		const total_wins = all_results.reduce((total, increment) => { return total + (increment ? 1 : 0); }, 0);
 		const total_losses = all_results.reduce((total, increment) => { return total + (increment ? 0 : 1); }, 0);
 		if (all_results.length > 5) newEmbed.addField("Older Match Results", all_results.slice(5).map(r => { return r ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss; }).join("") + "->Oldest");
-		newEmbed.setDescription(all_results.length + "G (" +  UTILS.round(100 * total_wins / (total_wins + total_losses), 2) + "%) = " + total_wins + "W + " + total_losses + "L " + "\tKDA:`" + (UTILS.round(all_KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(all_KDA.KDA, 2)) + "`");
+		newEmbed.setDescription(all_results.length + "G (" +  UTILS.round(100 * total_wins / (total_wins + total_losses), 2) + "%) = " + total_wins + "W + " + total_losses + "L " + "\tKDA:`" + (UTILS.round(all_KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(all_KDA.KDA, 2)) + "`\n" + lane_description.join("\n"));
 		let rpw = [];//recently played with
 		for (let b in common_teammates) rpw.push([b, common_teammates[b].w, common_teammates[b].l]);
 		rpw.sort((a, b) => { return b[1] + b[2] - a[1] - a[2]; });
