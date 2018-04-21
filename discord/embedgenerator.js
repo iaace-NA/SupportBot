@@ -396,7 +396,7 @@ module.exports = class EmbedGenerator {
 				team_description += " `M" + teams[b][c].mastery + "`";
 				team_description += CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
 				team_description += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
-				team_description += "__[" + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
+				team_description += "__[" + (teams[b][c].summonerId == summoner.id ? "**" + teams[b][c].summonerName + "**" : teams[b][c].summonerName) + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
 				if (UTILS.exists(match.bannedChampions[player_count])) {
 					try {
 						ban_description.push(CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].emoji);
