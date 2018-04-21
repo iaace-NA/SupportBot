@@ -409,7 +409,7 @@ module.exports = class EmbedGenerator {
 				++player_count;
 			}
 			UTILS.output("team_description length: " + team_description.length);
-			newEmbed.addField(":x::x: `SOLO Q`¦`FLEX 5`¦`FLEX 3`¦`M#` Bans: " + ban_description.join(""), team_description);
+			newEmbed.addField(":x::x: `SOLO Q`¦`FLEX 5`¦`FLEX 3` Bans: " + ban_description.join(""), team_description);
 			++team_count;
 		}
 		return newEmbed;
