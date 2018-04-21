@@ -146,11 +146,22 @@ module.exports = class EmbedGenerator {
 			D: 0,
 			A: 0
 		};
+		let all_lanes = [0, 0, 0, 0, 0, 0];
+		let all_lanes_w = [0, 0, 0, 0, 0, 0];
+		let all_lanes_l = [0, 0, 0, 0, 0, 0];
+		let all_lanes_KDA = [JSON.parse(JSON.stringify(all_KDA)), JSON.parse(JSON.stringify(all_KDA)), JSON.parse(JSON.stringify(all_KDA)), JSON.parse(JSON.stringify(all_KDA)), JSON.parse(JSON.stringify(all_KDA)), JSON.parse(JSON.stringify(all_KDA))]
 		for (let i = 0; i < match_meta.length && i < 20; ++i) {
 			const KDA = UTILS.KDA(summoner.id, matches[i]);
 			const stats = UTILS.stats(summoner.id, matches[i]);
 			const teamParticipant = UTILS.teamParticipant(summoner.id, matches[i]);
 			let teams = {};
+			let lane = UTILS.inferLane(match_meta[i].role, match_meta[i].lane, teamParticipant.spell1Id, teamParticipant.spell2Id);			
+			const win = UTILS.determineWin(summoner.id, matches[i]);
+			++all_lanes[lane];
+			win ? ++all_lanes_w[lane] : ++all_lanes_l[lane];
+			all_results.push(win);
+			for (let b in all_KDA) all_KDA[b] += KDA[b];
+			for (let b in all_lanes_KDA[lane]) all_lanes_KDA[lane][b] += KDA[b];
 			for (let b in matches[i].participants) {
 				if (!UTILS.exists(teams[matches[i].participants[b].teamId])) teams[matches[i].participants[b].teamId] = [];
 				teams[matches[i].participants[b].teamId].push(matches[i].participants[b]);
@@ -159,7 +170,7 @@ module.exports = class EmbedGenerator {
 				const tmPI = UTILS.findParticipantIdentityFromPID(matches[i], teams[teamParticipant.teamId][b].participantId);
 				if (tmPI.player.summonerId === summoner.id) continue;
 				if (!UTILS.exists(common_teammates[tmPI.player.summonerName])) common_teammates[tmPI.player.summonerName] = { w: 0, l: 0 };
-				if (UTILS.determineWin(summoner.id, matches[i])) common_teammates[tmPI.player.summonerName].w += 1;
+				if (win) common_teammates[tmPI.player.summonerName].w += 1;
 				else common_teammates[tmPI.player.summonerName].l += 1;
 			}
 			if (i < 5) {//printing limit
@@ -171,12 +182,8 @@ module.exports = class EmbedGenerator {
 				else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id];
 				else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell2Id].name + "`";
-				newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].emoji + CONFIG.EMOJIS.lanes[UTILS.inferLane(match_meta[i].role, match_meta[i].lane, teamParticipant.spell1Id, teamParticipant.spell2Id)] + " " + summoner_spells, "lv. `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\tKDR:`" + (UTILS.round(KDA.KD, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KD, 2)) + "`\tKDA:`" + (UTILS.round(KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KDA, 2)) + "` `" + UTILS.round((100 * (KDA.A + KDA.K)) / tK, 0) + "%`\tcs:`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(stats.goldEarned) + "`\n" + queues[matches[i].queueId + ""] + "\t`" + UTILS.standardTimestamp(matches[i].gameDuration) + "`\t" + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))));
+				newEmbed.addField((win ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].emoji + CONFIG.EMOJIS.lanes[lane] + " " + summoner_spells, "lv. `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\tKDR:`" + (UTILS.round(KDA.KD, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KD, 2)) + "`\tKDA:`" + (UTILS.round(KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KDA, 2)) + "` `" + UTILS.round((100 * (KDA.A + KDA.K)) / tK, 0) + "%`\tcs:`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(stats.goldEarned) + "`\n" + queues[matches[i].queueId + ""] + "\t`" + UTILS.standardTimestamp(matches[i].gameDuration) + "`\t" + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))));
 			}
-			all_results.push(UTILS.determineWin(summoner.id, matches[i]));
-			all_KDA.K += KDA.K;
-			all_KDA.D += KDA.D;
-			all_KDA.A += KDA.A;
 			// champion
 			// match result
 			// queue
@@ -191,11 +198,16 @@ module.exports = class EmbedGenerator {
 			// role
 			// KP
 		}
+		all_KDA.KDA = (all_KDA.K + all_KDA.A) / all_KDA.D;
+		for (let b in all_lanes_KDA) all_lanes_KDA[b].KDA =  (all_lanes_KDA[b].K + all_lanes_KDA[b].A) / all_lanes_KDA[b].D;
+		let lane_description = [];
+		for (let i = 0; i < 5; ++i) {
+			if (all_lanes[i] > 0) lane_description.push(CONFIG.EMOJIS.lanes[i] + " " + all_lanes[i] + "G (" + UTILS.round(100 * all_lanes_w[i] / (all_lanes_w[i] + all_lanes_l[i]), 2) + "%) = " + all_lanes_w[i] + "W + " + all_lanes_l[i] + "L\tKDA:`" + (UTILS.round(all_lanes_KDA[i].KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(all_KDA[i].KDA, 2)) + "`");
+		}
 		const total_wins = all_results.reduce((total, increment) => { return total + (increment ? 1 : 0); }, 0);
 		const total_losses = all_results.reduce((total, increment) => { return total + (increment ? 0 : 1); }, 0);
-		all_KDA.KDA = (all_KDA.K + all_KDA.A) / all_KDA.D;
 		if (all_results.length > 5) newEmbed.addField("Older Match Results", all_results.slice(5).map(r => { return r ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss; }).join("") + "->Oldest");
-		newEmbed.setDescription(all_results.length + "G = " + total_wins + "W + " + total_losses + "L\nWin Rate: " + UTILS.round(100 * total_wins / (total_wins + total_losses), 2) + "%\nKDA:`" + (UTILS.round(all_KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(all_KDA.KDA, 2)) + "`");
+		newEmbed.setDescription(all_results.length + "G (" +  UTILS.round(100 * total_wins / (total_wins + total_losses), 2) + "%) = " + total_wins + "W + " + total_losses + "L " + "\tKDA:`" + (UTILS.round(all_KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(all_KDA.KDA, 2)) + "`");
 		let rpw = [];//recently played with
 		for (let b in common_teammates) rpw.push([b, common_teammates[b].w, common_teammates[b].l]);
 		rpw.sort((a, b) => { return b[1] + b[2] - a[1] - a[2]; });
