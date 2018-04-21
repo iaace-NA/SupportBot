@@ -102,8 +102,8 @@ module.exports = class EmbedGenerator {
 		newEmbed.setAuthor(summoner.name);
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) newEmbed.setDescription("Level " + summoner.summonerLevel);
-		else if (match.gameStartTime != 0) newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Playing:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => { return p.summonerId == summoner.id; }).championId].name + "** on " + queues[match.gameQueueConfigId] + " for `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
-		else newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Game Loading:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => { return p.summonerId == summoner.id; }).championId].name + "** on " + queues[match.gameQueueConfigId]);
+		else if (match.gameStartTime != 0) newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Playing:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => { return p.summonerId == summoner.id; }).championId].emoji + "** on " + queues[match.gameQueueConfigId] + " for `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
+		else newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Game Loading:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => { return p.summonerId == summoner.id; }).championId].emoji + "** on " + queues[match.gameQueueConfigId]);
 		let highest_rank = -1;
 		for (let b in ranks) {
 			let description = (ranks[b].wins + ranks[b].losses) + "G = " + ranks[b].wins + "W + " + ranks[b].losses + "L\nWin Rate: " + UTILS.round(100 * ranks[b].wins / (ranks[b].wins + ranks[b].losses), 2) + "%";
@@ -119,7 +119,7 @@ module.exports = class EmbedGenerator {
 		let cm_description = [];
 		let cm_total = 0;
 		for (let i = 0; i < championmastery.length; ++i) {
-			if (i < 3) cm_description.push("`M" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].name + ": `" + UTILS.numberWithCommas(championmastery[i].championPoints) + "`pts");
+			if (i < 3) cm_description.push("`M" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + ": `" + UTILS.numberWithCommas(championmastery[i].championPoints) + "`pts");
 			cm_total += championmastery[i].championLevel;
 		}
 		if (cm_description.length > 0) newEmbed.addField("Champion Mastery: " + cm_total, cm_description.join("\n"));
@@ -171,7 +171,7 @@ module.exports = class EmbedGenerator {
 				else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id];
 				else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell2Id].name + "`";
-				newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + summoner_spells + "\t" + CONFIG.EMOJIS.lanes[UTILS.inferLane(match_meta[i].role, match_meta[i].lane, teamParticipant.spell1Id, teamParticipant.spell2Id)] + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].name, "lv. `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\tKDR:`" + (UTILS.round(KDA.KD, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KD, 2)) + "`\tKDA:`" + (UTILS.round(KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KDA, 2)) + "` `" + UTILS.round((100 * (KDA.A + KDA.K)) / tK, 0) + "%`\tcs:`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(stats.goldEarned) + "`\n" + queues[matches[i].queueId + ""] + "\t`" + UTILS.standardTimestamp(matches[i].gameDuration) + "`\t" + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))));
+				newEmbed.addField((UTILS.determineWin(summoner.id, matches[i]) ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + summoner_spells + "\t" + CONFIG.EMOJIS.lanes[UTILS.inferLane(match_meta[i].role, match_meta[i].lane, teamParticipant.spell1Id, teamParticipant.spell2Id)] + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].emoji, "lv. `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\tKDR:`" + (UTILS.round(KDA.KD, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KD, 2)) + "`\tKDA:`" + (UTILS.round(KDA.KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(KDA.KDA, 2)) + "` `" + UTILS.round((100 * (KDA.A + KDA.K)) / tK, 0) + "%`\tcs:`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(stats.goldEarned) + "`\n" + queues[matches[i].queueId + ""] + "\t`" + UTILS.standardTimestamp(matches[i].gameDuration) + "`\t" + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))));
 			}
 			all_results.push(UTILS.determineWin(summoner.id, matches[i]));
 			all_KDA.K += KDA.K;
@@ -252,7 +252,7 @@ module.exports = class EmbedGenerator {
 				else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[p.spell2Id].name + "`";
 				const username = pI.player.summonerName;
 				const lane = CONFIG.EMOJIS.lanes[UTILS.inferLane(p.timeline.role, p.timeline.lane, p.spell1Id, p.spell2Id)];
-				newEmbed.addField(summoner_spells + lane + " " + pI.solo + " ¦ " + pI.flex5 + " ¦ " + pI.flex3 + " ¦ `M" + pI.mastery + "` __" + username + "__: " + CONFIG.STATIC.CHAMPIONS[p.championId].name, "[" + CONFIG.EMOJIS["op.gg"] + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ")" + "lv. `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\tKDR:`" + (UTILS.round(p.stats.kills / p.stats.deaths, 2) == "Infinity" ? "Perfect" : UTILS.round(p.stats.kills / p.stats.deaths, 2)) + "`\tKDA:`" + (UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2) == "Infinity" ? "Perfect" : UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2)) + "` `" + UTILS.round((100 * (p.stats.assists + p.stats.kills)) / tK, 0) + "%`\tcs:`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(p.stats.goldEarned) + "`");
+				newEmbed.addField(summoner_spells + lane + " " + pI.solo + " ¦ " + pI.flex5 + " ¦ " + pI.flex3 + " ¦ `M" + pI.mastery + "` __" + username + "__: " + CONFIG.STATIC.CHAMPIONS[p.championId].emoji, "[" + CONFIG.EMOJIS["op.gg"] + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ")" + "lv. `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\tKDR:`" + (UTILS.round(p.stats.kills / p.stats.deaths, 2) == "Infinity" ? "Perfect" : UTILS.round(p.stats.kills / p.stats.deaths, 2)) + "`\tKDA:`" + (UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2) == "Infinity" ? "Perfect" : UTILS.round(((p.stats.kills + p.stats.assists) / p.stats.deaths), 2)) + "` `" + UTILS.round((100 * (p.stats.assists + p.stats.kills)) / tK, 0) + "%`\tcs:`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "`\tg:`" + UTILS.gold(p.stats.goldEarned) + "`");
 			}
 		}
 		// champion
@@ -300,7 +300,7 @@ module.exports = class EmbedGenerator {
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
 				else team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
 				team_description += "\t__[" + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")";
-				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
+				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
 				if (UTILS.exists(match.bannedChampions[player_count])) {
 					try {
 						ban_description.push(CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].name);
@@ -397,10 +397,10 @@ module.exports = class EmbedGenerator {
 				team_description += " `M" + teams[b][c].mastery + "`";
 				team_description += " __" + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
 				team_description += "[" + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")";
-				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].name;
+				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
 				if (UTILS.exists(match.bannedChampions[player_count])) {
 					try {
-						ban_description.push(CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].name);
+						ban_description.push(CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].emoji);
 					}
 					catch (e) {
 						UTILS.output("Champion lookup failed for champion id " + match.bannedChampions[player_count].championId);
