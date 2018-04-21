@@ -201,9 +201,9 @@ module.exports = class EmbedGenerator {
 		all_KDA.KDA = (all_KDA.K + all_KDA.A) / all_KDA.D;
 		for (let b in all_lanes_KDA) all_lanes_KDA[b].KDA =  (all_lanes_KDA[b].K + all_lanes_KDA[b].A) / all_lanes_KDA[b].D;
 		let lane_description = [];
-		for (let i = 0; i < 5; ++i) {
-			if (all_lanes[i] > 0) lane_description.push(CONFIG.EMOJIS.lanes[i] + " " + all_lanes[i] + "G (" + UTILS.round(100 * all_lanes_w[i] / (all_lanes_w[i] + all_lanes_l[i]), 0) + "%) = " + all_lanes_w[i] + "W + " + all_lanes_l[i] + "L\tKDA:`" + (UTILS.round(all_lanes_KDA[i].KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(all_lanes_KDA[i].KDA, 2)) + "`");
-		}
+		for (let i = 0; i < 5; ++i) if (all_lanes[i] > 0) lane_description.push([CONFIG.EMOJIS.lanes[i] + " " + all_lanes[i] + "G (" + UTILS.round(100 * all_lanes_w[i] / (all_lanes_w[i] + all_lanes_l[i]), 0) + "%) = " + all_lanes_w[i] + "W + " + all_lanes_l[i] + "L\tKDA:`" + (UTILS.round(all_lanes_KDA[i].KDA, 2) == "Infinity" ? "Perfect" : UTILS.round(all_lanes_KDA[i].KDA, 2)) + "`", all_lanes[i]]);
+		lane_description.sort((a, b) => { return b[1] - a[1]; });
+		lane_description = lane_description.map(s => { return s[0]; });
 		const total_wins = all_results.reduce((total, increment) => { return total + (increment ? 1 : 0); }, 0);
 		const total_losses = all_results.reduce((total, increment) => { return total + (increment ? 0 : 1); }, 0);
 		if (all_results.length > 5) newEmbed.addField("Older Match Results", all_results.slice(5).map(r => { return r ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss; }).join("") + "->Oldest");
