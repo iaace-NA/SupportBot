@@ -112,7 +112,9 @@ module.exports = class UTILS {
 		return collection.find(ch => { if (ch.type === type && ch.permissionsFor(client.user).has(permissions)) return true; });
 	}
 	trim(network) {
-		for (let a in network) for (let b in network[a]) if (network[a][b] < 2) delete network[a][b];
+		let count = 0;
+		for (let a in network) for (let b in network[a]) if (network[a][b] < 2) { delete network[a][b]; ++count; }
+		return count;
 	}
 	getGroup(candidate, graph, visited = {}) {//traverse graph
 		//this.output("candidate: " + candidate);

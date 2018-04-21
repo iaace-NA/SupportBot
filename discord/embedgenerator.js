@@ -46,7 +46,7 @@ const queues = {
 };
 const RANK_ORDER = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "CHALLENGER"];
 const RANK_COLOR = [[153, 51, 0], [179, 179, 179], [255, 214, 51], [102, 255, 204], [179, 240, 255], [255, 153, 255], [255, 0, 0]];
-const PREMADE_EMOJIS = ["", "❤", "💙", "💚"];
+const PREMADE_EMOJIS = ["", "\❤", "\💙", "\💚"];
 module.exports = class EmbedGenerator {
 	constructor() { }
 	test() {
@@ -363,7 +363,7 @@ module.exports = class EmbedGenerator {
 				}
 			}
 		}
-		UTILS.trim(common_teammates);
+		UTILS.output(UTILS.trim(common_teammates) + " premade entries trimmed.");
 		let team_count = 1;
 		let player_count = 0;
 		for (let b in teams) {//team
