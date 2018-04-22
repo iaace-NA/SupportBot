@@ -149,6 +149,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 									lolapi.getMultipleRanks(region, pSA.map(p => { return p.id; }), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS).then(ranks => {
 										lolapi.getMultipleChampionMastery(region, pSA.map(p => { return p.id; }), CONFIG.API_MAXAGE.LG.MULTIPLE_MASTERIES).then(masteries => {
 											nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries) }).catch();
+											reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, false));
 										}).catch();
 									}).catch();
 								});

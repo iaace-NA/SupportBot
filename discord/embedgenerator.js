@@ -155,7 +155,7 @@ module.exports = class EmbedGenerator {
 			const stats = UTILS.stats(summoner.id, matches[i]);
 			const teamParticipant = UTILS.teamParticipant(summoner.id, matches[i]);
 			let teams = {};
-			let lane = UTILS.inferLane(match_meta[i].role, match_meta[i].lane, teamParticipant.spell1Id, teamParticipant.spell2Id);			
+			let lane = UTILS.inferLane(match_meta[i].role, match_meta[i].lane, teamParticipant.spell1Id, teamParticipant.spell2Id);
 			const win = UTILS.determineWin(summoner.id, matches[i]);
 			++all_lanes[lane];
 			win ? ++all_lanes_w[lane] : ++all_lanes_l[lane];
@@ -329,7 +329,7 @@ module.exports = class EmbedGenerator {
 		}
 		return newEmbed;
 	}
-	liveMatchPremade(CONFIG, summoner, match, matches, ranks, masteries) {//show current match information
+	liveMatchPremade(CONFIG, summoner, match, matches, ranks, masteries, trim = true) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) {
@@ -374,7 +374,7 @@ module.exports = class EmbedGenerator {
 				}
 			}
 		}
-		UTILS.output(UTILS.trim(common_teammates) + " premade entries trimmed.");
+		if (trim) UTILS.output(UTILS.trim(common_teammates) + " premade entries trimmed.");
 		let team_count = 1;
 		let player_count = 0;
 		for (let b in teams) {//team
