@@ -214,7 +214,7 @@ module.exports = class EmbedGenerator {
 		let rpws = [];//recently played with string
 		for (let i = 0; i < rpw.length; ++i) if (rpw[i][1] + rpw[i][2] > 1) rpws.push("__[" + rpw[i][0] + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], rpw[i][0]) + ")__: " + rpw[i][1] + "W + " + rpw[i][2] + "L");
 		if (rpws.length == 0) rpws.push("No one");
-		newEmbed.addField("Recently Played With", rpws.join("\n"));
+		newEmbed.addField("Top 10 Recently Played With", rpws.slice(0, 10).join("\n"));
 		return newEmbed;
 	}
 	detailedMatch(CONFIG, summoner, match_meta, match, ranks, masteries) {//should show detailed information about 1 game
