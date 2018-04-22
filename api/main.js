@@ -36,13 +36,13 @@ let api_doc = new apicache.Schema({
 	expireAt: Date
 });
 api_doc.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
-api_doc.index({ url: 1 }, { unique: true });
+api_doc.index({ url: "hashed" });
 let api_doc_model = apicache.model("api_doc_model", api_doc);
 let shortcut_doc = new apicache.Schema({
 	uid: String,
 	shortcuts: { type: apicache.Schema.Types.Mixed, default: {} }
 }, { minimize: false });
-shortcut_doc.index({ uid: 1 }, { unique: true })
+shortcut_doc.index({ uid: "hashed" });
 let shortcut_doc_model = apicache.model("shortcut_doc_model", shortcut_doc);
 let region_limiters = {};
 let limiter = require("bottleneck");
