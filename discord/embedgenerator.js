@@ -212,7 +212,7 @@ module.exports = class EmbedGenerator {
 		for (let b in common_teammates) rpw.push([b, common_teammates[b].w, common_teammates[b].l]);
 		rpw.sort((a, b) => { return b[1] + b[2] - a[1] - a[2]; });
 		let rpws = [];//recently played with string
-		for (let i = 0; i < rpw.length; ++i) if (rpw[i][1] + rpw[i][2] > 1) rpws.push("__[" + rpw[i][0] + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], rpw[i][0]) + ")__: " + rpw[i][1] + "W + " + rpw[i][2] + "L");
+		for (let i = 0; i < rpw.length; ++i) if (rpw[i][1] + rpw[i][2] > 1) rpws.push("__[" + rpw[i][0] + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], rpw[i][0]) + ")__: " + rpw[i][1] + rpw[i][2] + "G (" + UTILS.round(rpw[i][1] / (rpw[i][1] + rpw[i][2]), 0) + "%) = " + rpw[i][1] + "W + " + rpw[i][2] + "L");
 		if (rpws.length == 0) rpws.push("No one");
 		newEmbed.addField("Top 10 Recently Played With", rpws.slice(0, 10).join("\n"));
 		return newEmbed;
