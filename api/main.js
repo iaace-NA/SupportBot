@@ -35,7 +35,7 @@ let api_doc = new apicache.Schema({
 	response: String,
 	expireAt: Date
 });
-api_doc.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
+api_doc.index({ expireAt: 1, url: 1 }, { expireAfterSeconds: 0 });
 let api_doc_model = apicache.model("api_doc_model", api_doc);
 let shortcut_doc = new apicache.Schema({
 	uid: String,
