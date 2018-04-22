@@ -226,8 +226,7 @@ module.exports = class EmbedGenerator {
 			newEmbed.setColor([255, 0, 0]);
 			return newEmbed;
 		}
-		newEmbed.setTitle(queues[match.queueId]);
-		newEmbed.setDescription("Match Length: `" + UTILS.standardTimestamp(match.gameDuration) + "`");
+		newEmbed.setTitle(queues[match.queueId] + " `" + UTILS.standardTimestamp(match.gameDuration) + "`");
 		newEmbed.setTimestamp(new Date(match_meta.timestamp + (match.gameDuration * 1000)));
 		newEmbed.setFooter("Match played " + UTILS.ago(new Date(match_meta.timestamp + (match.gameDuration * 1000))) + " at: ");
 		let teams = {};
