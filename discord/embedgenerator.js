@@ -106,7 +106,7 @@ module.exports = class EmbedGenerator {
 		else newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Game Loading:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => { return p.summonerId == summoner.id; }).championId].emoji + "** on " + queues[match.gameQueueConfigId]);
 		let highest_rank = -1;
 		for (let b in ranks) {
-			let description = (ranks[b].wins + ranks[b].losses) + "G = " + ranks[b].wins + "W + " + ranks[b].losses + "L\nWin Rate: " + UTILS.round(100 * ranks[b].wins / (ranks[b].wins + ranks[b].losses), 2) + "%";
+			let description = (ranks[b].wins + ranks[b].losses) + "G (" + UTILS.round(100 * ranks[b].wins / (ranks[b].wins + ranks[b].losses), 2) + "%) = " + ranks[b].wins + "W + " + ranks[b].losses + "L";
 			if (UTILS.exists(ranks[b].miniSeries)) description += "\nSeries in Progress: " + ranks[b].miniSeries.progress.replaceAll("N", ":grey_question:").replaceAll("W", CONFIG.EMOJIS.win).replaceAll("L", CONFIG.EMOJIS.loss);
 			newEmbed.addField(CONFIG.EMOJIS.ranks[RANK_ORDER.indexOf(ranks[b].tier)] + {
 				"RANKED_FLEX_SR": "Flex 5v5",
