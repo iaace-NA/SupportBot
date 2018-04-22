@@ -53,7 +53,7 @@ function ready() {
 		website.listen(CONFIG.API_PORT_PRODUCTION);
 	}
 	else {//non-production key
-		UTILS.output("IAPI and listening on port " + CONFIG.API_PORT_DEVELOPMENT);
+		UTILS.output("IAPI ready and listening on port " + CONFIG.API_PORT_DEVELOPMENT);
 		website.listen(CONFIG.API_PORT_DEVELOPMENT);
 	}
 	
