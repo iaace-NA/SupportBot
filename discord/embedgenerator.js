@@ -257,7 +257,7 @@ module.exports = class EmbedGenerator {
 				let p = teams[b][c];
 				let pI = match.participantIdentities.find(pI => { return pI.participantId == p.participantId; });
 				let summoner_spells = "";
-				if (UTILS.exists(pI.summonerId)) {
+				if (UTILS.exists(pI.player.summonerId)) {
 					if (UTILS.exists(CONFIG.SPELL_EMOJIS[p.spell1Id])) summoner_spells += CONFIG.SPELL_EMOJIS[p.spell1Id];
 					else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[p.spell1Id].name + "`";
 					if (UTILS.exists(CONFIG.SPELL_EMOJIS[p.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[p.spell2Id];
