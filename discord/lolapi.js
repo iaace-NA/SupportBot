@@ -215,7 +215,7 @@ module.exports = class LOLAPI {
 		});
 	}
 	getRecentGames(region, accountID, maxage) {
-		return this.get(region, "match/v3/matchlists/by-account/" + accountID + "/recent", {}, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage);
+		return this.get(region, "match/v3/matchlists/by-account/" + accountID, { endIndex: 20 }, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage);
 	}
 	getMatchInformation(region, gameID, maxage) {
 		return this.get(region, "match/v3/matches/" + gameID, {}, this.CONFIG.API_CACHETIME.GET_MATCH_INFORMATION, maxage);
