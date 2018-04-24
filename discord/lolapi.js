@@ -131,6 +131,7 @@ module.exports = class LOLAPI {
 		return this.get(region, "summoner/v3/summoners/" + id, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_FROM_SUMMONER_ID, maxage);
 	}
 	getRanks(region, summonerID, maxage) {
+		if (summonerID === null) return new Promise((resolve, reject) => { resolve([]); });
 		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_RANKS, maxage);
 	}
 	getMultipleRanks(region, summonerIDs, maxage) {
@@ -140,6 +141,7 @@ module.exports = class LOLAPI {
 		return Promise.all(requests);
 	}
 	getChampionMastery(region, summonerID, maxage) {
+		if (summonerID === null) return new Promise((resolve, reject) => { resolve([]); });
 		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_CHAMPION_MASTERY, maxage);
 	}
 	getMultipleChampionMastery(region, summonerIDs, maxage) {

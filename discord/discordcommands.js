@@ -168,8 +168,12 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`.");
 					if (number < 1 || number > 20 || !UTILS.exists(matchhistory.matches[number - 1])) return reply(":x: This number is out of range.");
 					lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId, CONFIG.API_MAXAGE.DMH.MATCH_INFORMATION).then(match => {
-						lolapi.getMultipleRanks(region, match.participantIdentities.map(pI => { return pI.player.summonerId; }), CONFIG.API_MAXAGE.DMH.MULTIPLE_RANKS).then(ranks => {
-							lolapi.getMultipleChampionMastery(region, match.participantIdentities.map(pI => { return pI.player.summonerId; }), CONFIG.API_MAXAGE.DMH.MULTIPLE_MASTERIES).then(masteries => {
+						const pIDA = match.participantIdentities.map(pI => { 
+							if (UTILS.exists(pI.player.summonerId)) return pI.player.summonerId;
+							else return null;//bot account
+						});//participant ID array
+						lolapi.getMultipleRanks(region, pIDA, CONFIG.API_MAXAGE.DMH.MULTIPLE_RANKS).then(ranks => {
+							lolapi.getMultipleChampionMastery(region, pIDA, CONFIG.API_MAXAGE.DMH.MULTIPLE_MASTERIES).then(masteries => {
 								reply_embed(embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match, ranks, masteries));
 							});
 						}).catch();
