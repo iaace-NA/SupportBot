@@ -188,4 +188,8 @@ module.exports = class UTILS {
 	getSingleChampionMastery(all, singleID) {
 		return this.exists(all.find(cmi => { return cmi.championId == singleID; })) ? all.find(cmi => { return cmi.championId == singleID; }).championLevel : 0;
 	}
+	KDAFormat(num) {
+		if (isNaN(num) || num == Infinity) return "Perfect";
+		else return this.round(num, 2);
+	}
 }
