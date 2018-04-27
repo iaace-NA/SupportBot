@@ -5,11 +5,16 @@ String.prototype.replaceAll = function(search, replacement) {
 	let target = this;
 	return target.replace(new RegExp(search, 'g'), replacement);
 };
+Number.prototype.pad = function(size) {
+	let s = String(this);
+	while (s.length < (size || 2)) {s = "0" + s;}
+	return s;
+}
 module.exports = class UTILS {
 	output(t) {//general utility function
 		if (this.exists(t)) {
 			let n = new Date().toISOString().slice(0, 19).replace('T', ' ');;
-			console.log(n + "." + new Date().getMilliseconds() + " : " + t);
+			console.log(n + "." + new Date().getMilliseconds().pad(3) + " : " + t);
 		}
 	}
 	exists(anyObject) {//general utility function
