@@ -192,4 +192,50 @@ module.exports = class UTILS {
 		if (isNaN(num) || num == Infinity) return "Perfect";
 		else return this.round(num, 2);
 	}
+	iMMR(rank) {//internal MMR Representation
+		/*
+		Bronze 5, 0LP: 100
+		Bronze 4, 0LP: 200
+		Bronze 3, 0LP: 300
+		Bronze 2, 0LP: 400
+		Bronze 1, 0LP: 500
+		Silver 5, 0LP: 600
+		Gold 5, 0LP: 1100
+		Platinum 5, 0LP: 1600
+		Diamond 5, 0LP: 2100
+		Master, 0LP: 2600
+		Challenger, 1000LP: 2800
+		*/
+		let answer = { BRONZE: 100, SILVER: 600, GOLD: 1100, PLATINUM: 1600, DIAMOND: 2100, MASTER: 2600, CHALLENGER: 2600 }[rank.tier];
+		if (answer != 2600) {
+			answer += { V: 0, IV: 100, III: 200, II: 300, I: 400 }[rank.rank];
+			answer += rank.leaguePoints;
+		}
+		else answer += rank.leaguePoints / 5;//magic number constant: 500 LP = 1 iMMR div
+		return answer;
+	}
+	iMMRtoEnglish(mmr) {
+		if (mmr < 100) mmr = 100;
+		let answer = "";
+		if (mmr < 600) answer += "BRONZE ";
+		else if (mmr < 1100) answer += "SILVER ";
+		else if (mmr < 1600) answer += "GOLD ";
+		else if (mmr < 2100) answer += "PLATINUM ";
+		else if (mmr < 2600) answer += "DIAMOND ";
+		else answer += "MASTER/CHALLENGER ";
+		if (mmr < 2600) answer += ["V", "IV", "III", "II", "I"][Math.floor(((mmr - 100) % 500) / 100)] + " " + mmr % 100 + "LP";
+		else answer += (mmr - 2600) * 5 + "LP";
+		return answer;
+	}
+	averageMatchMMR(ranks) {
+		let total_iMMR = 0;
+		let total_games = 0;
+		for (let b in ranks) {
+			for (let c in ranks[b]) {
+				total_iMMR += this.iMMR(ranks[b][c]) * (ranks[b][c].wins + ranks[b][c].losses);
+				total_games += ranks[b][c].wins + ranks[b][c].losses;
+			}
+		}
+		return total_iMMR / total_games;
+	}
 }
