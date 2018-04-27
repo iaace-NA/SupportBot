@@ -76,7 +76,7 @@ function ready() {
 		for (let b in irs) if (new Date().getTime - irs[b][5] > 1000 * 60 * 10) delete irs[b];
 		if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();
 		let description = [];
-		for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[req.params.request_id][i] + "):" + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%");
+		for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[req.params.request_id][i] + "): " + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%");
 		description = description.join(", ");
 		UTILS.output("IAPI: request #" + req.params.request_id + " (" + (new Date().getTime() - irs[req.params.request_id][5]) + "ms): " + description);
 		console.log("");
