@@ -9,7 +9,7 @@ module.exports = class UTILS {
 	output(t) {//general utility function
 		if (this.exists(t)) {
 			let n = new Date().toISOString().slice(0, 19).replace('T', ' ');;
-			console.log(n + " : " + t);
+			console.log(n + "." + new Date().getMilliseconds() + " : " + t);
 		}
 	}
 	exists(anyObject) {//general utility function
