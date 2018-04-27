@@ -77,7 +77,7 @@ function ready() {
 		let description = [];
 		for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[req.params.request_id][i] + "):" + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%");
 		description = description.join(", ");
-		UTILS.output("IAPI: request #" + req.params.request_id + " (" + (new Date().getTime() - irs[req.params.request_id][5]) + "ms): " + description + "\n");
+		UTILS.output("IAPI: request #" + req.params.request_id + " (" + (new Date().getTime() - irs[req.params.request_id][5]) + "ms): " + description + "\r\n");
 		delete irs[req.params.request_id];
 		res.status(200).end();
 	});
