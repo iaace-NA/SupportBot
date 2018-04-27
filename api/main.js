@@ -269,15 +269,33 @@ function get(region, url, cachetime, maxage) {
 				resolve(JSON.parse(cached_result));
 			}).catch((e) => {
 				if (UTILS.exists(e)) console.error(e);
-				region_limiters[region].submit(request, url_with_key, (error, response, body) => {
-					if (UTILS.exists(error)) {
-						reject(error);
-					}
+				region_limiters[region].submit(() => {
+					request(url_with_key, (error, response, body) => {
+						if (UTILS.exists(error)) reject(error);
+						else {
+							try {
+								const answer = JSON.parse(body);
+								UTILS.output("\tcache miss: " + url);
+								addCache(url, body, cachetime);
+								resolve(answer);
+							}
+							catch (e) {
+								reject(e);
+							}
+						}
+					});
+				}, null);
+			});
+		}
+		else {//don't cache
+			region_limiters[region].submit(() => {
+				request(url_with_key, (error, response, body) => {
+					if (UTILS.exists(error)) reject(error);
 					else {
 						try {
 							const answer = JSON.parse(body);
-							UTILS.output("\tcache miss: " + url);
-							addCache(url, body, cachetime);
+							UTILS.output("\tuncached: " + url);
+							load_average[1].add();
 							resolve(answer);
 						}
 						catch (e) {
@@ -285,23 +303,7 @@ function get(region, url, cachetime, maxage) {
 						}
 					}
 				});
-			});
-		}
-		else {//don't cache
-			region_limiters[region].submit(request, url_with_key, (error, response, body) => {
-				if (UTILS.exists(error)) reject(error);
-				else {
-					try {
-						const answer = JSON.parse(body);
-						UTILS.output("\tuncached: " + url);
-						load_average[1].add();
-						resolve(answer);
-					}
-					catch (e) {
-						reject(e);
-					}
-				}
-			});
+			}, null);
 		}
 	});
 }
