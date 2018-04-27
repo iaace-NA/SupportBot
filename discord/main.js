@@ -20,7 +20,7 @@ catch (e) {
 }
 let mode = process.argv.length === 2 ? "PRODUCTION:warning:" : "DEVELOPMENT";
 const DB = new (require("./dbmanager.js"))(CONFIG);
-const LOLAPI = new (require("./lolapi.js"))(CONFIG, mode);
+const LOLAPI = new (require("./lolapi.js"))(CONFIG, mode, 0);
 LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 	UTILS.output("DD STATIC RESOURCES LOADED");
 	CONFIG.STATIC = result;
@@ -64,7 +64,7 @@ client.on("disconnect", function () {
 });
 client.on("message", function (msg) {
 	try {
-		discordcommands(CONFIG, client, LOLAPI, msg, DB);
+		discordcommands(CONFIG, client, mode, msg, DB);
 	}
 	catch (e) {
 		console.error(e);

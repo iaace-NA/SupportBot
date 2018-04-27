@@ -3,10 +3,14 @@ let embedgenerator = new (require("./embedgenerator.js"))();
 let textgenerator = new (require("./textgenerator.js"))();
 let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
-module.exports = function (CONFIG, client, lolapi, msg, db) {
-	const msg_receive_time = new Date().getTime();
+let LOLAPI = require("./lolapi.js");
+let request_id = 1;
+module.exports = function (CONFIG, client, mode, msg, db) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 
+	++request_id;
+	const msg_receive_time = new Date().getTime();
+	let lolapi = new LOLAPI(CONFIG, mode, request_id);
 	if ((UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) || !UTILS.exists(msg.guild)) {//respondable server message or PM
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {
 			reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
@@ -328,6 +332,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 	}
 
 	function reply(reply_text, callback, error_callback) {
+		lolapi.terminate();
 		print_message();
 		console.log("reply (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
 		msg.channel.send(reply_text, { split: true }).then((nMsg) => {
@@ -339,6 +344,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 	}
 
 	function reply_to_author(reply_text, callback, error_callback) {
+		lolapi.terminate();
 		print_message();
 		console.log("reply to author (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
 		msg.author.send(reply_text, { split: true }).then((nMsg) => {
@@ -350,6 +356,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 	}
 
 	function reply_embed(reply_embed, callback, error_callback) {
+		lolapi.terminate();
 		if (UTILS.exists(msg.guild) && !msg.channel.permissionsFor(client.user).has(["EMBED_LINKS"])) {//doesn't have permission to embed links in server
 			reply("I cannot respond to your request without the \"embed links\" permission.");
 		}
@@ -366,6 +373,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 	}
 
 	function reply_embed_to_author(reply_embed, callback, error_callback) {
+		lolapi.terminate();
 		print_message();
 		console.log("reply embedded to author (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
 		msg.author.send("", { embed: reply_embed }).then((nMsg) => {

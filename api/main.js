@@ -49,6 +49,7 @@ let limiter = require("bottleneck");
 for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({ maxConcurrent: 1, minTime: CONFIG.API_PERIOD });
 let req_num = 0;
 ready();
+let irs = {};//individual request statistics
 function ready() {
 	if (process.argv.length === 2) {//production key
 		UTILS.output("IAPI ready and listening on port " + CONFIG.API_PORT_PRODUCTION);
@@ -63,11 +64,22 @@ function ready() {
 		res.removeHeader("X-Powered-By");
 		return next();
 	});
-	serveWebRequest("/lol/:region/:cachetime/:maxage/", function (req, res, next) {
-		get(req.params.region, req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage)).then(result => res.json(result)).catch(e => {
+	serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, res, next) {
+		if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
+		++irs[req.params.request_id][0];
+		get(req.params.region, req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage), req.params.request_id).then(result => res.json(result)).catch(e => {
 			console.error(e);
 			res.status(500);
 		});
+	});
+	serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
+		if (!UTILS.exists(irs[req.params.request_id])) res.status(200).end();
+		let description = [];
+		for (let i = 0; i < 5; ++i) description.push(response_type[i] + "(" + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%): " + irs[req.params.request_id][i]);
+		description = description.join(", ");
+		UTILS.output("API Stat: request #" + req.params.request_id + ": " + description);
+		delete irs[req.params.request_id];
+		res.status(200).end();
 	});
 	serveWebRequest("/createshortcut/:uid", function(req, res, next) {
 		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
@@ -192,7 +204,7 @@ function ready() {
 	function serveWebRequest(branch, callback) {
 		if (typeof(branch) == "string") {
 			website.get(branch, function (req, res, next) {
-				UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
+				//UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
 				++req_num;
 				load_average[0].add();
 				callback(req, res, next);
@@ -201,7 +213,7 @@ function ready() {
 		else {
 			for (let b in branch) {
 				website.get(branch[b], function(req, res, next){
-					UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
+					//UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
 					++req_num;
 					load_average[0].add();
 					callback(req, res, next);
@@ -230,14 +242,15 @@ function changeBaseTo55(number) {
 	}
 	return answer;
 }
-function checkCache(url, maxage) {
+function checkCache(url, maxage, request_id) {
 	return new Promise((resolve, reject) => {
 		api_doc_model.findOne({ url }, (err, doc) => {
 			if (err) return reject(err);
 			if (UTILS.exists(doc)) {
 				if (UTILS.exists(maxage) && apicache.Types.ObjectId(doc.id).getTimestamp().getTime() < new Date().getTime() - (maxage * 1000)) {//if expired
-					UTILS.output("\tmaxage expired url: " + url);
+					//UTILS.output("\tmaxage expired url: " + url);
 					load_average[3].add();
+					++irs[request_id][3];
 					doc.remove(() => {});
 					reject(null);
 				}
@@ -245,6 +258,7 @@ function checkCache(url, maxage) {
 			}
 			else {
 				load_average[4].add();
+				++irs[request_id][4];
 				reject(null);
 			}
 		});
@@ -256,16 +270,17 @@ function addCache(url, response, cachetime) {
 		if (e) console.error(e);
 	});
 }
-function get(region, url, cachetime, maxage) {
+function get(region, url, cachetime, maxage, request_id) {
 	//cachetime in seconds, if cachetime is 0, do not cache
 	//maxage in seconds, if maxage is 0, force refresh
 	let that = this;
 	return new Promise((resolve, reject) => {
 		const url_with_key = url.replace("?api_key=", "?api_key=" + CONFIG.RIOT_API_KEY);
 		if (cachetime != 0) {//cache
-			checkCache(url, maxage).then((cached_result) => {
-				UTILS.output("\tcache hit: " + url);
+			checkCache(url, maxage, request_id).then((cached_result) => {
+				//UTILS.output("\tcache hit: " + url);
 				load_average[2].add();
+				++irs[request_id][2];
 				resolve(JSON.parse(cached_result));
 			}).catch((e) => {
 				if (UTILS.exists(e)) console.error(e);
@@ -276,7 +291,7 @@ function get(region, url, cachetime, maxage) {
 						else {
 							try {
 								const answer = JSON.parse(body);
-								UTILS.output("\tcache miss: " + url);
+								//UTILS.output("\tcache miss: " + url);
 								addCache(url, body, cachetime);
 								resolve(answer);
 							}
@@ -296,8 +311,9 @@ function get(region, url, cachetime, maxage) {
 					else {
 						try {
 							const answer = JSON.parse(body);
-							UTILS.output("\tuncached: " + url);
+							//UTILS.output("\tuncached: " + url);
 							load_average[1].add();
+							++irs[request_id][1];
 							resolve(answer);
 						}
 						catch (e) {

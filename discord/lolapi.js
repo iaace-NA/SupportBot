@@ -1,16 +1,18 @@
 "use strict";
 const UTILS = new (require("../utils.js"))();
 const fs = require("fs");
+const REQUEST = require("request");
 module.exports = class LOLAPI {
-	constructor(INIT_CONFIG, MODE) {
+	constructor(INIT_CONFIG, MODE, request_id) {
 		this.CONFIG = INIT_CONFIG;
+		this.request_id = request_id;
 		if (!UTILS.exists(this.CONFIG)) {
 			throw new Error("config.json required to access riot api.");
 		}
 		else if (!UTILS.exists(this.CONFIG.RIOT_API_KEY) || this.CONFIG.RIOT_API_KEY === "") {
 			throw new Error("config.json RIOT_API_KEY required to access riot api.");
 		}
-		this.request = require("request");
+		this.request = REQUEST;
 		this.cache = {};
 		if (MODE == "DEVELOPMENT") {
 			this.address = this.CONFIG.API_ADDRESS_DEVELOPMENT;
@@ -54,8 +56,8 @@ module.exports = class LOLAPI {
 			for (let i in options) {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
-			UTILS.output("IAPI req sent: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
-			this.request(this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/?url=" + encodeURIComponent(url), (error, response, body) => {
+			//UTILS.output("IAPI req sent: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
+			this.request(this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/?url=" + encodeURIComponent(url), (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);
 				}
@@ -301,5 +303,8 @@ module.exports = class LOLAPI {
 	}
 	getShortcuts(uid) {
 		return this.getIAPI("getshortcuts/" + uid, {});
+	}
+	terminate() {
+		this.request(this.address + ":" + this.port + "/terminate_request/" + this.request_id + "/", (error, response, body) => {});
 	}
 }
