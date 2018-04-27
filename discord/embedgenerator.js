@@ -332,7 +332,7 @@ module.exports = class EmbedGenerator {
 		}
 		return newEmbed;
 	}*/
-	liveMatchPremade(CONFIG, summoner, match, matches, ranks, masteries, trim = true) {//show current match information
+	liveMatchPremade(CONFIG, summoner, match, matches, ranks, masteries, trim = true, newlogic = false) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) {
@@ -364,15 +364,38 @@ module.exports = class EmbedGenerator {
 			teams[match.participants[b].teamId].push(match.participants[b]);
 			common_teammates[match.participants[b].summonerName] = {};
 		}
-		for (let b in matches) {
-			for (let c in matches[b].participantIdentities) {
-				const tC = matches[b].participantIdentities[c];
-				if (!UTILS.exists(common_teammates[tC.player.summonerName])) common_teammates[tC.player.summonerName] = {};
-				for (let d in matches[b].participantIdentities) {
-					const tD = matches[b].participantIdentities[d];
-					if (tC.player.summonerId != tD.player.summonerId) { //same guy check
-						if (!UTILS.exists(common_teammates[tC.player.summonerName][tD.player.summonerName])) common_teammates[tC.player.summonerName][tD.player.summonerName] = 1;
-						else common_teammates[tC.player.summonerName][tD.player.summonerName] += 1;
+		if (newlogic) {//new logic
+			for (let b in matches) {
+				let teams_private = {};
+				for (let c in matches[b].participants) {
+					if (!UTILS.exists(teams_private[matches[b].participants[c].teamId])) teams_private[matches[b].participants[c].teamId] = [];
+					teams_private[matches[b].participants[c].teamId].push(matches[b].participants[c]);
+				}
+				for (let c in teams_private) teams_private[c] = teams_private[c].map(p => { return matches[b].participantIdentities.find(pI => { return pI.participantId === p.participantId; }); });
+				for (let c in teams_private) {//team of pIs
+					for (let d in teams_private[c]) {//individual pI
+						const dsn = teams_private[c][d].player.summonerName;
+						if (!UTILS.exists(common_teammates[dsn])) common_teammates[dsn] = {};
+						for (let e in teams_private[c]) {
+							const esn = teams_private[c][e].player.summonerName;
+							if (!UTILS.exists(common_teammates[dsn][esn])) common_teammates[dsn][esn] = 1;
+							else common_teammates[dsn][esn] += 1;
+						}
+					}
+				}
+			}
+		}
+		else {//old logic
+			for (let b in matches) {
+				for (let c in matches[b].participantIdentities) {
+					const tC = matches[b].participantIdentities[c];
+					if (!UTILS.exists(common_teammates[tC.player.summonerName])) common_teammates[tC.player.summonerName] = {};
+					for (let d in matches[b].participantIdentities) {
+						const tD = matches[b].participantIdentities[d];
+						if (tC.player.summonerId != tD.player.summonerId) { //same guy check
+							if (!UTILS.exists(common_teammates[tC.player.summonerName][tD.player.summonerName])) common_teammates[tC.player.summonerName][tD.player.summonerName] = 1;
+							else common_teammates[tC.player.summonerName][tD.player.summonerName] += 1;
+						}
 					}
 				}
 			}

@@ -154,7 +154,9 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 									lolapi.getMultipleRanks(region, pSA.map(p => { return p.id; }), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS).then(ranks => {
 										lolapi.getMultipleChampionMastery(region, pSA.map(p => { return p.id; }), CONFIG.API_MAXAGE.LG.MULTIPLE_MASTERIES).then(masteries => {
 											//nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries) }).catch();
-											reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries));
+											reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, true, true), () => {
+												reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, true, false));
+											});
 											//reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, false));//untrimmed output
 										}).catch();
 									}).catch();
@@ -174,7 +176,7 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`.");
 					if (number < 1 || number > 20 || !UTILS.exists(matchhistory.matches[number - 1])) return reply(":x: This number is out of range.");
 					lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId, CONFIG.API_MAXAGE.DMH.MATCH_INFORMATION).then(match => {
-						const pIDA = match.participantIdentities.map(pI => { 
+						const pIDA = match.participantIdentities.map(pI => {
 							if (UTILS.exists(pI.player.summonerId)) return pI.player.summonerId;
 							else return null;//bot account
 						});//participant ID array
