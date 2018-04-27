@@ -73,7 +73,7 @@ function ready() {
 		});
 	});
 	serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
-		if (!UTILS.exists(irs[req.params.request_id])) res.status(200).end();
+		if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();
 		let description = [];
 		for (let i = 0; i < 5; ++i) description.push(response_type[i] + "(" + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%): " + irs[req.params.request_id][i]);
 		description = description.join(", ");
