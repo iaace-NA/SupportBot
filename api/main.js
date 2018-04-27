@@ -269,7 +269,8 @@ function get(region, url, cachetime, maxage) {
 				resolve(JSON.parse(cached_result));
 			}).catch((e) => {
 				if (UTILS.exists(e)) console.error(e);
-				region_limiters[region].submit(() => {
+				region_limiters[region].submit((no_use, cb) => {
+					cb();
 					request(url_with_key, (error, response, body) => {
 						if (UTILS.exists(error)) reject(error);
 						else {
@@ -284,11 +285,12 @@ function get(region, url, cachetime, maxage) {
 							}
 						}
 					});
-				}, null);
+				}, null, () => {});
 			});
 		}
 		else {//don't cache
-			region_limiters[region].submit(() => {
+			region_limiters[region].submit((no_use, cb) => {
+				cb();
 				request(url_with_key, (error, response, body) => {
 					if (UTILS.exists(error)) reject(error);
 					else {
@@ -303,7 +305,7 @@ function get(region, url, cachetime, maxage) {
 						}
 					}
 				});
-			}, null);
+			}, null, () => {});
 		}
 	});
 }
