@@ -138,9 +138,9 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 				lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.LG.SUMMONER_ID).then(result => {
 					result.region = region;
 					result.guess = username;
-					if (!UTILS.exists(result.id)) return nMsg.edit("No username found for `" + username + "`.").catch();
+					if (!UTILS.exists(result.id)) return reply("No username found for `" + username + "`.");
 					lolapi.getLiveMatch(region, result.id, CONFIG.API_MAXAGE.LG.LIVE_MATCH).then(match => {
-						if (UTILS.exists(match.status)) return nMsg.edit("No current matches found for `" + username + "`.").catch();
+						if (UTILS.exists(match.status)) return reply("No current matches found for `" + username + "`.");
 						UTILS.sequential(match.participants.map(p => { return function () { return lolapi.getSummonerFromSummonerID(region, p.summonerId, CONFIG.API_MAXAGE.LG.OTHER_SUMMONER_ID); } })).then(pSA => {//participant summoner array
 							UTILS.sequential(pSA.map(pS => { return function () { return lolapi.getRecentGames(region, pS.accountId, CONFIG.API_MAXAGE.LG.RECENT_GAMES); } })).then(mhA => {//matchhistory array
 								let mIDA = [];//match id array;
