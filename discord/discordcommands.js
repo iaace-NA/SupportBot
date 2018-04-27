@@ -332,8 +332,8 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 	}
 
 	function reply(reply_text, callback, error_callback) {
-		lolapi.terminate();
 		print_message();
+		lolapi.terminate();
 		console.log("reply (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
 		msg.channel.send(reply_text, { split: true }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
@@ -344,8 +344,8 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 	}
 
 	function reply_to_author(reply_text, callback, error_callback) {
-		lolapi.terminate();
 		print_message();
+		lolapi.terminate();
 		console.log("reply to author (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
 		msg.author.send(reply_text, { split: true }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
@@ -356,12 +356,13 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 	}
 
 	function reply_embed(reply_embed, callback, error_callback) {
-		lolapi.terminate();
 		if (UTILS.exists(msg.guild) && !msg.channel.permissionsFor(client.user).has(["EMBED_LINKS"])) {//doesn't have permission to embed links in server
+			lolapi.terminate();
 			reply("I cannot respond to your request without the \"embed links\" permission.");
 		}
 		else {//has permission to embed links, or is a DM/PM
 			print_message();
+			lolapi.terminate();
 			console.log("reply embedded (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
 			msg.channel.send("", { embed: reply_embed }).then((nMsg) => {
 				if (UTILS.exists(callback)) callback(nMsg);
@@ -373,8 +374,8 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 	}
 
 	function reply_embed_to_author(reply_embed, callback, error_callback) {
-		lolapi.terminate();
 		print_message();
+		lolapi.terminate();
 		console.log("reply embedded to author (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
 		msg.author.send("", { embed: reply_embed }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
@@ -388,9 +389,9 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 		const basic = msg.id + "\ncontent: " + msg.content +
 			"\nauthor: " + msg.author.tag + " :: " + msg.author.id +
 			"\nchannel: " + msg.channel.name + " :: " + msg.channel.id;
-		if (UTILS.exists(msg.guild)) UTILS.output("received server message :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
+		if (UTILS.exists(msg.guild)) UTILS.output("received server message r#" + request_id + " :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
 		else {
-			UTILS.output("received PM/DM message :: " + basic);
+			UTILS.output("received PM/DM message r#" + request_id + " :: " + basic);
 		}
 	}
 	function assert_region(test_string, notify = true) {

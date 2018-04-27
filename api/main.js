@@ -75,9 +75,9 @@ function ready() {
 	serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
 		if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();
 		let description = [];
-		for (let i = 0; i < 5; ++i) description.push(response_type[i] + "(" + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%): " + irs[req.params.request_id][i]);
+		for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[req.params.request_id][i] + "):" + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%");
 		description = description.join(", ");
-		UTILS.output("API Stat: request #" + req.params.request_id + ": " + description);
+		UTILS.output("IAPI: request #" + req.params.request_id + " (" + (new Date().getTime() - irs[req.params.request_id][6]) + "ms): " + description + "\n");
 		delete irs[req.params.request_id];
 		res.status(200).end();
 	});
