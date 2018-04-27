@@ -243,4 +243,7 @@ module.exports = class UTILS {
 		}
 		return total_iMMR / total_games;
 	}
+	copy(obj) {//no functions
+		return JSON.parse(JSON.stringify(obj));
+	}
 }

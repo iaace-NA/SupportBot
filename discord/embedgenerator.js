@@ -149,7 +149,15 @@ module.exports = class EmbedGenerator {
 		let all_lanes = [0, 0, 0, 0, 0, 0];
 		let all_lanes_w = [0, 0, 0, 0, 0, 0];
 		let all_lanes_l = [0, 0, 0, 0, 0, 0];
-		let all_lanes_KDA = [JSON.parse(JSON.stringify(all_KDA)), JSON.parse(JSON.stringify(all_KDA)), JSON.parse(JSON.stringify(all_KDA)), JSON.parse(JSON.stringify(all_KDA)), JSON.parse(JSON.stringify(all_KDA)), JSON.parse(JSON.stringify(all_KDA))]
+		let all_lanes_KDA = [UTILS.copy(all_KDA), UTILS.copy(all_KDA), UTILS.copy(all_KDA), UTILS.copy(all_KDA), UTILS.copy(all_KDA), UTILS.copy(all_KDA)];
+		let all_champions = {};
+		let new_champion = {
+			w: 0,
+			l: 0,
+			K: 0,
+			D: 0,
+			A: 0
+		};
 		for (let i = 0; i < match_meta.length && i < 20; ++i) {
 			const KDA = UTILS.KDA(summoner.id, matches[i]);
 			const stats = UTILS.stats(summoner.id, matches[i]);
@@ -160,6 +168,11 @@ module.exports = class EmbedGenerator {
 			++all_lanes[lane];
 			win ? ++all_lanes_w[lane] : ++all_lanes_l[lane];
 			all_results.push(win);
+			if (!UTILS.exists(all_champions[match_meta[i].champion])) all_champions[match_meta[i].champion] = UTILS.copy(new_champion);
+			win ? ++all_champions[match_meta[i].champion].w : ++all_champions[match_meta[i].champion].l;
+			all_champions[match_meta[i].champion].K += KDA.K;
+			all_champions[match_meta[i].champion].D += KDA.D;
+			all_champions[match_meta[i].champion].A += KDA.K;
 			for (let b in all_KDA) all_KDA[b] += KDA[b];
 			for (let b in all_lanes_KDA[lane]) all_lanes_KDA[lane][b] += KDA[b];
 			for (let b in matches[i].participants) {
@@ -207,7 +220,8 @@ module.exports = class EmbedGenerator {
 		const total_wins = all_results.reduce((total, increment) => { return total + (increment ? 1 : 0); }, 0);
 		const total_losses = all_results.reduce((total, increment) => { return total + (increment ? 0 : 1); }, 0);
 		if (all_results.length > 5) newEmbed.addField("Older Match Results", all_results.slice(5).map(r => { return r ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss; }).join("") + "->Oldest");
-		newEmbed.setDescription(all_results.length + "G (" +  UTILS.round(100 * total_wins / (total_wins + total_losses), 0) + "%) = " + total_wins + "W + " + total_losses + "L " + "\tKDA:`" + UTILS.KDAFormat(all_KDA.KDA) + "`\n" + lane_description.join("\n"));
+		newEmbed.addField("Recent Games", all_results.length + "G (" + UTILS.round(100 * total_wins / (total_wins + total_losses), 0) + "%) = " + total_wins + "W + " + total_losses + "L " + "\tKDA:`" + UTILS.KDAFormat(all_KDA.KDA) + "`\n" + lane_description.join("\n"), true);
+		newEmbed.addField("Recent Champions", "", true);
 		let rpw = [];//recently played with
 		for (let b in common_teammates) rpw.push([b, common_teammates[b].w, common_teammates[b].l]);
 		rpw.sort((a, b) => { return b[1] + b[2] - a[1] - a[2]; });
