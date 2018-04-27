@@ -130,6 +130,18 @@ module.exports = class LOLAPI {
 	getSummonerFromSummonerID(region, id, maxage) {
 		return this.get(region, "summoner/v3/summoners/" + id, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_FROM_SUMMONER_ID, maxage);
 	}
+	getMultipleSummonerFromSummonerID(region, ids, maxage) {
+		let that = this;
+		let requests = [];
+		if (this.CONFIG.API_SEQUENTIAL) {
+			for (let i in ids) requests.push(function () { return that.getSummonerFromSummonerID(region, ids[i], maxage); });
+			return UTILS.sequential(requests);
+		}
+		else {
+			for (let i in ids) requests.push(that.getSummonerFromSummonerID(region, ids[i], maxage));
+			return Promise.all(requests);
+		}
+	}
 	getRanks(region, summonerID, maxage) {
 		if (summonerID === null) return new Promise((resolve, reject) => { resolve([]); });
 		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_RANKS, maxage);
@@ -219,14 +231,32 @@ module.exports = class LOLAPI {
 	getRecentGames(region, accountID, maxage) {
 		return this.get(region, "match/v3/matchlists/by-account/" + accountID, { endIndex: 20 }, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage);
 	}
+	getMultipleRecentGames(region, accountIDs, maxage) {
+		let that = this;
+		let requests = [];
+		if (this.CONFIG.API_SEQUENTIAL) {
+			for (let i in accountIDs) requests.push(function () { return that.getRecentGames(region, accountIDs[i], maxage); });
+			return UTILS.sequential(requests);
+		}
+		else {
+			for (let i in accountIDs) requests.push(that.getRecentGames(region, accountIDs[i], maxage));
+			return Promise.all(requests);
+		}
+	}
 	getMatchInformation(region, gameID, maxage) {
 		return this.get(region, "match/v3/matches/" + gameID, {}, this.CONFIG.API_CACHETIME.GET_MATCH_INFORMATION, maxage);
 	}
 	getMultipleMatchInformation(region, gameIDs, maxage) {
 		let that = this;
 		let requests = [];
-		for (let i in gameIDs) requests.push(function () { return that.getMatchInformation(region, gameIDs[i], maxage); });
-		return UTILS.sequential(requests);
+		if (this.CONFIG.API_SEQUENTIAL) {
+			for (let i in gameIDs) requests.push(function () { return that.getMatchInformation(region, gameIDs[i], maxage); });
+			return UTILS.sequential(requests);
+		}
+		else {
+			for (let i in gameIDs) requests.push(that.getMatchInformation(region, gameIDs[i], maxage));
+			return Promise.all(requests);
+		}
 	}
 	getLiveMatch(region, summonerID, maxage) {
 		return this.get(region, "spectator/v3/active-games/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_LIVE_MATCH, maxage);

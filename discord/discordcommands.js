@@ -141,8 +141,8 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 					if (!UTILS.exists(result.id)) return reply("No username found for `" + username + "`.");
 					lolapi.getLiveMatch(region, result.id, CONFIG.API_MAXAGE.LG.LIVE_MATCH).then(match => {
 						if (UTILS.exists(match.status)) return reply("No current matches found for `" + username + "`.");
-						UTILS.sequential(match.participants.map(p => { return function () { return lolapi.getSummonerFromSummonerID(region, p.summonerId, CONFIG.API_MAXAGE.LG.OTHER_SUMMONER_ID); } })).then(pSA => {//participant summoner array
-							UTILS.sequential(pSA.map(pS => { return function () { return lolapi.getRecentGames(region, pS.accountId, CONFIG.API_MAXAGE.LG.RECENT_GAMES); } })).then(mhA => {//matchhistory array
+						lolapi.getMultipleSummonerFromSummonerID(region, match.participants.map(p => { return p.summonerId; }), CONFIG.API_MAXAGE.LG.OTHER_SUMMONER_ID).then(pSA => {//participant summoner array
+							lolapi.getMultipleRecentGames(region, pSA.map(pS => { return pS.accountId; }), CONFIG.API_MAXAGE.LG.RECENT_GAMES).then(mhA => {//matchhistory array
 								let mIDA = [];//match id array;
 								for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
 								lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.LG.MULTIPLE_MATCH).then(matches => {
