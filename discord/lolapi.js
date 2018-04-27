@@ -50,7 +50,7 @@ module.exports = class LOLAPI {
 			UTILS.assert(UTILS.exists(region));
 			UTILS.assert(UTILS.exists(cachetime));
 			UTILS.assert(UTILS.exists(maxage));
-			let url = "https://" + region + ".api.riotgames.com/lol/" + path + "?api_key=" + this.CONFIG.RIOT_API_KEY;
+			let url = "https://" + region + ".api.riotgames.com/lol/" + path + "?api_key=";
 			for (let i in options) {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}

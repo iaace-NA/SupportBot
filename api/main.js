@@ -261,21 +261,22 @@ function get(region, url, cachetime, maxage) {
 	//maxage in seconds, if maxage is 0, force refresh
 	let that = this;
 	return new Promise((resolve, reject) => {
+		const url_with_key = url.replace("?api_key=", "?api_key=" + CONFIG.RIOT_API_KEY);
 		if (cachetime != 0) {//cache
 			checkCache(url, maxage).then((cached_result) => {
-				UTILS.output("\tcache hit: " + url.replace(CONFIG.RIOT_API_KEY, ""));
+				UTILS.output("\tcache hit: " + url);
 				load_average[2].add();
 				resolve(JSON.parse(cached_result));
 			}).catch((e) => {
 				if (UTILS.exists(e)) console.error(e);
-				region_limiters[region].submit(request, url, (error, response, body) => {
+				region_limiters[region].submit(request, url_with_key, (error, response, body) => {
 					if (UTILS.exists(error)) {
 						reject(error);
 					}
 					else {
 						try {
 							const answer = JSON.parse(body);
-							UTILS.output("\tcache miss: " + url.replace(CONFIG.RIOT_API_KEY, ""));
+							UTILS.output("\tcache miss: " + url);
 							addCache(url, body, cachetime);
 							resolve(answer);
 						}
@@ -287,12 +288,12 @@ function get(region, url, cachetime, maxage) {
 			});
 		}
 		else {//don't cache
-			region_limiters[region].submit(request, url, (error, response, body) => {
+			region_limiters[region].submit(request, url_with_key, (error, response, body) => {
 				if (UTILS.exists(error)) reject(error);
 				else {
 					try {
 						const answer = JSON.parse(body);
-						UTILS.output("\tuncached: " + url.replace(CONFIG.RIOT_API_KEY, ""));
+						UTILS.output("\tuncached: " + url);
 						load_average[1].add();
 						resolve(answer);
 					}
