@@ -4,6 +4,7 @@ let textgenerator = new (require("./textgenerator.js"))();
 let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
 module.exports = function (CONFIG, client, lolapi, msg, db) {
+	const msg_receive_time = new Date().getTime();
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 
 	if ((UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) || !UTILS.exists(msg.guild)) {//respondable server message or PM
@@ -328,7 +329,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 
 	function reply(reply_text, callback, error_callback) {
 		print_message();
-		console.log("reply (" + (new Date().getTime() - msg.createdTimestamp) + "ms): " + reply_text + "\n");
+		console.log("reply (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
 		msg.channel.send(reply_text, { split: true }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
@@ -339,7 +340,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 
 	function reply_to_author(reply_text, callback, error_callback) {
 		print_message();
-		console.log("reply to author (" + (new Date().getTime() - msg.createdTimestamp) + "ms): " + reply_text + "\n");
+		console.log("reply to author (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
 		msg.author.send(reply_text, { split: true }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
@@ -354,7 +355,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 		}
 		else {//has permission to embed links, or is a DM/PM
 			print_message();
-			console.log("reply embedded (" + (new Date().getTime() - msg.createdTimestamp) + "ms)\n");
+			console.log("reply embedded (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
 			msg.channel.send("", { embed: reply_embed }).then((nMsg) => {
 				if (UTILS.exists(callback)) callback(nMsg);
 			}).catch((e) => {
@@ -366,7 +367,7 @@ module.exports = function (CONFIG, client, lolapi, msg, db) {
 
 	function reply_embed_to_author(reply_embed, callback, error_callback) {
 		print_message();
-		console.log("reply embedded to author (" + (new Date().getTime() - msg.createdTimestamp) + "ms)\n");
+		console.log("reply embedded to author (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
 		msg.author.send("", { embed: reply_embed }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
