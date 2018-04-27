@@ -46,7 +46,7 @@ shortcut_doc.index({ uid: "hashed" });
 let shortcut_doc_model = apicache.model("shortcut_doc_model", shortcut_doc);
 let region_limiters = {};
 let limiter = require("bottleneck");
-for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({ maxConcurrent: 1, minTime: 1300 });
+for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({ maxConcurrent: 1, minTime: CONFIG.API_PERIOD });
 let req_num = 0;
 ready();
 function ready() {
