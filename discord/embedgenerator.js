@@ -286,7 +286,7 @@ module.exports = class EmbedGenerator {
 		// KP
 		return newEmbed;
 	}
-	liveMatch(CONFIG, summoner, match) {//show current match information
+	/*liveMatch(CONFIG, summoner, match) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) {
@@ -331,7 +331,7 @@ module.exports = class EmbedGenerator {
 			++team_count;
 		}
 		return newEmbed;
-	}
+	}*/
 	liveMatchPremade(CONFIG, summoner, match, matches, ranks, masteries, trim = true) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
