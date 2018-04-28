@@ -363,9 +363,8 @@ module.exports = class EmbedGenerator {
 			newEmbed.setColor([255, 0, 0]);
 			return newEmbed;
 		}
-		newEmbed.setTitle(queues[match.gameQueueConfigId]);
-		if (match.gameStartTime != 0) newEmbed.setDescription("Match Time: `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
-		else newEmbed.setDescription("Match not started.");
+		if (match.gameStartTime != 0) newEmbed.setTitle(queues[match.gameQueueConfigId] + " `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
+		else newEmbed.setTitle(queues[match.gameQueueConfigId] + " `GAME LOADING`");
 		let common_teammates = {};
 		/*{
 			"username1": {
