@@ -211,8 +211,14 @@ module.exports = class EmbedGenerator {
 			// role
 			// KP
 		}
+		let all_champions_a = [];
+		for (let b in all_champions) {
+			all_champions[b].id = b;
+			all_champions_a.push(all_champions[b]);
+		}
+		all_champions_a.sort((a, b) => { return b.w + b.l - a.w - a.l; });
 		all_KDA.KDA = (all_KDA.K + all_KDA.A) / all_KDA.D;
-		for (let b in all_lanes_KDA) all_lanes_KDA[b].KDA =  (all_lanes_KDA[b].K + all_lanes_KDA[b].A) / all_lanes_KDA[b].D;
+		for (let b in all_lanes_KDA) all_lanes_KDA[b].KDA = (all_lanes_KDA[b].K + all_lanes_KDA[b].A) / all_lanes_KDA[b].D;
 		let lane_description = [];
 		for (let i = 0; i <= 5; ++i) if (all_lanes[i] > 0) lane_description.push([CONFIG.EMOJIS.lanes[i] + all_lanes[i] + "G (" + UTILS.round(100 * all_lanes_w[i] / (all_lanes_w[i] + all_lanes_l[i]), 0) + "%) = " + all_lanes_w[i] + "W + " + all_lanes_l[i] + "L\tKDA:`" + UTILS.KDAFormat(all_lanes_KDA[i].KDA) + "`", all_lanes[i]]);
 		lane_description.sort((a, b) => { return b[1] - a[1]; });
@@ -221,7 +227,7 @@ module.exports = class EmbedGenerator {
 		const total_losses = all_results.reduce((total, increment) => { return total + (increment ? 0 : 1); }, 0);
 		if (all_results.length > 5) newEmbed.addField("Older Match Results", all_results.slice(5).map(r => { return r ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss; }).join("") + "->Oldest");
 		newEmbed.addField("Recent Games", all_results.length + "G (" + UTILS.round(100 * total_wins / (total_wins + total_losses), 0) + "%) = " + total_wins + "W + " + total_losses + "L " + "\tKDA:`" + UTILS.KDAFormat(all_KDA.KDA) + "`\n" + lane_description.join("\n"), true);
-		newEmbed.addField("Recent Champions", "", true);
+		newEmbed.addField("Recent Champions", all_champions_a.map(c => { return CONFIG.STATIC.CHAMPIONS[c.id].emoji + (c.w + c.l) + "G (" + UTILS.round(100 * c.w / (c.w + c.l), 0) + "%) = " + c.w + "W + " + c.l + "L\tKDA:`" + UTILS.KDAFormat((c.K + c.A) / c.D) + "`"; }).slice(0, 6).join("\n"), true);
 		let rpw = [];//recently played with
 		for (let b in common_teammates) rpw.push([b, common_teammates[b].w, common_teammates[b].l]);
 		rpw.sort((a, b) => { return b[1] + b[2] - a[1] - a[2]; });
