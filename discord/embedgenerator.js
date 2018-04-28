@@ -132,7 +132,7 @@ module.exports = class EmbedGenerator {
 		let newEmbed = new Discord.RichEmbed();
 
 		newEmbed.setTitle("Recent Games");
-		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(summoner.region, summoner.name));
+		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 		let common_teammates = {};
 		/*{
 			"name": {
@@ -241,7 +241,7 @@ module.exports = class EmbedGenerator {
 	}
 	detailedMatch(CONFIG, summoner, match_meta, match, ranks, masteries) {//should show detailed information about 1 game
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(summoner.region, summoner.name));
+		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 		if (UTILS.exists(match.status)) {
 			newEmbed.setAuthor(summoner.guess);
 			newEmbed.setTitle("This summoner has no recent matches.");
@@ -356,7 +356,7 @@ module.exports = class EmbedGenerator {
 	}*/
 	liveMatchPremade(CONFIG, summoner, match, matches, ranks, masteries, summoner_participants, trim = true, newlogic = true) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(summoner.region, summoner.name));
+		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 		if (UTILS.exists(match.status)) {
 			newEmbed.setAuthor(summoner.guess);
 			newEmbed.setTitle("This summoner is currently not in a match.");
