@@ -251,6 +251,7 @@ module.exports = class EmbedGenerator {
 		}
 		const avg_iMMR = UTILS.averageMatchMMR(ranks);
 		for (let i = 0; i < IMMR_THRESHOLD.length; ++i) if (avg_iMMR > IMMR_THRESHOLD[i]) newEmbed.setColor(RANK_COLOR[i]);
+		UTILS.output("average iMMR is " + avg_iMMR + " or " + UTILS.iMMRtoEnglish(avg_iMMR));
 		newEmbed.setTitle(queues[match.queueId] + " `" + UTILS.standardTimestamp(match.gameDuration) + "`");
 		newEmbed.setTimestamp(new Date(match_meta.timestamp + (match.gameDuration * 1000)));
 		newEmbed.setFooter("Match played " + UTILS.ago(new Date(match_meta.timestamp + (match.gameDuration * 1000))) + " at: ");
@@ -367,6 +368,7 @@ module.exports = class EmbedGenerator {
 			return newEmbed;
 		}
 		const avg_iMMR = UTILS.averageMatchMMR(ranks);
+		UTILS.output("average iMMR is " + avg_iMMR + " or " + UTILS.iMMRtoEnglish(avg_iMMR));
 		for (let i = 0; i < IMMR_THRESHOLD.length; ++i) if (avg_iMMR > IMMR_THRESHOLD[i]) newEmbed.setColor(RANK_COLOR[i]);
 		if (match.gameStartTime != 0) newEmbed.setTitle(queues[match.gameQueueConfigId] + " `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
 		else newEmbed.setTitle(queues[match.gameQueueConfigId] + " `GAME LOADING`");
