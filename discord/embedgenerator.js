@@ -173,7 +173,7 @@ module.exports = class EmbedGenerator {
 			win ? ++all_champions[match_meta[i].champion].w : ++all_champions[match_meta[i].champion].l;
 			all_champions[match_meta[i].champion].K += KDA.K;
 			all_champions[match_meta[i].champion].D += KDA.D;
-			all_champions[match_meta[i].champion].A += KDA.K;
+			all_champions[match_meta[i].champion].A += KDA.A;
 			for (let b in all_KDA) all_KDA[b] += KDA[b];
 			for (let b in all_lanes_KDA[lane]) all_lanes_KDA[lane][b] += KDA[b];
 			for (let b in matches[i].participants) {
