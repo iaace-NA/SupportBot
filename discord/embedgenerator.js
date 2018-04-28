@@ -257,9 +257,9 @@ module.exports = class EmbedGenerator {
 			const flex_5 = ranks[b].find(r => { return r.queueType === "RANKED_FLEX_SR"; });
 			const flex_3 = ranks[b].find(r => { return r.queueType === "RANKED_FLEX_TT"; });
 			const solo = ranks[b].find(r => { return r.queueType === "RANKED_SOLO_5x5"; });
-			pI.flex5 = UTILS.shortRank(flex_5);
-			pI.flex3 = UTILS.shortRank(flex_3);
-			pI.solo = UTILS.shortRank(solo);
+			pI.flex5 = "`" + UTILS.shortRank(flex_5) + "`";
+			pI.flex3 = "`" + UTILS.shortRank(flex_3) + "`";
+			pI.solo = "`" + UTILS.shortRank(solo) + "`";
 			pI.mastery = UTILS.getSingleChampionMastery(masteries[b], match.participants.find(p => { return p.participantId == pI.participantId; }).championId);
 		}
 		for (let b in match.participants) {
@@ -451,8 +451,8 @@ module.exports = class EmbedGenerator {
 				else team_description += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
 				else team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
-				team_description += " " + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3;
-				team_description += " `M" + teams[b][c].mastery + "`";
+				team_description += " `" + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3;
+				team_description += " M" + teams[b][c].mastery + "`";
 				team_description += CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
 				team_description += "`" + summoner_participants.find(p => { return p.id == teams[b][c].summonerId; }).summonerLevel + "`:";
 				team_description += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];

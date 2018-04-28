@@ -159,8 +159,8 @@ module.exports = class UTILS {
 		//G2P L_ Gold 2 promotion, 1 loss
 		//C +256 Challenger, 256LP
 		//C+1256 Challenger 1256 LP
-		if (!this.exists(info)) return "`******`";
-		let answer = "`";
+		if (!this.exists(info)) return "******";
+		let answer = "";
 		answer += info.tier[0];
 		if (this.exists(info.miniSeries)) {//series
 			if (info.miniSeries.progress.length == 5) {//BO5
@@ -188,7 +188,7 @@ module.exports = class UTILS {
 			if (LP >= 10) answer += LP;
 			else answer += "0" + LP;
 		}
-		return answer + "`";
+		return answer;
 	}
 	getSingleChampionMastery(all, singleID) {
 		return this.exists(all.find(cmi => { return cmi.championId == singleID; })) ? all.find(cmi => { return cmi.championId == singleID; }).championLevel : 0;
