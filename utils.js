@@ -29,7 +29,7 @@ module.exports = class UTILS {
 		}
 		else return "";
 	}
-	round(num, decimal) {
+	round(num, decimal = 0) {
 		return Math.round(num * Math.pow(10, decimal)) / Math.pow(10, decimal);
 	}
 	assert(condition) {
@@ -231,8 +231,8 @@ module.exports = class UTILS {
 		else if (mmr < 2100) answer += "PLATINUM ";
 		else if (mmr < 2600) answer += "DIAMOND ";
 		else answer += "MASTER/CHALLENGER ";
-		if (mmr < 2600) answer += ["V", "IV", "III", "II", "I"][Math.floor(((mmr - 100) % 500) / 100)] + " " + mmr % 100 + "LP";
-		else answer += (mmr - 2600) * 5 + "LP";
+		if (mmr < 2600) answer += ["V", "IV", "III", "II", "I"][Math.floor(((mmr - 100) % 500) / 100)] + " " + this.round(mmr % 100) + "LP";
+		else answer += this.round((mmr - 2600) * 5) + "LP";
 		return answer;
 	}
 	averageMatchMMR(ranks) {
