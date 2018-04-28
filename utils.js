@@ -244,7 +244,7 @@ module.exports = class UTILS {
 				total_games += ranks[b][c].wins + ranks[b][c].losses;
 			}
 		}
-		return total_iMMR / total_games;
+		return total_games === 0 ? 0 : total_iMMR / total_games;
 	}
 	copy(obj) {//no functions
 		return JSON.parse(JSON.stringify(obj));
