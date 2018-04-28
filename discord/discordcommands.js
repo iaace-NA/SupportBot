@@ -160,11 +160,11 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 								lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.LG.MULTIPLE_MATCH).then(matches => {
 									lolapi.getMultipleRanks(region, pSA.map(p => { return p.id; }), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS).then(ranks => {
 										lolapi.getMultipleChampionMastery(region, pSA.map(p => { return p.id; }), CONFIG.API_MAXAGE.LG.MULTIPLE_MASTERIES).then(masteries => {
-											//nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries) }).catch();
-											reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries), () => {
-												//reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, false, true));
+											//nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA) }).catch();
+											reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA), () => {
+												//reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false, true));
 											});
-											//reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, false));//untrimmed output
+											//reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false));//untrimmed output
 										}).catch();
 									}).catch();
 								});

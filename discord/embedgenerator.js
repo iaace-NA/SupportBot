@@ -354,7 +354,7 @@ module.exports = class EmbedGenerator {
 		}
 		return newEmbed;
 	}*/
-	liveMatchPremade(CONFIG, summoner, match, matches, ranks, masteries, trim = true, newlogic = true) {//show current match information
+	liveMatchPremade(CONFIG, summoner, match, matches, ranks, masteries, summoner_participants, trim = true, newlogic = true) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) {
@@ -456,7 +456,7 @@ module.exports = class EmbedGenerator {
 				team_description += CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
 				team_description += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
 				team_description += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
-				team_description += "__[" + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
+				team_description += "__[" + summoner_participants.find(p => { return p.id == teams[b][c].summonerId; }).summonerLevel + ": " + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
 				team_description += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
 				if (UTILS.exists(match.bannedChampions[player_count])) {
 					try {
