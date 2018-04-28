@@ -148,7 +148,7 @@ module.exports = class UTILS {
 		else return 0;
 	}
 	opgg(region, username) {
-		return "" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
+		return "http://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
 	}
 	shortRank(info) {
 		//****** unranked
