@@ -75,6 +75,7 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "setshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "ss ", CONFIG.DISCORD_COMMAND_PREFIX + "createshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "cs ", CONFIG.DISCORD_COMMAND_PREFIX + "addshortcut "], true, false, (original, index, parameter) => {
 			if (parameter[0] !== "$") return reply(":x: The shortcut must begin with an `$`. Please try again.");
 			if (parameter.indexOf(" ") === -1) return reply(":x: The shortcut word and the username must be separated by a space. Please try again.");
+			if (parameter.length > 60) return reply(":x: The shortcut name or the username is too long.");
 			const from = parameter.substring(1, parameter.indexOf(" ")).toLowerCase();
 			if (from.length === 0) return reply(":x: The shortcut name was not specified. Please try again.");
 			const to = parameter.substring(parameter.indexOf(" ") + 1);
