@@ -457,7 +457,8 @@ module.exports = class EmbedGenerator {
 				team_description += "`" + summoner_participants.find(p => { return p.id == teams[b][c].summonerId; }).summonerLevel + "`";
 				team_description += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
 				team_description += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
-				team_description += "__[" + teams[b][c].summonerName + "](" + UTILS.opggShort(CONFIG.OPGG_SHORT, CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
+				if (teams[b].length > 5) team_description += "__[" + teams[b][c].summonerName + "](" + UTILS.opggShort(CONFIG.OPGG_SHORT, CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
+				else team_description += "__[" + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
 				team_description += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
 				if (UTILS.exists(match.bannedChampions[player_count])) {
 					try {
