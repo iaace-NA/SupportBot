@@ -237,14 +237,20 @@ module.exports = class UTILS {
 	}
 	averageMatchMMR(ranks) {
 		let total_iMMR = 0;
-		let total_games = 0;
+		let total_users = 0;
 		for (let b in ranks) {
+			let individual_iMMR = 0;
+			let individual_games = 0;
 			for (let c in ranks[b]) {
-				total_iMMR += this.iMMR(ranks[b][c]) * (ranks[b][c].wins + ranks[b][c].losses);
-				total_games += ranks[b][c].wins + ranks[b][c].losses;
+				individual_iMMR += this.iMMR(ranks[b][c]) * (ranks[b][c].wins + ranks[b][c].losses);
+				individual_games += ranks[b][c].wins + ranks[b][c].losses;
+			}
+			if (individual_iMMR > 0) {
+				++total_users;
+				total_iMMR += individual_iMMR / individual_games;
 			}
 		}
-		return total_games === 0 ? 0 : total_iMMR / total_games;
+		return total_users === 0 ? 0 : total_iMMR / total_users;
 	}
 	copy(obj) {//no functions
 		return JSON.parse(JSON.stringify(obj));
