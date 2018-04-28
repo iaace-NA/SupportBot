@@ -132,8 +132,6 @@ module.exports = class EmbedGenerator {
 	}
 	match(CONFIG, summoner, match_meta, matches) {//should show 5 most recent games
 		let newEmbed = new Discord.RichEmbed();
-
-		newEmbed.setTitle("Recent Games");
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 		let common_teammates = {};
 		/*{
