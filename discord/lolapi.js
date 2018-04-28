@@ -130,6 +130,7 @@ module.exports = class LOLAPI {
 		return this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage);
 	}
 	getSummonerFromSummonerID(region, id, maxage) {
+		if (id === null) return new Promise((resolve, reject) => { resolve({}); });
 		return this.get(region, "summoner/v3/summoners/" + id, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_FROM_SUMMONER_ID, maxage);
 	}
 	getMultipleSummonerFromSummonerID(region, ids, maxage) {
