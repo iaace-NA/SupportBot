@@ -1,4 +1,4 @@
-# SupportBot v1.2.1
+# SupportBot v1.2.2
 League of Legends Statistics for Discord
 
 <a href="https://discord.gg/MTqDXvB" target="_blank" rel="noopener"><img src="https://discordapp.com/api/guilds/384552678161645568/embed.png" alt="current users" /></a>
