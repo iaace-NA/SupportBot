@@ -93,8 +93,13 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "shortcuts", CONFIG.DISCORD_COMMAND_PREFIX + "shortcut"], false, false, (original, index) => {
 			lolapi.getShortcuts(msg.author.id).then(result => {
-				reply(textgenerator.shortcuts(result) + "To add a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "setshortcut $<shortcut name> <username>`\nTo remove a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "removeshortcut $<shortcut name>`");
+				reply(textgenerator.shortcuts(CONFIG, result));
 			}).catch(console.error);
+		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "removeallshortcuts"], false, false, (original, index) => {
+			lolapi.removeAllShortcuts(msg.author.id).then(result => {
+				
+			}).catch();
 		});
 		command(["http://"], true, false, (original, index, parameter) => {
 			const region = assert_region(parameter.substring(0, parameter.indexOf(".")), false);

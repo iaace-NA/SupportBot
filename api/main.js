@@ -145,6 +145,30 @@ function ready() {
 			}
 		});
 	});
+	serveWebRequest("/removeallshortcuts/:uid", function(req, res, next) {
+		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
+			if (err) {
+				console.error(err);
+				return res.status(500).end();
+			}
+			if (UTILS.exists(doc)) {
+				doc.shortcuts = {};
+				doc.markModified("shortcuts");
+				doc.save(e => {
+					if (e) {
+						console.error(e);
+						return res.status(500).end();
+					}
+					else {
+						res.json({ success: true });
+					}
+				});
+			}
+			else {
+				res.json({ success: true });
+			}
+		});
+	});
 	serveWebRequest("/getshortcut/:uid", function(req, res, next) {
 		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
 			if (err) {

@@ -8,10 +8,10 @@ module.exports = class TextGenerator {
 	internal_ping(times) {
 		return "Time to internal api: " + (times.received - times.started) + " ms. Time to return: " + (times.ended - times.received) + " ms.";
 	}
-	shortcuts(obj) {
+	shortcuts(CONFIG, obj) {
 		if (!UTILS.exists(obj.shortcuts) || Object.keys(obj.shortcuts).length == 0) return "";
 		let answer = "```";
 		for (let b in obj.shortcuts) answer += "\n$" + b + " -> " + obj.shortcuts[b];
-		return answer + "```";
+		return answer + "```To add a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "setshortcut $<shortcut name> <username>`\nTo remove a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "removeshortcut $<shortcut name>`";
 	}
 }

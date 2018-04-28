@@ -298,6 +298,9 @@ module.exports = class LOLAPI {
 	removeShortcut(uid, from) {
 		return this.getIAPI("removeshortcut/" + uid, { from });
 	}
+	removeAllShortcuts(uid) {
+		return this.getIAPI("removeallshortcuts/" + uid);
+	}
 	getShortcut(uid, from) {
 		return this.getIAPI("getshortcut/" + uid, { from });
 	}
