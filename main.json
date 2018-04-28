@@ -3,11 +3,15 @@
 		{
 			"name": "main",
 			"script": "./discord/main.js",
+			"cwd": "./discord/",
 			"watch": false,
 			"min_uptime": 3000,
 			"max_restarts": 15,
 			"restart_delay": 2500,
 			"env": {
+				"NODE_ENV": "development"
+			},
+			"env_production": {
 				"NODE_ENV": "production"
 			},
 			"node_args": "--trace-deprecation"
@@ -15,11 +19,15 @@
 		{
 			"name": "api",
 			"script": "./api/main.js",
+			"cwd": "./api/",
 			"watch": false,
 			"min_uptime": 3000,
 			"max_restarts": 15,
 			"restart_delay": 2500,
 			"env": {
+				"NODE_ENV": "development"
+			},
+			"env_production": {
 				"NODE_ENV": "production"
 			},
 			"node_args": "--trace-deprecation"
