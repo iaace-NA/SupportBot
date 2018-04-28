@@ -90,6 +90,9 @@ function ready() {
 				return res.status(500).end();
 			}
 			if (UTILS.exists(doc)) {
+				let shortcut_count = 0;
+				for (let b in doc.shortcuts) ++shortcut_count;
+				if (shortcut_count >= 50) return res.json({ success: false });
 				doc.shortcuts[req.query.from] = req.query.to;
 				doc.markModified("shortcuts");
 				doc.save(e => {

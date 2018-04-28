@@ -81,6 +81,7 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 			if (to.length === 0) return reply(":x: The username was not specified. Please try again.");
 			lolapi.createShortcut(msg.author.id, from, to).then(result => {
 				if (result.success) reply(":white_check_mark: `$" + from + "` will now point to `" + to + "`.");
+				else reply(":x: You can only have up to 50 shortcuts. Please remove some and try again.");
 			}).catch(console.error);
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "removeshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "rs ", CONFIG.DISCORD_COMMAND_PREFIX + "deleteshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "ds "], true, false, (original, index, parameter) => {
