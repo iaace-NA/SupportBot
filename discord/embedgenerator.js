@@ -454,7 +454,7 @@ module.exports = class EmbedGenerator {
 				team_description += " " + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3;
 				team_description += " `M" + teams[b][c].mastery + "`";
 				team_description += CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
-				team_description += summoner_participants.find(p => { return p.id == teams[b][c].summonerId; }).summonerLevel + ": ";
+				team_description += "`" + summoner_participants.find(p => { return p.id == teams[b][c].summonerId; }).summonerLevel + "`: ";
 				team_description += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
 				team_description += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
 				team_description += "__[" + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
