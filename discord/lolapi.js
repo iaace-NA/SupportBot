@@ -1,79 +1,107 @@
 "use strict";
 const UTILS = new (require("../utils.js"))();
 const fs = require("fs");
+const REQUEST = require("request");
 module.exports = class LOLAPI {
-	constructor(INIT_CONFIG) {
+	constructor(INIT_CONFIG, MODE, request_id) {
 		this.CONFIG = INIT_CONFIG;
+		this.request_id = request_id;
 		if (!UTILS.exists(this.CONFIG)) {
 			throw new Error("config.json required to access riot api.");
 		}
 		else if (!UTILS.exists(this.CONFIG.RIOT_API_KEY) || this.CONFIG.RIOT_API_KEY === "") {
 			throw new Error("config.json RIOT_API_KEY required to access riot api.");
 		}
-		this.request = require("request");
+		this.request = REQUEST;
 		this.cache = {};
-	}
-	addCache(url, data) {//add data to api cache
-		this.cache[url] = {
-			data: data,
-			expiration: new Date().getTime() + 120000 //2 min cache expiration time (based on API key limit)
-		}
-		this.maintainCache();
-	}
-	checkCache(url) {//return the data if it exists, otherwise return false
-		this.maintainCache();
-		if (!UTILS.exists(this.cache[url])) {//cache miss
-			return false;
+		if (MODE == "DEVELOPMENT") {
+			this.address = this.CONFIG.API_ADDRESS_DEVELOPMENT;
+			this.port = this.CONFIG.API_PORT_DEVELOPMENT;
 		}
 		else {
-			return this.cache[url].data;
+			this.address = this.CONFIG.API_ADDRESS_PRODUCTION;
+			this.port = this.CONFIG.API_PORT_PRODUCTION;
 		}
 	}
-	maintainCache() {//prune old values
-		const now = new Date().getTime();
-		for (let b in this.cache) {
-			if (this.cache[b].expiration < now) {
-				delete this.cache[b];
-			}
-		}
+	ping() {
+		return new Promise((resolve, reject) => {
+			const now = new Date().getTime();
+			let url = this.address + ":" + this.port + "/ping";
+			this.request(url, function (error, response, body) {
+				if (UTILS.exists(error)) {
+					reject(error);
+				}
+				else {
+					try {
+						const answer = JSON.parse(body);
+						UTILS.output("cache miss: " + url);
+						answer.started = now;
+						answer.ended = new Date().getTime();
+						resolve(answer);
+					}
+					catch (e) {
+						reject(e);
+					}
+				}
+			});
+		});
 	}
-	cacheSize() {//check size of cache
-		let size = 0;
-		for (let b in this.cache) ++size;
-		return size;
-	}
-	get(region, path, options) {
+	get(region, path, options, cachetime, maxage) {
 		let that = this;
 		return new Promise((resolve, reject) => {
 			UTILS.assert(UTILS.exists(region));
-			let url = "https://" + region + ".api.riotgames.com/lol/" + path + "?api_key=" + this.CONFIG.RIOT_API_KEY;
+			UTILS.assert(UTILS.exists(cachetime));
+			UTILS.assert(UTILS.exists(maxage));
+			let url = "https://" + region + ".api.riotgames.com/lol/" + path + "?api_key=";
 			for (let i in options) {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
-			let cache_answer = this.checkCache(url);//access cache
-			if (cache_answer === false) {
-				this.request(url, function (error, response, body) {
-					if (error != undefined && error != null) {
-						reject(error);
+			//UTILS.output("IAPI req sent: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
+			this.request(this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/?url=" + encodeURIComponent(url), (error, response, body) => {
+				if (UTILS.exists(error)) {
+					reject(error);
+				}
+				else {
+					try {
+						const answer = JSON.parse(body);
+						if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
+						resolve(answer);
 					}
-					else {
-						try {
-							const answer = JSON.parse(body);
-							if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
-							else UTILS.output("cache miss: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
-							that.addCache(url, answer);
-							resolve(answer);
-						}
-						catch (e) {
-							reject(e);
-						}
+					catch (e) {
+						reject(e);
 					}
-				});
+				}
+			});
+		});
+	}
+	getIAPI(path, options) {//get internal API
+		let that = this;
+		return new Promise((resolve, reject) => {
+			let url = this.address + ":" + this.port + "/" + path;
+			let paramcount = 0;
+			for (let i in options) {
+				if (paramcount == 0) url += "?" + i + "=" + encodeURIComponent(options[i]);
+				else url += "&" + i + "=" + encodeURIComponent(options[i]);
+				++paramcount;
 			}
-			else {
-				UTILS.output("cache hit: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
-				resolve(cache_answer);
-			}
+			this.request(url, (error, response, body) => {
+				if (UTILS.exists(error)) {
+					reject(error);
+				}
+				else if (response.statusCode !== 200) {
+					reject(response.statusCode);
+				}
+				else {
+					try {
+						const answer = JSON.parse(body);
+						UTILS.output("IAPI req: " + url);
+						resolve(answer);
+					}
+					catch (e) {
+						reject(e);
+					}
+				}
+			});
 		});
 	}
 	getStatic(path) {//data dragon
@@ -98,19 +126,49 @@ module.exports = class LOLAPI {
 		});
 	}
 	//get(path, options) {}
-	getSummonerIDFromName(region, username) {
-		return this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {});
+	getSummonerIDFromName(region, username, maxage) {
+		return this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage);
 	}
-	getRanks(region, summonerID) {
-		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {});
+	getSummonerFromSummonerID(region, id, maxage) {
+		if (id === null) return new Promise((resolve, reject) => { resolve({}); });
+		return this.get(region, "summoner/v3/summoners/" + id, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_FROM_SUMMONER_ID, maxage);
 	}
-	getChampionMastery(region, summonerID) {
-		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, {});
+	getMultipleSummonerFromSummonerID(region, ids, maxage) {
+		let that = this;
+		let requests = [];
+		if (this.CONFIG.API_SEQUENTIAL) {
+			for (let i in ids) requests.push(function () { return that.getSummonerFromSummonerID(region, ids[i], maxage); });
+			return UTILS.sequential(requests);
+		}
+		else {
+			for (let i in ids) requests.push(that.getSummonerFromSummonerID(region, ids[i], maxage));
+			return Promise.all(requests);
+		}
+	}
+	getRanks(region, summonerID, maxage) {
+		if (summonerID === null) return new Promise((resolve, reject) => { resolve([]); });
+		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_RANKS, maxage);
+	}
+	getMultipleRanks(region, summonerIDs, maxage) {
+		let that = this;
+		let requests = [];
+		for (let i in summonerIDs) requests.push(that.getRanks(region, summonerIDs[i], maxage));
+		return Promise.all(requests);
+	}
+	getChampionMastery(region, summonerID, maxage) {
+		if (summonerID === null) return new Promise((resolve, reject) => { resolve([]); });
+		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_CHAMPION_MASTERY, maxage);
+	}
+	getMultipleChampionMastery(region, summonerIDs, maxage) {
+		let that = this;
+		let requests = [];
+		for (let i in summonerIDs) requests.push(that.getChampionMastery(region, summonerIDs[i], maxage));
+		return Promise.all(requests);
 	}
 	getStaticChampions(region) {
 		let that = this;
 		return new Promise((resolve, reject) => {
-			const path = "./data/static-api-cache/champions" + region + ".json";
+			const path = "../data/static-api-cache/champions" + region + ".json";
 			const exists = fs.existsSync(path);
 			if ((exists && fs.statSync(path).mtime.getTime() < new Date().getTime() - (6 * 3600 * 1000)) ||
 				!exists) {//expired
@@ -130,7 +188,7 @@ module.exports = class LOLAPI {
 				});
 			}
 			function refresh() {
-				that.get(region, "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" }).then((result) => {
+				that.get(region, "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" }, 0, 0).then((result) => {
 					fs.writeFile(path, JSON.stringify(result), err => {
 						UTILS.output("Cached version of " + region + " champions.json is expired or non-existant.");
 						if (err) throw err;
@@ -143,7 +201,7 @@ module.exports = class LOLAPI {
 	getStaticSummonerSpells(region) {
 		let that = this;
 		return new Promise((resolve, reject) => {
-			const path = "./data/static-api-cache/spells" + region + ".json";
+			const path = "../data/static-api-cache/spells" + region + ".json";
 			const exists = fs.existsSync(path);
 			if ((exists && fs.statSync(path).mtime.getTime() < new Date().getTime() - (6 * 3600 * 1000)) ||
 				!exists) {//expired
@@ -163,7 +221,7 @@ module.exports = class LOLAPI {
 				});
 			}
 			function refresh() {
-				that.get(region, "static-data/v3/summoner-spells", { locale: "en_US", dataById: true, spellListData: "all", tags: "all" }).then((result) => {
+				that.get(region, "static-data/v3/summoner-spells", { locale: "en_US", dataById: true, spellListData: "all", tags: "all" }, 0, 0).then((result) => {
 					fs.writeFile(path, JSON.stringify(result), err => {
 						UTILS.output("Cached version of " + region + " spells.json is expired or non-existant.");
 						if (err) throw err;
@@ -173,30 +231,84 @@ module.exports = class LOLAPI {
 			}
 		});
 	}
-	getRecentGames(region, accountID) {
-		return this.get(region, "match/v3/matchlists/by-account/" + accountID + "/recent", {});
+	getRecentGames(region, accountID, maxage) {
+		return this.get(region, "match/v3/matchlists/by-account/" + accountID, { endIndex: 20 }, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage);
 	}
-	getMatchInformation(region, gameID) {
-		return this.get(region, "match/v3/matches/" + gameID, {});
-	}
-	getMultipleMatchInformation(region, gameIDs) {
+	getMultipleRecentGames(region, accountIDs, maxage) {
+		let that = this;
 		let requests = [];
-		for (let i in gameIDs) requests.push(this.getMatchInformation(region, gameIDs[i]));
-		return Promise.all(requests);
+		if (this.CONFIG.API_SEQUENTIAL) {
+			for (let i in accountIDs) requests.push(function () { return that.getRecentGames(region, accountIDs[i], maxage); });
+			return UTILS.sequential(requests);
+		}
+		else {
+			for (let i in accountIDs) requests.push(that.getRecentGames(region, accountIDs[i], maxage));
+			return Promise.all(requests);
+		}
 	}
-	getLiveMatch(region, summonerID) {
-		return this.get(region, "spectator/v3/active-games/by-summoner/" + summonerID, {});
+	getMatchInformation(region, gameID, maxage) {
+		return this.get(region, "match/v3/matches/" + gameID, {}, this.CONFIG.API_CACHETIME.GET_MATCH_INFORMATION, maxage);
 	}
-	getMMR(region, summonerID) {
-		return this.get(region, "league/v3/mmr-af/by-summoner/" + summonerID, {});
+	getMultipleMatchInformation(region, gameIDs, maxage) {
+		let that = this;
+		let requests = [];
+		if (this.CONFIG.API_SEQUENTIAL) {
+			for (let i in gameIDs) requests.push(function () { return that.getMatchInformation(region, gameIDs[i], maxage); });
+			return UTILS.sequential(requests);
+		}
+		else {
+			for (let i in gameIDs) requests.push(that.getMatchInformation(region, gameIDs[i], maxage));
+			return Promise.all(requests);
+		}
 	}
-	getStatus(region) {
-		return this.get(region, "status/v3/shard-data", {});
+	getLiveMatch(region, summonerID, maxage) {
+		return this.get(region, "spectator/v3/active-games/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_LIVE_MATCH, maxage);
+	}
+	getMMR(region, summonerID, maxage) {
+		return this.get(region, "league/v3/mmr-af/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_MMR, maxage);
+	}
+	getStatus(region, maxage) {
+		return this.get(region, "status/v3/shard-data", {}, this.CONFIG.API_CACHETIME.GET_STATUS, maxage);
+	}
+	getSummonerCard(region, username) {
+		const that = this;
+		return new Promise((resolve, reject) => {
+			that.getSummonerIDFromName(region, username, this.CONFIG.API_MAXAGE.SUMMONER_CARD.SUMMONER_ID).then(result => {
+				result.region = region;
+				result.guess = username;
+				if (!UTILS.exists(result.id)) reject();
+				that.getRanks(region, result.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RANKS).then(result2 => {
+					that.getChampionMastery(region, result.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHAMPION_MASTERY).then(result3 => {
+						that.getLiveMatch(region, result.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.LIVE_MATCH).then(result4 => {
+							resolve([result, result2, result3, result4]);
+						}).catch(reject);
+					}).catch(reject);
+				}).catch(reject);
+			}).catch(reject);
+		});
 	}
 	clearCache() {
 		const filenames = fs.readdirSync("./data/static-api-cache/");
 		for (let b in filenames) {
 			fs.unlinkSync("./data/static-api-cache/" + filenames[b]);
 		}
+	}
+	createShortcut(uid, from, to) {
+		return this.getIAPI("createshortcut/" + uid, { from, to });
+	}
+	removeShortcut(uid, from) {
+		return this.getIAPI("removeshortcut/" + uid, { from });
+	}
+	removeAllShortcuts(uid) {
+		return this.getIAPI("removeallshortcuts/" + uid);
+	}
+	getShortcut(uid, from) {
+		return this.getIAPI("getshortcut/" + uid, { from });
+	}
+	getShortcuts(uid) {
+		return this.getIAPI("getshortcuts/" + uid, {});
+	}
+	terminate() {
+		this.request(this.address + ":" + this.port + "/terminate_request/" + this.request_id + "/", (error, response, body) => {});
 	}
 }

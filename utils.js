@@ -1,19 +1,24 @@
 "use strict";
 let ta = require("./timeago.js");
+let seq = require("./promise-sequential.js");
 String.prototype.replaceAll = function(search, replacement) {
-	var target = this;
+	let target = this;
 	return target.replace(new RegExp(search, 'g'), replacement);
 };
+Number.prototype.pad = function(size) {
+	let s = String(this);
+	while (s.length < (size || 2)) {s = "0" + s;}
+	return s;
+}
 module.exports = class UTILS {
 	output(t) {//general utility function
 		if (this.exists(t)) {
-			let d = new Date();
-			let n = d.toUTCString();
-			console.log(n + " : " + t);
+			let n = new Date().toISOString().slice(0, 19).replace('T', ' ');;
+			console.log(n + "." + new Date().getMilliseconds().pad(3) + " : " + t);
 		}
 	}
 	exists(anyObject) {//general utility function
-		if (anyObject != null && anyObject != undefined) return true;
+		if (anyObject !== null && anyObject !== undefined) return true;
 		else return false;
 	}
 	numberWithCommas(x) {//general utility function
@@ -24,7 +29,7 @@ module.exports = class UTILS {
 		}
 		else return "";
 	}
-	round(num, decimal) {
+	round(num, decimal = 0) {
 		return Math.round(num * Math.pow(10, decimal)) / Math.pow(10, decimal);
 	}
 	assert(condition) {
@@ -39,6 +44,9 @@ module.exports = class UTILS {
 		const participantID = match.participantIdentities.find(pI => { return pI.player.summonerId == summonerID; }).participantId;
 		const stats = match.participants.find(p => { return p.participantId == participantID; });
 		return stats;
+	}
+	findParticipantIdentityFromPID(match, pid) {
+		return match.participantIdentities.find(pI => { return pI.participantId == pid; });
 	}
 	stats(summonerID, match) {
 		return this.teamParticipant(summonerID, match).stats;
@@ -107,5 +115,144 @@ module.exports = class UTILS {
 			if (this.exists(candidate)) return candidate;
 		}
 		return collection.find(ch => { if (ch.type === type && ch.permissionsFor(client.user).has(permissions)) return true; });
+	}
+	trim(network) {
+		let count = 0;
+		for (let a in network) for (let b in network[a]) if (network[a][b] < 2) { delete network[a][b]; ++count; }
+		return count;
+	}
+	getGroup(candidate, graph, visited = {}) {//traverse graph
+		//this.output("candidate: " + candidate);
+		for (let b in graph[candidate]) {
+			if (!this.exists(visited[b])) {
+				visited[b] = true;
+				this.getGroup(b, graph, visited);
+			}
+		}
+		let answer = [];
+		for (let b in visited) answer.push(b);
+		answer.sort();
+		return answer;
+	}
+	sequential(tasks) {
+		return seq(tasks);
+	}
+	inferLane(role, lane, spell1Id, spell2Id) {//top=1, jungle=2, mid=3, support=4, bot=5
+		if (spell1Id == 11 || spell2Id == 11 || lane == "JUNGLE") return 2;
+		else if (lane == "BOTTOM") {
+			if (role == "DUO_SUPPORT") return 4;
+			else return 5;
+		}
+		else if (lane == "TOP") return 1;
+		else if (lane == "MIDDLE" || lane == "MID") return 3;
+		else return 0;
+	}
+	opgg(region, username) {
+		return "http://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
+	}
+	opggShort(base, region, username) {
+		return base.replace("%region%", region).replace("%username%", encodeURIComponent(username));
+	}
+	shortRank(info) {
+		//****** unranked
+		//██████ unranked
+		//G W--- Gold promotion, 1 win
+		//G2 +00 Gold 2, 0 LP
+		//G2 +56 Gold 2, 56LP
+		//G2P L_ Gold 2 promotion, 1 loss
+		//C +256 Challenger, 256LP
+		//C+1256 Challenger 1256 LP
+		if (!this.exists(info)) return "******";
+		let answer = "";
+		answer += info.tier[0];
+		if (this.exists(info.miniSeries)) {//series
+			if (info.miniSeries.progress.length == 5) {//BO5
+				answer += " " + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
+			}
+			else {//BO3
+				answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank] + "P " + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
+			}
+		}
+		else {//no series
+			let LP = info.leaguePoints;
+			if (info.tier[0] == "C" || info.tier[0] == "M") {//challenger or master (unlimited LP)
+				if (LP < 0) answer += "  -";
+				else if (LP < 100) answer += "  +";
+				else if (LP < 1000) answer += " +";
+				else answer += "+";
+			}
+			else {
+				answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank];
+				if (LP < 0) answer += " -";
+				else if (LP < 100) answer += " +";
+				else answer += "+";
+			}
+			LP = Math.abs(LP);
+			if (LP >= 10) answer += LP;
+			else answer += "0" + LP;
+		}
+		return answer;
+	}
+	getSingleChampionMastery(all, singleID) {
+		return this.exists(all.find(cmi => { return cmi.championId == singleID; })) ? all.find(cmi => { return cmi.championId == singleID; }).championLevel : 0;
+	}
+	KDAFormat(num) {
+		if (isNaN(num) || num == Infinity) return "Perfect";
+		else return this.round(num, 2);
+	}
+	iMMR(rank) {//internal MMR Representation
+		/*
+		Bronze 5, 0LP: 100
+		Bronze 4, 0LP: 200
+		Bronze 3, 0LP: 300
+		Bronze 2, 0LP: 400
+		Bronze 1, 0LP: 500
+		Silver 5, 0LP: 600
+		Gold 5, 0LP: 1100
+		Platinum 5, 0LP: 1600
+		Diamond 5, 0LP: 2100
+		Master, 0LP: 2600
+		Challenger, 1000LP: 2800
+		*/
+		let answer = { BRONZE: 100, SILVER: 600, GOLD: 1100, PLATINUM: 1600, DIAMOND: 2100, MASTER: 2600, CHALLENGER: 2600 }[rank.tier];
+		if (answer != 2600) {
+			answer += { V: 0, IV: 100, III: 200, II: 300, I: 400 }[rank.rank];
+			answer += rank.leaguePoints;
+		}
+		else answer += rank.leaguePoints / 5;//magic number constant: 500 LP = 1 iMMR div
+		return answer;
+	}
+	iMMRtoEnglish(mmr) {
+		if (mmr < 100) mmr = 100;
+		let answer = "";
+		if (mmr < 600) answer += "BRONZE ";
+		else if (mmr < 1100) answer += "SILVER ";
+		else if (mmr < 1600) answer += "GOLD ";
+		else if (mmr < 2100) answer += "PLATINUM ";
+		else if (mmr < 2600) answer += "DIAMOND ";
+		else answer += "MASTER/CHALLENGER ";
+		if (mmr < 2600) answer += ["V", "IV", "III", "II", "I"][Math.floor(((mmr - 100) % 500) / 100)] + " " + this.round(mmr % 100) + "LP";
+		else answer += this.round((mmr - 2600) * 5) + "LP";
+		return answer;
+	}
+	averageMatchMMR(ranks) {
+		let total_iMMR = 0;
+		let total_users = 0;
+		for (let b in ranks) {
+			let individual_iMMR = 0;
+			let individual_games = 0;
+			for (let c in ranks[b]) {
+				individual_iMMR += this.iMMR(ranks[b][c]) * (ranks[b][c].wins + ranks[b][c].losses);
+				individual_games += ranks[b][c].wins + ranks[b][c].losses;
+			}
+			if (individual_iMMR > 0) {
+				++total_users;
+				total_iMMR += individual_iMMR / individual_games;
+			}
+		}
+		return total_users === 0 ? 0 : total_iMMR / total_users;
+	}
+	copy(obj) {//no functions
+		return JSON.parse(JSON.stringify(obj));
 	}
 }

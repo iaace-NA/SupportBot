@@ -2,25 +2,25 @@
 const start_time = new Date().getTime();
 const fs = require("fs");
 const Discord = require("discord.js");
-let discordcommands = require("./discord/discordcommands.js");
+let discordcommands = require("./discordcommands.js");
 
-const UTILS = new (require("./utils.js"))();
+const UTILS = new (require("../utils.js"))();
 
 const client = new Discord.Client({ disabledEvents: ["TYPING_START"] });
 
 let CONFIG;
 try {
-	CONFIG = JSON.parse(fs.readFileSync("./config.json", "utf-8"));
-	CONFIG.VERSION = "v1.1.2";//b for non-release (in development)
+	CONFIG = JSON.parse(fs.readFileSync("../config.json", "utf-8"));
+	CONFIG.VERSION = "v1.2.0";//b for non-release (in development)
 }
 catch (e) {
 	console.log("something's wrong with config.json");
 	console.error(e);
 	process.exit(1);
 }
-const DB = new (require("./discord/dbmanager.js"))(CONFIG);
-const LOLAPI = new (require("./discord/lolapi.js"))(CONFIG);
-let mode = "N/A";
+let mode = process.argv.length === 2 ? "PRODUCTION:warning:" : "DEVELOPMENT";
+const DB = new (require("./dbmanager.js"))(CONFIG);
+const LOLAPI = new (require("./lolapi.js"))(CONFIG, mode, 0);
 LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 	UTILS.output("DD STATIC RESOURCES LOADED");
 	CONFIG.STATIC = result;
@@ -32,31 +32,39 @@ LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 			CONFIG.STATIC.SUMMONERSPELLS = result.data;
 			UTILS.output("API STATIC RESOURCES LOADED");
 			if (process.argv.length === 2) {//production key
-				mode = "PRODUCTION:warning:";
 				UTILS.output("PRODUCTION LOGIN");
 				client.login(CONFIG.DISCORD_API_KEY_PRODUCTION).catch(console.error);
 			}
 			else {//non-production key
-				mode = "DEVELOPMENT"
 				UTILS.output("DEVELOPMENT LOGIN");
 				client.login(CONFIG.DISCORD_API_KEY_DEVELOPMENT).catch(console.error);
 			}
 		});
 	}).catch(e => { throw e; });
 }).catch(e => { throw e; });
-
+let initial_start = true;
 client.on("ready", function () {
-	UTILS.output("discord user login success");
+	if (initial_start) UTILS.output("discord user login success");
+	else UTILS.output("discord reconnected");
 	client.user.setStatus("online").catch(console.error);
 	client.user.setActivity("League of Legends").catch(console.error);
-	client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Bot started in " + UTILS.round((new Date().getTime() - start_time) / 1000, 0) + "s: version: " + CONFIG.VERSION + " mode: " + mode + " servers: " + client.guilds.size);
+	if (initial_start) client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Bot started in " + UTILS.round((new Date().getTime() - start_time) / 1000, 0) + "s: version: " + CONFIG.VERSION + " mode: " + mode + " servers: " + client.guilds.size);
+	else client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Bot reconnected");
+	let all_emojis = [];
+	for (let i in CONFIG.CHAMP_EMOJI_SERVERS) all_emojis = all_emojis.concat(client.guilds.get(CONFIG.CHAMP_EMOJI_SERVERS[i]).emojis.array());
+	for (let b in CONFIG.STATIC.CHAMPIONS) {
+		const candidate = all_emojis.find(e => { return CONFIG.STATIC.CHAMPIONS[b].key.toLowerCase() == e.name.toLowerCase(); });
+		CONFIG.STATIC.CHAMPIONS[b].emoji = UTILS.exists(candidate) ? candidate.toString() : CONFIG.STATIC.CHAMPIONS[b].name;
+	}
+	UTILS.output("collected champion emojis");
+	initial_start = false;
 });
 client.on("disconnect", function () {
 	UTILS.output("discord disconnected");
 });
 client.on("message", function (msg) {
 	try {
-		discordcommands(CONFIG, client, LOLAPI, msg, DB);
+		discordcommands(CONFIG, client, mode, msg, DB);
 	}
 	catch (e) {
 		console.error(e);

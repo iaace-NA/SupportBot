@@ -1,17 +1,16 @@
 {
   "name": "supportbot",
-  "version": "1.0.0",
+  "version": "v1.2.0",
   "description": "",
-  "main": "main.js",
+  "main": "./main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "UNLICENSED",
+  "author": "iaace",
+  "license": "MIT",
   "dependencies": {
     "discord.js": "^11.3.2",
-    "erlpack": "github:discordapp/erlpack",
-    "mongoose": "^5.0.0-rc1",
+    "mongoose": "^5.0.14",
     "request": "^2.83.0",
     "uws": "^9.14.0",
     "zlib-sync": "^0.1.4"
