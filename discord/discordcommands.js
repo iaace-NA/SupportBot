@@ -98,8 +98,8 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "removeallshortcuts"], false, false, (original, index) => {
 			lolapi.removeAllShortcuts(msg.author.id).then(result => {
-				
-			}).catch();
+				reply(":white_check_mark: All shortcuts were removed.")
+			}).catch(console.error);
 		});
 		command(["http://"], true, false, (original, index, parameter) => {
 			const region = assert_region(parameter.substring(0, parameter.indexOf(".")), false);

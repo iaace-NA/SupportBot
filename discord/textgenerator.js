@@ -12,6 +12,6 @@ module.exports = class TextGenerator {
 		if (!UTILS.exists(obj.shortcuts) || Object.keys(obj.shortcuts).length == 0) return "";
 		let answer = "```";
 		for (let b in obj.shortcuts) answer += "\n$" + b + " -> " + obj.shortcuts[b];
-		return answer + "```To add a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "setshortcut $<shortcut name> <username>`\nTo remove a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "removeshortcut $<shortcut name>`";
+		return answer + "```To add a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "setshortcut $<shortcut name> <username>`\nTo remove a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "removeshortcut $<shortcut name>`\nTo remove all shortcuts: `" + CONFIG.DISCORD_COMMAND_PREFIX + "removeallshortcuts`";
 	}
 }
