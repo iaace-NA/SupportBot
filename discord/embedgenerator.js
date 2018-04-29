@@ -369,8 +369,9 @@ module.exports = class EmbedGenerator {
 		const avg_iMMR = UTILS.averageMatchMMR(ranks);
 		UTILS.output("average iMMR is " + UTILS.round(avg_iMMR) + " or " + UTILS.iMMRtoEnglish(avg_iMMR));
 		for (let i = 0; i < IMMR_THRESHOLD.length; ++i) if (avg_iMMR >= IMMR_THRESHOLD[i]) newEmbed.setColor(RANK_COLOR[i]);
-		if (match.gameStartTime != 0) newEmbed.setTitle(queues[match.gameQueueConfigId] + " `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
-		else newEmbed.setTitle(queues[match.gameQueueConfigId] + " `GAME LOADING`");
+		const game_type = match.gameType == "CUSTOM_GAME" ? "Custom" : queues[match.gameQueueConfigId];
+		if (match.gameStartTime != 0) newEmbed.setTitle(game_type + " `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
+		else newEmbed.setTitle(game_type + " `GAME LOADING`");
 		let common_teammates = {};
 		/*{
 			"username1": {
