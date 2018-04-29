@@ -200,6 +200,10 @@ module.exports = class UTILS {
 		if (isNaN(num) || num == Infinity) return "Perfect";
 		else return this.round(num, 2);
 	}
+	KPFormat(num) {
+		if (isNaN(num)) return 0;
+		else return this.round(num, 0);
+	}
 	iMMR(rank) {//internal MMR Representation
 		/*
 		Bronze 5, 0LP: 100
