@@ -73,8 +73,8 @@ function ready() {
 		});
 	});
 	serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
-		for (let b in irs) if (new Date().getTime - irs[b][5] > 1000 * 60 * 10) delete irs[b];
-		if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();
+		for (let b in irs) if (new Date().getTime - irs[b][5] > 1000 * 60 * 10) delete irs[b];//cleanup old requests
+		if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();//doesn't exist
 		let description = [];
 		for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[req.params.request_id][i] + "): " + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%");
 		description = description.join(", ");
@@ -279,7 +279,7 @@ function checkCache(url, maxage, request_id) {
 				if (UTILS.exists(maxage) && apicache.Types.ObjectId(doc.id).getTimestamp().getTime() < new Date().getTime() - (maxage * 1000)) {//if expired
 					//UTILS.output("\tmaxage expired url: " + url);
 					load_average[3].add();
-					++irs[request_id][3];
+					if (UTILS.exists(irs[request_id])) ++irs[request_id][3];
 					doc.remove(() => {});
 					reject(null);
 				}
@@ -287,7 +287,7 @@ function checkCache(url, maxage, request_id) {
 			}
 			else {
 				load_average[4].add();
-				++irs[request_id][4];
+				if (UTILS.exists(irs[request_id])) ++irs[request_id][4];
 				reject(null);
 			}
 		});
@@ -309,7 +309,7 @@ function get(region, url, cachetime, maxage, request_id) {
 			checkCache(url, maxage, request_id).then((cached_result) => {
 				//UTILS.output("\tcache hit: " + url);
 				load_average[2].add();
-				++irs[request_id][2];
+				if (UTILS.exists(irs[request_id])) ++irs[request_id][2];
 				resolve(JSON.parse(cached_result));
 			}).catch((e) => {
 				if (UTILS.exists(e)) console.error(e);
@@ -342,7 +342,7 @@ function get(region, url, cachetime, maxage, request_id) {
 							const answer = JSON.parse(body);
 							//UTILS.output("\tuncached: " + url);
 							load_average[1].add();
-							++irs[request_id][1];
+							if (UTILS.exists(irs[request_id])) ++irs[request_id][1];
 							resolve(answer);
 						}
 						catch (e) {
