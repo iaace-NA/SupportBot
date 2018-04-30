@@ -5,9 +5,11 @@ module.exports = class Profiler {
 		this.events = [];
 		this.creation_time = new Date().getTime();
 	}
-	mark(event_name) {}
+	mark(event_name) {
+		this.events.push({ type: 0, start: new Date().getTime() });
+	}
 	begin(event_name) {
-
+		this.events.push({ type: 1, start: new Date().getTime() });
 	}
 	end(event_name) {
 		
