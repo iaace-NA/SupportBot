@@ -434,22 +434,19 @@ module.exports = class EmbedGenerator {
 		for (let b in teams) {//team
 			let team_description = "";
 			let ban_description = [];
-			let networks = [];
-			for (let c in teams[b]) networks.push(UTILS.getGroup(teams[b][c].summonerName, common_teammates));
-			let premade_str = networks.map(g => { return g.join(","); });
-			let premade_letter = {};
-			for (let c in premade_str){
-				if (!UTILS.exists(premade_letter[premade_str[c]])) {
-					premade_letter[premade_str[c]] = 1;
-				}
-				else premade_letter[premade_str[c]] += 1;
+			let networks = teams[b].map(t => { return UTILS.getGroup(t.summonerName, common_teammates); });//for everyone on the team, put the premade group in the network array
+			let premade_str = networks.map(g => { return g.join(","); });//array of comma delimited network strings
+			let premade_letter = {};//object of network strings
+			for (let c in premade_str) {
+				if (!UTILS.exists(premade_letter[premade_str[c]])) premade_letter[premade_str[c]] = 1;//if the network doesn't exist as a key in premade_letter, assign 1 to it
+				else ++premade_letter[premade_str[c]];//otherwise it exists, and add 1 to it
 			}
 			let premade_number = 1;
-			for (let c in premade_letter) {
-				if (premade_letter[c] == 1) premade_letter[c] = 0;
+			for (let c in premade_letter) {//for each unique network in premade_letter
+				if (premade_letter[c] == 1) premade_letter[c] = 0;//not a premade (group size 1)
 				else {
-					premade_letter[c] = premade_number;
-					premade_number++;
+					premade_letter[c] = premade_number;//assign a premade symbol index
+					premade_number++;//increment the index
 				}
 			}
 			for (let c in teams[b]) {//player on team
@@ -467,12 +464,7 @@ module.exports = class EmbedGenerator {
 				else team_description += "__[" + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
 				team_description += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
 				if (UTILS.exists(match.bannedChampions[player_count])) {
-					try {
-						ban_description.push(CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].emoji);
-					}
-					catch (e) {
-						UTILS.output("Champion lookup failed for champion id " + match.bannedChampions[player_count].championId);
-					}
+					ban_description.push(match.bannedChampions[player_count].championId == -1 ? ":x:" : CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].emoji);
 				}
 				team_description += "\n";
 				++player_count;
