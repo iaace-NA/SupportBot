@@ -58,6 +58,7 @@ module.exports = class LOLAPI {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
 			//UTILS.output("IAPI req sent: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
+			const request_id = that.request_id;
 			let encrypted_request = aes256.encrypt(this.CONFIG.API_KEY, JSON.stringify({ region, cachetime, maxage, request_id, url }));
 			this.request(this.address + ":" + this.port + "/lol/" + encodeURIComponent(encrypted_request), (error, response, body) => {
 				if (UTILS.exists(error)) {
