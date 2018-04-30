@@ -74,21 +74,11 @@ module.exports = class UTILS {
 		let hours = Math.floor(parseInt(mins) / 60);
 		mins = mins % 60;
 		let secs = Math.floor(parseInt(sec) % 60);
-		if (secs < 10) {
-			secs = "0" + secs;
-		}
-		if (mins < 10) {
-			mins = "0" + mins;
-		}
-		if (hours < 10) {
-			hours = "0" + hours
-		}
-		if (hours == "00") {
-			return mins + ":" + secs;
-		}
-		else {
-			return hours + ":" + mins + ":" + secs;
-		}
+		if (secs < 10) secs = "0" + secs;
+		if (mins < 10) mins = "0" + mins;
+		if (hours < 10) hours = "0" + hours;
+		if (hours == "00") return mins + ":" + secs;
+		else return hours + ":" + mins + ":" + secs;
 	}
 	gold(number) {
 		number /= 1000;
