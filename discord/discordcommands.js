@@ -4,13 +4,11 @@ let textgenerator = new (require("./textgenerator.js"))();
 let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
 let LOLAPI = require("./lolapi.js");
-let request_id = 1;
 module.exports = function (CONFIG, client, mode, msg, db) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 
-	++request_id;
 	const msg_receive_time = new Date().getTime();
-	let lolapi = new LOLAPI(CONFIG, mode, request_id);
+	let lolapi = new LOLAPI(CONFIG, mode, msg.id);
 	if ((UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) || !UTILS.exists(msg.guild)) {//respondable server message or PM
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {
 			reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
@@ -400,9 +398,9 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 		const basic = msg.id + "\ncontent: " + msg.content +
 			"\nauthor: " + msg.author.tag + " :: " + msg.author.id +
 			"\nchannel: " + msg.channel.name + " :: " + msg.channel.id;
-		if (UTILS.exists(msg.guild)) UTILS.output("received server message r#" + request_id + " :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
+		if (UTILS.exists(msg.guild)) UTILS.output("received server message :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
 		else {
-			UTILS.output("received PM/DM message r#" + request_id + " :: " + basic);
+			UTILS.output("received PM/DM message :: " + basic);
 		}
 	}
 	function assert_region(test_string, notify = true) {
