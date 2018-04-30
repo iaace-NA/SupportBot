@@ -16,8 +16,8 @@ let crypto = require("crypto");
 let https = require('https');
 let http = require('http');
 let LoadAverage = require("../loadaverage.js");
-//const aes256 = require("aes256");
-//let cipher = aes256.createCipher(fs.readFileSync("./aes256.key", "utf-8"));
+const aes256 = require("aes256");
+let cipher = aes256.createCipher(CONFIG.API_KEY);
 const response_type = ["Total", "Uncachable", "Cache hit", "Cache hit expired", "Cache miss"];
 const load_average = [new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60)];
 const express = require("express");
@@ -64,12 +64,19 @@ function ready() {
 		res.removeHeader("X-Powered-By");
 		return next();
 	});
-	serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, res, next) {
-		if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
-		++irs[req.params.request_id][0];
-		get(req.params.region, req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage), req.params.request_id).then(result => res.json(result)).catch(e => {
+	serveWebRequest("/lol/:encrypted_request", function (req, res, next) {
+		let decrypted_request;
+		try {
+			decrypted_request = JSON.parse(cipher.decrypt(req.params.encrypted_request));
+		}
+		catch(e) {
+			return res.status(403).end();
+		}
+		if (!UTILS.exists(irs[decrypted_request.request_id])) irs[decrypted_request.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
+		++irs[decrypted_request.request_id][0];
+		get(decrypted_request.region, decrypted_request.url, parseInt(decrypted_request.cachetime), parseInt(decrypted_request.maxage), decrypted_request.request_id).then(result => res.json(result)).catch(e => {
 			console.error(e);
-			res.status(500);
+			res.status(500).end();
 		});
 	});
 	serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
