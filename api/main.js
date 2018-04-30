@@ -68,6 +68,11 @@ function ready() {
 		let decrypted_request;
 		try {
 			decrypted_request = JSON.parse(cipher.decrypt(req.params.encrypted_request));
+			UTILS.assert(UTILS.exists(decrypted_request.request_id));
+			UTILS.assert(UTILS.exists(decrypted_request.url));
+			UTILS.assert(UTILS.exists(decrypted_request.cachetime));
+			UTILS.assert(UTILS.exists(decrypted_request.maxage));
+			UTILS.assert(UTILS.exists(decrypted_request.region));
 		}
 		catch(e) {
 			return res.status(403).end();
