@@ -46,7 +46,7 @@ module.exports = class LOLAPI {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
 			//UTILS.output("IAPI req sent: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
-			url = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/?url=" + encodeURIComponent(url);
+			url = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) +"&url=" + encodeURIComponent(url);
 			this.request({ url, agentOptions }, (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);
@@ -66,6 +66,7 @@ module.exports = class LOLAPI {
 	}
 	getIAPI(path, options, response_expected = true) {//get internal API
 		let that = this;
+		options.k = this.CONFIG.API_KEY;
 		return new Promise((resolve, reject) => {
 			let url = this.address + ":" + this.port + "/" + path;
 			let paramcount = 0;

@@ -234,10 +234,11 @@ function ready() {
 	serveWebRequest("*", function (req, res, next) {
 		res.status(404).end();
 	});
-	function serveWebRequest(branch, callback) {
+	function serveWebRequest(branch, callback, validate = false) {
 		if (typeof(branch) == "string") {
 			website.get(branch, function (req, res, next) {
 				//UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
+				if (validate && req.query.k !== CONFIG.API_KEY) return res.status(401).end();
 				++req_num;
 				load_average[0].add();
 				callback(req, res, next);
@@ -247,6 +248,7 @@ function ready() {
 			for (let b in branch) {
 				website.get(branch[b], function(req, res, next){
 					//UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
+					if (validate && req.query.k !== CONFIG.API_KEY) return res.status(401).end();
 					++req_num;
 					load_average[0].add();
 					callback(req, res, next);
