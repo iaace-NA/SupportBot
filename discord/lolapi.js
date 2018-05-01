@@ -2,7 +2,6 @@
 const UTILS = new (require("../utils.js"))();
 const fs = require("fs");
 const REQUEST = require("request");
-const aes256 = require("aes256");
 module.exports = class LOLAPI {
 	constructor(INIT_CONFIG, MODE, request_id) {
 		this.CONFIG = INIT_CONFIG;
@@ -58,8 +57,7 @@ module.exports = class LOLAPI {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
 			//UTILS.output("IAPI req sent: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
-			let encrypted_request = aes256.encrypt(this.CONFIG.API_KEY, JSON.stringify({ region, cachetime, maxage, request_id, url }));
-			this.request(this.address + ":" + this.port + "/lol/" + encodeURIComponent(encrypted_request), (error, response, body) => {
+			this.request(this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/?url=" + encodeURIComponent(url), (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);
 				}
