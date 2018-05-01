@@ -84,8 +84,8 @@ function ready() {
 		delete irs[dr.request_id];
 		res.status(200).end();
 	});
-	serveWebRequest("/createshortcut/:uid", function(req, res, next) {
-		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
+	serveEncryptedWebRequest("/createshortcut/", ["uid", "from", "to"], function(req, res, next, dr) {
+		shortcut_doc_model.findOne({ uid: dr.uid }, (err, doc) => {
 			if (err) {
 				console.error(err);
 				return res.status(500).end();
@@ -94,7 +94,7 @@ function ready() {
 				let shortcut_count = 0;
 				for (let b in doc.shortcuts) ++shortcut_count;
 				if (shortcut_count >= 50) return res.json({ success: false });
-				doc.shortcuts[req.query.from] = req.query.to;
+				doc.shortcuts[dr.from] = dr.to;
 				doc.markModified("shortcuts");
 				doc.save(e => {
 					if (e) {
@@ -108,10 +108,10 @@ function ready() {
 			}
 			else {
 				let new_shortcuts = {
-					uid: req.params.uid,
+					uid: dr.uid,
 					shortcuts: {}
 				}
-				new_shortcuts.shortcuts[req.query.from] = req.query.to;
+				new_shortcuts.shortcuts[dr.from] = dr.to;
 				let new_document = new shortcut_doc_model(new_shortcuts);
 				new_document.save((e, doc) => {
 					if (e) {

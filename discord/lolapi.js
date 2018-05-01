@@ -82,11 +82,7 @@ module.exports = class LOLAPI {
 		return new Promise((resolve, reject) => {
 			let url = this.address + ":" + this.port + "/" + path;
 			let paramcount = 0;
-			for (let i in options) {
-				if (paramcount == 0) url += "?" + i + "=" + encodeURIComponent(options[i]);
-				else url += "&" + i + "=" + encodeURIComponent(options[i]);
-				++paramcount;
-			}
+			url += encodeURIComponent(aes256.encrypt(this.CONFIG.API_KEY, JSON.stringify(options)));
 			this.request(url, (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);
@@ -297,7 +293,7 @@ module.exports = class LOLAPI {
 		}
 	}
 	createShortcut(uid, from, to) {
-		return this.getIAPI("createshortcut/" + uid, { from, to });
+		return this.getIAPI("createshortcut/", { uid, from, to });
 	}
 	removeShortcut(uid, from) {
 		return this.getIAPI("removeshortcut/" + uid, { from });
