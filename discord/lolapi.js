@@ -2,7 +2,7 @@
 const UTILS = new (require("../utils.js"))();
 const fs = require("fs");
 const REQUEST = require("request");
-const agentOptions =  { key: fs.readFileSync("../data/keys/server.key"), cert: fs.readFileSync("../data/keys/server.crt"), ca: fs.readFileSync("../data/keys/ca.crt"), requestCert: true };
+const agentOptions =  { ca: fs.readFileSync("../data/keys/ca.crt") };
 module.exports = class LOLAPI {
 	constructor(INIT_CONFIG, MODE, request_id) {
 		this.CONFIG = INIT_CONFIG;
