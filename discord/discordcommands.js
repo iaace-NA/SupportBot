@@ -4,13 +4,14 @@ let textgenerator = new (require("./textgenerator.js"))();
 let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
 let LOLAPI = require("./lolapi.js");
-let request_id = 1;
+let Profiler = require("../timeprofiler.js");
 module.exports = function (CONFIG, client, mode, msg, db) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 
-	++request_id;
 	const msg_receive_time = new Date().getTime();
-	let lolapi = new LOLAPI(CONFIG, mode, request_id);
+	let request_profiler = new Profiler("r#" + msg.id)
+	let lolapi = new LOLAPI(CONFIG, mode, msg.id);
+	request_profiler.mark("lolapi instantiated");
 	if ((UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) || !UTILS.exists(msg.guild)) {//respondable server message or PM
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {
 			reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
@@ -146,32 +147,37 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 			}).catch(console.error);
 		});*/
 		commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {//new
+			request_profiler.mark("lg command recognized");
 			//reply(":warning:We are processing the latest information for your command: if this message does not update within 5 minutes, try the same command again. Thank you for your patience.", nMsg => {
-				lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.LG.SUMMONER_ID).then(result => {
-					result.region = region;
-					result.guess = username;
-					if (!UTILS.exists(result.id)) return reply("No username found for `" + username + "`.");
-					lolapi.getLiveMatch(region, result.id, CONFIG.API_MAXAGE.LG.LIVE_MATCH).then(match => {
-						if (UTILS.exists(match.status)) return reply("No current matches found for `" + username + "`.");
-						lolapi.getMultipleSummonerFromSummonerID(region, match.participants.map(p => { return p.summonerId; }), CONFIG.API_MAXAGE.LG.OTHER_SUMMONER_ID).then(pSA => {//participant summoner array
-							lolapi.getMultipleRecentGames(region, pSA.map(pS => { return pS.accountId; }), CONFIG.API_MAXAGE.LG.RECENT_GAMES).then(mhA => {//matchhistory array
-								let mIDA = [];//match id array;
-								for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
-								lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.LG.MULTIPLE_MATCH).then(matches => {
-									lolapi.getMultipleRanks(region, pSA.map(p => { return p.id; }), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS).then(ranks => {
-										lolapi.getMultipleChampionMastery(region, pSA.map(p => { return p.id; }), CONFIG.API_MAXAGE.LG.MULTIPLE_MASTERIES).then(masteries => {
-											//nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA) }).catch();
-											reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA), () => {
-												//reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false, true));
-											});
-											//reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false));//untrimmed output
-										}).catch();
+			lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.LG.SUMMONER_ID).then(result => {
+				result.region = region;
+				result.guess = username;
+				if (!UTILS.exists(result.id)) return reply("No username found for `" + username + "`.");
+				lolapi.getLiveMatch(region, result.id, CONFIG.API_MAXAGE.LG.LIVE_MATCH).then(match => {
+					if (UTILS.exists(match.status)) return reply("No current matches found for `" + username + "`.");
+					lolapi.getMultipleSummonerFromSummonerID(region, match.participants.map(p => { return p.summonerId; }), CONFIG.API_MAXAGE.LG.OTHER_SUMMONER_ID).then(pSA => {//participant summoner array
+						lolapi.getMultipleRecentGames(region, pSA.map(pS => { return pS.accountId; }), CONFIG.API_MAXAGE.LG.RECENT_GAMES).then(mhA => {//matchhistory array
+							let mIDA = [];//match id array;
+							for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
+							lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.LG.MULTIPLE_MATCH).then(matches => {
+								lolapi.getMultipleRanks(region, pSA.map(p => { return p.id; }), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS).then(ranks => {
+									lolapi.getMultipleChampionMastery(region, pSA.map(p => { return p.id; }), CONFIG.API_MAXAGE.LG.MULTIPLE_MASTERIES).then(masteries => {
+										//nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA) }).catch();
+										request_profiler.begin("generating embed");
+										const newEmbed = embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA);
+										request_profiler.end("generating embed");
+										UTILS.debug(request_profiler.endAll());
+										reply_embed(newEmbed, () => {
+											//reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false, true));
+										});
+										//reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false));//untrimmed output
 									}).catch();
-								});
-							}).catch(console.error);
+								}).catch();
+							});
 						}).catch(console.error);
 					}).catch(console.error);
 				}).catch(console.error);
+			}).catch(console.error);
 			//});
 		});
 		commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number) => {
@@ -400,9 +406,9 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 		const basic = msg.id + "\ncontent: " + msg.content +
 			"\nauthor: " + msg.author.tag + " :: " + msg.author.id +
 			"\nchannel: " + msg.channel.name + " :: " + msg.channel.id;
-		if (UTILS.exists(msg.guild)) UTILS.output("received server message r#" + request_id + " :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
+		if (UTILS.exists(msg.guild)) UTILS.output("received server message :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
 		else {
-			UTILS.output("received PM/DM message r#" + request_id + " :: " + basic);
+			UTILS.output("received PM/DM message :: " + basic);
 		}
 	}
 	function assert_region(test_string, notify = true) {
