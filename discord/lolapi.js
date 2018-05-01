@@ -2,10 +2,7 @@
 const UTILS = new (require("../utils.js"))();
 const fs = require("fs");
 const REQUEST = require("request");
-const IAPISECUREREQUEST = require("request");
-const https = require("https");
-const agent_options = { key: fs.readFileSync("../data/keys/server.key"), cert: fs.readFileSync("../data/keys/server.crt"), ca: fs.readFileSync("../data/keys/ca.crt"), requestCert: true };
-let agent = new https.Agent(agent_options);
+const agentOptions =  { key: fs.readFileSync("../data/keys/server.key"), cert: fs.readFileSync("../data/keys/server.crt"), ca: fs.readFileSync("../data/keys/ca.crt"), requestCert: true };
 module.exports = class LOLAPI {
 	constructor(INIT_CONFIG, MODE, request_id) {
 		this.CONFIG = INIT_CONFIG;
@@ -50,7 +47,7 @@ module.exports = class LOLAPI {
 			}
 			//UTILS.output("IAPI req sent: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
 			url = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/?url=" + encodeURIComponent(url);
-			this.request({ url, agent }, (error, response, body) => {
+			this.request({ url, agentOptions }, (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);
 				}
@@ -77,7 +74,7 @@ module.exports = class LOLAPI {
 				else url += "&" + i + "=" + encodeURIComponent(options[i]);
 				++paramcount;
 			}
-			this.request({ url , agent }, (error, response, body) => {
+			this.request({ url , agentOptions }, (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);
 				}
