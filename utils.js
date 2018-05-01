@@ -17,6 +17,9 @@ module.exports = class UTILS {
 			console.log(n + "." + new Date().getMilliseconds().pad(3) + " : " + t);
 		}
 	}
+	debug(t) {
+		if (process.env.DEBUG) this.output(t);
+	}
 	exists(anyObject) {//general utility function
 		if (anyObject !== null && anyObject !== undefined) return true;
 		else return false;

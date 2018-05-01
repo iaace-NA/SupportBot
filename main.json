@@ -9,10 +9,8 @@
 			"max_restarts": 15,
 			"restart_delay": 2500,
 			"env": {
-				"NODE_ENV": "development"
-			},
-			"env_production": {
-				"NODE_ENV": "production"
+				"NODE_ENV": "production",
+				"DEBUG": false
 			},
 			"node_args": "--trace-deprecation"
 		},
@@ -25,10 +23,8 @@
 			"max_restarts": 15,
 			"restart_delay": 2500,
 			"env": {
-				"NODE_ENV": "development"
-			},
-			"env_production": {
-				"NODE_ENV": "production"
+				"NODE_ENV": "production",
+				"DEBUG": false
 			},
 			"node_args": "--trace-deprecation"
 		}
