@@ -64,7 +64,7 @@ module.exports = class LOLAPI {
 			});
 		});
 	}
-	getIAPI(path, options) {//get internal API
+	getIAPI(path, options, response_expected = true) {//get internal API
 		let that = this;
 		return new Promise((resolve, reject) => {
 			let url = this.address + ":" + this.port + "/" + path;
@@ -75,6 +75,10 @@ module.exports = class LOLAPI {
 				++paramcount;
 			}
 			this.request({ url , agentOptions }, (error, response, body) => {
+				if (!response_expected) {
+					resolve();
+					return;
+				}
 				if (UTILS.exists(error)) {
 					reject(error);
 				}
@@ -299,6 +303,6 @@ module.exports = class LOLAPI {
 		return this.getIAPI("getshortcuts/" + uid, {});
 	}
 	terminate() {
-		this.getIAPI("terminate_request/" + this.request_id + "/").catch();
+		this.getIAPI("terminate_request/" + this.request_id, {}, false).catch();
 	}
 }
