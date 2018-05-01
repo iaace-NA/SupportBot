@@ -16,7 +16,7 @@ module.exports = class Profiler {
 	}
 	endAll() {
 		const now = process.hrtime();
-		let answer = this.name + " profile completed in " + this.ms(this.diff(now, this.creation_time)) + "ms.";
+		let answer = this.name + " profile completed in " + this.ms(this.diff(now, this.creation_time)) + "ms.\n";
 		for (let b = 0; b < this.events.length; ++b) {
 			if (this.events[b].type === 0) answer += this.name + " marked ";
 			else if (this.events[b].type === 1) answer += this.name + " started ";
@@ -31,6 +31,6 @@ module.exports = class Profiler {
 		return ((now[0] - prev[0]) * 1e9) + (now[1] - prev[1]);
 	}
 	ms(nsn) {
-		return (nsn / 1000).toFixed(3);
+		return (nsn / 1000000).toFixed(3);
 	}
 }
