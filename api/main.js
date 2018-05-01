@@ -52,11 +52,17 @@ ready();
 let irs = {};//individual request statistics
 function ready() {
 	if (process.argv.length === 2) {//production key
-		https.createServer({ key: fs.readFileSync("../data/keys/server.key"), cert: fs.readFileSync("../data/keys/server.crt"), ca: fs.readFileSync("../data/keys/ca.crt") }, website).listen(CONFIG.API_PORT_PRODUCTION);
+		https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
+			cert: fs.readFileSync("../data/keys/server.crt"), 
+			ca: fs.readFileSync("../data/keys/ca.crt"), 
+			requestCert: true, rejectUnauthorized: false }, website).listen(CONFIG.API_PORT_PRODUCTION);
 		UTILS.output("IAPI ready and listening on port " + CONFIG.API_PORT_PRODUCTION);
 	}
 	else {//non-production key
-		https.createServer({ key: fs.readFileSync("../data/keys/server.key"), cert: fs.readFileSync("../data/keys/server.crt"), ca: fs.readFileSync("../data/keys/ca.crt") }, website).listen(CONFIG.API_PORT_DEVELOPMENT);
+		https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
+			cert: fs.readFileSync("../data/keys/server.crt"), 
+			ca: fs.readFileSync("../data/keys/ca.crt"), 
+			requestCert: true, rejectUnauthorized: false }, website).listen(CONFIG.API_PORT_DEVELOPMENT);
 		UTILS.output("IAPI ready and listening on port " + CONFIG.API_PORT_DEVELOPMENT);
 	}
 	
