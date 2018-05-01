@@ -18,9 +18,9 @@ module.exports = class Profiler {
 		const now = process.hrtime();
 		let answer = this.name + " profile completed in " + this.ms(this.diff(now, this.creation_time)) + "ms.\n";
 		for (let b = 0; b < this.events.length; ++b) {
-			if (this.events[b].type === 0) answer += this.name + " marked ";
-			else if (this.events[b].type === 1) answer += this.name + " started ";
-			else if (this.events[b].type === 2) answer += this.name + " completed in " + this.ms(this.diff(this.events[b].time, this.events.find(e => { return e.name == this.events[b].name; }).time)) + "ms, ";
+			if (this.events[b].type === 0) answer += this.events[b].name + " marked ";
+			else if (this.events[b].type === 1) answer += this.events[b].name + " started ";
+			else if (this.events[b].type === 2) answer += this.events[b].name + " completed in " + this.ms(this.diff(this.events[b].time, this.events.find(e => { return e.name == this.events[b].name; }).time)) + "ms, ";
 			answer += this.ms(this.diff(this.events[b].time, this.creation_time)) + "ms after profiling began";
 			if (b > 0) answer += " and " + this.ms(this.diff(this.events[b].time, this.events[b - 1].time)) + "ms after the last event.\n";
 			else answer += ".\n";
