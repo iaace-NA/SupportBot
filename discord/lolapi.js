@@ -2,7 +2,7 @@
 const UTILS = new (require("../utils.js"))();
 const fs = require("fs");
 const REQUEST = require("request");
-const agentOptions =  { ca: fs.readFileSync("../data/keys/ca.crt") };
+const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt") };
 module.exports = class LOLAPI {
 	constructor(INIT_CONFIG, MODE, request_id) {
 		this.CONFIG = INIT_CONFIG;
@@ -32,7 +32,7 @@ module.exports = class LOLAPI {
 				answer.started = now;
 				answer.ended = new Date().getTime();
 				resolve(answer);
-			});
+			}).catch(reject);
 		});
 	}
 	get(region, path, options, cachetime, maxage) {
