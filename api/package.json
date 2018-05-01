@@ -9,7 +9,6 @@
   "author": "iaace",
   "license": "MIT",
   "dependencies": {
-    "aes256": "^1.0.3",
     "bottleneck": "^2.3.0",
     "express": "^4.16.3",
     "mongoose": "^5.0.14",
