@@ -313,5 +313,6 @@ module.exports = class LOLAPI {
 	}
 	terminate() {
 		this.request(this.address + ":" + this.port + "/terminate_request/" + this.request_id + "/", (error, response, body) => {});
+		this.getIAPI("terminate_request/", { request_id: this.request_id });
 	}
 }
