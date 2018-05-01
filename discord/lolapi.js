@@ -2,6 +2,10 @@
 const UTILS = new (require("../utils.js"))();
 const fs = require("fs");
 const REQUEST = require("request");
+const IAPISECUREREQUEST = require("request");
+const https = require("https");
+const agent_options = { key: fs.readFileSync("../data/key.pem"), cert: fs.readFileSync("../data/cert.pem") };
+let agent = new https.Agent(agent_options);
 module.exports = class LOLAPI {
 	constructor(INIT_CONFIG, MODE, request_id) {
 		this.CONFIG = INIT_CONFIG;
@@ -26,23 +30,11 @@ module.exports = class LOLAPI {
 	ping() {
 		return new Promise((resolve, reject) => {
 			const now = new Date().getTime();
-			let url = this.address + ":" + this.port + "/ping";
-			this.request(url, function (error, response, body) {
-				if (UTILS.exists(error)) {
-					reject(error);
-				}
-				else {
-					try {
-						const answer = JSON.parse(body);
-						UTILS.output("cache miss: " + url);
-						answer.started = now;
-						answer.ended = new Date().getTime();
-						resolve(answer);
-					}
-					catch (e) {
-						reject(e);
-					}
-				}
+			this.getIAPI("ping", {}).then(answer => {
+				UTILS.output("cache miss: " + url);
+				answer.started = now;
+				answer.ended = new Date().getTime();
+				resolve(answer);
 			});
 		});
 	}
@@ -57,7 +49,8 @@ module.exports = class LOLAPI {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
 			//UTILS.output("IAPI req sent: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
-			this.request(this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/?url=" + encodeURIComponent(url), (error, response, body) => {
+			url = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/?url=" + encodeURIComponent(url);
+			this.request({ url, agent }, (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);
 				}
@@ -84,7 +77,7 @@ module.exports = class LOLAPI {
 				else url += "&" + i + "=" + encodeURIComponent(options[i]);
 				++paramcount;
 			}
-			this.request(url, (error, response, body) => {
+			this.request({ url , agent }, (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);
 				}
@@ -309,6 +302,6 @@ module.exports = class LOLAPI {
 		return this.getIAPI("getshortcuts/" + uid, {});
 	}
 	terminate() {
-		this.request(this.address + ":" + this.port + "/terminate_request/" + this.request_id + "/", (error, response, body) => {});
+		this.getIAPI("terminate_request/" + this.request_id + "/").catch();
 	}
 }
