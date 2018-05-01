@@ -252,7 +252,7 @@ function ready() {
 		}
 	}
 	function serveEncryptedWebRequest(branch, expected_properties, callback) {
-		serveWebRequest(typeof(branch) === "string" ? branch + ":encrypted_request" : branch.map(b => { return b + ":encrypted_request"; }), (req, res, next) => {
+		serveWebRequest(branch.map(b => { return b + ":encrypted_request"; }), (req, res, next) => {
 			let decrypted_request;
 			try {
 				decrypted_request = JSON.parse(cipher.decrypt(req.params.encrypted_request));
