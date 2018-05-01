@@ -64,8 +64,19 @@ function ready() {
 		res.removeHeader("X-Powered-By");
 		return next();
 	});
-	serveEncryptedWebRequest("/lol/", ["request_id", "url", "cachetime", "maxage", "region"], function (req, res, next, decrypted_request) {
-		
+	serveWebRequest("/lol/:encrypted_request", function (req, res, next) {
+		let decrypted_request;
+		try {
+			decrypted_request = JSON.parse(cipher.decrypt(req.params.encrypted_request));
+			UTILS.assert(UTILS.exists(decrypted_request.request_id));
+			UTILS.assert(UTILS.exists(decrypted_request.url));
+			UTILS.assert(UTILS.exists(decrypted_request.cachetime));
+			UTILS.assert(UTILS.exists(decrypted_request.maxage));
+			UTILS.assert(UTILS.exists(decrypted_request.region));
+		}
+		catch(e) {
+			return res.status(403).end();
+		}
 		if (!UTILS.exists(irs[decrypted_request.request_id])) irs[decrypted_request.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
 		++irs[decrypted_request.request_id][0];
 		get(decrypted_request.region, decrypted_request.url, parseInt(decrypted_request.cachetime), parseInt(decrypted_request.maxage), decrypted_request.request_id).then(result => res.json(result)).catch(e => {
@@ -73,15 +84,15 @@ function ready() {
 			res.status(500).end();
 		});
 	});
-	serveEncryptedWebRequest("/terminate_request/", ["request_id"], function (req, res, next, dr) {
+	serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
 		for (let b in irs) if (new Date().getTime() - irs[b][5] > 1000 * 60 * 10) delete irs[b];//cleanup old requests
-		if (!UTILS.exists(irs[dr.request_id])) return res.status(200).end();//doesn't exist
+		if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();//doesn't exist
 		let description = [];
-		for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[dr.request_id][i] + "): " + UTILS.round(100 * irs[dr.request_id][i] / irs[dr.request_id][0], 0) + "%");
+		for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[req.params.request_id][i] + "): " + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%");
 		description = description.join(", ");
-		UTILS.output("IAPI: request #" + dr.request_id + " (" + (new Date().getTime() - irs[dr.request_id][5]) + "ms): " + description);
+		UTILS.output("IAPI: request #" + req.params.request_id + " (" + (new Date().getTime() - irs[req.params.request_id][5]) + "ms): " + description);
 		console.log("");
-		delete irs[dr.request_id];
+		delete irs[req.params.request_id];
 		res.status(200).end();
 	});
 	serveWebRequest("/createshortcut/:uid", function(req, res, next) {
@@ -250,19 +261,6 @@ function ready() {
 				});
 			}
 		}
-	}
-	function serveEncryptedWebRequest(branch, expected_properties, callback) {
-		serveWebRequest(branch.map(b => { return b + ":encrypted_request"; }), (req, res, next) => {
-			let decrypted_request;
-			try {
-				decrypted_request = JSON.parse(cipher.decrypt(req.params.encrypted_request));
-				for (let b in expected_properties) UTILS.assert(UTILS.exists(decrypted_request[expected_properties[b]]));
-			}
-			catch(e) {
-				return res.status(403).end();
-			}
-			callback(req, res, next, decrypted_request);
-		});
 	}
 }
 function changeBaseTo62(number) {
