@@ -4,7 +4,7 @@ const fs = require("fs");
 const REQUEST = require("request");
 const IAPISECUREREQUEST = require("request");
 const https = require("https");
-const agent_options = { key: fs.readFileSync("../data/keys/key.pem"), cert: fs.readFileSync("../data/keys/cert.pem") };
+const agent_options = { key: fs.readFileSync("../data/keys/server.key"), cert: fs.readFileSync("../data/keys/server.crt"), ca: fs.readFileSync("../data/keys/ca.crt") };
 let agent = new https.Agent(agent_options);
 module.exports = class LOLAPI {
 	constructor(INIT_CONFIG, MODE, request_id) {
