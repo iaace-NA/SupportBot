@@ -75,7 +75,7 @@ function ready() {
 			console.error(e);
 			res.status(500);
 		});
-	});
+	}, true);
 	serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
 		for (let b in irs) if (new Date().getTime() - irs[b][5] > 1000 * 60 * 10) delete irs[b];//cleanup old requests
 		if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();//doesn't exist
@@ -86,7 +86,7 @@ function ready() {
 		console.log("");
 		delete irs[req.params.request_id];
 		res.status(200).end();
-	});
+	}, true);
 	serveWebRequest("/createshortcut/:uid", function(req, res, next) {
 		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
 			if (err) {
@@ -127,7 +127,7 @@ function ready() {
 				});
 			}
 		});
-	});
+	}, true);
 	serveWebRequest("/removeshortcut/:uid", function(req, res, next) {
 		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
 			if (err) {
@@ -151,7 +151,7 @@ function ready() {
 				res.json({ success: true });
 			}
 		});
-	});
+	}, true);
 	serveWebRequest("/removeallshortcuts/:uid", function(req, res, next) {
 		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
 			if (err) {
@@ -175,7 +175,7 @@ function ready() {
 				res.json({ success: true });
 			}
 		});
-	});
+	}, true);
 	serveWebRequest("/getshortcut/:uid", function(req, res, next) {
 		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
 			if (err) {
@@ -194,7 +194,7 @@ function ready() {
 				res.status(404).end();
 			}
 		});
-	});
+	}, true);
 	serveWebRequest("/getshortcuts/:uid", function(req, res, next) {
 		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
 			if (err) {
@@ -212,7 +212,7 @@ function ready() {
 	//https.createServer({ key: fs.readFileSync("./privkey.pem"), cert: fs.readFileSync("./fullchain.pem") }, website).listen(443);
 	serveWebRequest("/ping", function (req, res, next) {
 		res.json({ received: new Date().getTime() });
-	});
+	}, true);
 	serveWebRequest("/stats", function (req, res, next) {
 		let answer = {};
 		for (let i in load_average) {
@@ -227,7 +227,7 @@ function ready() {
 			answer[i + ""].total_count = load_average[i].total_count();
 		}
 		res.json(answer);
-	});
+	}, true);
 	serveWebRequest("/", function (req, res, next) {
 		res.send("You have reached the online api's testing page.");
 	});
