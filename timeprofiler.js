@@ -25,6 +25,7 @@ module.exports = class Profiler {
 			else if (this.events[b].type === 2) answer += "duration: " + this.ms(this.diff(this.events[b].time, this.events.find(e => { return e.name == this.events[b].name; }).time)) + "ms " + this.events[b].name + " completed";
 			answer += "\n";
 		}
+		this.events = {};
 		return answer + this.name + " profiling complete.";
 	}
 	diff(now, prev) {//returns ns

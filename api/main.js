@@ -23,6 +23,7 @@ const load_average = [new LoadAverage(60), new LoadAverage(60), new LoadAverage(
 const express = require("express");
 const website = express();
 const UTILS = new (require("../utils.js"))();
+let Profiler = require("../timeprofiler.js");
 let request = require("request");
 UTILS.assert(UTILS.exists(CONFIG.API_PORT_PRODUCTION));
 UTILS.assert(UTILS.exists(CONFIG.API_PORT_DEVELOPMENT));
@@ -50,6 +51,7 @@ for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({
 let req_num = 0;
 ready();
 let irs = {};//individual request statistics
+let database_profiler = new Profiler("Database Profiler");
 function ready() {
 	if (process.argv.length === 2) {//production key
 		https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
@@ -86,6 +88,7 @@ function ready() {
 		console.log("");
 		delete irs[req.params.request_id];
 		res.status(200).end();
+		UTILS.debug(database_profiler.endAll());
 	}, true);
 	serveWebRequest("/createshortcut/:uid", function(req, res, next) {
 		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
@@ -279,7 +282,9 @@ function changeBaseTo55(number) {
 }
 function checkCache(url, maxage, request_id) {
 	return new Promise((resolve, reject) => {
+		database_profiler.begin(url + " cache check");
 		api_doc_model.findOne({ url }, (err, doc) => {
+			database_profiler.end(url + " cache check");
 			if (err) return reject(err);
 			if (UTILS.exists(doc)) {
 				if (UTILS.exists(maxage) && apicache.Types.ObjectId(doc.id).getTimestamp().getTime() < new Date().getTime() - (maxage * 1000)) {//if expired
