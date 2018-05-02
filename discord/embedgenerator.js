@@ -409,9 +409,9 @@ module.exports = class EmbedGenerator {
 				else team_description_c1 += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
 				else team_description_c1 += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
-				team_description_c1 += " `" + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3 + "`\n";
-				team_description_c2 += "`M" + teams[b][c].mastery + "`";
-				team_description_c2 += CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
+				team_description_c1 += " `" + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3 + "` ";
+				team_description_c1 += "`M" + teams[b][c].mastery + "`";
+				team_description_c1 += CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji + "\n";
 				team_description_c2 += "`" + summoner_participants.find(p => { return p.id == teams[b][c].summonerId; }).summonerLevel + "`";
 				team_description_c2 += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
 				team_description_c2 += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
