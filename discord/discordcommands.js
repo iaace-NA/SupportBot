@@ -179,6 +179,7 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 			//});
 		});
 		commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number) => {
+			request_profiler.mark("dmh command recognized");
 			lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.DMH.SUMMONER_ID).then(result => {
 				result.region = region;
 				result.guess = username;
@@ -194,7 +195,11 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 						lolapi.getMultipleRanks(region, pIDA, CONFIG.API_MAXAGE.DMH.MULTIPLE_RANKS).then(ranks => {
 							lolapi.getMultipleChampionMastery(region, pIDA, CONFIG.API_MAXAGE.DMH.MULTIPLE_MASTERIES).then(masteries => {
 								lolapi.getMultipleSummonerFromSummonerID(region, pIDA, CONFIG.API_MAXAGE.DMH.OTHER_SUMMONER_ID).then(pSA => {
-									reply_embed(embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match, ranks, masteries, pSA));
+									request_profiler.begin("generating embed");
+									const answer = embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match, ranks, masteries, pSA);
+									request_profiler.end("generating embed");
+									UTILS.debug(request_profiler.endAll());
+									reply_embed(answer);
 								});
 							});
 						}).catch();
