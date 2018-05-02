@@ -296,7 +296,7 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 						lolapi.getShortcut(msg.author.id, parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)).then(result => {
 							callback(region, result[parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)], parameter.substring(0, parameter.indexOf(" ")));
 						}).catch(e => {
-							if (e) reply("An error has occurred. The shortcut may not exist.");
+							if (e) reply(":x:An error has occurred. The shortcut may not exist.");
 						});
 					}
 					else callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")));
@@ -331,7 +331,7 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 						lolapi.getShortcut(msg.author.id, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)).then(result => {
 							callback(region, result[parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)], number);
 						}).catch(e => {
-							if (e) reply("An error has occurred. The shortcut may not exist.");
+							if (e) reply(":x:An error has occurred. The shortcut may not exist.");
 						});
 					}
 					else callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number);
