@@ -18,7 +18,7 @@ module.exports = class UTILS {
 		}
 	}
 	debug(t) {
-		if (process.env.DEBUG) this.output(t);
+		if (process.env.DEBUG == "true") this.output(t);
 	}
 	exists(anyObject) {//general utility function
 		if (anyObject !== null && anyObject !== undefined) return true;
