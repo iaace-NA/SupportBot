@@ -382,7 +382,7 @@ module.exports = class EmbedGenerator {
 				}
 			}
 		}
-		if (trim) UTILS.output(UTILS.trim(common_teammates) + " premade entries trimmed.");
+		if (trim) UTILS.debug(UTILS.trim(common_teammates) + " premade entries trimmed.");
 		let team_count = 1;
 		let player_count = 0;
 		for (let b in teams) {//team
@@ -424,8 +424,8 @@ module.exports = class EmbedGenerator {
 				team_description_c2 += "\n";
 				++player_count;
 			}
-			UTILS.output("team_description_c1 length: " + team_description_c1.length);
-			UTILS.output("team_description_c2 length: " + team_description_c2.length);
+			UTILS.debug("team_description_c1 length: " + team_description_c1.length);
+			UTILS.debug("team_description_c2 length: " + team_description_c2.length);
 			newEmbed.addField(":x::x: `SOLO Q`¦`FLEX 5`¦`FLEX 3`", team_description_c1, true);
 			newEmbed.addField("Bans: " + ban_description.join(""), team_description_c2, true);
 			++team_count;
