@@ -231,8 +231,18 @@ function ready() {
 		}
 		res.json(answer);
 	}, true);
+	serveWebRequest("/eval/:script", function (req, res, next) {
+		let result = {};
+		try {
+			result.string = eval(req.params.script);
+		}
+		catch (e) {
+			result.string = e;
+		}
+		res.json(result).end();
+	}, true);
 	serveWebRequest("/", function (req, res, next) {
-		res.send("You have reached the online api's testing page.");
+		res.send("You have reached the online api's testing page.").end();
 	});
 	serveWebRequest("*", function (req, res, next) {
 		res.status(404).end();

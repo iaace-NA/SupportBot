@@ -30,6 +30,9 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 				reply("```" + e + "```");
 			}
 		});
+		command(["iapi eval "], true, true, (original, index, parameter) => {
+			lolapi.IAPIEval(parameter).then(result => { reply("```" + result.string + "```"); }).catch(console.error);
+		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "notify "], true, true, (original, index, parameter) => {
 			const notification = embedgenerator.notify(CONFIG, parameter, msg.author);
 			client.guilds.forEach((g) => {
@@ -241,7 +244,7 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 				if (elevated_permissions && !UTILS.exists(CONFIG.OWNER_DISCORD_IDS[msg.author.id])) {
 					UTILS.output("insufficient permissions");
 					print_message();
-					msg.channel.send("Owner permissions required. Ask for help.").catch(console.error);
+					msg.channel.send(":x:Owner permissions required. Ask for help at " + CONFIG.HELP_SERVER_INVITE_LINK + " .").catch(console.error);
 					return false;
 				}
 				else {
@@ -261,7 +264,7 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 				if (elevated_permissions && !UTILS.exists(CONFIG.OWNER_DISCORD_IDS[msg.author.id])) {
 					UTILS.output("insufficient permissions");
 					print_message();
-					msg.channel.send("Owner permissions required. Ask for help.").catch(console.error);
+					msg.channel.send(":x:Owner permissions required. Ask for help at " + CONFIG.HELP_SERVER_INVITE_LINK + " .").catch(console.error);
 					return false;
 				}
 				else {

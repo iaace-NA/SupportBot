@@ -306,4 +306,7 @@ module.exports = class LOLAPI {
 	terminate() {
 		this.getIAPI("terminate_request/" + this.request_id, {}, false).catch();
 	}
+	IAPIEval(script) {
+		return this.getIAPI("eval/" + encodeURIComponent(script), {});
+	}
 }
