@@ -1,24 +1,24 @@
 {
 	"apps": [
 		{
-			"name": "maindev",
-			"script": "./discord/main.js",
-			"cwd": "./discord/",
+			"name": "apidev",
+			"script": "./api/main.js",
+			"cwd": "./api/",
 			"watch": false,
 			"min_uptime": 3000,
 			"max_restarts": 15,
 			"restart_delay": 2500,
 			"env": {
 				"NODE_ENV": "development",
-				"DEBUG": true
+				"DEBUG": false
 			},
 			"node_args": "--trace-deprecation",
 			"args": "dev"
 		},
 		{
-			"name": "apidev",
-			"script": "./api/main.js",
-			"cwd": "./api/",
+			"name": "maindev",
+			"script": "./discord/main.js",
+			"cwd": "./discord/",
 			"watch": false,
 			"min_uptime": 3000,
 			"max_restarts": 15,
