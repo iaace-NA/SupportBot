@@ -128,27 +128,22 @@ module.exports = function (CONFIG, client, mode, msg, db) {
 			}).catch(() => { reply("No results for `" + username + "`. Please revise your request."); });
 		});
 		commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter) => {
+			request_profiler.mark("mh command recognized");
 			lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.MH.SUMMONER_ID).then(result => {
 				result.region = region;
 				if (!UTILS.exists(result.accountId)) return reply("No recent matches found for `" + username + "`.");
 				lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.MH.RECENT_GAMES).then(matchhistory => {
 					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`.");
 					lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => { return m.gameId; }), CONFIG.API_MAXAGE.MH.MULTIPLE_MATCH).then(matches => {
-						reply_embed(embedgenerator.match(CONFIG, result, matchhistory.matches, matches));
+						request_profiler.begin("generating embed");
+						const answer = embedgenerator.match(CONFIG, result, matchhistory.matches, matches);
+						request_profiler.end("generating embed");
+						UTILS.debug(request_profiler.endAll());
+						reply_embed(answer);
 					}).catch(console.error);
 				}).catch(console.error);
 			}).catch(console.error);
 		});
-		/*commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {//old no premade detection
-			lolapi.getSummonerIDFromName(region, username, 3600).then(result => {
-				result.region = region;
-				result.guess = username;
-				if (!UTILS.exists(result.id)) return reply("No current matches found for `" + username + "`.");
-				lolapi.getLiveMatch(region, result.id, 60).then(match => {
-					reply_embed(embedgenerator.liveMatch(CONFIG, result, match));
-				}).catch(console.error);
-			}).catch(console.error);
-		});*/
 		commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {//new
 			request_profiler.mark("lg command recognized");
 			//reply(":warning:We are processing the latest information for your command: if this message does not update within 5 minutes, try the same command again. Thank you for your patience.", nMsg => {
