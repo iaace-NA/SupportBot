@@ -159,12 +159,16 @@ module.exports = class EmbedGenerator {
 			A: 0
 		};
 		let individual_match_description = [];
+		let lane_record = [];//ordered, sequential
+		let champion_record = [];//ordered, sequential
 		for (let i = 0; i < match_meta.length && i < 20; ++i) {
 			const KDA = UTILS.KDA(summoner.id, matches[i]);
 			const stats = UTILS.stats(summoner.id, matches[i]);
 			const teamParticipant = UTILS.teamParticipant(summoner.id, matches[i]);
 			let teams = {};
 			let lane = UTILS.inferLane(match_meta[i].role, match_meta[i].lane, teamParticipant.spell1Id, teamParticipant.spell2Id);
+			lane_record.push(lane);
+			champion_record.push(match_meta[i].champion);
 			const win = UTILS.determineWin(summoner.id, matches[i]);
 			++all_lanes[lane];
 			win ? ++all_lanes_w[lane] : ++all_lanes_l[lane];
@@ -229,7 +233,8 @@ module.exports = class EmbedGenerator {
 		newEmbed.addField("Recent Games", all_results.length + "G (" + UTILS.round(100 * total_wins / (total_wins + total_losses), 0) + "%) = " + total_wins + "W + " + total_losses + "L " + "\tKDA:`" + UTILS.KDAFormat(all_KDA.KDA) + "`\n" + lane_description.join("\n"), true);
 		newEmbed.addField("Recent Champions", all_champions_a.map(c => { return CONFIG.STATIC.CHAMPIONS[c.id].emoji + (c.w + c.l) + "G (" + UTILS.round(100 * c.w / (c.w + c.l), 0) + "%) = " + c.w + "W + " + c.l + "L\tKDA:`" + UTILS.KDAFormat((c.K + c.A) / c.D) + "`"; }).slice(0, 7).join("\n"), true);
 		for (let i = 0; i < individual_match_description.length; ++i) newEmbed.addField(individual_match_description[i][0], individual_match_description[i][1]);
-		if (all_results.length > 5) newEmbed.addField("Older Match Results", all_results.slice(5).map(r => { return r ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss; }).join("") + "->Oldest");
+		if (all_results.length > 5) newEmbed.addField("Old Match Results", all_results.slice(5, 13).map(r => { return r ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss; }).join("") + "\n" + lane_record.slice(5, 13).map(l => { return CONFIG.EMOJIS.lanes[l]; }).join("") + "\n" + champion_record.slice(5, 13).map(c => { return CONFIG.STATIC.CHAMPIONS[c].emoji; }), true);
+		if (all_results.length > 12) newEmbed.addField("Older Match Results", all_results.slice(13).map(r => { return r ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss; }).join("") + "\n" + lane_record.slice(13).map(l => { return CONFIG.EMOJIS.lanes[l]; }).join("") + "\n" + champion_record.slice(13).map(c => { return CONFIG.STATIC.CHAMPIONS[c].emoji; }), true);
 		let rpw = [];//recently played with
 		for (let b in common_teammates) rpw.push([b, common_teammates[b].w, common_teammates[b].l]);
 		rpw.sort((a, b) => { return b[1] + b[2] - a[1] - a[2]; });
