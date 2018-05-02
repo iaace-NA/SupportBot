@@ -311,52 +311,6 @@ module.exports = class EmbedGenerator {
 		// KP
 		return newEmbed;
 	}
-	/*liveMatch(CONFIG, summoner, match) {//show current match information
-		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
-		if (UTILS.exists(match.status)) {
-			newEmbed.setAuthor(summoner.guess);
-			newEmbed.setTitle("This summoner is currently not in a match.");
-			newEmbed.setColor([255, 0, 0]);
-			return newEmbed;
-		}
-		newEmbed.setTitle(queues[match.gameQueueConfigId]);
-		if (match.gameStartTime != 0) newEmbed.setDescription("Match Time: `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
-		else newEmbed.setDescription("Match not started.");
-		let teams = {};
-		for (let b in match.participants) {
-			if (!UTILS.exists(teams[match.participants[b].teamId])) teams[match.participants[b].teamId] = [];
-			teams[match.participants[b].teamId].push(match.participants[b]);
-		}
-		let team_count = 1;
-		let player_count = 0;
-		for (let b in teams) {
-			let team_description = "";
-			let ban_description = [];
-			for (let c in teams[b]) {
-				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id];
-				else team_description += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
-				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
-				else team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
-				team_description += "\t__[" + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")";
-				team_description += "__: " + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
-				if (UTILS.exists(match.bannedChampions[player_count])) {
-					try {
-						ban_description.push(CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].name);
-					}
-					catch (e) {
-						UTILS.output("Champion lookup failed for champion id " + match.bannedChampions[player_count].championId);
-					}
-				}
-				team_description += "\n";
-				++player_count;
-			}
-			team_description += "Bans: " + ban_description.join(", ");
-			newEmbed.addField("Team " + team_count, team_description);
-			++team_count;
-		}
-		return newEmbed;
-	}*/
 	liveMatchPremade(CONFIG, summoner, match, matches, ranks, masteries, summoner_participants, trim = true, newlogic = true) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
