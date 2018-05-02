@@ -386,7 +386,8 @@ module.exports = class EmbedGenerator {
 		let team_count = 1;
 		let player_count = 0;
 		for (let b in teams) {//team
-			let team_description = "";
+			let team_description_c1 = "";
+			let team_description_c2 = "";
 			let ban_description = [];
 			let networks = teams[b].map(t => { return UTILS.getGroup(t.summonerName, common_teammates); });//for everyone on the team, put the premade group in the network array
 			let premade_str = networks.map(g => { return g.join(","); });//array of comma delimited network strings
@@ -404,27 +405,29 @@ module.exports = class EmbedGenerator {
 				}
 			}
 			for (let c in teams[b]) {//player on team
-				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id];
-				else team_description += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
-				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
-				else team_description += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
-				team_description += " `" + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3;
-				team_description += " M" + teams[b][c].mastery + "`";
-				team_description += CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
-				team_description += "`" + summoner_participants.find(p => { return p.id == teams[b][c].summonerId; }).summonerLevel + "`";
-				team_description += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
-				team_description += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
-				if (teams[b].length > 5) team_description += "__[" + teams[b][c].summonerName + "](" + UTILS.opggShort(CONFIG.OPGG_SHORT, CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
-				else team_description += "__[" + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
-				team_description += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
+				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id];
+				else team_description_c1 += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
+				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
+				else team_description_c1 += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
+				team_description_c1 += " `" + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3 + "`\n";
+				team_description_c2 += "`M" + teams[b][c].mastery + "`";
+				team_description_c2 += CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
+				team_description_c2 += "`" + summoner_participants.find(p => { return p.id == teams[b][c].summonerId; }).summonerLevel + "`";
+				team_description_c2 += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
+				team_description_c2 += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
+				if (teams[b].length > 5) team_description_c2 += "__[" + teams[b][c].summonerName + "](" + UTILS.opggShort(CONFIG.OPGG_SHORT, CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
+				else team_description_c2 += "__[" + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
+				team_description_c2 += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
 				if (UTILS.exists(match.bannedChampions[player_count])) {
 					ban_description.push(match.bannedChampions[player_count].championId == -1 ? ":x:" : CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].emoji);
 				}
-				team_description += "\n";
+				team_description_c2 += "\n";
 				++player_count;
 			}
-			UTILS.output("team_description length: " + team_description.length);
-			newEmbed.addField(":x::x: `SOLO Q`¦`FLEX 5`¦`FLEX 3` Bans: " + ban_description.join(""), team_description);
+			UTILS.output("team_description_c1 length: " + team_description_c1.length);
+			UTILS.output("team_description_c2 length: " + team_description_c1.length);
+			newEmbed.addField(":x::x: `SOLO Q`¦`FLEX 5`¦`FLEX 3`", team_description_c1);
+			newEmbed.addField("Bans: " + ban_description.join(""), team_description_c2);
 			++team_count;
 		}
 		return newEmbed;
