@@ -28,7 +28,6 @@ module.exports = class LOLAPI {
 		return new Promise((resolve, reject) => {
 			const now = new Date().getTime();
 			this.getIAPI("ping", {}).then(answer => {
-				UTILS.output("cache miss: " + url);
 				answer.started = now;
 				answer.ended = new Date().getTime();
 				resolve(answer);
