@@ -71,10 +71,10 @@ website.use(function (req, res, next) {
 });
 website.ws("/shard", (ws, req) => {
 	UTILS.debug("/shard reached");
-	if (!UTILS.exists(req.query.k)) return ws.close(401);//unauthenticated
-	if (req.query.k !== CONFIG.API_KEY) return ws.close(403);//wrong key
+	if (!UTILS.exists(req.query.k)) return ws.close(4401);//unauthenticated
+	if (req.query.k !== CONFIG.API_KEY) return ws.close(4403);//wrong key
 	UTILS.debug("ws connected from shard: " + req.query.id);
-	ws.close(200);
+	ws.close(4200);//OK
 });
 serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, res, next) {
 	if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
