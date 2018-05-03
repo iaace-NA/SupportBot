@@ -14,7 +14,6 @@ catch (e) {
 let path = require('path');
 let crypto = require("crypto");
 let https = require('https');
-let http = require('http');
 let LoadAverage = require("../loadaverage.js");
 //const aes256 = require("aes256");
 //let cipher = aes256.createCipher(fs.readFileSync("./aes256.key", "utf-8"));
