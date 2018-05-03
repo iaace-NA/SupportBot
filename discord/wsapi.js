@@ -20,6 +20,7 @@ module.exports = class WSAPI {
 			this.address = "wss://" + this.CONFIG.API_ADDRESS_PRODUCTION;
 			this.port = this.CONFIG.API_PORT_PRODUCTION;
 		}
+		UTILS.debug("wss address attempted: " + this.address + ":" + this.port + "/shard?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&id=" + id);
 		this.connection = new ws(this.address + ":" + this.port + "/shard?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&id=" + id, agentOptions);
 		this.connection.on("open", () => {
 			UTILS.output("ws connected");
