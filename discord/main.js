@@ -17,7 +17,6 @@ catch (e) {
 	process.exit(1);
 }
 const mode = process.env.NODE_ENV === "production" ? "PRODUCTION:warning:" : process.env.NODE_ENV;
-const LOLAPI = new (require("./lolapi.js"))(CONFIG, 0);
 
 const manager = new ShardingManager("./shard.js", 
 	{ token: process.env.NODE_ENV == "production" ? CONFIG.DISCORD_API_KEY_PRODUCTION : CONFIG.DISCORD_API_KEY_DEVELOPMENT,
