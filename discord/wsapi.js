@@ -5,8 +5,8 @@ const ws = require("ws");
 const fs = require("fs");
 const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt") };
 module.exports = class WSAPI {
-	constructor(INIT_CONFIG, id) {
-		this.CONFIG = INIT_CONFIG;
+	constructor(id) {
+		this.CONFIG = JSON.parse(fs.readFileSync("../config.json", "utf-8"));;
 		if (!UTILS.exists(this.CONFIG)) {
 			throw new Error("config.json required.");
 		}
