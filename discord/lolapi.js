@@ -4,7 +4,7 @@ const fs = require("fs");
 const REQUEST = require("request");
 const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt") };
 module.exports = class LOLAPI {
-	constructor(INIT_CONFIG, MODE, request_id) {
+	constructor(INIT_CONFIG, request_id) {
 		this.CONFIG = INIT_CONFIG;
 		this.request_id = request_id;
 		if (!UTILS.exists(this.CONFIG)) {
@@ -15,7 +15,7 @@ module.exports = class LOLAPI {
 		}
 		this.request = REQUEST;
 		this.cache = {};
-		if (MODE == "DEVELOPMENT") {
+		if (process.env.NODE_ENV !== "production") {
 			this.address = this.CONFIG.API_ADDRESS_DEVELOPMENT;
 			this.port = this.CONFIG.API_PORT_DEVELOPMENT;
 		}

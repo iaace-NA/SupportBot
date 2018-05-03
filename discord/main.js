@@ -18,9 +18,9 @@ catch (e) {
 	console.error(e);
 	process.exit(1);
 }
-let mode = process.argv.length === 2 ? "PRODUCTION:warning:" : "DEVELOPMENT";
+const mode = process.env.NODE_ENV === "production" ? "PRODUCTION:warning:" : process.env.NODE_ENV;
 const DB = new (require("./dbmanager.js"))(CONFIG);
-const LOLAPI = new (require("./lolapi.js"))(CONFIG, mode, 0);
+const LOLAPI = new (require("./lolapi.js"))(CONFIG, 0);
 LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 	UTILS.output("DD STATIC RESOURCES LOADED");
 	CONFIG.STATIC = result;
@@ -31,7 +31,7 @@ LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 		LOLAPI.getStaticSummonerSpells("na1").then(result => {
 			CONFIG.STATIC.SUMMONERSPELLS = result.data;
 			UTILS.output("API STATIC RESOURCES LOADED");
-			if (process.argv.length === 2) {//production key
+			if (process.env.NODE_ENV === "production") {//production key
 				UTILS.output("PRODUCTION LOGIN");
 				client.login(CONFIG.DISCORD_API_KEY_PRODUCTION).catch(console.error);
 			}
@@ -64,7 +64,7 @@ client.on("disconnect", function () {
 });
 client.on("message", function (msg) {
 	try {
-		discordcommands(CONFIG, client, mode, msg, DB);
+		discordcommands(CONFIG, client, msg, DB);
 	}
 	catch (e) {
 		console.error(e);

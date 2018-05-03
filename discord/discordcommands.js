@@ -5,12 +5,12 @@ let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
 let LOLAPI = require("./lolapi.js");
 let Profiler = require("../timeprofiler.js");
-module.exports = function (CONFIG, client, mode, msg, db) {
+module.exports = function (CONFIG, client, msg, db) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 
 	const msg_receive_time = new Date().getTime();
 	let request_profiler = new Profiler("r#" + msg.id)
-	let lolapi = new LOLAPI(CONFIG, mode, msg.id);
+	let lolapi = new LOLAPI(CONFIG, msg.id);
 	request_profiler.mark("lolapi instantiated");
 	if ((UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) || !UTILS.exists(msg.guild)) {//respondable server message or PM
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {

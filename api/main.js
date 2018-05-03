@@ -53,17 +53,17 @@ ready();
 let irs = {};//individual request statistics
 let database_profiler = new Profiler("Database Profiler");
 function ready() {
-	if (process.argv.length === 2) {//production key
+	if (process.env.NODE_ENV === "production") {//production key
 		https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
 			cert: fs.readFileSync("../data/keys/server.crt"), 
 			ca: fs.readFileSync("../data/keys/ca.crt")}, website).listen(CONFIG.API_PORT_PRODUCTION);
-		UTILS.output("IAPI ready and listening on port " + CONFIG.API_PORT_PRODUCTION);
+		UTILS.output("IAPI PRODUCTION mode ready and listening on port " + CONFIG.API_PORT_PRODUCTION);
 	}
 	else {//non-production key
 		https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
 			cert: fs.readFileSync("../data/keys/server.crt"), 
 			ca: fs.readFileSync("../data/keys/ca.crt")}, website).listen(CONFIG.API_PORT_DEVELOPMENT);
-		UTILS.output("IAPI ready and listening on port " + CONFIG.API_PORT_DEVELOPMENT);
+		UTILS.output("IAPI " + process.env.NODE_ENV + " mode ready and listening on port " + CONFIG.API_PORT_DEVELOPMENT);
 	}
 	
 	website.use(function (req, res, next) {

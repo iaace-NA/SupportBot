@@ -12,8 +12,7 @@
 				"NODE_ENV": "development",
 				"DEBUG": false
 			},
-			"node_args": "--trace-deprecation",
-			"args": "dev"
+			"node_args": "--trace-deprecation"
 		},
 		{
 			"name": "maindev",
@@ -27,8 +26,7 @@
 				"NODE_ENV": "development",
 				"DEBUG": true
 			},
-			"node_args": "--trace-deprecation",
-			"args": "dev"
+			"node_args": "--trace-deprecation"
 		}
 	]
 }
