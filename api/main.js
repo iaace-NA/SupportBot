@@ -21,7 +21,7 @@ const response_type = ["Total", "Uncachable", "Cache hit", "Cache hit expired", 
 const load_average = [new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60)];
 const express = require("express");
 const website = express();
-let websocket = require("express-ws")(website);
+
 const UTILS = new (require("../utils.js"))();
 let Profiler = require("../timeprofiler.js");
 let request = require("request");
@@ -64,6 +64,7 @@ else {//non-production key
 		ca: fs.readFileSync("../data/keys/ca.crt")}, website).listen(CONFIG.API_PORT_DEVELOPMENT);
 	UTILS.output("IAPI " + process.env.NODE_ENV + " mode ready and listening on port " + CONFIG.API_PORT_DEVELOPMENT);
 }
+let websocket = require("express-ws")(website, server);
 website.use(function (req, res, next) {
 	res.removeHeader("X-Powered-By");
 	return next();
