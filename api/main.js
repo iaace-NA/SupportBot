@@ -69,6 +69,7 @@ website.use(function (req, res, next) {
 	return next();
 });
 website.ws("/shard", (ws, req) => {
+	UTILS.debug("/shard reached");
 	if (!UTILS.exists(req.query.k)) return ws.close(401);//unauthenticated
 	if (req.query.k !== CONFIG.API_KEY) return ws.close(403);//wrong key
 	UTILS.debug("ws connected from shard: " + req.query.id);
