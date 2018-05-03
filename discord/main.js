@@ -4,6 +4,7 @@ const fs = require("fs");
 
 const UTILS = new (require("../utils.js"))();
 const { ShardingManager } = require('discord.js');
+const util = require("util");
 
 let CONFIG;
 try {
@@ -26,6 +27,7 @@ manager.spawn();
 UTILS.output("Sharding Manager started");
 manager.on("launch", shard => {
 	UTILS.output("Launched shard " + shard.id);
-	shard.process.stdio.on("data", data => console.log("$" + shard.id + ": " + data));
-	shard.process.stderr.on("data", data => console.error("$" + shard.id + ": " + data));
+	UTILS.output(util.inspect(shard.process));
+	//shard.process.stdio.on("data", data => console.log("$" + shard.id + ": " + data));
+	//shard.process.stderr.on("data", data => console.error("$" + shard.id + ": " + data));
 });
