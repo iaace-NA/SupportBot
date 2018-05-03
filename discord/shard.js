@@ -50,12 +50,13 @@ client.on("ready", function () {
 	client.user.setActivity("League of Legends").catch(console.error);
 	if (initial_start && UTILS.exists(client.channels.get(CONFIG.LOG_CHANNEL_ID))) client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Bot started in " + UTILS.round((new Date().getTime() - start_time) / 1000, 0) + "s: version: " + CONFIG.VERSION + " mode: " + mode + " servers: " + client.guilds.size).catch(console.error);
 	else if (UTILS.exists(client.channels.get(CONFIG.LOG_CHANNEL_ID))) client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Bot reconnected");
+	/*
 	let all_emojis = [];
 	for (let i in CONFIG.CHAMP_EMOJI_SERVERS) all_emojis = all_emojis.concat(client.guilds.get(CONFIG.CHAMP_EMOJI_SERVERS[i]).emojis.array());
 	for (let b in CONFIG.STATIC.CHAMPIONS) {
 		const candidate = all_emojis.find(e => { return CONFIG.STATIC.CHAMPIONS[b].key.toLowerCase() == e.name.toLowerCase(); });
 		CONFIG.STATIC.CHAMPIONS[b].emoji = UTILS.exists(candidate) ? candidate.toString() : CONFIG.STATIC.CHAMPIONS[b].name;
-	}
+	}*/
 	UTILS.output("collected champion emojis");
 	initial_start = false;
 });
