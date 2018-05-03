@@ -17,11 +17,11 @@ module.exports = class LOLAPI {
 		this.cache = {};
 		if (process.env.NODE_ENV !== "production") {
 			this.address = "https://" + this.CONFIG.API_ADDRESS_DEVELOPMENT;
-			this.port = "https://" + this.CONFIG.API_PORT_DEVELOPMENT;
+			this.port = this.CONFIG.API_PORT_DEVELOPMENT;
 		}
 		else {
 			this.address = "https://" + this.CONFIG.API_ADDRESS_PRODUCTION;
-			this.port = "https://" + this.CONFIG.API_PORT_PRODUCTION;
+			this.port = this.CONFIG.API_PORT_PRODUCTION;
 		}
 	}
 	ping() {

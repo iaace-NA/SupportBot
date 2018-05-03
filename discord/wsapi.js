@@ -14,11 +14,11 @@ module.exports = class WSAPI {
 		this.cache = {};
 		if (process.env.NODE_ENV !== "production") {
 			this.address = "wss://" + this.CONFIG.API_ADDRESS_DEVELOPMENT;
-			this.port = "wss://" + this.CONFIG.API_PORT_DEVELOPMENT;
+			this.port = this.CONFIG.API_PORT_DEVELOPMENT;
 		}
 		else {
 			this.address = "wss://" + this.CONFIG.API_ADDRESS_PRODUCTION;
-			this.port = "wss://" + this.CONFIG.API_PORT_PRODUCTION;
+			this.port = this.CONFIG.API_PORT_PRODUCTION;
 		}
 		this.connection = new ws(this.address + ":" + this.port + "/shard?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&id=" + id);
 		this.connection.on("open", () => {
