@@ -5,7 +5,7 @@ let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
 let LOLAPI = require("./lolapi.js");
 let Profiler = require("../timeprofiler.js");
-const wsapi = new(require("./wsapi.js"))(process.env.SHARD_ID);
+//const wsapi = new(require("./wsapi.js"))(process.env.SHARD_ID);
 module.exports = function (CONFIG, client, msg, db) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 

@@ -28,6 +28,6 @@ UTILS.output("Sharding Manager started");
 manager.on("launch", shard => {
 	UTILS.output("Launched shard " + shard.id);
 	//UTILS.output(util.inspect(shard.process));
-	shard.process.stdout.on("data", data => console.log("$" + shard.id + ": " + data));
+	//shard.process.stdout.on("data", data => console.log("$" + shard.id + ": " + data));
 	//shard.process.stderr.on("data", data => console.error("$" + shard.id + ": " + data));
 });
