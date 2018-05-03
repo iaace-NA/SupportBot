@@ -2,6 +2,7 @@
 const UTILS = new (require("../utils.js"))();
 const REQUEST = require("request");
 const ws = require("ws");
+const fs = require("fs");
 const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt") };
 module.exports = class WSAPI {
 	constructor(INIT_CONFIG, id) {
