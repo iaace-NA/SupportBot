@@ -14,7 +14,7 @@ module.exports = class UTILS {
 	output(t) {//general utility function
 		if (this.exists(t)) {
 			let n = new Date().toISOString().slice(0, 19).replace('T', ' ');;
-			console.log(n + "." + new Date().getMilliseconds().pad(3) + " : " + t);
+			console.log(n + "." + new Date().getMilliseconds().pad(3) + " " + (this.exists(process.env.SHARD_ID) ? "$" + process.env.SHARD_ID : "") + ": " + t);
 		}
 	}
 	debug(t) {
