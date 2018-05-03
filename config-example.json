@@ -120,5 +120,6 @@
 		}
 	},
 	"CHAMP_EMOJI_SERVERS": ["437263625980215316", "437271022560083968"],
-	"OPGG_SHORT": "https://iaace.gg/op/%region%/%username%"
+	"OPGG_SHORT": "https://iaace.gg/op/%region%/%username%",
+	"SHARD_COUNT": 3
 }

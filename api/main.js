@@ -21,6 +21,7 @@ const response_type = ["Total", "Uncachable", "Cache hit", "Cache hit expired", 
 const load_average = [new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60)];
 const express = require("express");
 const website = express();
+let websocket = require("express-ws")(website);
 const UTILS = new (require("../utils.js"))();
 let Profiler = require("../timeprofiler.js");
 let request = require("request");
@@ -48,224 +49,229 @@ let region_limiters = {};
 let limiter = require("bottleneck");
 for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({ maxConcurrent: 1, minTime: CONFIG.API_PERIOD });
 let req_num = 0;
-ready();
 let irs = {};//individual request statistics
 let database_profiler = new Profiler("Database Profiler");
-function ready() {
-	if (process.env.NODE_ENV === "production") {//production key
-		https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
-			cert: fs.readFileSync("../data/keys/server.crt"), 
-			ca: fs.readFileSync("../data/keys/ca.crt")}, website).listen(CONFIG.API_PORT_PRODUCTION);
-		UTILS.output("IAPI PRODUCTION mode ready and listening on port " + CONFIG.API_PORT_PRODUCTION);
-	}
-	else {//non-production key
-		https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
-			cert: fs.readFileSync("../data/keys/server.crt"), 
-			ca: fs.readFileSync("../data/keys/ca.crt")}, website).listen(CONFIG.API_PORT_DEVELOPMENT);
-		UTILS.output("IAPI " + process.env.NODE_ENV + " mode ready and listening on port " + CONFIG.API_PORT_DEVELOPMENT);
-	}
-	
-	website.use(function (req, res, next) {
-		res.removeHeader("X-Powered-By");
-		return next();
+let server;
+if (process.env.NODE_ENV === "production") {//production key
+	server = https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
+		cert: fs.readFileSync("../data/keys/server.crt"), 
+		ca: fs.readFileSync("../data/keys/ca.crt")}, website).listen(CONFIG.API_PORT_PRODUCTION);
+	UTILS.output("IAPI PRODUCTION mode ready and listening on port " + CONFIG.API_PORT_PRODUCTION);
+}
+else {//non-production key
+	server = https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
+		cert: fs.readFileSync("../data/keys/server.crt"), 
+		ca: fs.readFileSync("../data/keys/ca.crt")}, website).listen(CONFIG.API_PORT_DEVELOPMENT);
+	UTILS.output("IAPI " + process.env.NODE_ENV + " mode ready and listening on port " + CONFIG.API_PORT_DEVELOPMENT);
+}
+website.use(function (req, res, next) {
+	res.removeHeader("X-Powered-By");
+	return next();
+});
+website.ws("/shard", (ws, req) => {
+	if (!UTILS.exists(req.query.k)) return ws.close(401);//unauthenticated
+	if (req.query.k !== CONFIG.API_KEY) return ws.close(403);//wrong key
+	UTILS.debug("ws connected from shard: " + req.query.id);
+	ws.close(200);
+});
+serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, res, next) {
+	if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
+	++irs[req.params.request_id][0];
+	get(req.params.region, req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage), req.params.request_id).then(result => res.json(result)).catch(e => {
+		console.error(e);
+		res.status(500);
 	});
-	serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, res, next) {
-		if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
-		++irs[req.params.request_id][0];
-		get(req.params.region, req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage), req.params.request_id).then(result => res.json(result)).catch(e => {
-			console.error(e);
-			res.status(500);
-		});
-	}, true);
-	serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
-		for (let b in irs) if (new Date().getTime() - irs[b][5] > 1000 * 60 * 10) delete irs[b];//cleanup old requests
-		if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();//doesn't exist
-		let description = [];
-		for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[req.params.request_id][i] + "): " + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%");
-		description = description.join(", ");
-		UTILS.output("IAPI: request #" + req.params.request_id + " (" + (new Date().getTime() - irs[req.params.request_id][5]) + "ms): " + description);
-		console.log("");
-		delete irs[req.params.request_id];
-		res.status(200).end();
-		UTILS.debug(database_profiler.endAll());
-	}, true);
-	serveWebRequest("/createshortcut/:uid", function(req, res, next) {
-		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
-			if (err) {
-				console.error(err);
-				return res.status(500).end();
-			}
-			if (UTILS.exists(doc)) {
-				let shortcut_count = 0;
-				for (let b in doc.shortcuts) ++shortcut_count;
-				if (shortcut_count >= 50) return res.json({ success: false });
-				doc.shortcuts[req.query.from] = req.query.to;
-				doc.markModified("shortcuts");
-				doc.save(e => {
-					if (e) {
-						console.error(e);
-						return res.status(500).end();
-					}
-					else {
-						res.json({ success: true });
-					}
-				});
-			}
-			else {
-				let new_shortcuts = {
-					uid: req.params.uid,
-					shortcuts: {}
+}, true);
+serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
+	for (let b in irs) if (new Date().getTime() - irs[b][5] > 1000 * 60 * 10) delete irs[b];//cleanup old requests
+	if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();//doesn't exist
+	let description = [];
+	for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[req.params.request_id][i] + "): " + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%");
+	description = description.join(", ");
+	UTILS.output("IAPI: request #" + req.params.request_id + " (" + (new Date().getTime() - irs[req.params.request_id][5]) + "ms): " + description);
+	console.log("");
+	delete irs[req.params.request_id];
+	res.status(200).end();
+	UTILS.debug(database_profiler.endAll());
+}, true);
+serveWebRequest("/createshortcut/:uid", function(req, res, next) {
+	shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
+		if (err) {
+			console.error(err);
+			return res.status(500).end();
+		}
+		if (UTILS.exists(doc)) {
+			let shortcut_count = 0;
+			for (let b in doc.shortcuts) ++shortcut_count;
+			if (shortcut_count >= 50) return res.json({ success: false });
+			doc.shortcuts[req.query.from] = req.query.to;
+			doc.markModified("shortcuts");
+			doc.save(e => {
+				if (e) {
+					console.error(e);
+					return res.status(500).end();
 				}
-				new_shortcuts.shortcuts[req.query.from] = req.query.to;
-				let new_document = new shortcut_doc_model(new_shortcuts);
-				new_document.save((e, doc) => {
-					if (e) {
-						console.error(e);
-						return res.status(500).end();
-					}
-					else {
-						res.json({ success: true });
-					}
-				});
-			}
-		});
-	}, true);
-	serveWebRequest("/removeshortcut/:uid", function(req, res, next) {
-		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
-			if (err) {
-				console.error(err);
-				return res.status(500).end();
-			}
-			if (UTILS.exists(doc)) {
-				delete doc.shortcuts[req.query.from];
-				doc.markModified("shortcuts");
-				doc.save(e => {
-					if (e) {
-						console.error(e);
-						return res.status(500).end();
-					}
-					else {
-						res.json({ success: true });
-					}
-				});
-			}
-			else {
-				res.json({ success: true });
-			}
-		});
-	}, true);
-	serveWebRequest("/removeallshortcuts/:uid", function(req, res, next) {
-		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
-			if (err) {
-				console.error(err);
-				return res.status(500).end();
-			}
-			if (UTILS.exists(doc)) {
-				doc.shortcuts = {};
-				doc.markModified("shortcuts");
-				doc.save(e => {
-					if (e) {
-						console.error(e);
-						return res.status(500).end();
-					}
-					else {
-						res.json({ success: true });
-					}
-				});
-			}
-			else {
-				res.json({ success: true });
-			}
-		});
-	}, true);
-	serveWebRequest("/getshortcut/:uid", function(req, res, next) {
-		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
-			if (err) {
-				console.error(err);
-				return res.status(500).end();
-			}
-			if (UTILS.exists(doc)) {
-				if (UTILS.exists(doc.shortcuts[req.query.from])) {
-					let answer = {};
-					answer[req.query.from] = doc.shortcuts[req.query.from];
-					res.json(answer);
+				else {
+					res.json({ success: true });
 				}
-				else res.status(404).end();
+			});
+		}
+		else {
+			let new_shortcuts = {
+				uid: req.params.uid,
+				shortcuts: {}
 			}
-			else {
-				res.status(404).end();
+			new_shortcuts.shortcuts[req.query.from] = req.query.to;
+			let new_document = new shortcut_doc_model(new_shortcuts);
+			new_document.save((e, doc) => {
+				if (e) {
+					console.error(e);
+					return res.status(500).end();
+				}
+				else {
+					res.json({ success: true });
+				}
+			});
+		}
+	});
+}, true);
+serveWebRequest("/removeshortcut/:uid", function(req, res, next) {
+	shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
+		if (err) {
+			console.error(err);
+			return res.status(500).end();
+		}
+		if (UTILS.exists(doc)) {
+			delete doc.shortcuts[req.query.from];
+			doc.markModified("shortcuts");
+			doc.save(e => {
+				if (e) {
+					console.error(e);
+					return res.status(500).end();
+				}
+				else {
+					res.json({ success: true });
+				}
+			});
+		}
+		else {
+			res.json({ success: true });
+		}
+	});
+}, true);
+serveWebRequest("/removeallshortcuts/:uid", function(req, res, next) {
+	shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
+		if (err) {
+			console.error(err);
+			return res.status(500).end();
+		}
+		if (UTILS.exists(doc)) {
+			doc.shortcuts = {};
+			doc.markModified("shortcuts");
+			doc.save(e => {
+				if (e) {
+					console.error(e);
+					return res.status(500).end();
+				}
+				else {
+					res.json({ success: true });
+				}
+			});
+		}
+		else {
+			res.json({ success: true });
+		}
+	});
+}, true);
+serveWebRequest("/getshortcut/:uid", function(req, res, next) {
+	shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
+		if (err) {
+			console.error(err);
+			return res.status(500).end();
+		}
+		if (UTILS.exists(doc)) {
+			if (UTILS.exists(doc.shortcuts[req.query.from])) {
+				let answer = {};
+				answer[req.query.from] = doc.shortcuts[req.query.from];
+				res.json(answer);
 			}
+			else res.status(404).end();
+		}
+		else {
+			res.status(404).end();
+		}
+	});
+}, true);
+serveWebRequest("/getshortcuts/:uid", function(req, res, next) {
+	shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
+		if (err) {
+			console.error(err);
+			return res.status(500).end();
+		}
+		if (UTILS.exists(doc)) {
+			res.json(doc.toObject());
+		}
+		else {
+			res.send("{}");
+		}
+	});
+});
+//https.createServer({ key: fs.readFileSync("./privkey.pem"), cert: fs.readFileSync("./fullchain.pem") }, website).listen(443);
+serveWebRequest("/ping", function (req, res, next) {
+	res.json({ received: new Date().getTime() });
+}, true);
+serveWebRequest("/stats", function (req, res, next) {
+	let answer = {};
+	for (let i in load_average) {
+		answer[i + ""] = {};
+		answer[i + ""].description = response_type[i];
+		answer[i + ""].min1 = load_average[i].min1();
+		answer[i + ""].min5 = load_average[i].min5();
+		answer[i + ""].min15 = load_average[i].min15();
+		answer[i + ""].min30 = load_average[i].min30();
+		answer[i + ""].min60 = load_average[i].min60();
+		answer[i + ""].total_rate = load_average[i].total_rate();
+		answer[i + ""].total_count = load_average[i].total_count();
+	}
+	res.json(answer);
+}, true);
+serveWebRequest("/eval/:script", function (req, res, next) {
+	let result = {};
+	try {
+		result.string = eval(req.params.script);
+	}
+	catch (e) {
+		result.string = e;
+	}
+	res.json(result).end();
+}, true);
+serveWebRequest("/", function (req, res, next) {
+	res.send("You have reached the online api's testing page.").end();
+});
+serveWebRequest("*", function (req, res, next) {
+	res.status(404).end();
+});
+function serveWebRequest(branch, callback, validate = false) {
+	if (typeof(branch) == "string") {
+		website.get(branch, function (req, res, next) {
+			//UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
+			if (validate && !UTILS.exists(req.query.k)) return res.status(401).end();//no key
+			if (validate && req.query.k !== CONFIG.API_KEY) return res.status(403).end();//wrong key
+			++req_num;
+			load_average[0].add();
+			callback(req, res, next);
 		});
-	}, true);
-	serveWebRequest("/getshortcuts/:uid", function(req, res, next) {
-		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
-			if (err) {
-				console.error(err);
-				return res.status(500).end();
-			}
-			if (UTILS.exists(doc)) {
-				res.json(doc.toObject());
-			}
-			else {
-				res.send("{}");
-			}
-		});
-	});
-	//https.createServer({ key: fs.readFileSync("./privkey.pem"), cert: fs.readFileSync("./fullchain.pem") }, website).listen(443);
-	serveWebRequest("/ping", function (req, res, next) {
-		res.json({ received: new Date().getTime() });
-	}, true);
-	serveWebRequest("/stats", function (req, res, next) {
-		let answer = {};
-		for (let i in load_average) {
-			answer[i + ""] = {};
-			answer[i + ""].description = response_type[i];
-			answer[i + ""].min1 = load_average[i].min1();
-			answer[i + ""].min5 = load_average[i].min5();
-			answer[i + ""].min15 = load_average[i].min15();
-			answer[i + ""].min30 = load_average[i].min30();
-			answer[i + ""].min60 = load_average[i].min60();
-			answer[i + ""].total_rate = load_average[i].total_rate();
-			answer[i + ""].total_count = load_average[i].total_count();
-		}
-		res.json(answer);
-	}, true);
-	serveWebRequest("/eval/:script", function (req, res, next) {
-		let result = {};
-		try {
-			result.string = eval(req.params.script);
-		}
-		catch (e) {
-			result.string = e;
-		}
-		res.json(result).end();
-	}, true);
-	serveWebRequest("/", function (req, res, next) {
-		res.send("You have reached the online api's testing page.").end();
-	});
-	serveWebRequest("*", function (req, res, next) {
-		res.status(404).end();
-	});
-	function serveWebRequest(branch, callback, validate = false) {
-		if (typeof(branch) == "string") {
-			website.get(branch, function (req, res, next) {
+	}
+	else {
+		for (let b in branch) {
+			website.get(branch[b], function(req, res, next){
 				//UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
-				if (validate && req.query.k !== CONFIG.API_KEY) return res.status(401).end();
+				if (validate && !UTILS.exists(req.query.k)) return res.status(401).end();//no key
+				if (validate && req.query.k !== CONFIG.API_KEY) return res.status(403).end();//wrong key
 				++req_num;
 				load_average[0].add();
 				callback(req, res, next);
 			});
-		}
-		else {
-			for (let b in branch) {
-				website.get(branch[b], function(req, res, next){
-					//UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
-					if (validate && req.query.k !== CONFIG.API_KEY) return res.status(401).end();
-					++req_num;
-					load_average[0].add();
-					callback(req, res, next);
-				});
-			}
 		}
 	}
 }
