@@ -7,10 +7,7 @@ module.exports = class WSAPI {
 	constructor(INIT_CONFIG, id) {
 		this.CONFIG = INIT_CONFIG;
 		if (!UTILS.exists(this.CONFIG)) {
-			throw new Error("config.json required to access riot api.");
-		}
-		else if (!UTILS.exists(this.CONFIG.RIOT_API_KEY) || this.CONFIG.RIOT_API_KEY === "") {
-			throw new Error("config.json RIOT_API_KEY required to access riot api.");
+			throw new Error("config.json required.");
 		}
 		this.request = REQUEST;
 		this.cache = {};
@@ -24,7 +21,10 @@ module.exports = class WSAPI {
 		}
 		this.connection = new ws(this.address + ":" + this.port + "/shard?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&id=" + id);
 		this.connection.on("open", () => {
-			UTILS.output("ws connected")
+			UTILS.output("ws connected");
+		});
+		this.connection.on("close", (code, reason) => {
+			UTILS.output("ws closed: " + code + ", " + reason);
 		});
 	}
 }
