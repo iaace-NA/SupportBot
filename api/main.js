@@ -96,7 +96,7 @@ website.ws("/shard", (ws, req) => {
 				}
 				break;
 			case 7:
-				shardBroadcast({ type: 6, content: data.content, cid: data.cid }, [0, data.id]);
+				shardBroadcast({ type: 6, content: data.content, cid: data.cid }, [data.id]);
 				break;
 			default:
 				UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
