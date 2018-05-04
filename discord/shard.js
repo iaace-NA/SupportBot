@@ -67,7 +67,7 @@ client.on("disconnect", function () {
 });
 client.on("message", function (msg) {
 	try {
-		discordcommands(CONFIG, client, msg, DB);
+		discordcommands(CONFIG, client, msg, DB, wsapi);
 	}
 	catch (e) {
 		console.error(e);
@@ -84,7 +84,7 @@ client.on("guildDelete", function(guild) {
 	UTILS.output("Server Left: " + guild.id + " :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
 	sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x:`$" + process.env.SHARD_ID + "`Server Left: `" + guild.id + "` :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
 });
-function sendToChannel(cid, text) {
+function sendToChannel(cid, text) {//duplicated in discordcommands.js
 	const candidate = client.channels.get(cid);
 	if (UTILS.exists(candidate)) return candidate.send(text);
 	else wsapi.sendTextToChannel(cid, text);

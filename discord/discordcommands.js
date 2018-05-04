@@ -5,7 +5,7 @@ let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
 let LOLAPI = require("./lolapi.js");
 let Profiler = require("../timeprofiler.js");
-module.exports = function (CONFIG, client, msg, db) {
+module.exports = function (CONFIG, client, msg, db, wsapi) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 
 	const msg_receive_time = new Date().getTime();
@@ -251,7 +251,7 @@ module.exports = function (CONFIG, client, msg, db) {
 					return false;
 				}
 				else {
-					if (elevated_permissions) client.channels.get(CONFIG.LOG_CHANNEL_ID).send(msg.author.tag + " used " + msg.cleanContent).catch(console.error);
+					if (elevated_permissions) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
 					if (UTILS.exists(callback)) {
 						try {
 							callback(trigger_array[i], i, msg.content.trim().substring(trigger_array[i].length));
@@ -271,7 +271,7 @@ module.exports = function (CONFIG, client, msg, db) {
 					return false;
 				}
 				else {
-					if (elevated_permissions) client.channels.get(CONFIG.LOG_CHANNEL_ID).send(msg.author.tag + " used " + msg.cleanContent).catch(console.error);
+					if (elevated_permissions) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
 					if (UTILS.exists(callback)) {
 						try {
 							callback(trigger_array[i], i);
@@ -427,7 +427,7 @@ module.exports = function (CONFIG, client, msg, db) {
 		}
 	}
 	function shutdown() {
-		client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":x:Shutdown initiated.").catch(console.error);
+		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x:Shutdown initiated.");
 		client.user.setStatus("invisible").then(step2).catch(step2);
 		function step2() {
 			client.destroy().catch();
@@ -438,7 +438,7 @@ module.exports = function (CONFIG, client, msg, db) {
 		}
 	}
 	function restart() {
-		client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Restart initiated.").catch(console.error);
+		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":repeat:Restart initiated.");
 		client.user.setStatus("invisible").then(step2).catch(step2);
 		function step2() {
 			client.destroy().catch();
@@ -447,5 +447,10 @@ module.exports = function (CONFIG, client, msg, db) {
 				child_process.spawnSync("pm2", ["restart", "all"]);
 			}, 5000);
 		}
+	}
+	function sendToChannel(cid, text) {//duplicated in shard.js
+		const candidate = client.channels.get(cid);
+		if (UTILS.exists(candidate)) return candidate.send(text);
+		else wsapi.sendTextToChannel(cid, text);
 	}
 }
