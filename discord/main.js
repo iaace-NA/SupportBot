@@ -19,8 +19,8 @@ const manager = new ShardingManager("./shard.js",
 	totalShards: CONFIG.SHARD_COUNT,
 	respawn: false });
 
-manager.spawn(undefined, 10000);
-UTILS.output("Sharding Manager started");
 manager.on("launch", shard => {
 	UTILS.output("Launched shard " + shard.id);
 });
+manager.spawn(undefined, 10000);
+UTILS.output("Sharding Manager started");
