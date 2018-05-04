@@ -149,10 +149,10 @@ module.exports = class UTILS {
 	shortRank(info) {
 		//****** unranked
 		//██████ unranked
-		//G W--- Gold promotion, 1 win
+		//G⇧W--- Gold promotion, 1 win
 		//G2 +00 Gold 2, 0 LP
 		//G2 +56 Gold 2, 56LP
-		//G2P L_ Gold 2 promotion, 1 loss
+		//G2↑ L_ Gold 2 promotion, 1 loss
 		//C +256 Challenger, 256LP
 		//C+1256 Challenger 1256 LP
 		if (!this.exists(info)) return "******";
@@ -160,10 +160,10 @@ module.exports = class UTILS {
 		answer += info.tier[0];
 		if (this.exists(info.miniSeries)) {//series
 			if (info.miniSeries.progress.length == 5) {//BO5
-				answer += " " + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
+				answer += "⇧" + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
 			}
 			else {//BO3
-				answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank] + "P " + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
+				answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank] + "↑ " + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
 			}
 		}
 		else {//no series
