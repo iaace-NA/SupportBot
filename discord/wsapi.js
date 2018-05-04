@@ -50,6 +50,7 @@ module.exports = class WSAPI {
 		});
 		this.connection.on("message", data => {
 			data = JSON.parse(data);
+			UTILS.output("ws message received: type: " + data.type);
 			switch(data.type) {//client receives even values only
 				case 0://reserved/heartbeat
 					this.send({ type: 1, received: new Date().getTime() });
