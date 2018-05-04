@@ -70,7 +70,9 @@ website.use(function (req, res, next) {
 	return next();
 });
 let shard_ws = {};
+let shard_ws_connected = {};
 let champ_emojis = {};
+const HEARTBEAT_INTERVAL = 60000;
 website.ws("/shard", (ws, req) => {
 	UTILS.debug("/shard reached");
 	if (!UTILS.exists(req.query.k)) return ws.close(4401);//unauthenticated
@@ -82,6 +84,7 @@ website.ws("/shard", (ws, req) => {
 		UTILS.debug("ws message received: type: " + data.type);
 		switch (data.type) {
 			case 1:
+				shard_ws_connected[data.id + ""] = true;
 			case 3:
 			case 5://received emojis
 				for (let b in data.emojis) champ_emojis[data.emojis[b].name] = data.emojis[b].code;
@@ -97,6 +100,14 @@ website.ws("/shard", (ws, req) => {
 	});
 	//ws.close(4200);//OK
 });
+setInterval(() => {
+	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) {
+		if (!UTILS.exists(shard_ws_connected[i + ""])) shard_ws_connected = true;
+		if (!shard_ws_connected[i + ""]) shard_ws[i + ""] = undefined;
+	}
+	for (let b in shard_ws_connected) shard_ws_connected = false;
+	shardBroadcast({ type: 0 });
+}, HEARTBEAT_INTERVAL);
 function allShardsConnected() {
 	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) if (!UTILS.exists(shard_ws[i + ""])) return false;
 	return true;
@@ -104,7 +115,7 @@ function allShardsConnected() {
 function shardBroadcast(message, server_shards_only = false) {
 	let i = 0;
 	if (server_shards_only) i = 1;
-	for (; i < CONFIG.SHARD_COUNT; ++i) shard_ws[i + ""].send(JSON.stringify(message));
+	for (; i < CONFIG.SHARD_COUNT; ++i) if (UTILS.exists(shard_ws[i + ""])) shard_ws[i + ""].send(JSON.stringify(message));
 	UTILS.debug("ws broadcast message sent: type: " + message.type);
 }
 serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, res, next) {

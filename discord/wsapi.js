@@ -16,7 +16,7 @@ module.exports = class WSAPI {
 		emojis: [...]
 	}
 	id table:
-		0: heartbeat
+		0: heartbeat request
 		1: heartbeat
 
 		2: IAPI stats
@@ -52,6 +52,7 @@ module.exports = class WSAPI {
 			data = JSON.parse(data);
 			switch(data.type) {//client receives even values only
 				case 0://reserved/heartbeat
+					this.send({ type: 1, received: new Date().getTime() });
 				case 2://reserved/stat
 				case 4://emoji
 					let all_emojis = data.emojis;
@@ -70,6 +71,10 @@ module.exports = class WSAPI {
 		});
 	}
 	sendEmojis(emojis) {
-		this.connection.send(JSON.stringify({ type: 5, id: process.env.SHARD_ID, emojis }));
+		this.send({ type: 5, emojis });
+	}
+	send(raw_object) {
+		raw_object.id = process.env.SHARD_ID;
+		this.connection.send(JSON.stringify(raw_object));
 	}
 }
