@@ -160,7 +160,7 @@ module.exports = class UTILS {
 		answer += info.tier[0];
 		if (this.exists(info.miniSeries)) {//series
 			if (info.miniSeries.progress.length == 5) {//BO5
-				answer += "⇧" + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
+				answer += "↑" + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
 			}
 			else {//BO3
 				answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank] + "↑ " + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
