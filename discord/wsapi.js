@@ -70,7 +70,6 @@ module.exports = class WSAPI {
 		});
 	}
 	sendEmojis(emojis) {
-		this.connection.send({ type: 5, id: process.env.SHARD_ID, emojis });
+		this.connection.send(JSON.stringify({ type: 5, id: process.env.SHARD_ID, emojis }));
 	}
-
 }
