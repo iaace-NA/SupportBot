@@ -77,7 +77,7 @@ website.ws("/shard", (ws, req) => {
 	UTILS.debug("/shard reached");
 	if (!UTILS.exists(req.query.k)) return ws.close(4401);//unauthenticated
 	if (req.query.k !== CONFIG.API_KEY) return ws.close(4403);//wrong key
-	UTILS.debug("ws connected from shard: " + req.query.id);
+	UTILS.debug("ws connected $" + req.query.id);
 	shard_ws[req.query.id] = ws;
 	ws.on("message", data => {
 		data = JSON.parse(data);
@@ -99,6 +99,9 @@ website.ws("/shard", (ws, req) => {
 				UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
 		}
 	});
+	ws.on("close", (code, reason) => {
+		UTILS.output("ws $" + req.query.id + " closed: " + code + ", " + reason);
+	});
 	//ws.close(4200);//OK
 });
 setInterval(() => {
@@ -117,8 +120,11 @@ function allShardsConnected() {//checks heartbeat
 function shardBroadcast(message, server_shards_only = false) {
 	let i = 0;
 	if (server_shards_only) i = 1;
-	for (; i < CONFIG.SHARD_COUNT; ++i) if (UTILS.exists(shard_ws[i + ""]) && shard_ws[i + ""].readyState == 1) shard_ws[i + ""].send(JSON.stringify(message));
+	for (; i < CONFIG.SHARD_COUNT; ++i) sendToShard(message, i);
 	UTILS.debug("ws broadcast message sent: type: " + message.type);
+}
+function sendToShard(message, id) {
+	if (UTILS.exists(shard_ws[id + ""]) && shard_ws[id + ""].readyState == 1) shard_ws[id + ""].send(JSON.stringify(message));
 }
 serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, res, next) {
 	if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
