@@ -102,7 +102,7 @@ website.ws("/shard", (ws, req) => {
 });
 setInterval(() => {
 	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) {
-		if (!UTILS.exists(shard_ws_connected[i + ""])) shard_ws_connected = true;
+		if (!UTILS.exists(shard_ws_connected[i + ""])) shard_ws_connected[i + ""] = true;
 		if (!shard_ws_connected[i + ""]) shard_ws[i + ""] = undefined;
 	}
 	for (let b in shard_ws_connected) shard_ws_connected = false;
