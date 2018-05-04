@@ -78,8 +78,8 @@ website.ws("/shard", (ws, req) => {
 	UTILS.debug("ws connected from shard: " + req.query.id);
 	shard_ws[req.query.id] = ws;
 	ws.on("message", data => {
-		UTILS.debug("ws message received: type: " + data.type);
 		data = JSON.parse(data);
+		UTILS.debug("ws message received: type: " + data.type);
 		switch (data.type) {
 			case 1:
 			case 3:
@@ -104,7 +104,7 @@ function allShardsConnected() {
 function shardBroadcast(message, server_shards_only = true) {
 	let i = 0;
 	if (server_shards_only) i = 1;
-	for (; i < CONFIG.SHARD_COUNT; ++i) shard_ws[i + ""].send(message);
+	for (; i < CONFIG.SHARD_COUNT; ++i) shard_ws[i + ""].send(JSON.stringify(message));
 	UTILS.debug("ws broadcast message sent: type: " + message.type);
 }
 serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, res, next) {
