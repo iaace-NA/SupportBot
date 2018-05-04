@@ -101,7 +101,7 @@ function allShardsConnected() {
 	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) if (!UTILS.exists(shard_ws[i + ""])) return false;
 	return true;
 }
-function shardBroadcast(message, server_shards_only = true) {
+function shardBroadcast(message, server_shards_only = false) {
 	let i = 0;
 	if (server_shards_only) i = 1;
 	for (; i < CONFIG.SHARD_COUNT; ++i) shard_ws[i + ""].send(JSON.stringify(message));
