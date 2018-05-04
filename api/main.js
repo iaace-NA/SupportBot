@@ -121,9 +121,7 @@ function allShardsConnected() {//checks heartbeat
 	return true;
 }
 function shardBroadcast(message, exclusions = []) {
-	let i = 0;
-	if (server_shards_only) i = 1;
-	for (; i < CONFIG.SHARD_COUNT; ++i) if (exclusions.indexOf(i) == -1) sendToShard(message, i);
+	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) if (exclusions.indexOf(i) == -1) sendToShard(message, i);
 	UTILS.debug("ws broadcast message sent: type: " + message.type);
 }
 function sendToShard(message, id) {
