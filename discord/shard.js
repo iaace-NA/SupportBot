@@ -21,7 +21,7 @@ catch (e) {
 const mode = process.env.NODE_ENV === "production" ? "PRODUCTION:warning:" : process.env.NODE_ENV;
 const DB = new (require("./dbmanager.js"))(CONFIG);
 const LOLAPI = new (require("./lolapi.js"))(CONFIG, 0);
-const wsapi = new (require("./wsapi.js"))(CONFIG);
+const wsapi = new (require("./wsapi.js"))(CONFIG, client);
 LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 	UTILS.output("DD STATIC RESOURCES LOADED");
 	CONFIG.STATIC = result;
@@ -49,8 +49,8 @@ client.on("ready", function () {
 	else UTILS.output("discord reconnected");
 	client.user.setStatus("online").catch(console.error);
 	client.user.setActivity("League of Legends").catch(console.error);
-	if (initial_start && UTILS.exists(client.channels.get(CONFIG.LOG_CHANNEL_ID))) client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Bot started in " + UTILS.round((new Date().getTime() - start_time) / 1000, 0) + "s: version: " + CONFIG.VERSION + " mode: " + mode + " servers: " + client.guilds.size).catch(console.error);
-	else if (UTILS.exists(client.channels.get(CONFIG.LOG_CHANNEL_ID))) client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":repeat:Bot reconnected");
+	if (initial_start) sendToChannel(CONFIG.LOG_CHANNEL_ID, ":repeat:`$" + process.env.SHARD_ID + "`Bot started in " + UTILS.round((new Date().getTime() - start_time) / 1000, 0) + "s: version: " + CONFIG.VERSION + " mode: " + mode + " servers: " + client.guilds.size);
+	else sendToChannel(CONFIG.LOG_CHANNEL_ID, ":repeat:`$" + process.env.SHARD_ID + "`Bot reconnected");
 	let all_emojis = [];//collects all emojis from emoji servers
 	for (let i in CONFIG.CHAMP_EMOJI_SERVERS) {
 		const candidate = client.guilds.get(CONFIG.CHAMP_EMOJI_SERVERS[i]);
@@ -75,13 +75,18 @@ client.on("message", function (msg) {
 });
 client.on("guildCreate", function (guild) {
 	UTILS.output("Server Joined: " + guild.id + " :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
-	client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":white_check_mark:Server Joined: `" + guild.id + "` :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag).catch(e => console.error(e));
+	sendToChannel(CONFIG.LOG_CHANNEL_ID, ":white_check_mark:`$" + process.env.SHARD_ID + "`Server Joined: `" + guild.id + "` :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
 	guild.owner.send("SupportBot has joined your server: " + guild.name + "\nUse `Lhelp` for information on how to use SupportBot.\nAdd SupportBot to other servers using this link: <" + CONFIG.BOT_ADD_LINK + ">").catch(e => console.error(e));
 	let candidate = UTILS.preferredTextChannel(client, guild.channels, "text", ["general", "bot", "bots", "bot-commands", "botcommands", "lol", "league", "spam"], ["VIEW_CHANNEL", "SEND_MESSAGES"]);
 	if (UTILS.exists(candidate)) candidate.send("Use `Lhelp` for information on how to use SupportBot.\nAdd SupportBot to other servers using this link: <" + CONFIG.BOT_ADD_LINK + ">").catch();
 });
 client.on("guildDelete", function(guild) {
 	UTILS.output("Server Left: " + guild.id + " :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
-	client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":x:Server Left: `" + guild.id + "` :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag).catch(e => console.error(e));
+	sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x:`$" + process.env.SHARD_ID + "`Server Left: `" + guild.id + "` :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
 });
+function sendToChannel(cid, text) {
+	const candidate = client.channels.get(cid);
+	if (UTILS.exists(candidate)) return candidate.send(text);
+	else wsapi.sendTextToChannel(cid, text);
+}
 //setInterval(() => {}, 60000);

@@ -34,7 +34,8 @@ module.exports = class WSAPI {
 		10: IAPI wants to send a PM
 		11: shard wants to send a PM
 	*/
-	constructor(INIT_CONFIG) {
+	constructor(INIT_CONFIG, discord_client) {
+		this.client = discord_client;
 		this.CONFIG = INIT_CONFIG;
 		if (!UTILS.exists(this.CONFIG)) throw new Error("config.json required.");
 		this.request = REQUEST;
@@ -65,6 +66,12 @@ module.exports = class WSAPI {
 					UTILS.output("champion emojis registered");
 					break;
 				case 6://send message to channel
+					const candidate = this.client.get(data.cid);
+					if (UTILS.exists(candidate)) {
+						candidate.send(data.content).catch(console.error);
+						UTILS.debug("message sent to " + data.cid);
+					}
+					break;
 				case 8://send message to default channel in server
 				case 10://send message to user
 				default:
@@ -75,9 +82,12 @@ module.exports = class WSAPI {
 	sendEmojis(emojis) {
 		this.send({ type: 5, emojis });
 	}
+	sendTextToChannel(cid, content) {
+		this.send({ type: 7, content, cid });
+	}
 	send(raw_object) {
 		let that = this;
-		raw_object.id = process.env.SHARD_ID;
+		raw_object.id = parseInt(process.env.SHARD_ID);
 		if (this.connection.readyState != 1) {
 			this.connect();
 			setTimeout(() => {

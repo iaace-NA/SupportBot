@@ -13,6 +13,9 @@ module.exports = function (CONFIG, client, msg, db) {
 	let lolapi = new LOLAPI(CONFIG, msg.id);
 	request_profiler.mark("lolapi instantiated");
 	if ((UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) || !UTILS.exists(msg.guild)) {//respondable server message or PM
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "stats"], false, true, () => {
+			reply("This is shard " + process.env.SHARD_ID);
+		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {
 			reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
 		});

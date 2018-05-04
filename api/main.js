@@ -95,6 +95,9 @@ website.ws("/shard", (ws, req) => {
 					shardBroadcast({ type: 4, emojis: response });
 				}
 				break;
+			case 7:
+				shardBroadcast({ type: 6, content: data.content, cid: data.cid }, [0, data.id]);
+				break;
 			default:
 				UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
 		}
@@ -117,10 +120,10 @@ function allShardsConnected() {//checks heartbeat
 	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) if (!UTILS.exists(shard_ws[i + ""])) return false;
 	return true;
 }
-function shardBroadcast(message, server_shards_only = false) {
+function shardBroadcast(message, exclusions = []) {
 	let i = 0;
 	if (server_shards_only) i = 1;
-	for (; i < CONFIG.SHARD_COUNT; ++i) sendToShard(message, i);
+	for (; i < CONFIG.SHARD_COUNT; ++i) if (exclusions.indexOf(i) == -1) sendToShard(message, i);
 	UTILS.debug("ws broadcast message sent: type: " + message.type);
 }
 function sendToShard(message, id) {
