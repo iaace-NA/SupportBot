@@ -41,7 +41,7 @@ module.exports = class WSAPI {
 		this.address = "wss://" + (process.env.NODE_ENV !== "production" ? this.CONFIG.API_ADDRESS_DEVELOPMENT : this.CONFIG.API_ADDRESS_PRODUCTION);
 		this.port = process.env.NODE_ENV !== "production" ? this.CONFIG.API_PORT_DEVELOPMENT : this.CONFIG.API_PORT_PRODUCTION;
 		UTILS.debug("wss address attempted: " + this.address + ":" + this.port + "/shard?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&id=" + process.env.SHARD_ID);
-		this.connection = new ws(this.address + ":" + this.port + "/shard?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&id=" + process.env.SHARD_ID, agentOptions);
+		this.connect();
 		this.connection.on("open", () => {
 			UTILS.output("ws connected");
 		});
@@ -76,7 +76,17 @@ module.exports = class WSAPI {
 		this.send({ type: 5, emojis });
 	}
 	send(raw_object) {
+		let that = this;
 		raw_object.id = process.env.SHARD_ID;
-		this.connection.send(JSON.stringify(raw_object));
+		if (this.connection.readyState != 1) {
+			this.connect();
+			setTimeout(() => {
+				that.send(raw_object);
+			}, 10000);
+		}
+		else this.connection.send(JSON.stringify(raw_object));
+	}
+	connect() {
+		this.connection = new ws(this.address + ":" + this.port + "/shard?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&id=" + process.env.SHARD_ID, agentOptions);
 	}
 }

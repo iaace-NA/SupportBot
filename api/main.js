@@ -104,12 +104,13 @@ website.ws("/shard", (ws, req) => {
 setInterval(() => {
 	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) {
 		if (!UTILS.exists(shard_ws_connected[i + ""])) shard_ws_connected[i + ""] = true;
+		if (shard_ws[i + ""].readyState != 1) shard_ws_connected[i + ""] = false;
 		if (!shard_ws_connected[i + ""]) shard_ws[i + ""] = undefined;
 	}
 	for (let b in shard_ws_connected) shard_ws_connected[b] = false;
 	shardBroadcast({ type: 0 });
 }, HEARTBEAT_INTERVAL);
-function allShardsConnected() {
+function allShardsConnected() {//checks heartbeat
 	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) if (!UTILS.exists(shard_ws[i + ""])) return false;
 	return true;
 }
