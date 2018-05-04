@@ -17,9 +17,9 @@ catch (e) {
 const manager = new ShardingManager("./shard.js", 
 	{ token: process.env.NODE_ENV == "production" ? CONFIG.DISCORD_API_KEY_PRODUCTION : CONFIG.DISCORD_API_KEY_DEVELOPMENT,
 	totalShards: CONFIG.SHARD_COUNT,
-	respawn: false});
+	respawn: false });
 
-manager.spawn();
+manager.spawn(undefined, 10000);
 UTILS.output("Sharding Manager started");
 manager.on("launch", shard => {
 	UTILS.output("Launched shard " + shard.id);
