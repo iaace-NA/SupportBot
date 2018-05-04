@@ -117,7 +117,7 @@ function allShardsConnected() {//checks heartbeat
 function shardBroadcast(message, server_shards_only = false) {
 	let i = 0;
 	if (server_shards_only) i = 1;
-	for (; i < CONFIG.SHARD_COUNT; ++i) if (UTILS.exists(shard_ws[i + ""])) shard_ws[i + ""].send(JSON.stringify(message));
+	for (; i < CONFIG.SHARD_COUNT; ++i) if (UTILS.exists(shard_ws[i + ""]) && shard_ws[i + ""].readyState == 1) shard_ws[i + ""].send(JSON.stringify(message));
 	UTILS.debug("ws broadcast message sent: type: " + message.type);
 }
 serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, res, next) {
