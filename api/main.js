@@ -69,13 +69,43 @@ website.use(function (req, res, next) {
 	res.removeHeader("X-Powered-By");
 	return next();
 });
+let shard_ws = {};
+let champ_emojis = {};
 website.ws("/shard", (ws, req) => {
 	UTILS.debug("/shard reached");
 	if (!UTILS.exists(req.query.k)) return ws.close(4401);//unauthenticated
 	if (req.query.k !== CONFIG.API_KEY) return ws.close(4403);//wrong key
 	UTILS.debug("ws connected from shard: " + req.query.id);
-	ws.close(4200);//OK
+	shard_ws[req.query.id] = ws;
+	ws.on("message", data => {
+		data = JSON.parse(data);
+		switch (data.type) {
+			case 1:
+			case 3:
+			case 5://received emojis
+				for (let b in data.emojis) champ_emojis[data.emojis[b].name] = data.emojis[b].code;
+				if (allShardsConnected()) {
+					let response = [];
+					for (let b in champ_emojis) response.push({ name: b, code: champ_emojis[b] });
+					shardBroadcast({ type: 4, emojis: response });
+				}
+				break;
+			default:
+				UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
+		}
+	});
+	//ws.close(4200);//OK
 });
+function allShardsConnected() {
+	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) if (!UTILS.exists(shard_ws[i + ""])) return false;
+	return true;
+}
+function shardBroadcast(message, server_shards_only = true) {
+	let i = 0;
+	if (server_shards_only) i = 1;
+	for (; i < CONFIG.SHARD_COUNT; ++i) shard_ws[i + ""].send(message);
+	UTILS.debug("ws broadcast message sent: type: " + message.type);
+}
 serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, res, next) {
 	if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
 	++irs[req.params.request_id][0];
