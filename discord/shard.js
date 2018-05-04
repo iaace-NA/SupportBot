@@ -84,4 +84,4 @@ client.on("guildDelete", function(guild) {
 	UTILS.output("Server Left: " + guild.id + " :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
 	client.channels.get(CONFIG.LOG_CHANNEL_ID).send(":x:Server Left: `" + guild.id + "` :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag).catch(e => console.error(e));
 });
-setInterval(, 60000);
+//setInterval(() => {}, 60000);
