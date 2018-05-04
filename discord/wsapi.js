@@ -66,7 +66,7 @@ module.exports = class WSAPI {
 					UTILS.output("champion emojis registered");
 					break;
 				case 6://send message to channel
-					const candidate = this.client.get(data.cid);
+					const candidate = this.client.channels.get(data.cid);
 					if (UTILS.exists(candidate)) {
 						candidate.send(data.content).catch(console.error);
 						UTILS.debug("message sent to " + data.cid);
