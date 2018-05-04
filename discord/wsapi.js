@@ -54,6 +54,7 @@ module.exports = class WSAPI {
 			switch(data.type) {//client receives even values only
 				case 0://reserved/heartbeat
 					this.send({ type: 1, received: new Date().getTime() });
+					break;
 				case 2://reserved/stat
 				case 4://emoji
 					let all_emojis = data.emojis;

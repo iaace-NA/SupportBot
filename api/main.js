@@ -85,6 +85,7 @@ website.ws("/shard", (ws, req) => {
 		switch (data.type) {
 			case 1:
 				shard_ws_connected[data.id + ""] = true;
+				break;
 			case 3:
 			case 5://received emojis
 				for (let b in data.emojis) champ_emojis[data.emojis[b].name] = data.emojis[b].code;
