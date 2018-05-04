@@ -21,7 +21,7 @@ catch (e) {
 const mode = process.env.NODE_ENV === "production" ? "PRODUCTION:warning:" : process.env.NODE_ENV;
 const DB = new (require("./dbmanager.js"))(CONFIG);
 const LOLAPI = new (require("./lolapi.js"))(CONFIG, 0);
-const wsapi = new (require("./wsapi.js"))(CONFIG, process.env.SHARD_ID);
+const wsapi = new (require("./wsapi.js"))(CONFIG);
 LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 	UTILS.output("DD STATIC RESOURCES LOADED");
 	CONFIG.STATIC = result;
