@@ -520,10 +520,10 @@ module.exports = class EmbedGenerator {
 				if (streak_result == results[j]) streak_count++;
 				else break;
 			}
-			individual_description += (streak_count + "").padStart(2, "0") + (streak_result ? "Ws " : "Ls ");//streak information
+			individual_description += (streak_count + "").padStart(2, " ") + (streak_result ? "Ws " : "Ls ");//streak information
 			const total_wins = results.reduce((total, increment) => { return total + (increment ? 1 : 0); }, 0) + "";
 			const total_losses = results.reduce((total, increment) => { return total + (increment ? 0 : 1); }, 0) + "";
-			individual_description += total_wins.padStart(2, "0") + "W/" + total_losses.padStart(2, "0") + "L ";//20 game W/L record
+			individual_description += total_wins.padStart(2, " ") + "W/" + total_losses.padStart(2, " ") + "L ";//20 game W/L record
 			individual_description += "@ " + UTILS.KDAFormat((all_KDA.K + all_KDA.A) / all_KDA.D) + "` ";
 			for (let j = 0; j < 3; ++j) {//top 3 champion masteries
 				individual_description += j < masteries[i].length ? CONFIG.STATIC.CHAMPIONS[masteries[i][j].championId].emoji : ":x:";
