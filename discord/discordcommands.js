@@ -151,6 +151,7 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 			let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
 			let pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => { return s.trim(); });
 			if (pre_usernames.length > 5) return reply(":x:There are too many usernames to get data for.");
+			if (pre_usernames.length < 1) return reply(":x:There are not enough usernames to get data for.");
 			Promise.all(pre_usernames.map(u => {
 				return new Promise((resolve, reject) => {
 					if (u[0] !== "$") resolve(u);
