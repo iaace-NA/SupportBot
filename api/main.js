@@ -94,6 +94,7 @@ website.ws("/shard", (ws, req) => {
 					for (let b in champ_emojis) response.push({ name: b, code: champ_emojis[b] });
 					shardBroadcast({ type: 4, emojis: response });
 				}
+				else UTILS.debug(JSON.stringify(disconnectedShards()) + " shards are not connected so emojis will not be sent out yet");
 				break;
 			case 7:
 				shardBroadcast({ type: 6, content: data.content, cid: data.cid }, [data.id]);
@@ -117,8 +118,13 @@ setInterval(() => {
 	shardBroadcast({ type: 0 });
 }, HEARTBEAT_INTERVAL);
 function allShardsConnected() {//checks heartbeat
-	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) if (!UTILS.exists(shard_ws[i + ""])) return false;
+	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) if (!UTILS.exists(shard_ws[i + ""]) || shard_ws[i + ""].readyState != 1) return false;
 	return true;
+}
+function disconnectedShards() {//checks heartbeat
+	let answer = [];
+	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) if (!UTILS.exists(shard_ws[i + ""]) || shard_ws[i + ""].readyState != 1) answer.push(i);
+	return answer;
 }
 function shardBroadcast(message, exclusions = []) {
 	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) if (exclusions.indexOf(i) == -1) sendToShard(message, i);
