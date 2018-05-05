@@ -508,8 +508,8 @@ module.exports = class EmbedGenerator {
 				D: 0,
 				A: 0
 			};
-			for (let b in match_metas[i]) {//iterate through match meta for 1 summoner
-				const indv_match = matches.find(m => { return match_metas[i][b].gameId == m.gameId; });
+			for (let b in match_metas[i].matches) {//iterate through match meta for 1 summoner
+				const indv_match = matches.find(m => { return match_metas[i].matches[b].gameId == m.gameId; });
 				results.push(UTILS.determineWin(summoners[i], indv_match));
 				const KDA = UTILS.KDA(summoners[i].id, indv_match);
 				for (let b in all_KDA) all_KDA[b] += KDA[b];
