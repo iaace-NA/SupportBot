@@ -147,7 +147,7 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 				}).catch(console.error);
 			}).catch(console.error);
 		});
-		command(["m ", "multi "], true, false, (original, index, parameter) => {
+		command(["m ", "multi ", "c ", "compare "], true, false, (original, index, parameter) => {
 			let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
 			let pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => { return s.trim(); });
 			if (pre_usernames.length > 5) return reply(":x:There are too many usernames to get data for.");
