@@ -167,7 +167,7 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 					const ids = summoners.map(s => { return s.id; });
 					lolapi.getMultipleRanks(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_RANKS).then(ranks => {
 						lolapi.getMultipleChampionMastery(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_MASTERIES).then(masteries => {
-							lolapi.getMultipleRecentGames(region, summoners.map(s => { return s.accountId; }), CONFIG.API_MAXAGE.MULTIPLE_RECENT_GAMES).then(mhA => {
+							lolapi.getMultipleRecentGames(region, summoners.map(s => { return s.accountId; }), CONFIG.API_MAXAGE.MULTI.MULTIPLE_RECENT_GAMES).then(mhA => {
 								let mIDA = [];//match id array;
 								for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
 								lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.MULTI.MULTIPLE_MATCH).then(matches => {
