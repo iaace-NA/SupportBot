@@ -529,7 +529,7 @@ module.exports = class EmbedGenerator {
 				individual_description += j < masteries[i].length ? CONFIG.STATIC.CHAMPIONS[masteries[i][j].championId].emoji : ":x:";
 			}
 			individual_description += " lv. `" + summoners[i].summonerLevel + "`";
-			individual_description += " [" + summoners[i].name + "](" + UTILS.opgg(region) + ")";
+			individual_description += " [" + summoners[i].name + "](" + UTILS.opgg(region, summoners[i].name) + ")";
 			UTILS.debug("individual_description length: " + individual_description.length);
 			response_str.push(individual_description);
 		}
