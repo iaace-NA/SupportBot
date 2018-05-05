@@ -499,9 +499,9 @@ module.exports = class EmbedGenerator {
 				continue;
 			}
 			let individual_description = "`";
+			individual_description += UTILS.shortRank(ranks[i].find(r => { return r.queueType === "RANKED_SOLO_5x5"; })) + " ";
 			individual_description += UTILS.shortRank(ranks[i].find(r => { return r.queueType === "RANKED_FLEX_SR"; })) + " ";
 			individual_description += UTILS.shortRank(ranks[i].find(r => { return r.queueType === "RANKED_FLEX_TT"; })) + " ";
-			individual_description += UTILS.shortRank(ranks[i].find(r => { return r.queueType === "RANKED_SOLO_5x5"; })) + " ";
 			let results = [];
 			let all_KDA = {
 				K: 0,
