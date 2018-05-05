@@ -517,7 +517,7 @@ module.exports = class EmbedGenerator {
 			let streak_count = 1;
 			const streak_result = results[0];
 			for (let j = 1; j < results.length; ++j) {
-				if (streak_result == results[b]) streak_count++;
+				if (streak_result == results[j]) streak_count++;
 				else break;
 			}
 			individual_description += streak_count + (streak_result ? "Ws" : "Ls");//streak information
