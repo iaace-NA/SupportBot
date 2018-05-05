@@ -429,7 +429,7 @@ module.exports = class EmbedGenerator {
 			}
 			UTILS.debug("team_description_c1 length: " + team_description_c1.length);
 			UTILS.debug("team_description_c2 length: " + team_description_c2.length);
-			newEmbed.addField(":x::x: `SOLO Q`¦`FLEX 5`¦`FLEX 3`", team_description_c1, true);
+			newEmbed.addField(":x::x: `SOLOQ `¦`FLEX5 `¦`FLEX3 `", team_description_c1, true);
 			newEmbed.addField("Bans: " + ban_description.join(""), team_description_c2, true);
 			++team_count;
 		}
@@ -489,5 +489,20 @@ module.exports = class EmbedGenerator {
 		newEmbed.setTimestamp();
 		newEmbed.setThumbnail("https://cdn.discordapp.com/attachments/423261885262069771/433465885420945409/cby4p-fp0aj-0.png");
 		return newEmbed;
+	}
+	multiSummoner() {
+		//SOLO Q|FLEX 5|FLEX 3 [MH1][MH2][MH3][MH4][W]W/[L]L KDA: [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
+		//6     7      7      1 25   25   25   25   2 2  2 2 4    6     26  26  26 5    3    48
+		//SOLO Q|FLEX 5|FLEX 3 [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
+		//6     7      7      1 2 2  2 2 6     26  26  26 5    3    48
+		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
+		//6     7      7      1 2   1 2  2 2  2 2 6     26  26  26 5    3    48
+
+
+		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
+		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
+		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
+		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
+		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
 	}
 }
