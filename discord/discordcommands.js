@@ -154,8 +154,10 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 			pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => { return s.trim(); });
 			}
 			else {
-				pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split("joined the lobby\n").map(s => { return s.trim(); });
-				pre_usernames[pre_usernames.length - 1] = pre_usernames[pre_usernames.length - 1].replace("joined the lobby", "");
+				pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(" joined the lobby\n").map(s => { return s.trim(); });
+				pre_usernames[pre_usernames.length - 1] = pre_usernames[pre_usernames.length - 1].replace(" joined the lobby", "");
+				pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(" left the lobby\n").map(s => { return s.trim(); });
+				pre_usernames[pre_usernames.length - 1] = pre_usernames[pre_usernames.length - 1].replace(" left the lobby", "");
 			}
 			if (pre_usernames.length > 5) return reply(":x:There are too many usernames to get data for.");
 			if (pre_usernames.length < 1) return reply(":x:There are not enough usernames to get data for.");
