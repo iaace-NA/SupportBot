@@ -149,7 +149,13 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 		});
 		command(["m ", "multi ", "c ", "compare "], true, false, (original, index, parameter) => {
 			let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
-			let pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => { return s.trim(); });
+			let pre_usernames;
+			if (parameter.indexOf(",") != -1) {
+			pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => { return s.trim(); });
+			}
+			else {
+				pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split("joined the lobby\n").map(s => { return s.trim(); });
+			}
 			if (pre_usernames.length > 5) return reply(":x:There are too many usernames to get data for.");
 			if (pre_usernames.length < 1) return reply(":x:There are not enough usernames to get data for.");
 			Promise.all(pre_usernames.map(u => {
