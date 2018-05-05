@@ -342,7 +342,6 @@ module.exports = class EmbedGenerator {
 			const flex_5 = ranks[b].find(r => { return r.queueType === "RANKED_FLEX_SR"; });
 			const flex_3 = ranks[b].find(r => { return r.queueType === "RANKED_FLEX_TT"; });
 			const solo = ranks[b].find(r => { return r.queueType === "RANKED_SOLO_5x5"; });
-			const divs = { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" };
 			match.participants[b].flex5 = UTILS.shortRank(flex_5);
 			match.participants[b].flex3 = UTILS.shortRank(flex_3);
 			match.participants[b].solo = UTILS.shortRank(solo);
@@ -490,7 +489,52 @@ module.exports = class EmbedGenerator {
 		newEmbed.setThumbnail("https://cdn.discordapp.com/attachments/423261885262069771/433465885420945409/cby4p-fp0aj-0.png");
 		return newEmbed;
 	}
-	multiSummoner() {
+	multiSummoner(CONFIG, region, summoners, ranks, masteries, match_metas, matches) {
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setTitle("Multiple Summoner Comparison");
+		let response_str = [];
+		for (let i = 0; i < summoners.length; ++i) {
+			if (UTILS.exists(summoners[i].status)) {
+				response_str.push("The requested summoner does not exist.");
+				continue;
+			}
+			let individual_description = "`";
+			individual_description += UTILS.shortRank(ranks[b].find(r => { return r.queueType === "RANKED_FLEX_SR"; })) + " ";
+			individual_description += UTILS.shortRank(ranks[b].find(r => { return r.queueType === "RANKED_FLEX_TT"; })) + " ";
+			individual_description += UTILS.shortRank(ranks[b].find(r => { return r.queueType === "RANKED_SOLO_5x5"; })) + "` ";
+			let results = [];
+			let all_KDA = {
+				K: 0,
+				D: 0,
+				A: 0
+			};
+			for (let b in match_metas[i]) {//iterate through match meta for 1 summoner
+				const indv_match = matches.find(m => { return match_metas[i][b].gameId == m.gameId; });
+				results.push(UTILS.determineWin(summoners[i], indv_match));
+				const KDA = UTILS.KDA(summoners[i].id, indv_match);
+				for (let b in all_KDA) all_KDA[b] += KDA[b];
+			}
+			let streak_count = 1;
+			const streak_result = results[0];
+			for (let j = 1; j < results.length; ++j) {
+				if (streak_result == results[b]) streak_count++;
+				else break;
+			}
+			individual_description += streak_count + (streak_result ? "Ws" : "Ls");//streak information
+			const total_wins = results.reduce((total, increment) => { return total + (increment ? 1 : 0); }, 0);
+			const total_losses = all_results.reduce((total, increment) => { return total + (increment ? 0 : 1); }, 0);
+			individual_description += total_wins + "W/" + total_losses + "L ";//20 game W/L record
+			individual_description += "KDA: `" + UTILS.KDAFormat((all_KDA.K + all_KDA.A) / all_KDA.D) + "` ";
+			for (let j = 0; j < 3; ++j) {//top 3 champion masteries
+				individual_description += j < masteries[i].length ? CONFIG.STATIC.CHAMPIONS[masteries[i][j].championId].emoji : ":x:";
+			}
+			individual_description += " lv. `" + summoners[i].summonerLevel + "`";
+			individual_description += " [" + summoners[i].name + "](" + UTILS.opgg(region) + ")";
+			UTILS.debug("individual_description length: " + individual_description.length);
+			response_str.push(individual_description);
+		}
+		newEmbed.addField("`SOLOQ |FLEX5 |FLEX3` W/L-STREAK, RECENT W/L, RECENT KDA, HIGHEST MASTERY CHAMPS, ACCOUNT LVL", response_str.join("\n"));
+		return newEmbed;
 		//SOLO Q|FLEX 5|FLEX 3 [MH1][MH2][MH3][MH4][W]W/[L]L KDA: [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
 		//6     7      7      1 25   25   25   25   2 2  2 2 4    6     26  26  26 5    3    48
 		//SOLO Q|FLEX 5|FLEX 3 [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]

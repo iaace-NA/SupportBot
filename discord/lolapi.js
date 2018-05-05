@@ -116,6 +116,18 @@ module.exports = class LOLAPI {
 	getSummonerIDFromName(region, username, maxage) {
 		return this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage);
 	}
+	getMultipleSummonerIDFromName(region, usernames, maxage) {
+		let that = this;
+		let requests = [];
+		if (this.CONFIG.API_SEQUENTIAL) {
+			for (let i in usernames) requests.push(function () { return that.getSummonerIDFromName(region, usernames[i], maxage); });
+			return UTILS.sequential(requests);
+		}
+		else {
+			for (let i in usernames) requests.push(that.getSummonerIDFromName(region, usernames[i], maxage));
+			return Promise.all(requests);
+		}
+	}
 	getSummonerFromSummonerID(region, id, maxage) {
 		if (id === null) return new Promise((resolve, reject) => { resolve({}); });
 		return this.get(region, "summoner/v3/summoners/" + id, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_FROM_SUMMONER_ID, maxage);
