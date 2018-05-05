@@ -522,7 +522,7 @@ module.exports = class EmbedGenerator {
 			}
 			individual_description += streak_count + (streak_result ? "Ws" : "Ls");//streak information
 			const total_wins = results.reduce((total, increment) => { return total + (increment ? 1 : 0); }, 0);
-			const total_losses = all_results.reduce((total, increment) => { return total + (increment ? 0 : 1); }, 0);
+			const total_losses = results.reduce((total, increment) => { return total + (increment ? 0 : 1); }, 0);
 			individual_description += total_wins + "W/" + total_losses + "L ";//20 game W/L record
 			individual_description += "KDA: `" + UTILS.KDAFormat((all_KDA.K + all_KDA.A) / all_KDA.D) + "` ";
 			for (let j = 0; j < 3; ++j) {//top 3 champion masteries
