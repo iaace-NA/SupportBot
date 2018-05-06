@@ -200,7 +200,7 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 				pre_usernames = pre_usernames.slice(0, 10);
 			}
 			if (pre_usernames.length < 1) return reply(":x:There are not enough usernames to get data for.");
-			request_profiler.end("processing usernames");
+			request_profiler.end("parsing usernames");
 			UTILS.debug(request_profiler.endAll());
 			Promise.all(pre_usernames.map(u => {
 				return new Promise((resolve, reject) => {
