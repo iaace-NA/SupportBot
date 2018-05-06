@@ -152,7 +152,7 @@ serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
 	console.log("");
 	delete irs[req.params.request_id];
 	res.status(200).end();
-	UTILS.debug(database_profiler.endAll());
+	UTILS.debug(database_profiler.endAll(), false);
 }, true);
 serveWebRequest("/createshortcut/:uid", function(req, res, next) {
 	shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
