@@ -150,19 +150,41 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 		command(["m ", "multi ", "c ", "compare "], true, false, (original, index, parameter) => {
 			let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
 			let pre_usernames;
-			if (parameter.indexOf(",") != -1) {
-				pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => { return s.trim(); });
+			if (parameter.indexOf(",") != -1) pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => { return s.trim(); });
+			else if (parameter.indexOf("\n") != -1) {//lobby text formatting
+				pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split("\n");
+				let present = [];//users present
+				let join_detected = false, leave_detected = false;
+				let joins = [], leaves = [];
+				for (let i = 0; i < pre_usernames.length; ++i) {
+					const join_suffix = " joined the lobby";
+					const leave_suffix = " left the lobby";
+					if (pre_usernames[i].substring(pre_usernames[i].length - join_suffix) === join_suffix && joins.indexOf(pre_usernames[i]) === -1) {
+						joins.push(pre_usernames[i]);//user joined, add to attendance
+						join_detected = true;
+					}
+					else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix) === leave_suffix && leaves.indexOf(preusernames[i] === -1)){
+						leaves.push(pre_usernames[i]);//user left, delete from attendance
+						leave_detected = true;
+					}
+					else;//chat message
+				}
+				if (join_detected) {
+					present = joins;
+					for (let b in leaves) if (present.indexOf(leaves[b]) == -1) present.splice(present.indexOf(leaves[b]), 1);
+				}
+				else if (leave_detected) present = leaves;
+				/*
+				if (join) lobby/champ select, so joins add to usernames queried and leaves remove from usernames queried
+				if (leave) end game screen, so leaves add to usernames queried
+				*/
+				pre_usernames = present;
 			}
-			else {
-				let j_pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(" joined the lobby\n").map(s => { return s.trim(); });
-				j_pre_usernames[j_pre_usernames.length - 1] = j_pre_usernames[j_pre_usernames.length - 1].replace(" joined the lobby", "");
-				let l_pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(" left the lobby\n").map(s => { return s.trim(); });
-				l_pre_usernames[l_pre_usernames.length - 1] = l_pre_usernames[l_pre_usernames.length - 1].replace(" left the lobby", "");
-				if (j_pre_usernames > l_pre_usernames) pre_usernames = j_pre_usernames;
-				else if (l_pre_usernames > j_pre_usernames) pre_usernames = l_pre_usernames;
-				else pre_usernames = [parameter.substring(parameter.indexOf(" ") + 1)];
+			else pre_usernames = [parameter.substring(parameter.indexOf(" ") + 1)];//CSV
+			if (pre_usernames.length > 10) {
+				reply(":warning:There are too many usernames to get data for. Only the first 10 results will be displayed.");
+				pre_usernames = pre_usernames.slice(0, 10);
 			}
-			if (pre_usernames.length > 5) return reply(":x:There are too many usernames to get data for.");
 			if (pre_usernames.length < 1) return reply(":x:There are not enough usernames to get data for.");
 			Promise.all(pre_usernames.map(u => {
 				return new Promise((resolve, reject) => {
@@ -190,7 +212,7 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 						}).catch(console.error);
 					}).catch(console.error);
 				}).catch(console.error);
-			});
+			}).catch(console.error);
 		});
 		commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {//new
 			request_profiler.mark("lg command recognized");
