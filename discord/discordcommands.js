@@ -171,7 +171,7 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 				}
 				if (join_detected) {
 					present = joins;
-					for (let b in leaves) if (present.indexOf(leaves[b]) == -1) present.splice(present.indexOf(leaves[b]), 1);
+					for (let b in leaves) if (present.indexOf(leaves[b]) != -1) present.splice(present.indexOf(leaves[b]), 1);
 				}
 				else if (leave_detected) present = leaves;
 				/*
