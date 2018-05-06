@@ -154,10 +154,13 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 			pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => { return s.trim(); });
 			}
 			else {
-				pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(" joined the lobby\n").map(s => { return s.trim(); });
-				pre_usernames[pre_usernames.length - 1] = pre_usernames[pre_usernames.length - 1].replace(" joined the lobby", "");
-				pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(" left the lobby\n").map(s => { return s.trim(); });
-				pre_usernames[pre_usernames.length - 1] = pre_usernames[pre_usernames.length - 1].replace(" left the lobby", "");
+				let j_pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(" joined the lobby\n").map(s => { return s.trim(); });
+				j_pre_usernames[j_pre_usernames.length - 1] = j_pre_usernames[j_pre_usernames.length - 1].replace(" joined the lobby", "");
+				let l_pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(" left the lobby\n").map(s => { return s.trim(); });
+				l_pre_usernames[l_pre_usernames.length - 1] = l_pre_usernames[l_pre_usernames.length - 1].replace(" left the lobby", "");
+				if (j_pre_usernames > l_pre_usernames) pre_usernames = j_pre_usernames;
+				else if (l_pre_usernames > j_pre_usernames) pre_usernames = l_pre_usernames;
+				else pre_usernames = parameter;
 			}
 			if (pre_usernames.length > 5) return reply(":x:There are too many usernames to get data for.");
 			if (pre_usernames.length < 1) return reply(":x:There are not enough usernames to get data for.");

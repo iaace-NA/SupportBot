@@ -4,7 +4,10 @@ let seq = require("./promise-sequential.js");
 String.prototype.replaceAll = function(search, replacement) {
 	let target = this;
 	return target.replace(new RegExp(search, 'g'), replacement);
-};
+}
+String.prototype.replaceLast = function(str, replacement) {//untested
+	return str.replace(/_([^_]*)$/, replacement + '$1');
+}
 Number.prototype.pad = function(size) {
 	let s = String(this);
 	while (s.length < (size || 2)) {s = "0" + s;}
