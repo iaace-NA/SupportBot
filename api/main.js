@@ -80,6 +80,7 @@ website.ws("/shard", (ws, req) => {
 	UTILS.debug("ws connected $" + req.query.id);
 	shard_ws[req.query.id] = ws;
 	ws.on("message", data => {
+		shard_ws_connected[data.id + ""] = true;
 		data = JSON.parse(data);
 		UTILS.debug("ws message received: $" + data.id + " type: " + data.type);
 		switch (data.type) {
