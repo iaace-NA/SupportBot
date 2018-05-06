@@ -163,7 +163,7 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 						joins.push(pre_usernames[i].trim());//user joined, add to attendance
 						join_detected = true;
 					}
-					else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix && leaves.indexOf(preusernames[i] === -1)){
+					else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix && leaves.indexOf(pre_usernames[i] === -1)){
 						leaves.push(pre_usernames[i].trim());//user left, delete from attendance
 						leave_detected = true;
 					}
