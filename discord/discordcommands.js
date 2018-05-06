@@ -160,11 +160,11 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 					const join_suffix = " joined the lobby";
 					const leave_suffix = " left the lobby";
 					if (pre_usernames[i].substring(pre_usernames[i].length - join_suffix) === join_suffix && joins.indexOf(pre_usernames[i]) === -1) {
-						joins.push(pre_usernames[i]);//user joined, add to attendance
+						joins.push(pre_usernames[i].trim());//user joined, add to attendance
 						join_detected = true;
 					}
 					else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix) === leave_suffix && leaves.indexOf(preusernames[i] === -1)){
-						leaves.push(pre_usernames[i]);//user left, delete from attendance
+						leaves.push(pre_usernames[i].trim());//user left, delete from attendance
 						leave_detected = true;
 					}
 					else;//chat message
