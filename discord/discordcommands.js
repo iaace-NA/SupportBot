@@ -151,7 +151,7 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 			let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
 			let pre_usernames;
 			if (parameter.indexOf(",") != -1) {
-			pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => { return s.trim(); });
+				pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => { return s.trim(); });
 			}
 			else {
 				let j_pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(" joined the lobby\n").map(s => { return s.trim(); });
@@ -160,7 +160,7 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 				l_pre_usernames[l_pre_usernames.length - 1] = l_pre_usernames[l_pre_usernames.length - 1].replace(" left the lobby", "");
 				if (j_pre_usernames > l_pre_usernames) pre_usernames = j_pre_usernames;
 				else if (l_pre_usernames > j_pre_usernames) pre_usernames = l_pre_usernames;
-				else pre_usernames = [parameter];
+				else pre_usernames = [parameter.substring(parameter.indexOf(" ") + 1)];
 			}
 			if (pre_usernames.length > 5) return reply(":x:There are too many usernames to get data for.");
 			if (pre_usernames.length < 1) return reply(":x:There are not enough usernames to get data for.");
