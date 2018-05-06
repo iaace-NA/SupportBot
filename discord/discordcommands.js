@@ -169,11 +169,14 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 					}
 					else;//chat message
 				}
+				UTILS.debug("joins: " + JSON.stringify(joins));
+				UTILS.debug("leaves: " + JSON.stringify(leaves));
 				if (join_detected) {
 					present = joins;
 					for (let b in leaves) if (present.indexOf(leaves[b]) != -1) present.splice(present.indexOf(leaves[b]), 1);
 				}
 				else if (leave_detected) present = leaves;
+				UTILS.debug("attending: " + JSON.stringify(present));
 				/*
 				if (join) lobby/champ select, so joins add to usernames queried and leaves remove from usernames queried
 				if (leave) end game screen, so leaves add to usernames queried
