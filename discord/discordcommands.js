@@ -160,7 +160,7 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 				l_pre_usernames[l_pre_usernames.length - 1] = l_pre_usernames[l_pre_usernames.length - 1].replace(" left the lobby", "");
 				if (j_pre_usernames > l_pre_usernames) pre_usernames = j_pre_usernames;
 				else if (l_pre_usernames > j_pre_usernames) pre_usernames = l_pre_usernames;
-				else pre_usernames = parameter;
+				else pre_usernames = [parameter];
 			}
 			if (pre_usernames.length > 5) return reply(":x:There are too many usernames to get data for.");
 			if (pre_usernames.length < 1) return reply(":x:There are not enough usernames to get data for.");
