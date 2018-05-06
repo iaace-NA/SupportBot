@@ -255,4 +255,7 @@ module.exports = class UTILS {
 	copy(obj) {//no functions
 		return JSON.parse(JSON.stringify(obj));
 	}
+	removeAllOccurances(arr, deletable) {
+		while (arr.indexOf(deletable) != -1) arr.splice(arr.indexOf(deletable), 1);
+	}
 }

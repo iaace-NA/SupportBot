@@ -156,18 +156,32 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 				let present = [];//users present
 				let join_detected = false, leave_detected = false;
 				let joins = [], leaves = [];
+				const join_suffix = " joined the lobby";
+				const leave_suffix = " left the lobby";
 				for (let i = 0; i < pre_usernames.length; ++i) {
-					const join_suffix = " joined the lobby";
-					const leave_suffix = " left the lobby";
-					if (pre_usernames[i].substring(pre_usernames[i].length - join_suffix.length) === join_suffix && joins.indexOf(pre_usernames[i]) === -1) {
-						joins.push(pre_usernames[i].substring(0, pre_usernames[i].length - join_suffix.length).trim());//user joined, add to attendance
-						join_detected = true;
-					}
-					else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix && leaves.indexOf(pre_usernames[i] === -1)){
-						leaves.push(pre_usernames[i].substring(0, pre_usernames[i].length - leave_suffix.length).trim());//user left, delete from attendance
-						leave_detected = true;
-					}
+					if (pre_usernames[i].substring(pre_usernames[i].length - join_suffix.length) === join_suffix && joins.indexOf(pre_usernames[i]) === -1) join_detected = true;
+					else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix && leaves.indexOf(pre_usernames[i] === -1)) leave_detected = true;
+					else if (join_detected && leave_detected) break;//all necessary results recorded
 					else;//chat message
+				}
+				if (join_detected) {//champ select mode
+					for (let i = 0; i < pre_usernames.length; ++i) {
+						if (pre_usernames[i].substring(pre_usernames[i].length - join_suffix.length) === join_suffix && joins.indexOf(pre_usernames[i]) === -1) {
+							present.push(pre_usernames[i].substring(0, pre_usernames[i].length - join_suffix.length).trim());//user joined, add to attendance
+						}
+						else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix && leaves.indexOf(pre_usernames[i] === -1)) {
+							UTILS.removeAllOccurances(present, pre_usernames[i].substring(0, pre_usernames[i].length - leave_suffix.length).trim());//user left, delete from attendance
+						}
+						else;//chat message
+					}
+				}
+				else if (leave_detected) {//end game mode
+					for (let i = 0; i < pre_usernames.length; ++i) {
+						if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix && leaves.indexOf(pre_usernames[i] === -1)) {
+							present.push(pre_usernames[i].substring(0, pre_usernames[i].length - leave_suffix.length).trim());//user left, add to attendance
+						}
+						else;//chat message
+					}
 				}
 				UTILS.debug("joins: " + JSON.stringify(joins));
 				UTILS.debug("leaves: " + JSON.stringify(leaves));
