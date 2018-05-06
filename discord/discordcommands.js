@@ -148,7 +148,7 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 			}).catch(console.error);
 		});
 		command(["m ", "multi ", "c ", "compare "], true, false, (original, index, parameter) => {
-			request_profiler.mark("mutli command recognized");
+			request_profiler.mark("multi command recognized");
 			request_profiler.begin("parsing usernames");
 			let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
 			let pre_usernames;
