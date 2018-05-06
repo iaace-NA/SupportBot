@@ -148,6 +148,8 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 			}).catch(console.error);
 		});
 		command(["m ", "multi ", "c ", "compare "], true, false, (original, index, parameter) => {
+			request_profiler.mark("mutli command recognized");
+			request_profiler.begin("parsing usernames");
 			let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
 			let pre_usernames;
 			if (parameter.indexOf(",") != -1) pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => { return s.trim(); });
@@ -159,37 +161,32 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 				const join_suffix = " joined the lobby";
 				const leave_suffix = " left the lobby";
 				for (let i = 0; i < pre_usernames.length; ++i) {
-					if (pre_usernames[i].substring(pre_usernames[i].length - join_suffix.length) === join_suffix && joins.indexOf(pre_usernames[i]) === -1) join_detected = true;
-					else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix && leaves.indexOf(pre_usernames[i] === -1)) leave_detected = true;
+					if (pre_usernames[i].substring(pre_usernames[i].length - join_suffix.length) === join_suffix) join_detected = true;
+					else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix) leave_detected = true;
 					else if (join_detected && leave_detected) break;//all necessary results recorded
 					else;//chat message
 				}
 				if (join_detected) {//champ select mode
+					UTILS.debug("champ select mode");
 					for (let i = 0; i < pre_usernames.length; ++i) {
-						if (pre_usernames[i].substring(pre_usernames[i].length - join_suffix.length) === join_suffix && joins.indexOf(pre_usernames[i]) === -1) {
+						if (pre_usernames[i].substring(pre_usernames[i].length - join_suffix.length) === join_suffix) {
 							present.push(pre_usernames[i].substring(0, pre_usernames[i].length - join_suffix.length).trim());//user joined, add to attendance
 						}
-						else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix && leaves.indexOf(pre_usernames[i] === -1)) {
+						else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix) {
 							UTILS.removeAllOccurances(present, pre_usernames[i].substring(0, pre_usernames[i].length - leave_suffix.length).trim());//user left, delete from attendance
 						}
 						else;//chat message
 					}
 				}
 				else if (leave_detected) {//end game mode
+					UTILS.debug("end game lobby mode");
 					for (let i = 0; i < pre_usernames.length; ++i) {
-						if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix && leaves.indexOf(pre_usernames[i] === -1)) {
+						if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix) {
 							present.push(pre_usernames[i].substring(0, pre_usernames[i].length - leave_suffix.length).trim());//user left, add to attendance
 						}
 						else;//chat message
 					}
 				}
-				UTILS.debug("joins: " + JSON.stringify(joins));
-				UTILS.debug("leaves: " + JSON.stringify(leaves));
-				if (join_detected) {
-					present = joins;
-					for (let b in leaves) if (present.indexOf(leaves[b]) != -1) present.splice(present.indexOf(leaves[b]), 1);
-				}
-				else if (leave_detected) present = leaves;
 				UTILS.debug("attending: " + JSON.stringify(present));
 				/*
 				if (join) lobby/champ select, so joins add to usernames queried and leaves remove from usernames queried
@@ -203,6 +200,8 @@ module.exports = function (CONFIG, client, msg, db, wsapi) {
 				pre_usernames = pre_usernames.slice(0, 10);
 			}
 			if (pre_usernames.length < 1) return reply(":x:There are not enough usernames to get data for.");
+			request_profiler.end("processing usernames");
+			UTILS.debug(request_profiler.endAll());
 			Promise.all(pre_usernames.map(u => {
 				return new Promise((resolve, reject) => {
 					if (u[0] !== "$") resolve(u);
