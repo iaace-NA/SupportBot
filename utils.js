@@ -235,11 +235,13 @@ module.exports = class UTILS {
 		let LP;
 		if (mmr < 2600) {
 			answer += ["V", "IV", "III", "II", "I"][Math.floor(((mmr - 100) % 500) / 100)];
-			LP = " " + this.round(mmr % 100);
+			LP = " +" + this.round(mmr % 100).pad(2);
 		}
 		else {
 			LP = this.round((mmr - 2600) * 5);
-			answer += LP;
+			if (LP < 100) answer += "  +" + LP;
+			else if (LP < 1000) answer += " +" + LP;
+			else answer += "+" + LP;
 		}
 		return answer;
 	}
