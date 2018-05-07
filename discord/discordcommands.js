@@ -96,7 +96,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 			if (!UTILS.exists(msg.mentions.users.first())) return reply(":x: No user mention specified.");
 			lolapi.getLink(msg.mentions.users.first().id).then(result => {
 				if (UTILS.exists(result.username) && result.username != "") reply(":white_check_mark: " + msg.mentions.users.first().tag + " is `" + result.username + "`");
-				else reply(":x: No records for " + msg.mentions.users.first().id);
+				else reply(":x: No records for user id " + msg.mentions.users.first().id);
 			}).catch(console.error);
 		});
 		/*command([CONFIG.DISCORD_COMMAND_PREFIX + "cs", CONFIG.DISCORD_COMMAND_PREFIX + "cachesize"], false, false, (original, index) => {
