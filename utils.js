@@ -234,7 +234,7 @@ module.exports = class UTILS {
 		else answer += "M";
 		let LP;
 		if (mmr < 2600) {
-			answer += ["V", "IV", "III", "II", "I"][Math.floor(((mmr - 100) % 500) / 100)];
+			answer += ["5", "4", "3", "2", "1"][Math.floor(((mmr - 100) % 500) / 100)];
 			LP = " +" + this.round(mmr % 100).pad(2);
 		}
 		else {
