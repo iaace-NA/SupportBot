@@ -231,11 +231,13 @@ module.exports = class UTILS {
 		else if (mmr < 1600) answer += "G";
 		else if (mmr < 2100) answer += "P";
 		else if (mmr < 2600) answer += "D";
-		else answer += "M";
+		else if (mmr < 2700) answer += "M";//arbitrary M/C threshold
+		else answer += "C";
 		let LP;
 		if (mmr < 2600) {
 			answer += ["5", "4", "3", "2", "1"][Math.floor(((mmr - 100) % 500) / 100)];
 			LP = " +" + this.round(mmr % 100).pad(2);
+			answer += LP;
 		}
 		else {
 			LP = this.round((mmr - 2600) * 5);
