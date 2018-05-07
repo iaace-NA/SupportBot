@@ -276,7 +276,7 @@ serveWebRequest("/getlink/:uid", function(req, res, next) {
 	});
 }, true);
 function findShortcut(uid, res, callback) {
-	shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
+	shortcut_doc_model.findOne({ uid }, (err, doc) => {
 		if (err) {
 			console.error(err);
 			return res.status(500).end();
