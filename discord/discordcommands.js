@@ -88,14 +88,14 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "gl", CONFIG.DISCORD_COMMAND_PREFIX + "getlink"], false, false, (original, index) => {
 			lolapi.getLink(msg.author.id).then(result => {
-				if (UTILS.exists(result.username) && username != "") reply(":white_check_mark: You're `" + result.username + "`");
+				if (UTILS.exists(result.username) && result.username != "") reply(":white_check_mark: You're `" + result.username + "`");
 				else reply(":x: No records for user id " + msg.author.id);
 			}).catch(console.error);
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "gl ", CONFIG.DISCORD_COMMAND_PREFIX + "getlink "], true, true, (original, index) => {
 			if (!UTILS.exists(msg.mentions.users.first())) return reply(":x: No user mention specified.");
 			lolapi.getLink(msg.mentions.users.first().id).then(result => {
-				if (UTILS.exists(result.username) && username != "") reply(":white_check_mark: " + msg.mentions.users.first().tag + " is `" + result.username + "`");
+				if (UTILS.exists(result.username) && result.username != "") reply(":white_check_mark: " + msg.mentions.users.first().tag + " is `" + result.username + "`");
 				else reply(":x: No records for " + msg.mentions.users.first().id);
 			}).catch(console.error);
 		});
