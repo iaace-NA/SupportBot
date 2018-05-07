@@ -41,7 +41,8 @@ api_doc.index({ url: "hashed" });
 let api_doc_model = apicache.model("api_doc_model", api_doc);
 let shortcut_doc = new apicache.Schema({
 	uid: String,
-	shortcuts: { type: apicache.Schema.Types.Mixed, default: {} }
+	shortcuts: { type: apicache.Schema.Types.Mixed, default: {} },
+	username: String
 }, { minimize: false });
 shortcut_doc.index({ uid: "hashed" });
 let shortcut_doc_model = apicache.model("shortcut_doc_model", shortcut_doc);
@@ -155,11 +156,7 @@ serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
 	UTILS.debug(database_profiler.endAll(), false);
 }, true);
 serveWebRequest("/createshortcut/:uid", function(req, res, next) {
-	shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
-		if (err) {
-			console.error(err);
-			return res.status(500).end();
-		}
+	findShortcut(req.params.uid, res, doc => {
 		if (UTILS.exists(doc)) {
 			let shortcut_count = 0;
 			for (let b in doc.shortcuts) ++shortcut_count;
@@ -171,15 +168,14 @@ serveWebRequest("/createshortcut/:uid", function(req, res, next) {
 					console.error(e);
 					return res.status(500).end();
 				}
-				else {
-					res.json({ success: true });
-				}
+				else res.json({ success: true });
 			});
 		}
 		else {
 			let new_shortcuts = {
 				uid: req.params.uid,
-				shortcuts: {}
+				shortcuts: {},
+				username: ""
 			}
 			new_shortcuts.shortcuts[req.query.from] = req.query.to;
 			let new_document = new shortcut_doc_model(new_shortcuts);
@@ -188,19 +184,13 @@ serveWebRequest("/createshortcut/:uid", function(req, res, next) {
 					console.error(e);
 					return res.status(500).end();
 				}
-				else {
-					res.json({ success: true });
-				}
+				else res.json({ success: true });
 			});
 		}
 	});
 }, true);
 serveWebRequest("/removeshortcut/:uid", function(req, res, next) {
-	shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
-		if (err) {
-			console.error(err);
-			return res.status(500).end();
-		}
+	findShortcut(req.params.uid, res, doc => {
 		if (UTILS.exists(doc)) {
 			delete doc.shortcuts[req.query.from];
 			doc.markModified("shortcuts");
@@ -209,22 +199,14 @@ serveWebRequest("/removeshortcut/:uid", function(req, res, next) {
 					console.error(e);
 					return res.status(500).end();
 				}
-				else {
-					res.json({ success: true });
-				}
+				else res.json({ success: true });
 			});
 		}
-		else {
-			res.json({ success: true });
-		}
+		else res.json({ success: true });
 	});
 }, true);
 serveWebRequest("/removeallshortcuts/:uid", function(req, res, next) {
-	shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
-		if (err) {
-			console.error(err);
-			return res.status(500).end();
-		}
+	findShortcut(req.params.uid, res, doc => {
 		if (UTILS.exists(doc)) {
 			doc.shortcuts = {};
 			doc.markModified("shortcuts");
@@ -233,22 +215,14 @@ serveWebRequest("/removeallshortcuts/:uid", function(req, res, next) {
 					console.error(e);
 					return res.status(500).end();
 				}
-				else {
-					res.json({ success: true });
-				}
+				else res.json({ success: true });
 			});
 		}
-		else {
-			res.json({ success: true });
-		}
+		else res.json({ success: true });
 	});
 }, true);
 serveWebRequest("/getshortcut/:uid", function(req, res, next) {
-	shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
-		if (err) {
-			console.error(err);
-			return res.status(500).end();
-		}
+	findShortcut(req.params.uid, res, doc => {
 		if (UTILS.exists(doc)) {
 			if (UTILS.exists(doc.shortcuts[req.query.from])) {
 				let answer = {};
@@ -257,25 +231,59 @@ serveWebRequest("/getshortcut/:uid", function(req, res, next) {
 			}
 			else res.status(404).end();
 		}
+		else res.status(404).end();
+	});
+}, true);
+serveWebRequest("/getshortcuts/:uid", function(req, res, next) {
+	findShortcut(req.params.uid, res, doc => {
+		if (UTILS.exists(doc)) res.json({ shortcuts: doc.toObject().shortcuts });
+		else res.send("{}");
+	});
+}, true);
+serveWebRequest("/setlink/:uid", (req, res, next) => {
+	findShortcut(req.params.uid, res, doc => {
+		if (UTILS.exists(doc)) {
+			doc.username = req.query.link;
+			doc.save(e => {
+				if (e) {
+					console.error(e);
+					return res.status(500).end();
+				}
+				else res.json({ success: true });
+			});
+		}
 		else {
-			res.status(404).end();
+			let new_shortcuts = {
+				uid: req.params.uid,
+				shortcuts: {},
+				username: req.query.link
+			}
+			let new_document = new shortcut_doc_model(new_shortcuts);
+			new_document.save((e, doc) => {
+				if (e) {
+					console.error(e);
+					return res.status(500).end();
+				}
+				else res.json({ success: true });
+			});
 		}
 	});
 }, true);
 serveWebRequest("/getshortcuts/:uid", function(req, res, next) {
+	findShortcut(req.params.uid, res, doc => {
+		if (UTILS.exists(doc)) res.json({ username: doc.toObject().username });
+		else res.send("{}");
+	});
+}, true);
+function findShortcut(uid, res, callback) {
 	shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
 		if (err) {
 			console.error(err);
 			return res.status(500).end();
 		}
-		if (UTILS.exists(doc)) {
-			res.json(doc.toObject());
-		}
-		else {
-			res.send("{}");
-		}
+		callback(doc);
 	});
-});
+}
 //https.createServer({ key: fs.readFileSync("./privkey.pem"), cert: fs.readFileSync("./fullchain.pem") }, website).listen(443);
 serveWebRequest("/ping", function (req, res, next) {
 	res.json({ received: new Date().getTime() });
