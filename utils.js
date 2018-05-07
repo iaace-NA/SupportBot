@@ -241,7 +241,7 @@ module.exports = class UTILS {
 		}
 		else {
 			LP = this.round((mmr - 2600) * 5);
-			if (LP < 100) answer += "  +" + LP;
+			if (LP < 100) answer += "  +" + LP.pad(2);
 			else if (LP < 1000) answer += " +" + LP;
 			else answer += "+" + LP;
 		}
