@@ -269,7 +269,7 @@ serveWebRequest("/setlink/:uid", (req, res, next) => {
 		}
 	});
 }, true);
-serveWebRequest("/getshortcuts/:uid", function(req, res, next) {
+serveWebRequest("/getlink/:uid", function(req, res, next) {
 	findShortcut(req.params.uid, res, doc => {
 		if (UTILS.exists(doc)) res.json({ username: doc.toObject().username });
 		else res.send("{}");

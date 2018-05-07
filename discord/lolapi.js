@@ -313,4 +313,10 @@ module.exports = class LOLAPI {
 	IAPIEval(script) {
 		return this.getIAPI("eval/" + encodeURIComponent(script), {});
 	}
+	getLink(uid) {
+		return this.getIAPI("getlink/" + uid, {});
+	}
+	setLink(uid, username) {
+		return this.getIAPI("setlink/" + uid, { link: username });
+	}
 }

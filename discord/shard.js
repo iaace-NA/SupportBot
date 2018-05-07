@@ -19,7 +19,6 @@ catch (e) {
 	process.exit(1);
 }
 const mode = process.env.NODE_ENV === "production" ? "PRODUCTION:warning:" : process.env.NODE_ENV;
-const DB = new (require("./dbmanager.js"))(CONFIG);
 const LOLAPI = new (require("./lolapi.js"))(CONFIG, 0);
 const wsapi = new (require("./wsapi.js"))(CONFIG, client);
 LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
@@ -67,7 +66,7 @@ client.on("disconnect", function () {
 });
 client.on("message", function (msg) {
 	try {
-		discordcommands(CONFIG, client, msg, DB, wsapi);
+		discordcommands(CONFIG, client, msg, wsapi);
 	}
 	catch (e) {
 		console.error(e);
