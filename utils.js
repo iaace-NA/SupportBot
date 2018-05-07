@@ -224,7 +224,7 @@ module.exports = class UTILS {
 	}
 	iMMRtoEnglish(mmr) {
 		//6-char representation
-		if (mmr < 100) mmr = 100;
+		if (mmr < 100) return "******";
 		let answer = "";
 		if (mmr < 600) answer += "B";
 		else if (mmr < 1100) answer += "S";
