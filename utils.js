@@ -152,7 +152,7 @@ module.exports = class UTILS {
 	shortRank(info) {
 		//****** unranked
 		//██████ unranked
-		//G⇧W--- Gold promotion, 1 win
+		//G↑W--- Gold promotion, 1 win
 		//G2 +00 Gold 2, 0 LP
 		//G2 +56 Gold 2, 56LP
 		//G2↑ L_ Gold 2 promotion, 1 loss
@@ -223,16 +223,24 @@ module.exports = class UTILS {
 		return answer;
 	}
 	iMMRtoEnglish(mmr) {
+		//6-char representation
 		if (mmr < 100) mmr = 100;
 		let answer = "";
-		if (mmr < 600) answer += "BRONZE ";
-		else if (mmr < 1100) answer += "SILVER ";
-		else if (mmr < 1600) answer += "GOLD ";
-		else if (mmr < 2100) answer += "PLATINUM ";
-		else if (mmr < 2600) answer += "DIAMOND ";
-		else answer += "MASTER/CHALLENGER ";
-		if (mmr < 2600) answer += ["V", "IV", "III", "II", "I"][Math.floor(((mmr - 100) % 500) / 100)] + " " + this.round(mmr % 100) + "LP";
-		else answer += this.round((mmr - 2600) * 5) + "LP";
+		if (mmr < 600) answer += "B";
+		else if (mmr < 1100) answer += "S";
+		else if (mmr < 1600) answer += "G";
+		else if (mmr < 2100) answer += "P";
+		else if (mmr < 2600) answer += "D";
+		else answer += "M";
+		let LP;
+		if (mmr < 2600) {
+			answer += ["V", "IV", "III", "II", "I"][Math.floor(((mmr - 100) % 500) / 100)];
+			LP = " " + this.round(mmr % 100);
+		}
+		else {
+			LP = this.round((mmr - 2600) * 5);
+			answer += LP;
+		}
 		return answer;
 	}
 	averageMatchMMR(ranks) {
