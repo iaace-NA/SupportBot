@@ -97,8 +97,8 @@ module.exports = class WSAPI {
 	sendTextToChannel(cid, content) {
 		this.send({ type: 7, content, cid });
 	}
-	lnotify(uid, displayAvatarURL, content) {
-		this.send({ type: 13, content, uid, displayAvatarURL });
+	lnotify(username, displayAvatarURL, content) {
+		this.send({ type: 13, content, username, displayAvatarURL });
 	}
 	send(raw_object) {
 		let that = this;

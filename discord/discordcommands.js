@@ -42,7 +42,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 				let candidate = UTILS.preferredTextChannel(client, g.channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
 				if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).catch(console.error);
 			});
-			wsapi.lnotify(uid, displayAvatarURL, parameter);
+			wsapi.lnotify(msg.author.username, msg.author.displayAvatarURL, parameter);
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, () => {
 			reply_embed(embedgenerator.test());
