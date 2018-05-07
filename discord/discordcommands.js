@@ -56,8 +56,8 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 			let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
 			if (msg.mentions.users.size == 0) {
 				lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.LINK).then(summoner => {
-					result.region = region;
-					result.guess = parameter.substring(parameter.indexOf(" ") + 1);
+					summoner.region = region;
+					summoner.guess = parameter.substring(parameter.indexOf(" ") + 1);
 					if (UTILS.exists(summoner.status)) return reply(":x: The username appears to be invalid.");
 					lolapi.setLink(msg.author.id, summoner.name).then(result => { 
 						result.success ? reply(":white_check_mark: Your discord account is now linked to " + summoner.name) : reply(":x: Something went wrong.");
@@ -66,8 +66,8 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 			}
 			else if (msg.mentions.users.size == 1 && isOwner()) {
 				lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1, parameter.indexOf(" <")), CONFIG.API_MAXAGE.LINK).then(summoner => {
-					result.region = region;
-					result.guess = parameter.substring(parameter.indexOf(" ") + 1, parameter.indexOf(" <"));
+					summoner.region = region;
+					summoner.guess = parameter.substring(parameter.indexOf(" ") + 1, parameter.indexOf(" <"));
 					if (UTILS.exists(summoner.status)) return reply(":x: The username appears to be invalid. Follow the format: `" + CONFIG.DISCORD_COMMAND_PREFIX + "link <region> <username> <@mention>`");
 					lolapi.setLink(msg.mentions.users.first().id, summoner.name).then(result => { 
 						result.success ? reply(":white_check_mark: " + msg.mentions.users.first().tag + "'s discord account is now linked to " + summoner.name) : reply(":x: Something went wrong.");
