@@ -417,8 +417,7 @@ module.exports = class EmbedGenerator {
 				team_description_c2 += "`" + summoner_participants.find(p => { return p.id == teams[b][c].summonerId; }).summonerLevel + "`";
 				team_description_c2 += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
 				team_description_c2 += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
-				if (teams[b].length > 5) team_description_c2 += "__[" + teams[b][c].summonerName + "](" + UTILS.opggShort(CONFIG.OPGG_SHORT, CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
-				else team_description_c2 += "__[" + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
+				team_description_c2 += "__[" + teams[b][c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
 				team_description_c2 += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
 				if (UTILS.exists(match.bannedChampions[player_count])) {
 					ban_description.push(match.bannedChampions[player_count].championId == -1 ? ":x:" : CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].emoji);
