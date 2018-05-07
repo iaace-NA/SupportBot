@@ -37,11 +37,12 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 			lolapi.IAPIEval(parameter).then(result => { reply("```" + result.string + "```"); }).catch(console.error);
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "notify "], true, true, (original, index, parameter) => {
-			const notification = embedgenerator.notify(CONFIG, parameter, msg.author);
+			const notification = embedgenerator.notify(CONFIG, parameter, msg.author.username, msg.author.displayAvatarURL);
 			client.guilds.forEach((g) => {
-				let candidate = UTILS.preferredTextChannel(client, g.channels, "text", ["general", "bot", "bots", "bot-commands", "botcommands", "lol", "league", "spam"], ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
+				let candidate = UTILS.preferredTextChannel(client, g.channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
 				if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).catch(console.error);
 			});
+			wsapi.lnotify(uid, displayAvatarURL, parameter);
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, () => {
 			reply_embed(embedgenerator.test());

@@ -449,12 +449,12 @@ module.exports = class EmbedGenerator {
 		newEmbed.setFooter("This information is subject to very frequent change.");
 		return newEmbed;
 	}
-	notify(CONFIG, content, author) {
+	notify(CONFIG, content, username, displayAvatarURL) {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setColor([255, 255, 0]);
 		newEmbed.setTitle("Important message from SupportBot staff");
 		newEmbed.setURL(CONFIG.HELP_SERVER_INVITE_LINK);
-		newEmbed.setAuthor(author.username, author.displayAvatarURL);
+		newEmbed.setAuthor(username, displayAvatarURL);
 		newEmbed.setDescription(content);
 		newEmbed.setTimestamp();
 		newEmbed.setFooter("Message sent ");

@@ -258,4 +258,7 @@ module.exports = class UTILS {
 	removeAllOccurances(arr, deletable) {
 		while (arr.indexOf(deletable) != -1) arr.splice(arr.indexOf(deletable), 1);
 	}
+	defaultChannelNames() {
+		return ["general", "bot", "bots", "bot-commands", "botcommands", "commands", "league", "lol", "games", "spam"];
+	}
 }

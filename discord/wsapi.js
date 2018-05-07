@@ -4,6 +4,7 @@ const REQUEST = require("request");
 const ws = require("ws");
 const fs = require("fs");
 const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt") };
+let embedgenerator = new (require("./embedgenerator.js"))();
 module.exports = class WSAPI {
 	/*
 	Used for internal communication between shards and IAPI.
@@ -33,6 +34,9 @@ module.exports = class WSAPI {
 
 		10: IAPI wants to send a PM
 		11: shard wants to send a PM
+
+		12: IAPI wants to send a message to all servers' defaults
+		13: shard wants to send a message to all servers' defaults
 	*/
 	constructor(INIT_CONFIG, discord_client) {
 		this.client = discord_client;
@@ -74,6 +78,14 @@ module.exports = class WSAPI {
 					break;
 				case 8://send message to default channel in server
 				case 10://send message to user
+				case 12:
+					const notification = embedgenerator.notify(this.CONFIG, data.content, data.username, data.displayAvatarURL);
+					let that = this;
+					this.client.guilds.forEach((g) => {
+						let candidate = UTILS.preferredTextChannel(that.client, g.channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
+						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).catch(console.error);
+					});
+					break;
 				default:
 					UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
 			}
@@ -84,6 +96,9 @@ module.exports = class WSAPI {
 	}
 	sendTextToChannel(cid, content) {
 		this.send({ type: 7, content, cid });
+	}
+	lnotify(uid, displayAvatarURL, content) {
+		this.send({ type: 13, content, uid, displayAvatarURL });
 	}
 	send(raw_object) {
 		let that = this;
