@@ -37,13 +37,7 @@ client.on("ready", function () {
 	client.user.setActivity("League of Legends").catch(console.error);
 	if (initial_start) sendToChannel(CONFIG.LOG_CHANNEL_ID, ":repeat:`$" + process.env.SHARD_ID + "`Bot started in " + UTILS.round((new Date().getTime() - start_time) / 1000, 0) + "s: version: " + CONFIG.VERSION + " mode: " + mode + " servers: " + client.guilds.size);
 	else sendToChannel(CONFIG.LOG_CHANNEL_ID, ":repeat:`$" + process.env.SHARD_ID + "`Bot reconnected");
-	let all_emojis = [];//collects all emojis from emoji servers
-	for (let i in CONFIG.CHAMP_EMOJI_SERVERS) {
-		const candidate = client.guilds.get(CONFIG.CHAMP_EMOJI_SERVERS[i]);
-		if (UTILS.exists(candidate)) all_emojis = all_emojis.concat(candidate.emojis.array());
-	}
-	all_emojis = all_emojis.map(e => { return { name: e.name.toLowerCase(), code: e.toString() }; });
-	wsapi.sendEmojis(all_emojis);
+	wsapi.sendEmojis(allEmojis());
 	for (let b in CONFIG.STATIC.CHAMPIONS) CONFIG.STATIC.CHAMPIONS[b].emoji = CONFIG.STATIC.CHAMPIONS[b].name;
 	UTILS.output("default champion emojis set");
 	initial_start = false;
@@ -87,7 +81,7 @@ function loadAllStaticResources(callback = () => {}) {
 				CONFIG.STATIC.SUMMONERSPELLS = result.data;
 				for (let b in CONFIG.STATIC.CHAMPIONS) CONFIG.STATIC.CHAMPIONS[b].emoji = CONFIG.STATIC.CHAMPIONS[b].name;
 				UTILS.output("API STATIC RESOURCES LOADED");
-				wsapi.sendEmojis(all_emojis);
+				wsapi.sendEmojis(allEmojis());
 				callback();
 			});
 		}).catch(e => { throw e; });
@@ -96,3 +90,11 @@ function loadAllStaticResources(callback = () => {}) {
 setInterval(() => {//long term maintenance loop
 	loadAllStaticResources();
 }, 60000 * 15);
+function allEmojis() {
+	let all_emojis = [];//collects all emojis from emoji servers
+	for (let i in CONFIG.CHAMP_EMOJI_SERVERS) {
+		const candidate = client.guilds.get(CONFIG.CHAMP_EMOJI_SERVERS[i]);
+		if (UTILS.exists(candidate)) all_emojis = all_emojis.concat(candidate.emojis.array());
+	}
+	return all_emojis.map(e => { return { name: e.name.toLowerCase(), code: e.toString() }; });
+}
