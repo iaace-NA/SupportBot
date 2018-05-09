@@ -71,7 +71,7 @@ function sendToChannel(cid, text) {//duplicated in discordcommands.js
 	if (UTILS.exists(candidate)) return candidate.send(text);
 	else wsapi.sendTextToChannel(cid, text);
 }
-function loadAllStaticResources(callback) {
+function loadAllStaticResources(callback = () => {}) {
 	LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
 		UTILS.output("DD STATIC RESOURCES LOADED");
 		CONFIG.STATIC = result;
