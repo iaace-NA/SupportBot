@@ -54,7 +54,7 @@ for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({
 let req_num = 0;
 let irs = {};//individual request statistics
 let database_profiler = new Profiler("Database Profiler");
-let Server = https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
+let server = https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
 		cert: fs.readFileSync("../data/keys/server.crt"), 
 		ca: fs.readFileSync("../data/keys/ca.crt")}, website).listen(CONFIG.API_PORT);
 UTILS.output("IAPI " + process.env.NODE_ENV + " mode ready and listening on port " + CONFIG.API_PORT);
