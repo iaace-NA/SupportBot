@@ -47,12 +47,12 @@ module.exports = class UTILS {
 		return ta.ago(date);
 	}
 	teamParticipant(summonerID, match) {
-		const participantID = match.participantIdentities.find(pI => { return pI.player.summonerId == summonerID; }).participantId;
-		const stats = match.participants.find(p => { return p.participantId == participantID; });
+		const participantID = match.participantIdentities.find(pI => pI.player.summonerId == summonerID).participantId;
+		const stats = match.participants.find(p => p.participantId == participantID);
 		return stats;
 	}
 	findParticipantIdentityFromPID(match, pid) {
-		return match.participantIdentities.find(pI => { return pI.participantId == pid; });
+		return match.participantIdentities.find(pI => pI.participantId == pid);
 	}
 	stats(summonerID, match) {
 		return this.teamParticipant(summonerID, match).stats;
@@ -68,12 +68,12 @@ module.exports = class UTILS {
 		};
 	}
 	determineWin(summonerID, match) {
-		const participantID = match.participantIdentities.find(pI => { return pI.player.summonerId == summonerID; }).participantId;
-		const teamID = match.participants.find(p => { return p.participantId == participantID; }).teamId;
-		return match.teams.find(t => { return t.teamId == teamID; }).win == "Win";
+		const participantID = match.participantIdentities.find(pI => pI.player.summonerId == summonerID).participantId;
+		const teamID = match.participants.find(p => p.participantId == participantID).teamId;
+		return match.teams.find(t => t.teamId == teamID).win == "Win";
 	}
 	english(text) {
-		return text.split("_").map(t => { return t.substring(0, 1).toUpperCase() + t.substring(1).toLowerCase(); }).join(" ");
+		return text.split("_").map(t => t.substring(0, 1).toUpperCase() + t.substring(1).toLowerCase()).join(" ");
 	}
 	standardTimestamp(sec) {
 		let mins = Math.floor(parseInt(sec) / 60);
@@ -187,7 +187,7 @@ module.exports = class UTILS {
 		return answer;
 	}
 	getSingleChampionMastery(all, singleID) {
-		return this.exists(all.find(cmi => { return cmi.championId == singleID; })) ? all.find(cmi => { return cmi.championId == singleID; }).championLevel : 0;
+		return this.exists(all.find(cmi => cmi.championId == singleID)) ? all.find(cmi => cmi.championId == singleID).championLevel : 0;
 	}
 	KDAFormat(num) {
 		if (isNaN(num) || num == Infinity) return "Perfect";

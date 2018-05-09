@@ -55,7 +55,7 @@ client.on("ready", function () {
 		const candidate = client.guilds.get(CONFIG.CHAMP_EMOJI_SERVERS[i]);
 		if (UTILS.exists(candidate)) all_emojis = all_emojis.concat(candidate.emojis.array());
 	}
-	all_emojis = all_emojis.map(e => { return { name: e.name.toLowerCase(), code: e.toString() }; });
+	all_emojis = all_emojis.map(e => { name: e.name.toLowerCase(), code: e.toString() });
 	wsapi.sendEmojis(all_emojis);
 	for (let b in CONFIG.STATIC.CHAMPIONS) CONFIG.STATIC.CHAMPIONS[b].emoji = CONFIG.STATIC.CHAMPIONS[b].name;
 	UTILS.output("default champion emojis set");
@@ -88,4 +88,6 @@ function sendToChannel(cid, text) {//duplicated in discordcommands.js
 	if (UTILS.exists(candidate)) return candidate.send(text);
 	else wsapi.sendTextToChannel(cid, text);
 }
-//setInterval(() => {}, 60000);
+setInterval(() => {//long term maintenance loop
+
+}, 60000 * 15);

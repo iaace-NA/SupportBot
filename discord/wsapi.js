@@ -64,7 +64,7 @@ module.exports = class WSAPI {
 				case 4://emoji
 					let all_emojis = data.emojis;
 					for (let b in this.CONFIG.STATIC.CHAMPIONS) {
-						const candidate = all_emojis.find(e => { return this.CONFIG.STATIC.CHAMPIONS[b].key.toLowerCase() == e.name; });
+						const candidate = all_emojis.find(e => this.CONFIG.STATIC.CHAMPIONS[b].key.toLowerCase() == e.name);
 						this.CONFIG.STATIC.CHAMPIONS[b].emoji = UTILS.exists(candidate) ? candidate.code : this.CONFIG.STATIC.CHAMPIONS[b].name;
 					}
 					UTILS.output("champion emojis registered");
@@ -81,7 +81,7 @@ module.exports = class WSAPI {
 				case 12:
 					const notification = embedgenerator.notify(this.CONFIG, data.content, data.username, data.displayAvatarURL);
 					let that = this;
-					this.client.guilds.forEach((g) => {
+					this.client.guilds.forEach(g => {
 						let candidate = UTILS.preferredTextChannel(that.client, g.channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
 						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).catch(console.error);
 					});

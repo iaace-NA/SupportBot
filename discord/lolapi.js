@@ -193,7 +193,7 @@ module.exports = class LOLAPI {
 						if (err) throw err;
 						resolve(result);
 					});
-				}).catch(e => { reject(e); });
+				}).catch(e => reject(e));
 			}
 		});
 	}
@@ -226,7 +226,7 @@ module.exports = class LOLAPI {
 						if (err) throw err;
 						resolve(result);
 					});
-				}).catch(e => { reject(e); });
+				}).catch(e => reject(e));
 			}
 		});
 	}

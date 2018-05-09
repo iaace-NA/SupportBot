@@ -34,7 +34,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 			}
 		});
 		command(["iapi eval "], true, true, (original, index, parameter) => {
-			lolapi.IAPIEval(parameter).then(result => { reply("```" + result.string + "```"); }).catch(console.error);
+			lolapi.IAPIEval(parameter).then(result => reply("```" + result.string + "```")).catch(console.error);
 		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "notify "], true, true, (original, index, parameter) => {
 			wsapi.lnotify(msg.author.username, msg.author.displayAvatarURL, parameter);
@@ -95,9 +95,6 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 				else reply(":x: No records for user id " + msg.mentions.users.first().id);
 			}).catch(console.error);
 		});
-		/*command([CONFIG.DISCORD_COMMAND_PREFIX + "cs", CONFIG.DISCORD_COMMAND_PREFIX + "cachesize"], false, false, (original, index) => {
-			reply("The cache size is " + lolapi.cacheSize());
-		});*/
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "invite"], false, false, (original, index) => {
 			reply("This is the link to add SupportBot to other servers: <" + CONFIG.BOT_ADD_LINK + ">\nAdding it requires the \"Manage Server\" permission.");
 		});
@@ -154,7 +151,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		commandGuessUsername([""], false, (region, username, parameter) => {
 			lolapi.getSummonerCard(region, username).then(result => {
 				reply_embed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter, result[3]));
-			}).catch(() => { reply(":x: No results for `" + username + "`. Please revise your request."); });
+			}).catch(() => reply(":x: No results for `" + username + "`. Please revise your request."));
 		});
 		commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter) => {
 			request_profiler.mark("mh command recognized");
@@ -241,7 +238,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 				});
 			})).then(usernames => {
 				lolapi.getMultipleSummonerIDFromName(region, usernames, CONFIG.API_MAXAGE.MULTI.MULTIPLE_SUMMONER_ID).then(summoners => {
-					const ids = summoners.map(s => { return s.id; });
+					const ids = summoners.map(s => s.id);
 					lolapi.getMultipleRanks(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_RANKS).then(ranks => {
 						lolapi.getMultipleChampionMastery(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_MASTERIES).then(masteries => {
 							lolapi.getMultipleRecentGames(region, summoners.map(s => { return s.accountId; }), CONFIG.API_MAXAGE.MULTI.MULTIPLE_RECENT_GAMES).then(mhA => {
@@ -265,13 +262,13 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 				if (!UTILS.exists(result.id)) return reply(":x: No username found for `" + username + "`.");
 				lolapi.getLiveMatch(region, result.id, CONFIG.API_MAXAGE.LG.LIVE_MATCH).then(match => {
 					if (UTILS.exists(match.status)) return reply(":x: No current matches found for `" + username + "`.");
-					lolapi.getMultipleSummonerFromSummonerID(region, match.participants.map(p => { return p.summonerId; }), CONFIG.API_MAXAGE.LG.OTHER_SUMMONER_ID).then(pSA => {//participant summoner array
-						lolapi.getMultipleRecentGames(region, pSA.map(pS => { return pS.accountId; }), CONFIG.API_MAXAGE.LG.RECENT_GAMES).then(mhA => {//matchhistory array
+					lolapi.getMultipleSummonerFromSummonerID(region, match.participants.map(p => p.summonerId), CONFIG.API_MAXAGE.LG.OTHER_SUMMONER_ID).then(pSA => {//participant summoner array
+						lolapi.getMultipleRecentGames(region, pSA.map(pS => pS.accountId), CONFIG.API_MAXAGE.LG.RECENT_GAMES).then(mhA => {//matchhistory array
 							let mIDA = [];//match id array;
 							for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
 							lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.LG.MULTIPLE_MATCH).then(matches => {
-								lolapi.getMultipleRanks(region, pSA.map(p => { return p.id; }), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS).then(ranks => {
-									lolapi.getMultipleChampionMastery(region, pSA.map(p => { return p.id; }), CONFIG.API_MAXAGE.LG.MULTIPLE_MASTERIES).then(masteries => {
+								lolapi.getMultipleRanks(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS).then(ranks => {
+									lolapi.getMultipleChampionMastery(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_MASTERIES).then(masteries => {
 										//nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA) }).catch();
 										request_profiler.begin("generating embed");
 										const newEmbed = embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA);
