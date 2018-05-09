@@ -20,7 +20,8 @@ catch (e) {
 const manager = new ShardingManager("./shard.js",
 	{ token: CONFIG.DISCORD_API_KEY,
 	totalShards: CONFIG.SHARD_COUNT,
-	respawn: false });
+	respawn: false,
+	shardArgs: process.argv.slice(2) });
 
 manager.on("launch", shard => {
 	UTILS.output("Launched shard " + shard.id);
