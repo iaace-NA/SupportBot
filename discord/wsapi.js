@@ -43,8 +43,8 @@ module.exports = class WSAPI {
 		this.CONFIG = INIT_CONFIG;
 		if (!UTILS.exists(this.CONFIG)) throw new Error("config.json required.");
 		this.request = REQUEST;
-		this.address = "wss://" + (process.env.NODE_ENV !== "production" ? this.CONFIG.API_ADDRESS_DEVELOPMENT : this.CONFIG.API_ADDRESS_PRODUCTION);
-		this.port = process.env.NODE_ENV !== "production" ? this.CONFIG.API_PORT_DEVELOPMENT : this.CONFIG.API_PORT_PRODUCTION;
+		this.address = "wss://" + this.CONFIG.API_ADDRESS;
+		this.port = this.CONFIG.API_PORT;
 		UTILS.debug("wss address attempted: " + this.address + ":" + this.port + "/shard?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&id=" + process.env.SHARD_ID);
 		this.connect();
 		this.connection.on("open", () => {

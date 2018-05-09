@@ -28,8 +28,7 @@ const website = express();
 const UTILS = new (require("../utils.js"))();
 let Profiler = require("../timeprofiler.js");
 let request = require("request");
-UTILS.assert(UTILS.exists(CONFIG.API_PORT_PRODUCTION));
-UTILS.assert(UTILS.exists(CONFIG.API_PORT_DEVELOPMENT));
+UTILS.assert(UTILS.exists(CONFIG.API_PORT));
 UTILS.output("Modules loaded.");
 let apicache = require("mongoose");
 apicache.connect("mongodb://localhost/apicache");//cache of summoner object name lookups
@@ -55,19 +54,10 @@ for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({
 let req_num = 0;
 let irs = {};//individual request statistics
 let database_profiler = new Profiler("Database Profiler");
-let server;
-if (process.env.NODE_ENV === "production") {//production key
-	server = https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
+let Server = https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
 		cert: fs.readFileSync("../data/keys/server.crt"), 
-		ca: fs.readFileSync("../data/keys/ca.crt")}, website).listen(CONFIG.API_PORT_PRODUCTION);
-	UTILS.output("IAPI PRODUCTION mode ready and listening on port " + CONFIG.API_PORT_PRODUCTION);
-}
-else {//non-production key
-	server = https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
-		cert: fs.readFileSync("../data/keys/server.crt"), 
-		ca: fs.readFileSync("../data/keys/ca.crt")}, website).listen(CONFIG.API_PORT_DEVELOPMENT);
-	UTILS.output("IAPI " + process.env.NODE_ENV + " mode ready and listening on port " + CONFIG.API_PORT_DEVELOPMENT);
-}
+		ca: fs.readFileSync("../data/keys/ca.crt")}, website).listen(CONFIG.API_PORT);
+UTILS.output("IAPI " + process.env.NODE_ENV + " mode ready and listening on port " + CONFIG.API_PORT);
 let websocket = require("express-ws")(website, server);
 website.use(function (req, res, next) {
 	res.removeHeader("X-Powered-By");
