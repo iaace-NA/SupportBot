@@ -21,27 +21,10 @@ catch (e) {
 const mode = process.env.NODE_ENV === "production" ? "PRODUCTION:warning:" : process.env.NODE_ENV;
 const LOLAPI = new (require("./lolapi.js"))(CONFIG, 0);
 const wsapi = new (require("./wsapi.js"))(CONFIG, client);
-LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
-	UTILS.output("DD STATIC RESOURCES LOADED");
-	CONFIG.STATIC = result;
-	let temp_regions = [];
-	for (let i in CONFIG.REGIONS) temp_regions.push(CONFIG.REGIONS[i]);
-	Promise.all(temp_regions.map(tr => { return LOLAPI.getStaticChampions(tr); })).then(results => {
-		CONFIG.STATIC.CHAMPIONS = results[0].data;
-		LOLAPI.getStaticSummonerSpells("na1").then(result => {
-			CONFIG.STATIC.SUMMONERSPELLS = result.data;
-			UTILS.output("API STATIC RESOURCES LOADED");
-			if (process.env.NODE_ENV === "production") {//production key
-				UTILS.output("PRODUCTION LOGIN");
-				client.login().catch(console.error);
-			}
-			else {//non-production key
-				UTILS.output("DEVELOPMENT LOGIN");
-				client.login().catch(console.error);
-			}
-		});
-	}).catch(e => { throw e; });
-}).catch(e => { throw e; });
+loadAllStaticResources(() => {
+	UTILS.output(process.env.NODE_ENV === "production" ? "PRODUCTION LOGIN" : "DEVELOPMENT LOGIN");
+	client.login().catch(console.error);
+});
 let initial_start = true;
 client.on("ready", function () {
 	if (initial_start) UTILS.output("discord user login success");
@@ -88,6 +71,22 @@ function sendToChannel(cid, text) {//duplicated in discordcommands.js
 	if (UTILS.exists(candidate)) return candidate.send(text);
 	else wsapi.sendTextToChannel(cid, text);
 }
+function loadAllStaticResources(callback) {
+	LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
+		UTILS.output("DD STATIC RESOURCES LOADED");
+		CONFIG.STATIC = result;
+		let temp_regions = [];
+		for (let i in CONFIG.REGIONS) temp_regions.push(CONFIG.REGIONS[i]);
+		Promise.all(temp_regions.map(tr => LOLAPI.getStaticChampions(tr))).then(results => {
+			CONFIG.STATIC.CHAMPIONS = results[0].data;
+			LOLAPI.getStaticSummonerSpells("na1").then(result => {
+				CONFIG.STATIC.SUMMONERSPELLS = result.data;
+				UTILS.output("API STATIC RESOURCES LOADED");
+				callback();
+			});
+		}).catch(e => { throw e; });
+	}).catch(e => { throw e; });
+}
 setInterval(() => {//long term maintenance loop
-
+	loadAllStaticResources();
 }, 60000 * 15);
