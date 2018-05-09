@@ -12,7 +12,8 @@
 				"NODE_ENV": "development",
 				"DEBUG": true
 			},
-			"node_args": "--trace-deprecation"
+			"node_args": "--trace-deprecation",
+			"args": "--config=devconfig.json"
 		}
 	]
 }

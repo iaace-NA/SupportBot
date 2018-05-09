@@ -1,6 +1,10 @@
 "use strict";
 const start_time = new Date().getTime();
+
 const fs = require("fs");
+const argv_options = new (require("getopts"))(process.argv.slice(2), {
+	alias: { c: ["config"] },
+	default: { c: "config.json" }});
 const Discord = require("discord.js");
 let discordcommands = require("./discordcommands.js");
 
@@ -10,7 +14,7 @@ const client = new Discord.Client({ disabledEvents: ["TYPING_START"] });
 
 let CONFIG;
 try {
-	CONFIG = JSON.parse(fs.readFileSync("../config.json", "utf-8"));
+	CONFIG = JSON.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
 	CONFIG.VERSION = "v1.3.0b";//b for non-release (in development)
 }
 catch (e) {

@@ -1,9 +1,12 @@
 "use strict";
 const fs = require("fs");
+const argv_options = new (require("getopts"))(process.argv.slice(2), {
+	alias: { c: ["config"] },
+	default: { c: "config.json" }});
 let CONFIG;
 try {
-	CONFIG = JSON.parse(fs.readFileSync("../config.json", "utf-8"));
-	CONFIG.VERSION = "v1.2.0b";//b for non-release (in development)
+	CONFIG = JSON.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
+	CONFIG.VERSION = "v1.3.0b";//b for non-release (in development)
 }
 catch (e) {
 	console.log("something's wrong with config.json");
