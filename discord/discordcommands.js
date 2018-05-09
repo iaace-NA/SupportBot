@@ -13,6 +13,13 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 	let lolapi = new LOLAPI(CONFIG, msg.id);
 	request_profiler.mark("lolapi instantiated");
 	if ((UTILS.exists(msg.guild) && msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) || !UTILS.exists(msg.guild)) {//respondable server message or PM
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "permissionstest", CONFIG.DISCORD_COMMAND_PREFIX + "pt"], false, false, () => {
+			reply("You have " + (isOwner(undefined, false) ? "owner" : "normal") + " permissions.");
+		});
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "permissionstest ", CONFIG.DISCORD_COMMAND_PREFIX + "pt "], true, false, () => {
+			if (msg.mentions.users.size != 1) return reply(":x: A user must be mentioned.");
+			reply(msg.mentions.users.first().tag + " has " + (isOwner(msg.mentions.users.first(), false) ? "owner" : "normal") + " permissions.");
+		});
 		command([CONFIG.DISCORD_COMMAND_PREFIX + "stats"], false, true, () => {
 			reply("This is shard " + process.env.SHARD_ID);
 		});
@@ -448,8 +455,8 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 			}
 		});
 	}
-	function isOwner(notify = true) {
-		const answer = UTILS.exists(CONFIG.OWNER_DISCORD_IDS[msg.author.id]) && CONFIG.OWNER_DISCORD_IDS[msg.author.id];
+	function isOwner(candidate = msg.author, notify = true) {
+		const answer = UTILS.exists(CONFIG.OWNER_DISCORD_IDS[candidate.id]) && CONFIG.OWNER_DISCORD_IDS[candidate.id];
 		if (!answer) {
 			UTILS.output("insufficient permissions");
 			print_message();
