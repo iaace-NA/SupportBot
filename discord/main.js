@@ -18,7 +18,7 @@ catch (e) {
 }
 
 const manager = new ShardingManager("./shard.js",
-	{ token: process.env.NODE_ENV == "production" ? CONFIG.DISCORD_API_KEY_PRODUCTION : CONFIG.DISCORD_API_KEY_DEVELOPMENT,
+	{ token: CONFIG.DISCORD_API_KEY,
 	totalShards: CONFIG.SHARD_COUNT,
 	respawn: false });
 

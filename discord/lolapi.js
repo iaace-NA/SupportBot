@@ -14,8 +14,8 @@ module.exports = class LOLAPI {
 			throw new Error("config.json RIOT_API_KEY required to access riot api.");
 		}
 		this.request = REQUEST;
-		this.address = "https://" + (process.env.NODE_ENV !== "production" ? this.CONFIG.API_ADDRESS_DEVELOPMENT : this.CONFIG.API_ADDRESS_PRODUCTION);
-		this.port = process.env.NODE_ENV !== "production" ? this.CONFIG.API_PORT_DEVELOPMENT : this.CONFIG.API_PORT_PRODUCTION;
+		this.address = "https://" + this.CONFIG.API_ADDRESS;
+		this.port = this.CONFIG.API_PORT;
 	}
 	ping() {
 		return new Promise((resolve, reject) => {
