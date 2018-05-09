@@ -182,8 +182,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 			request_profiler.begin("parsing usernames");
 			let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
 			let pre_usernames;
-			if (parameter.indexOf(",") != -1) pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => s.trim());
-			else if (parameter.indexOf("\n") != -1) {//lobby text formatting
+			if (parameter.indexOf("\n") != -1) {//lobby text formatting
 				pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split("\n");
 				let present = [];//users present
 				let join_detected = false, leave_detected = false;
@@ -224,7 +223,8 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 				*/
 				pre_usernames = present;
 			}
-			else pre_usernames = [parameter.substring(parameter.indexOf(" ") + 1)];//CSV
+			else if (parameter.indexOf(",") != -1) pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => s.trim());//CSV
+			else pre_usernames = [parameter.substring(parameter.indexOf(" ") + 1)];//single username
 			if (pre_usernames.length > 10) {
 				reply(":warning: There are too many usernames to get data for. Only the first 10 results will be displayed.");
 				pre_usernames = pre_usernames.slice(0, 10);
