@@ -85,7 +85,9 @@ function loadAllStaticResources(callback = () => {}) {
 			CONFIG.STATIC.CHAMPIONS = results[0].data;
 			LOLAPI.getStaticSummonerSpells("na1").then(result => {
 				CONFIG.STATIC.SUMMONERSPELLS = result.data;
+				for (let b in CONFIG.STATIC.CHAMPIONS) CONFIG.STATIC.CHAMPIONS[b].emoji = CONFIG.STATIC.CHAMPIONS[b].name;
 				UTILS.output("API STATIC RESOURCES LOADED");
+				wsapi.sendEmojis(all_emojis);
 				callback();
 			});
 		}).catch(e => { throw e; });

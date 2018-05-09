@@ -16,7 +16,7 @@ module.exports = class WSAPI {
 		id: 0,//shard ID
 		emojis: [...]
 	}
-	id table:
+	type table:
 		0: heartbeat request
 		1: heartbeat
 
@@ -37,6 +37,12 @@ module.exports = class WSAPI {
 
 		12: IAPI wants to send a message to all servers' defaults
 		13: shard wants to send a message to all servers' defaults
+
+		14: IAPI wants to update shards with new ban information on users
+		15: unimplemented
+
+		16: IAPI wants to update shards with new ban information on servers
+		17: unimplemented
 	*/
 	constructor(INIT_CONFIG, discord_client) {
 		this.client = discord_client;
