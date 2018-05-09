@@ -64,7 +64,6 @@ website.use(function (req, res, next) {
 	return next();
 });
 let shard_ws = {};
-let shard_ws_connected = {};
 let champ_emojis = {};
 const HEARTBEAT_INTERVAL = 60000;
 website.ws("/shard", (ws, req) => {
@@ -74,12 +73,10 @@ website.ws("/shard", (ws, req) => {
 	UTILS.debug("ws connected $" + req.query.id);
 	shard_ws[req.query.id] = ws;
 	ws.on("message", data => {
-		shard_ws_connected[data.id + ""] = true;
 		data = JSON.parse(data);
 		UTILS.debug("ws message received: $" + data.id + " type: " + data.type);
 		switch (data.type) {
 			case 1:
-				shard_ws_connected[data.id + ""] = true;
 				break;
 			case 3:
 			case 5://received emojis
@@ -107,12 +104,6 @@ website.ws("/shard", (ws, req) => {
 	//ws.close(4200);//OK
 });
 setInterval(() => {
-	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) {
-		if (!UTILS.exists(shard_ws_connected[i + ""])) shard_ws_connected[i + ""] = true;
-		if (UTILS.exists(shard_ws[i + ""]) && shard_ws[i + ""].readyState != 1) shard_ws_connected[i + ""] = false;
-		if (!shard_ws_connected[i + ""]) shard_ws[i + ""] = undefined;
-	}
-	for (let b in shard_ws_connected) shard_ws_connected[b] = false;
 	shardBroadcast({ type: 0 });
 }, HEARTBEAT_INTERVAL);
 function allShardsConnected() {//checks heartbeat
