@@ -160,7 +160,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 				if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`.");
 				lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.MH.RECENT_GAMES).then(matchhistory => {
 					if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`.");
-					lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => { return m.gameId; }), CONFIG.API_MAXAGE.MH.MULTIPLE_MATCH).then(matches => {
+					lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m =>  m.gameId), CONFIG.API_MAXAGE.MH.MULTIPLE_MATCH).then(matches => {
 						request_profiler.begin("generating embed");
 						const answer = embedgenerator.match(CONFIG, result, matchhistory.matches, matches);
 						request_profiler.end("generating embed");
@@ -175,7 +175,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 			request_profiler.begin("parsing usernames");
 			let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
 			let pre_usernames;
-			if (parameter.indexOf(",") != -1) pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => { return s.trim(); });
+			if (parameter.indexOf(",") != -1) pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => s.trim());
 			else if (parameter.indexOf("\n") != -1) {//lobby text formatting
 				pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split("\n");
 				let present = [];//users present
