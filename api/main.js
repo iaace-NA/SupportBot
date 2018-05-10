@@ -140,7 +140,7 @@ function sendToShard(message, id, callback) {
 	if (UTILS.exists(shard_ws[id + ""]) && shard_ws[id + ""].readyState == 1) shard_ws[id + ""].send(JSON.stringify(message), callback);
 }
 function getBans(user, callback) {
-	disciplinary_model.find({ user, ban: true, active: true, date: { $or: [ new Date(0), { $gte: new Date() }] } }, "target_id date", (err, docs) => {
+	disciplinary_model.find({ user, ban: true, active: true, $or: [{ date : { $eq: new Date(0) } }, { date: { $gte: new Date() } }] }, "target_id date", (err, docs) => {
 		if (err) console.error(err);
 		let bans = {};
 		docs.forEach(ban => {
