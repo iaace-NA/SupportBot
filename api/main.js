@@ -116,7 +116,7 @@ function sendExpectReplyRaw(message, destination, callback) {
 }
 function sendExpectReply(message, destination, timeout = 5000) {
 	return new Promise((resolve, reject) => {
-		sendExpectReplyRaw(message, resolve);
+		sendExpectReplyRaw(message, destination, resolve);
 		setTimeout(function () {
 			reject(new Error("timed out waiting for response from shard"));
 		}, timeout);
