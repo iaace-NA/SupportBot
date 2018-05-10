@@ -43,6 +43,12 @@ module.exports = class UTILS {
 	ago(date) {
 		return ta.ago(date);
 	}
+	until(date) {
+		const now = new Date().getTime();
+		let answer = ta.ago(now - (date.getTime() - now));
+		answer = answer.substring(0, answer.length - 4);
+		return answer;
+	}
 	teamParticipant(summonerID, match) {
 		const participantID = match.participantIdentities.find(pI => pI.player.summonerId == summonerID).participantId;
 		const stats = match.participants.find(p => p.participantId == participantID);
