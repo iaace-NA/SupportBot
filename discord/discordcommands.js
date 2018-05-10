@@ -64,7 +64,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		}
 		const end_date = duration == 0 ? 0 : new Date().getTime() + duration;
 		if (id.length < 1 || reason.length < 1 || typeof(duration) != "number") return reply(":x: The id, duration, or reason could not be found.");
-		lolapi.banServer(id, reason, date, msg.author.id, msg.author.tag, msg.author.displayAvatarURL).then(result => {
+		lolapi.banServer(id, reason, end_date, msg.author.id, msg.author.tag, msg.author.displayAvatarURL).then(result => {
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":no_entry: Server banned, id " + id + " by " + msg.author.tag + ": " + reason);
 		}).catch(console.error);
 	});
