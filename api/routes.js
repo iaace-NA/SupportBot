@@ -137,7 +137,7 @@ module.exports = function(CONFIG, serveWebRequest, response_type, load_average, 
 				res.status(500).end();
 			}
 			else res.json({ success: true });
-			if (req.query.user != "true") shardBroadcast({ type: 17, 
+			if (req.query.user != "true") shardBroadcast({ type: 18, 
 				sid: req.query.id,
 				reason: req.query.reason,
 				date: parseInt(req.query.date),
