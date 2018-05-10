@@ -98,6 +98,18 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "serverhistory "], true, true, (original, index, parameter) => {
 		s
 	});
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "unbanserver "], true, true, (original, index, parameter) => {
+		const id = parameter.substring(0, parameter.indexOf(" "));
+		const reason = parameter.substring(parameter.indexOf(" ") + 1);
+		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
+		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
+	});
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "unbanuser "], true, true, (original, index, parameter) => {
+		const id = parameter.substring(0, parameter.indexOf(" "));
+		const reason = parameter.substring(parameter.indexOf(" ") + 1);
+		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
+		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
+	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "permissionstest", CONFIG.DISCORD_COMMAND_PREFIX + "pt"], false, false, () => {
 		reply("You have " + (isOwner(undefined, false) ? "owner" : "normal") + " permissions.");
 	});
