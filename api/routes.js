@@ -150,7 +150,7 @@ module.exports = function(CONFIG, serveWebRequest, response_type, load_average, 
 				issuer_avatarURL: req.query.issuer_avatarURL,
 				date: req.query.date }).then(results => {
 					for (let i = 0; i < results.length; ++i) {
-						if (results[b].connected) {
+						if (results[i].connected) {
 							sendToShard({ type: 22,
 								uid: req.query.id,
 								reason: req.query.reason,
