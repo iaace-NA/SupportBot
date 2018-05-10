@@ -34,7 +34,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		let duration = parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2));
 		if (duration == "0") duration = 0;
 		else {
-			let multiplier = duration.substring(duration.length - 1, duration.length);
+			let multiplier = duration.substring(duration.length - 1, duration.length).toUpperCase();
 			if (multiplier == "D") multiplier = 24 * 60 * 60 * 1000;
 			else if (multiplier == "H") multiplier = 60 * 60 * 1000;
 			else return reply(":x: The duration is invalid.");
@@ -56,7 +56,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		let duration = parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2));
 		if (duration == "0") duration = 0;
 		else {
-			let multiplier = duration.substring(duration.length - 1, duration.length);
+			let multiplier = duration.substring(duration.length - 1, duration.length).toUpperCase();
 			if (multiplier == "D") multiplier = 24 * 60 * 60 * 1000;
 			else if (multiplier == "H") multiplier = 60 * 60 * 1000;
 			else return reply(":x: The duration is invalid.");
