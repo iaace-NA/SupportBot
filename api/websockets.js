@@ -1,6 +1,5 @@
 "use strict";
 const UTILS = new (require("../utils.js"))();
-const HEARTBEAT_INTERVAL = 60000;
 module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans) {
 	switch (data.type) {
 		case 1:

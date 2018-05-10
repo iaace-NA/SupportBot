@@ -77,6 +77,7 @@ website.use(function (req, res, next) {
 	res.removeHeader("X-Powered-By");
 	return next();
 });
+const HEARTBEAT_INTERVAL = 60000;
 let shard_ws = {};
 let champ_emojis = {};
 let ws_request_id = 0;
