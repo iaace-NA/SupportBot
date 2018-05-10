@@ -111,7 +111,7 @@ module.exports = class WSAPI {
 				case 18:
 					if (UTILS.exists(this.client.guilds.get(data.sid))) {
 						const notification = embedgenerator.serverBan(this.CONFIG, this.client.guilds.get(data.sid), data.reason, data.date, data.issuer_tag, data.issuer_avatarURL);
-						let candidate = UTILS.preferredTextChannel(this.client, g.channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
+						let candidate = UTILS.preferredTextChannel(this.client, this.client.guilds.get(data.sid).channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
 						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).catch(console.error);
 						this.client.guilds.get(data.sid).owner.send("", { embed: notification }).catch(console.error);
 					}
