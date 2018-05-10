@@ -39,10 +39,19 @@ module.exports = class WSAPI {
 		13: shard wants to send a message to all servers' defaults
 
 		14: IAPI wants to update shards with new ban information on users
-		15: unimplemented
+		15: shard wants to retrieve user bans
 
 		16: IAPI wants to update shards with new ban information on servers
-		17: unimplemented
+		17: shard wants to retrieve server bans
+
+		18: IAPI wants to issue server ban message and leave server
+		19: unimplemented
+
+		20: IAPI asks if shard can see user (user ban step 1)
+		21: shard response with whether or not user is in cache (user ban step 2)
+
+		22: IAPI wants to send user a ban message (user ban step 3)
+		23: unimplemented
 	*/
 	constructor(INIT_CONFIG, discord_client) {
 		this.client = discord_client;
@@ -92,6 +101,29 @@ module.exports = class WSAPI {
 						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).catch(console.error);
 					});
 					break;
+				case 14:
+					this.CONFIG.BANS.USERS = data.bans;
+					break;
+				case 16:
+					this.CONFIG.BANS.SERVERS = data.bans;
+					break;
+				case 18:
+					if (UTILS.exists(this.client.guilds.get(data.sid))) {
+						const notification = embedgenerator.serverBan(this.CONFIG, this.client.guilds.get(data.sid), data.reason, data.date, data.issuer_tag, data.issuer_avatarURL);
+						let candidate = UTILS.preferredTextChannel(that.client, g.channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
+						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).catch(console.error);
+						this.client.guilds.get(data.sid).owner.send("", { embed: notification }).catch(console.error);
+					}
+					break;
+				case 20:
+					if (UTILS.exists(this.client.users.get(data.uid))) data.connected = true;
+					else data.connected = false;
+					data.type = 21;
+					this.send(data);
+					break;
+				case 22:
+					this.client.users.get(data.uid).send(embedgenerator.userBan(this.CONFIG, data.reason, data.date, data.issuer_tag, data.issuer_avatarURL)).catch(console.error);
+					break;
 				default:
 					UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
 			}
@@ -105,6 +137,12 @@ module.exports = class WSAPI {
 	}
 	lnotify(username, displayAvatarURL, content) {
 		this.send({ type: 13, content, username, displayAvatarURL });
+	}
+	getUserBans() {
+		this.send({ type: 15 });
+	}
+	getServerBans() {
+		this.send({ type: 17 });
 	}
 	send(raw_object) {
 		let that = this;

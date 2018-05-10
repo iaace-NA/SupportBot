@@ -548,4 +548,44 @@ module.exports = class EmbedGenerator {
 		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
 		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
 	}
+	serverBan(CONFIG, server, reason, date, issuer_tag, issuer_avatarURL) {
+		let newEmbed = new Discord.RichEmbed();
+		if (date == 0) {
+			newEmbed.setTitle("This server (" + server.name + ") has been permanently banned from using SupportBot");
+			newEmbed.setColor([1, 1, 1]);
+			newEmbed.addField("Duration", "Permanent", true);
+		}
+		else {
+			const date_date = new Date(date);
+			newEmbed.setTitle("This server (" + server.name + ") has been temporarily suspended from using SupportBot");
+			newEmbed.setColor([255, 0, 0]);
+			newEmbed.addField("Duration", UTILS.until(date_date), true);
+			newEmbed.setFooter("This suspension expires at");
+			newEmbed.setTimestamp(date_date);
+		}
+		newEmbed.addField("Help", "If you believe this is a mistake, please visit " + CONFIG.HELP_SERVER_INVITE_LINK, true);
+		newEmbed.setAuthor(issuer_tag, issuer_avatarURL);
+		newEmbed.setDescription("The reason given was: " + reason);
+		return newEmbed;
+	}
+	userBan(CONFIG, reason, date, issuer_tag, issuer_avatarURL) {
+		let newEmbed = new Discord.RichEmbed();
+		if (date == 0) {
+			newEmbed.setTitle("You have been permanently banned from using SupportBot");
+			newEmbed.setColor([1, 1, 1]);
+			newEmbed.addField("Duration", "Permanent", true);
+		}
+		else {
+			const date_date = new Date(date);
+			newEmbed.setTitle("You have been temporarily suspended from using SupportBot");
+			newEmbed.setColor([255, 0, 0]);
+			newEmbed.addField("Duration", UTILS.until(date_date), true);
+			newEmbed.setFooter("This suspension expires at");
+			newEmbed.setTimestamp(date_date);
+		}
+		newEmbed.addField("Help", "If you believe this is a mistake, please visit " + CONFIG.HELP_SERVER_INVITE_LINK + " and state your case to an admin.", true);
+		newEmbed.setAuthor(issuer_tag, issuer_avatarURL);
+		newEmbed.setDescription("The reason given was: " + reason);
+		return newEmbed;
+	}
 }

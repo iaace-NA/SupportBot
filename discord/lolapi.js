@@ -7,12 +7,8 @@ module.exports = class LOLAPI {
 	constructor(INIT_CONFIG, request_id) {
 		this.CONFIG = INIT_CONFIG;
 		this.request_id = request_id;
-		if (!UTILS.exists(this.CONFIG)) {
-			throw new Error("config.json required to access riot api.");
-		}
-		else if (!UTILS.exists(this.CONFIG.RIOT_API_KEY) || this.CONFIG.RIOT_API_KEY === "") {
-			throw new Error("config.json RIOT_API_KEY required to access riot api.");
-		}
+		if (!UTILS.exists(this.CONFIG)) throw new Error("config.json required to access riot api.");
+		else if (!UTILS.exists(this.CONFIG.RIOT_API_KEY) || this.CONFIG.RIOT_API_KEY === "") throw new Error("config.json RIOT_API_KEY required to access riot api.");
 		this.request = REQUEST;
 		this.address = "https://" + this.CONFIG.API_ADDRESS;
 		this.port = this.CONFIG.API_PORT;
@@ -260,5 +256,11 @@ module.exports = class LOLAPI {
 	}
 	setLink(uid, username) {
 		return this.getIAPI("setlink/" + uid, { link: username });
+	}
+	banUser(uid, reason, date, issuer, issuer_tag, issuer_avatarURL) {
+		return this.getIAPI("ban", { id: uid, user: true, date, reason, issuer, issuer_tag, issuer_avatarURL });
+	}
+	banServer(sid, reason, date, issuer, issuer_tag, issuer_avatarURL) {
+		return this.getIAPI("ban", { id: sid, user: false, date, reason, issuer, issuer_tag, issuer_avatarURL });
 	}
 }

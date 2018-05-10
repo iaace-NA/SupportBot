@@ -16,6 +16,7 @@ let CONFIG;
 try {
 	CONFIG = JSON.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
 	CONFIG.VERSION = "v1.3.0b";//b for non-release (in development)
+	CONFIG.BANS = {};
 }
 catch (e) {
 	console.log("something's wrong with config.json");
@@ -38,6 +39,8 @@ client.on("ready", function () {
 	if (initial_start) sendToChannel(CONFIG.LOG_CHANNEL_ID, ":repeat:`$" + process.env.SHARD_ID + "`Bot started in " + UTILS.round((new Date().getTime() - start_time) / 1000, 0) + "s: version: " + CONFIG.VERSION + " mode: " + mode + " servers: " + client.guilds.size);
 	else sendToChannel(CONFIG.LOG_CHANNEL_ID, ":repeat:`$" + process.env.SHARD_ID + "`Bot reconnected");
 	wsapi.sendEmojis(allEmojis());
+	wsapi.getUserBans();
+	wsapi.getServerBans();
 	for (let b in CONFIG.STATIC.CHAMPIONS) CONFIG.STATIC.CHAMPIONS[b].emoji = CONFIG.STATIC.CHAMPIONS[b].name;
 	UTILS.output("default champion emojis set");
 	initial_start = false;
@@ -89,6 +92,8 @@ function loadAllStaticResources(callback = () => {}) {
 }
 setInterval(() => {//long term maintenance loop
 	loadAllStaticResources();
+	wsapi.getUserBans();
+	wsapi.getServerBans();
 }, 60000 * 15);
 function allEmojis() {
 	let all_emojis = [];//collects all emojis from emoji servers
