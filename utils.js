@@ -17,8 +17,9 @@ module.exports = class UTILS {
 			console.log(n + "." + new Date().getMilliseconds().pad(3) + " " + (this.exists(process.env.SHARD_ID) ? "$" + process.env.SHARD_ID : "") + ": " + t);
 		}
 	}
-	debug(t, override = true) {
-		if (process.env.DEBUG == "true" && override) this.output(t);
+	debug(t, override) {
+		if (this.exists(override) && override) this.output(t);
+		else if (process.env.DEBUG == "true") this.output(t);
 	}
 	exists(anyObject) {//general utility function
 		if (anyObject !== null && anyObject !== undefined) return true;
