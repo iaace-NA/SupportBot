@@ -69,6 +69,7 @@ module.exports = class WSAPI {
 			UTILS.output("ws closed: " + code + ", " + reason);
 		});
 		this.connection.on("message", data => {
+			UTILS.debug(data);
 			data = JSON.parse(data);
 			UTILS.output("ws message received: type: " + data.type);
 			switch(data.type) {//client receives even values only

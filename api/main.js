@@ -112,7 +112,7 @@ function sendExpectReplyRaw(message, destination, callback) {
 	request.request_id = new Date().getTime() + ":" + ws_request_id;
 	message_handlers[request.request_id] = callback;
 	sendToShard(request, destination);
-	UTILS.debug("request " + ws_request_id + " sent");
+	UTILS.debug("request " + ws_request_id + " sent with contents" + JSON.stringify(request, null, "\t"));
 }
 function sendExpectReply(message, destination, timeout = 5000) {
 	return new Promise((resolve, reject) => {
