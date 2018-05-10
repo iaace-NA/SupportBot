@@ -98,7 +98,7 @@ website.ws("/shard", (ws, req) => {
 			message_handlers[data.request_id](nMsg);
 			delete message_handlers[data.request_id];
 		}
-		for (let b in message_handlers) if (parseInt(b.substring(0, b.indexOf(":"))) < now - (15 * 60 * 1000)) delete message_handlers[b];//cleanup old message handlers
+		for (let b in message_handlers) if (parseInt(b.substring(0, b.indexOf(":"))) < new Date().getTime() - (15 * 60 * 1000)) delete message_handlers[b];//cleanup old message handlers
 	});
 	ws.on("close", (code, reason) => {
 		UTILS.output("ws $" + req.query.id + " closed: " + code + ", " + reason);
