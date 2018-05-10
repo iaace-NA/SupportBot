@@ -79,7 +79,6 @@ website.use(function (req, res, next) {
 });
 const HEARTBEAT_INTERVAL = 60000;
 let shard_ws = {};
-let champ_emojis = {};
 let ws_request_id = 0;
 let message_handlers = {};
 website.ws("/shard", (ws, req) => {

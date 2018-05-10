@@ -1,5 +1,6 @@
 "use strict";
 const UTILS = new (require("../utils.js"))();
+let champ_emojis = {};
 module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans) {
 	switch (data.type) {
 		case 1:
