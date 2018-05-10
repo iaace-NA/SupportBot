@@ -140,7 +140,7 @@ module.exports = function(CONFIG, serveWebRequest, response_type, load_average, 
 			if (req.query.user != "true") shardBroadcast({ type: 17, 
 				sid: req.query.id,
 				reason: req.query.reason,
-				date: req.query.date,
+				date: parseInt(req.query.date),
 				issuer_tag: req.query.issuer_tag,
 				issuer_avatarURL: req.query.issuer_avatarURL });
 			else sendExpectReplyBroadcast({ type: 20,
@@ -148,7 +148,7 @@ module.exports = function(CONFIG, serveWebRequest, response_type, load_average, 
 				reason: req.query.reason,
 				issuer_tag: req.query.issuer_tag,
 				issuer_avatarURL: req.query.issuer_avatarURL,
-				date: req.query.date }).then(results => {
+				date: parseInt(req.query.date) }).then(results => {
 					for (let i = 0; i < results.length; ++i) {
 						if (results[i].connected) {
 							sendToShard({ type: 22,
@@ -156,7 +156,7 @@ module.exports = function(CONFIG, serveWebRequest, response_type, load_average, 
 								reason: req.query.reason,
 								issuer_tag: req.query.issuer_tag,
 								issuer_avatarURL: req.query.issuer_avatarURL,
-								date: req.query.date }, i);
+								date: parseInt(req.query.date) }, i);
 							break;
 						}
 					}

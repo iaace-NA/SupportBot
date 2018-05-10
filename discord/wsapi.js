@@ -123,7 +123,7 @@ module.exports = class WSAPI {
 					this.send(data);
 					break;
 				case 22:
-					this.client.users.get(data.uid).send(embedgenerator.userBan(this.CONFIG, data.reason, parseInt(data.date), data.issuer_tag, data.issuer_avatarURL)).catch(console.error);
+					this.client.users.get(data.uid).send(embedgenerator.userBan(this.CONFIG, data.reason, data.date, data.issuer_tag, data.issuer_avatarURL)).catch(console.error);
 					break;
 				default:
 					UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
