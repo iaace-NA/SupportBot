@@ -45,7 +45,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		if (id == msg.author.id) return reply(":x: You cannot ban yourself.");
 		if (id == client.user.id) return reply(":x: You cannot ban me.");
 		if (isOwner(id, false)) return reply(":x: The id you are trying to ban has elevated permissions.");
-		lolapi.banUser(id, reason, date, msg.author.id, msg.author.tag, msg.author.displayAvatarURL).then(result => {
+		lolapi.banUser(id, reason, end_date, msg.author.id, msg.author.tag, msg.author.displayAvatarURL).then(result => {
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":no_entry: User banned, id " + id + " by " + msg.author.tag + " for : " + reason);
 		}).catch(console.error);
 	});
