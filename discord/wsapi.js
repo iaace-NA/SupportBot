@@ -78,6 +78,7 @@ module.exports = class WSAPI {
 			UTILS.debug(data);
 			data = JSON.parse(data);
 			UTILS.output("ws message received: type: " + data.type);
+			const that = this;
 			switch(data.type) {//client receives even values only
 				case 0://reserved/heartbeat
 					this.send({ type: 1, received: new Date().getTime() });
@@ -102,7 +103,6 @@ module.exports = class WSAPI {
 				case 10://send message to user
 				case 12:
 					const notification = embedgenerator.notify(this.CONFIG, data.content, data.username, data.displayAvatarURL);
-					let that = this;
 					this.client.guilds.forEach(g => {
 						let candidate = UTILS.preferredTextChannel(that.client, g.channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
 						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).catch(console.error);
@@ -115,7 +115,6 @@ module.exports = class WSAPI {
 					this.CONFIG.BANS.SERVERS = data.bans;
 					break;
 				case 18:
-					let that = this;
 					if (UTILS.exists(this.client.guilds.get(data.sid))) {
 						const notification = embedgenerator.serverBan(this.CONFIG, this.client.guilds.get(data.sid), data.reason, data.date, data.issuer_tag, data.issuer_avatarURL);
 						let candidate = UTILS.preferredTextChannel(this.client, this.client.guilds.get(data.sid).channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
@@ -139,7 +138,6 @@ module.exports = class WSAPI {
 					this.send(data);
 					break;
 				case 22:
-					let that = this;
 					this.client.users.get(data.uid).send(embedgenerator.userBan(this.CONFIG, data.reason, data.date, data.issuer_tag, data.issuer_avatarURL)).then(() => {
 						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail::no_entry: User notified");
 					}).catch(e => {
@@ -148,7 +146,6 @@ module.exports = class WSAPI {
 					});
 					break;
 				case 24:
-					let that = this;
 					this.client.users.get(data.uid).send(embedgenerator.userWarn(this.CONFIG, data.reason, data.issuer_tag, data.issuer_avatarURL)).then(() => {
 						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail::warning: User notified");
 					}).catch(e => {
