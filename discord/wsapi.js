@@ -120,16 +120,16 @@ module.exports = class WSAPI {
 						const notification = embedgenerator.serverBan(this.CONFIG, this.client.guilds.get(data.sid), data.reason, data.date, data.issuer_tag, data.issuer_avatarURL);
 						let candidate = UTILS.preferredTextChannel(this.client, this.client.guilds.get(data.sid).channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
 						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).then(() => {
-							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail: Server notified in channel " + candidate.name);
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail::no_entry: Server notified in channel " + candidate.name);
 						}).catch(e => {
 							console.error(e);
-							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x: Server could not be notified");
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x::no_entry: Server could not be notified");
 						});
 						this.client.guilds.get(data.sid).owner.send("", { embed: notification }).then(() => {
-							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail: Owner notified");
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail::no_entry: Owner notified");
 						}).catch(e => {
 							console.error(e);
-							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x: Owner could not be notified");
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x::no_entry: Owner could not be notified");
 						});
 					}
 					break;
@@ -141,19 +141,19 @@ module.exports = class WSAPI {
 				case 22:
 					let that = this;
 					this.client.users.get(data.uid).send(embedgenerator.userBan(this.CONFIG, data.reason, data.date, data.issuer_tag, data.issuer_avatarURL)).then(() => {
-						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail: User notified");
+						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail::no_entry: User notified");
 					}).catch(e => {
 						console.error(e);
-						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x: User could not be notified");
+						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x::no_entry: User could not be notified");
 					});
 					break;
 				case 24:
 					let that = this;
 					this.client.users.get(data.uid).send(embedgenerator.userWarn(this.CONFIG, data.reason, data.issuer_tag, data.issuer_avatarURL)).then(() => {
-						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail: User notified");
+						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail::warning: User notified");
 					}).catch(e => {
 						console.error(e);
-						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x: User could not be notified");
+						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x::warning: User could not be notified");
 					});
 					break;
 				case 26:
@@ -161,16 +161,16 @@ module.exports = class WSAPI {
 						const notification = embedgenerator.serverWarn(this.CONFIG, this.client.guilds.get(data.sid), data.reason, data.issuer_tag, data.issuer_avatarURL);
 						let candidate = UTILS.preferredTextChannel(this.client, this.client.guilds.get(data.sid).channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
 						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).then(() => {
-							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail: Server notified in channel " + candidate.name);
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail::warning: Server notified in channel " + candidate.name);
 						}).catch(e => {
 							console.error(e);
-							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x: Server could not be notified");
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x::warning: Server could not be notified");
 						});
 						this.client.guilds.get(data.sid).owner.send("", { embed: notification }).then(() => {
-							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail: Owner notified");
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail::warning: Owner notified");
 						}).catch(e => {
 							console.error(e);
-							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x: Owner could not be notified");
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x::warning: Owner could not be notified");
 						});
 					}
 					break;
