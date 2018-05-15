@@ -532,7 +532,17 @@ module.exports = class EmbedGenerator {
 			UTILS.debug("individual_description length: " + individual_description.length);
 			response_str.push(individual_description);
 		}
-		newEmbed.addField("`SOLOQ |FLEX5 |FLEX3` W/L-Streak, 20G W/L, 20G KDA, Best Champs", response_str.join("\n"));
+		for (let i = 0; i < response_str.length; ++i) {
+			let field_str = "";
+			for (let j = i; j < response_str.length; ++j) {
+				if (field_str.length + response_str[i].length < 1024) field_str += response_str[i] + "\n";
+				else {
+					i = j;
+					break;
+				}
+			}
+			newEmbed.addField("`SOLOQ |FLEX5 |FLEX3` W/L-Streak, 20G W/L, 20G KDA, Best Champs", field_str.substring(0, field_str.length - 1));
+		}
 		return newEmbed;
 		//SOLO Q|FLEX 5|FLEX 3 [MH1][MH2][MH3][MH4][W]W/[L]L KDA: [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
 		//6     7      7      1 25   25   25   25   2 2  2 2 4    6     26  26  26 5    3    48
