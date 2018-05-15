@@ -63,6 +63,8 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
 		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
+		if (id == msg.author.id) return reply(":x: You cannot ban yourself.");
+		if (id == client.user.id) return reply(":x: You cannot ban me.");
 		lolapi.warnUser(id, reason, msg.author.id, msg.author.tag, msg.author.displayAvatarURL).then(result => {
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":warning: User warned, id " + id + " by " + msg.author.tag + ": " + reason);
 			reply(":warning: User warned, id " + id + " by " + msg.author.tag + ": " + reason);
