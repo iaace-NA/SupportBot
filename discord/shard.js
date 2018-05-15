@@ -68,9 +68,7 @@ client.on("guildDelete", function(guild) {
 	sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x:`$" + process.env.SHARD_ID + "`Server Left: `" + guild.id + "` :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
 });
 function sendToChannel(cid, text) {//duplicated in discordcommands.js
-	const candidate = client.channels.get(cid);
-	if (UTILS.exists(candidate)) return candidate.send(text);
-	else wsapi.sendTextToChannel(cid, text);
+	wsapi.sendTextToChannel(cid, text);
 }
 function loadAllStaticResources(callback = () => {}) {
 	LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version

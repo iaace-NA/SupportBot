@@ -659,8 +659,6 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		}
 	}
 	function sendToChannel(cid, text) {//duplicated in shard.js
-		const candidate = client.channels.get(cid);
-		if (UTILS.exists(candidate)) return candidate.send(text).catch(console.error);
-		else wsapi.sendTextToChannel(cid, text);
+		wsapi.sendTextToChannel(cid, text);
 	}
 }
