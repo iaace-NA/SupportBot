@@ -174,7 +174,6 @@ serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
 	UTILS.debug(database_profiler.endAll(), false);
 }, true);
 
-routes(CONFIG, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard);
 serveWebRequest("/eval/:script", function (req, res, next) {
 	let result = {};
 	try {
@@ -185,6 +184,7 @@ serveWebRequest("/eval/:script", function (req, res, next) {
 	}
 	res.json(result).end();
 }, true);
+routes(CONFIG, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard);
 function serveWebRequest(branch, callback, validate = false) {
 	if (typeof(branch) == "string") {
 		website.get(branch, function (req, res, next) {
