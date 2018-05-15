@@ -211,7 +211,17 @@ module.exports = function(CONFIG, serveWebRequest, response_type, load_average, 
 			}
 		});
 	}, true);
-	serveWebRequest("/unban", (req, res, next) => {//boolean-user, string-id
+	serveWebRequest("/unban", (req, res, next) => {//boolean-user, string-id, string-issuer, string-issuer_tag, string-issuer_avatarURL
+		let new_doc = new disciplinary_model({
+			user: req.query.user == "true",
+			ban: false,
+			target_id: req.query.id,
+			reason: ":no_entry_sign: Bans cleared (unbanned)",
+			date: new Date(0),
+			active: false,
+			issuer_id: req.query.issuer
+		});
+		new_doc.save(console.error);
 		disciplinary_model.find({ user: req.query.user == "true", target_id: req.query.id, active: true }, (err, docs) => {
 			let errored = false;
 			docs.forEach(doc => {
