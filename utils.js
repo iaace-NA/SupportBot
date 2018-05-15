@@ -18,7 +18,9 @@ module.exports = class UTILS {
 		}
 	}
 	debug(t, override) {
-		if (this.exists(override)) if (override) this.output(t);
+		if (this.exists(override)) {
+			if (override) this.output(t);
+		}
 		else if (process.env.DEBUG == "true") this.output(t);
 	}
 	exists(anyObject) {//general utility function
