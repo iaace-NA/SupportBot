@@ -167,12 +167,12 @@ module.exports = function(CONFIG, serveWebRequest, response_type, load_average, 
 			
 		});
 	}, true);
-	serveWebRequest("/warn", (req, res, next) => {//boolean-user, string-id, string-reason, string-issuer, boolean-notify
+	serveWebRequest("/warn", (req, res, next) => {//boolean-user, string-id, string-reason, string-issuer, boolean-notify, string-issuer_tag, string-issuer_avatarURL
 		let new_doc = new disciplinary_model({
 			user: req.query.user == "true",
 			ban: false,
 			target_id: req.query.id,
-			reason: req.query.reason,
+			reason: (req.query.notify == "true" ? "WARN: " : "NOTE: ") + req.query.reason,
 			date: new Date(0),
 			active: false,
 			issuer_id: req.query.issuer
@@ -182,7 +182,33 @@ module.exports = function(CONFIG, serveWebRequest, response_type, load_average, 
 				console.error(e);
 				res.status(500).end();
 			}
-			else res.json({ success: true });
+			else {
+				res.json({ success: true });
+				if (req.query.notify == "true") 
+				{
+					if (req.query.user == "true") sendExpectReplyBroadcast({ type: 20,
+					uid: req.query.id,
+					reason: req.query.reason,
+					issuer_tag: req.query.issuer_tag,
+					issuer_avatarURL: req.query.issuer_avatarURL, }).then(results => {
+						for (let i = 0; i < results.length; ++i) {
+							if (results[i].connected) {
+								sendToShard({ type: 24,
+									uid: req.query.id,
+									reason: req.query.reason,
+									issuer_tag: req.query.issuer_tag,
+									issuer_avatarURL: req.query.issuer_avatarURL }, i);
+								break;
+							}
+						}
+					}).catch(console.error);
+					else shardBroadcast({ type: 18, 
+						sid: req.query.id,
+						reason: req.query.reason,
+						issuer_tag: req.query.issuer_tag,
+						issuer_avatarURL: req.query.issuer_avatarURL });
+				}
+			}
 		});
 	}, true);
 	serveWebRequest("/unban", (req, res, next) => {//boolean-user, string-id

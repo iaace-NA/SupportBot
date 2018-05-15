@@ -47,11 +47,17 @@ module.exports = class WSAPI {
 		18: IAPI wants to issue server ban message and leave server
 		19: unimplemented
 
-		20: IAPI asks if shard can see user (user ban step 1)
-		21: shard response with whether or not user is in cache (user ban step 2)
+		20: IAPI asks if shard can see user (user ban/warn step 1)
+		21: shard response with whether or not user is in cache (user ban/warn step 2)
 
 		22: IAPI wants to send user a ban message (user ban step 3)
 		23: unimplemented
+
+		24: IAPI wants to send user a warning message (user warn step 3)
+		25: unimplemented
+
+		26: IAPI wants to issue server warning message
+		27: unimplemented
 	*/
 	constructor(INIT_CONFIG, discord_client) {
 		this.client = discord_client;
@@ -124,6 +130,17 @@ module.exports = class WSAPI {
 					break;
 				case 22:
 					this.client.users.get(data.uid).send(embedgenerator.userBan(this.CONFIG, data.reason, data.date, data.issuer_tag, data.issuer_avatarURL)).catch(console.error);
+					break;
+				case 24:
+					this.client.users.get(data.uid).send(embedgenerator.userWarn(this.CONFIG, data.reason, data.issuer_tag, data.issuer_avatarURL)).catch(console.error);
+					break;
+				case 26:
+					if (UTILS.exists(this.client.guilds.get(data.sid))) {
+						const notification = embedgenerator.serverWarn(this.CONFIG, this.client.guilds.get(data.sid), data.reason, data.issuer_tag, data.issuer_avatarURL);
+						let candidate = UTILS.preferredTextChannel(this.client, this.client.guilds.get(data.sid).channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
+						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).catch(console.error);
+						this.client.guilds.get(data.sid).owner.send("", { embed: notification }).catch(console.error);
+					}
 					break;
 				default:
 					UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));

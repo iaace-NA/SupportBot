@@ -263,4 +263,16 @@ module.exports = class LOLAPI {
 	banServer(sid, reason, date, issuer, issuer_tag, issuer_avatarURL) {
 		return this.getIAPI("ban", { id: sid, user: false, date, reason, issuer, issuer_tag, issuer_avatarURL });
 	}
+	warnUser(uid, reason, issuer, issuer_tag, issuer_avatarURL) {
+		return this.getIAPI("warn", { id: uid, user: true, reason, issuer, issuer_tag, issuer_avatarURL, notify: true });
+	}
+	warnServer(sid, reason, issuer, issuer_tag, issuer_avatarURL) {
+		return this.getIAPI("warn", { id: sid, user: false, reason, issuer, issuer_tag, issuer_avatarURL, notify: true });
+	}
+	noteUser(uid, reason, issuer, issuer_tag, issuer_avatarURL) {
+		return this.getIAPI("warn", { id: uid, user: true, reason, issuer, issuer_tag, issuer_avatarURL, notify: false });
+	}
+	noteServer(sid, reason, issuer, issuer_tag, issuer_avatarURL) {
+		return this.getIAPI("warn", { id: sid, user: false, reason, issuer, issuer_tag, issuer_avatarURL, notify: false });
+	}
 }

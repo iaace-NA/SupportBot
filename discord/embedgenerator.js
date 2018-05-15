@@ -570,7 +570,7 @@ module.exports = class EmbedGenerator {
 			newEmbed.setFooter("This suspension expires at");
 			newEmbed.setTimestamp(date_date);
 		}
-		newEmbed.addField("While this ban is effective", "SupportBot will ignore all messages sent from this server.");
+		newEmbed.addField("While this ban is effective", "SupportBot will ignore all messages sent from this server.", true);
 		newEmbed.addField("Help", "If you believe this is a mistake, please visit " + CONFIG.HELP_SERVER_INVITE_LINK, true);
 		newEmbed.setAuthor(issuer_tag, issuer_avatarURL);
 		newEmbed.setDescription("The reason given was: " + reason);
@@ -591,8 +591,30 @@ module.exports = class EmbedGenerator {
 			newEmbed.setFooter("This suspension expires at");
 			newEmbed.setTimestamp(date_date);
 		}
-		newEmbed.addField("While this ban is effective", "SupportBot will ignore all messages sent from your account.");
+		newEmbed.addField("While this ban is effective", "SupportBot will ignore all messages sent from your account.", true);
 		newEmbed.addField("Help", "If you believe this is a mistake, please visit " + CONFIG.HELP_SERVER_INVITE_LINK + " and state your case to an admin.", true);
+		newEmbed.setAuthor(issuer_tag, issuer_avatarURL);
+		newEmbed.setDescription("The reason given was: " + reason);
+		return newEmbed;
+	}
+	serverWarn(CONFIG, server, reason, issuer_tag, issuer_avatarURL) {
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setTitle("This is an official warning for your server (" + server.name + ")");
+		newEmbed.setTimestamp();
+		newEmbed.setColor([255, 255, 0]);
+		newEmbed.addField("This server can be temporarily or permanently banned from using SupportBot", "if you continue to violate our policies.", true);
+		newEmbed.addField("No further action is required from anyone.", "Please ensure everyone is familiar with our Terms and Conditions, which you can read about by sending `" + CONFIG.DISCORD_COMMAND_PREFIX + "help`. For more assistance, please visit " + CONFIG.HELP_SERVER_INVITE_LINK + " .", true);
+		newEmbed.setAuthor(issuer_tag, issuer_avatarURL);
+		newEmbed.setDescription("The reason given was: " + reason);
+		return newEmbed;
+	}
+	userWarn(CONFIG, reason, issuer_tag, issuer_avatarURL) {
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setTitle("This is an official warning");
+		newEmbed.setColor([255, 255, 0]);
+		newEmbed.setTimestamp();
+		newEmbed.addField("You can be temporarily or permanently banned from using SupportBot", "if you continue to violate our policies.", true);
+		newEmbed.addField("No further action is required from you.", "Please ensure you are familiar with our Terms and Conditions, which you can read about by sending `" + CONFIG.DISCORD_COMMAND_PREFIX + "help`. For more assistance, please visit " + CONFIG.HELP_SERVER_INVITE_LINK + " .", true);
 		newEmbed.setAuthor(issuer_tag, issuer_avatarURL);
 		newEmbed.setDescription("The reason given was: " + reason);
 		return newEmbed;

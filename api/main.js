@@ -54,7 +54,7 @@ let disciplinary_doc = new apicache.Schema({
 	target_id: { type: String, required: true },//target id: uid or sid
 	reason: { type: String, required: true },//text reason for disciplinary action
 	date: { type: Date, required: true },//new Date() set to 0 if permanent, set to date values for temporary
-	active: { type: Boolean, required: true },//false if overridden or warning
+	active: { type: Boolean, required: true },//true if active ban, false if overridden or warning
 	issuer_id: { type: String, required: true }//uid for the person who issued the ban
 });
 disciplinary_doc.index({ target_id: "hashed" });//direct username lookups
