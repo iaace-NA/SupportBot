@@ -123,8 +123,7 @@ module.exports = class WSAPI {
 					}
 					break;
 				case 20:
-					if (UTILS.exists(this.client.users.get(data.uid))) data.connected = true;
-					else data.connected = false;
+					data.connected = UTILS.exists(this.client.users.get(data.uid)) ? true : false;
 					data.type = 21;
 					this.send(data);
 					break;
