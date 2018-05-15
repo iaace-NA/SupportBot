@@ -115,11 +115,22 @@ module.exports = class WSAPI {
 					this.CONFIG.BANS.SERVERS = data.bans;
 					break;
 				case 18:
+					let that = this;
 					if (UTILS.exists(this.client.guilds.get(data.sid))) {
 						const notification = embedgenerator.serverBan(this.CONFIG, this.client.guilds.get(data.sid), data.reason, data.date, data.issuer_tag, data.issuer_avatarURL);
 						let candidate = UTILS.preferredTextChannel(this.client, this.client.guilds.get(data.sid).channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
-						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).catch(console.error);
-						this.client.guilds.get(data.sid).owner.send("", { embed: notification }).catch(console.error);
+						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).then(() => {
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail: Server notified in channel " + candidate.name);
+						}).catch(e => {
+							console.error(e);
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x: Server could not be notified");
+						});
+						this.client.guilds.get(data.sid).owner.send("", { embed: notification }).then(() => {
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail: Owner notified");
+						}).catch(e => {
+							console.error(e);
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x: Owner could not be notified");
+						});
 					}
 					break;
 				case 20:
@@ -128,17 +139,39 @@ module.exports = class WSAPI {
 					this.send(data);
 					break;
 				case 22:
-					this.client.users.get(data.uid).send(embedgenerator.userBan(this.CONFIG, data.reason, data.date, data.issuer_tag, data.issuer_avatarURL)).catch(console.error);
+					let that = this;
+					this.client.users.get(data.uid).send(embedgenerator.userBan(this.CONFIG, data.reason, data.date, data.issuer_tag, data.issuer_avatarURL)).then(() => {
+						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail: User notified");
+					}).catch(e => {
+						console.error(e);
+						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x: User could not be notified");
+					});
 					break;
 				case 24:
-					this.client.users.get(data.uid).send(embedgenerator.userWarn(this.CONFIG, data.reason, data.issuer_tag, data.issuer_avatarURL)).catch(console.error);
+					let that = this;
+					this.client.users.get(data.uid).send(embedgenerator.userWarn(this.CONFIG, data.reason, data.issuer_tag, data.issuer_avatarURL)).then(() => {
+						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail: User notified");
+					}).catch(e => {
+						console.error(e);
+						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x: User could not be notified");
+					});
 					break;
 				case 26:
 					if (UTILS.exists(this.client.guilds.get(data.sid))) {
 						const notification = embedgenerator.serverWarn(this.CONFIG, this.client.guilds.get(data.sid), data.reason, data.issuer_tag, data.issuer_avatarURL);
 						let candidate = UTILS.preferredTextChannel(this.client, this.client.guilds.get(data.sid).channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
-						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).catch(console.error);
-						this.client.guilds.get(data.sid).owner.send("", { embed: notification }).catch(console.error);
+						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).then(() => {
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail: Server notified in channel " + candidate.name);
+						}).catch(e => {
+							console.error(e);
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x: Server could not be notified");
+						});
+						this.client.guilds.get(data.sid).owner.send("", { embed: notification }).then(() => {
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail: Owner notified");
+						}).catch(e => {
+							console.error(e);
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x: Owner could not be notified");
+						});
 					}
 					break;
 				default:
