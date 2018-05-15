@@ -534,12 +534,9 @@ module.exports = class EmbedGenerator {
 		}
 		for (let i = 0; i < response_str.length; ++i) {
 			let field_str = "";
-			for (let j = i; j < response_str.length; ++j) {
+			for (; i < response_str.length; ++i) {
 				if (field_str.length + response_str[i].length < 1024) field_str += response_str[i] + "\n";
-				else {
-					i = j;
-					break;
-				}
+				else break;
 			}
 			newEmbed.addField("`SOLOQ |FLEX5 |FLEX3` W/L-Streak, 20G W/L, 20G KDA, Best Champs", field_str.substring(0, field_str.length - 1));
 		}
