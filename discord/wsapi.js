@@ -180,7 +180,7 @@ module.exports = class WSAPI {
 		this.send({ type: 5, emojis });
 	}
 	sendTextToChannel(cid, content) {
-		if (UTILS.exists(client.channels.get(cid))) client.channels.get(cid).send(content).catch(console.error);
+		if (UTILS.exists(this.client.channels.get(cid))) this.client.channels.get(cid).send(content).catch(console.error);
 		else this.send({ type: 7, content, cid });
 	}
 	lnotify(username, displayAvatarURL, content) {
