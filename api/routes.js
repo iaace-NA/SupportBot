@@ -167,7 +167,7 @@ module.exports = function(CONFIG, serveWebRequest, response_type, load_average, 
 			
 		});
 	}, true);
-	serveWebRequest("/warn", (req, res, next) => {//boolean-user, string-id, string-reason
+	serveWebRequest("/warn", (req, res, next) => {//boolean-user, string-id, string-reason, string-issuer, boolean-notify
 		let new_doc = new disciplinary_model({
 			user: req.query.user == "true",
 			ban: false,
@@ -204,8 +204,7 @@ module.exports = function(CONFIG, serveWebRequest, response_type, load_average, 
 		});
 	}, true);
 	serveWebRequest("/gethistory", (req, res, next) => {//boolean-user, string-id
-		disciplinary_model.find({ user: req.query.user == "true", target_id: req.query.id }, (err, docs) => {
-			docs.sort((a, b) => apicache.Types.ObjectId(a.id).getTimestamp().getTime() - apicache.Types.ObjectId(b.id).getTimestamp().getTime());
+		disciplinary_model.find({ user: req.query.user == "true", target_id: req.query.id }, null, { sort: { "_id": -1 } }, (err, docs) => {
 			let answer = {};
 			answer[req.query.id] = docs.map(d => {
 				d = d.toObject();
