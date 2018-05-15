@@ -556,7 +556,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		});
 	}
 	function isOwner(candidate = msg.author.id, notify = true) {
-		const answer = UTILS.exists(CONFIG.OWNER_DISCORD_IDS[candidate]) && CONFIG.OWNER_DISCORD_IDS[candidate];
+		const answer = UTILS.exists(CONFIG.OWNER_DISCORD_IDS[candidate]) && CONFIG.OWNER_DISCORD_IDS[candidate].active;
 		if (!answer) {
 			UTILS.output("insufficient permissions");
 			print_message();

@@ -2,8 +2,26 @@
 	"DISCORD_API_KEY": "",
 	"RIOT_API_KEY": "",
 	"OWNER_DISCORD_IDS": {
-		"109894307070083072": true,
-		"333384744483946508": true
+		"109894307070083072": {
+			"name": "iaace",
+			"active": true
+		},
+		"333384744483946508": {
+			"name": "routuro",
+			"active": true
+		},
+		"250698693982945282": {
+			"name": "K-den",
+			"active": true
+		},
+		"175003640111693824": {
+			"name": "WastedYoTimeReadingThis",
+			"active": true
+		},
+		"66336882170015744": {
+			"name": "HiKomodo",
+			"active": true
+		}
 	},
 	"DISCORD_COMMAND_PREFIX": "l",
 	"REGIONS": {
