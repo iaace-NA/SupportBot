@@ -274,4 +274,11 @@ module.exports = class UTILS {
 	defaultChannelNames() {
 		return ["general", "bot", "bots", "bot-commands", "botcommands", "commands", "league", "lol", "games", "spam"];
 	}
+	durationParse(duration) {
+		let multiplier = duration.substring(duration.length - 1, duration.length).toUpperCase();
+		if (multiplier == "D") multiplier = 24 * 60 * 60 * 1000;//days
+		else if (multiplier == "H") multiplier = 60 * 60 * 1000;//hours
+		else return NaN;
+		return parseInt(duration) * multiplier;
+	}
 }

@@ -32,14 +32,8 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1);
 		let duration = parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2));
-		if (duration == "0") duration = 0;
-		else {
-			let multiplier = duration.substring(duration.length - 1, duration.length).toUpperCase();
-			if (multiplier == "D") multiplier = 24 * 60 * 60 * 1000;
-			else if (multiplier == "H") multiplier = 60 * 60 * 1000;
-			else return reply(":x: The duration is invalid.");
-			duration = parseInt(duration) * multiplier;
-		}
+		duration = duration == "0" ? duration = 0 : UTILS.durationParse(duration);
+		if (isNaN(duration)) return reply(":x: The duration is invalid.");
 		const end_date = duration == 0 ? 0 : new Date().getTime() + duration;
 		if (id.length < 1 || reason.length < 1 || typeof(duration) != "number") return reply(":x: The id, duration, or reason could not be found.");
 		if (id == msg.author.id) return reply(":x: You cannot ban yourself.");
@@ -47,6 +41,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		if (isOwner(id, false)) return reply(":x: The id you are trying to ban has elevated permissions.");
 		lolapi.banUser(id, reason, end_date, msg.author.id, msg.author.tag, msg.author.displayAvatarURL).then(result => {
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":no_entry: User banned, id " + id + " by " + msg.author.tag + " for : " + reason);
+			reply(":no_entry: User banned, id " + id + " by " + msg.author.tag + " for : " + reason);
 		}).catch(console.error);
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "banserver "], true, true, (original, index, parameter) => {
@@ -54,24 +49,20 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1);
 		let duration = parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2));
-		if (duration == "0") duration = 0;
-		else {
-			let multiplier = duration.substring(duration.length - 1, duration.length).toUpperCase();
-			if (multiplier == "D") multiplier = 24 * 60 * 60 * 1000;
-			else if (multiplier == "H") multiplier = 60 * 60 * 1000;
-			else return reply(":x: The duration is invalid.");
-			duration = parseInt(duration) * multiplier;
-		}
+		duration = duration == "0" ? duration = 0 : UTILS.durationParse(duration);
+		if (isNaN(duration)) return reply(":x: The duration is invalid.");
 		const end_date = duration == 0 ? 0 : new Date().getTime() + duration;
 		if (id.length < 1 || reason.length < 1 || typeof(duration) != "number") return reply(":x: The id, duration, or reason could not be found.");
 		lolapi.banServer(id, reason, end_date, msg.author.id, msg.author.tag, msg.author.displayAvatarURL).then(result => {
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":no_entry: Server banned, id " + id + " by " + msg.author.tag + ": " + reason);
+			reply(":no_entry: Server banned, id " + id + " by " + msg.author.tag + ": " + reason);
 		}).catch(console.error);
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "warnuser "], true, true, (original, index, parameter) => {
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
 		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
+		lolapi.
 		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":warning: User warned, id " + id + " by " + msg.author.tag + ": " + reason);
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "warnserver "], true, true, (original, index, parameter) => {
@@ -91,6 +82,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
 		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
 		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
+		
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "userhistory "], true, true, (original, index, parameter) => {
 		s
@@ -103,12 +95,14 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
 		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
 		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
+		//add note on unban
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "unbanuser "], true, true, (original, index, parameter) => {
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
 		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
 		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
+		//add note on unban
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "permissionstest", CONFIG.DISCORD_COMMAND_PREFIX + "pt"], false, false, () => {
 		reply("You have " + (isOwner(undefined, false) ? "owner" : "normal") + " permissions.");
