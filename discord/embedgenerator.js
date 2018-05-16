@@ -676,7 +676,7 @@ module.exports = class EmbedGenerator {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Administrative Actions Report");
 		newEmbed.setDescription("Showing 10 most recent events:");
-		newEmbed.setAuthor(CONFIG.OWNER_DISCORD_IDS[id].name + "(" + id + ")");
+		newEmbed.setAuthor(CONFIG.OWNER_DISCORD_IDS[id].name + " (" + id + ")");
 		for (let i = 0; i < docs.length && i < 10; ++i) {
 			let description = "To: " + docs[i].target_id + ", ";
 			description += UTILS.ago(new Date(docs[i].id_timestamp)) + " ago, ";
