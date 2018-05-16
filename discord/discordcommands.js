@@ -278,7 +278,10 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 	commandGuessUsername([""], false, (region, username, parameter) => {
 		lolapi.getSummonerCard(region, username).then(result => {
 			reply_embed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter, result[3], result[4]));
-		}).catch(() => reply(":x: No results for `" + username + "`. Please revise your request."));
+		}).catch(e => {
+			if (UTILS.exists(e)) console.error(e);
+			reply(":x: No results for `" + username + "`. Please revise your request."}
+		));
 	});
 	commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter) => {
 		request_profiler.mark("mh command recognized");
