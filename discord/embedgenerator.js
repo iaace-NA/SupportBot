@@ -656,15 +656,15 @@ module.exports = class EmbedGenerator {
 		}
 		if (active_ban == 0) {
 			newEmbed.setColor([1, 1, 1]);
-			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active permanent ban.");
+			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active permanent ban.\nHere are the 10 most recent events:");
 		}
 		else if (active_ban == -1) {
 			newEmbed.setColor([0, 255, 0]);
-			newEmbed.setDescription("This " + (user ? "user" : "server") + " has no active bans.");
+			newEmbed.setDescription("This " + (user ? "user" : "server") + " has no active bans.\nHere are the 10 most recent events:");
 		}
 		else {
 			newEmbed.setColor([255, 0, 0]);
-			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active temporary ban. It expires in " + UTILS.until(new Date(active_ban)) + ".");
+			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active temporary ban. It expires in " + UTILS.until(new Date(active_ban)) + ".\nHere are the 10 most recent events:");
 		}
 		for (let i = 0; i < docs.length && i < 10; ++i) {
 			newEmbed.addField("By " + CONFIG.OWNER_DISCORD_IDS[docs[i].issuer_id].name + ", " + UTILS.ago(new Date(docs[i].id_timestamp)) + (docs[i].ban && docs[i].active ? (docs[i].date == 0 ? ", Permanent Ban" : ", Ban Expires in " + UTILS.until(new Date(docs[i].date))) : ""), docs[i].reason);
