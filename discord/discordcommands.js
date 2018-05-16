@@ -280,8 +280,8 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 			reply_embed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter, result[3], result[4]));
 		}).catch(e => {
 			if (UTILS.exists(e)) console.error(e);
-			reply(":x: No results for `" + username + "`. Please revise your request."}
-		));
+			reply(":x: No results for `" + username + "`. Please revise your request.");
+		});
 	});
 	commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter) => {
 		request_profiler.mark("mh command recognized");
