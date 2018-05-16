@@ -221,7 +221,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			active: false,
 			issuer_id: req.query.issuer
 		});
-		new_doc.save(console.error);//save a note that the user was unbanned
+		new_doc.save(e => console.error(e));//save a note that the user was unbanned
 		disciplinary_model.find({ user: req.query.user == "true", target_id: req.query.id, active: true }, (err, docs) => {
 			let errored = false;
 			docs.forEach(doc => {
@@ -237,7 +237,27 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			getBans(req.query.user == "true", bans => {
 				shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });
 			});//update shards with new ban list
-			//send unban message
+			if (req.query.user != "true") shardBroadcast({ type: 30, 
+				sid: req.query.id,
+				issuer_tag: req.query.issuer_tag,
+				issuer_avatarURL: req.query.issuer_avatarURL });
+			else sendExpectReplyBroadcast({ type: 20,
+				uid: req.query.id,
+				issuer_tag: req.query.issuer_tag,
+				issuer_avatarURL: req.query.issuer_avatarURL }).then(results => {
+					for (let i = 0; i < results.length; ++i) {
+						if (results[i].connected) {
+							sendToShard({ type: 28,
+								uid: req.query.id,
+								issuer_tag: req.query.issuer_tag,
+								issuer_avatarURL: req.query.issuer_avatarURL }, i);
+							break;
+						}
+					}
+				}).catch(console.error);
+			getBans(req.query.user == "true", bans => {
+				shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });//updates all shards with new ban information
+			});
 		});
 	}, true);
 	serveWebRequest("/gethistory", (req, res, next) => {//boolean-user, string-id, number-limit (optional)
