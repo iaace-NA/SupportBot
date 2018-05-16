@@ -78,49 +78,51 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		lolapi.warnServer(id, reason, msg.author.id, msg.author.tag, msg.author.displayAvatarURL).then(result => {
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":warning: Server warned, id " + id + " by " + msg.author.tag + ": " + reason);
 			reply(CONFIG.LOG_CHANNEL_ID, ":warning: Server warned, id " + id + " by " + msg.author.tag + ": " + reason);
-		});
+		}).catch(console.error);
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "noteuser "], true, true, (original, index, parameter) => {
 		//Lnoteuser <uid> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
 		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
-		lolapi.noteUser(id, reason, msg.author.id);
-		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
+		lolapi.noteUser(id, reason, msg.author.id).then(result => {
+			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
+		}).catch(console.error);
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "noteserver "], true, true, (original, index, parameter) => {
 		//Lnoteserver <sid> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
 		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
-		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
-		
+		lolapi.noteServer(id, reason, msg.author.id).then(result => {
+			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
+		}).catch(console.error);
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "userhistory "], true, true, (original, index, parameter) => {
 		//Luserhistory <uid>
 		lolapi.userHistory(parameter).then(results => {
-			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, true, results));
+			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, parameter, true, results));
 		}).catch();
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "serverhistory "], true, true, (original, index, parameter) => {
 		//Lserverhistory <sid>
 		lolapi.serverHistory(parameter).then(results => {
-			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, false, results));
+			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, parameter, false, results));
 		}).catch();
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "unbanserver "], true, true, (original, index, parameter) => {
-		const id = parameter.substring(0, parameter.indexOf(" "));
-		const reason = parameter.substring(parameter.indexOf(" ") + 1);
-		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
-		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
-		//add note on unban
+		//Lunbanserver <sid>
+		lolapi.unbanServer(parameter, msg.author.id, msg.author.tag, msg.author.displayAvatarURL).then(result => {
+			reply(":no_entry_sign: Server unbanned, id " + parameter + " by " + msg.author.tag);
+			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":no_entry_sign: Server unbanned, id " + parameter + " by " + msg.author.tag);
+		}).catch(console.error);
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "unbanuser "], true, true, (original, index, parameter) => {
-		const id = parameter.substring(0, parameter.indexOf(" "));
-		const reason = parameter.substring(parameter.indexOf(" ") + 1);
-		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
-		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
-		//add note on unban
+		//Lunbanuser <uid>
+		lolapi.unbanUser(parameter, msg.author.id, msg.author.tag, msg.author.displayAvatarURL).then(result => {
+			reply(":no_entry_sign: User unbanned, id " + parameter + " by " + msg.author.tag);
+			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":no_entry_sign: User unbanned, id " + parameter + " by " + msg.author.tag);
+		}).catch(console.error);
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "permissionstest", CONFIG.DISCORD_COMMAND_PREFIX + "pt"], false, false, () => {
 		reply("You have " + (isOwner(undefined, false) ? "owner" : "normal") + " permissions.");
