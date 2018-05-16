@@ -637,7 +637,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.setAuthor(issuer_tag, issuer_avatarURL);
 		return newEmbed;
 	}
-	disciplinaryHistory(CONFIG, user, docs) {
+	disciplinaryHistory(CONFIG, id, user, docs) {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Disciplinary History");
 		let active_ban = -1;
@@ -669,7 +669,7 @@ module.exports = class EmbedGenerator {
 		for (let i = 0; i < docs.length && i < 10; ++i) {
 			newEmbed.addField("By " + CONFIG.OWNER_DISCORD_IDS[docs[i].issuer_id].name + ", " + UTILS.ago(new Date(docs[i].id_timestamp)) + (docs[i].ban && docs[i].active ? (docs[i].date == 0 ? ", Permanent Ban" : ", Ban Expires in " + UTILS.until(new Date(docs[i].date))) : ""), docs[i].reason);
 		}
-		newEmbed.setAuthor(docs[i].id);
+		newEmbed.setAuthor(id);
 		return newEmbed;
 	}
 }
