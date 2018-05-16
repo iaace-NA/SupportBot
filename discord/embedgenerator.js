@@ -641,7 +641,7 @@ module.exports = class EmbedGenerator {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Disciplinary History");
 		let active_ban = -1;
-		let now = new Date().getTime();
+		const now = new Date().getTime();
 		for (let b in docs) {
 			if (docs[b].ban && docs[b].active) {
 				const ban_date = new Date(docs[b].date);
@@ -670,6 +670,24 @@ module.exports = class EmbedGenerator {
 			newEmbed.addField("By " + CONFIG.OWNER_DISCORD_IDS[docs[i].issuer_id].name + ", " + UTILS.ago(new Date(docs[i].id_timestamp)) + (docs[i].ban && docs[i].active ? (docs[i].date == 0 ? ", Permanent Ban" : ", Ban Expires in " + UTILS.until(new Date(docs[i].date))) : ""), docs[i].reason);
 		}
 		newEmbed.setAuthor(id);
+		return newEmbed;
+	}
+	actionReport(CONFIG, id, docs) {
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setTitle("Administrative Actions Report");
+		newEmbed.setDescription("Showing 10 most recent events:");
+		newEmbed.setAuthor(CONFIG.OWNER_DISCORD_IDS[id].name + "(" + id + ")");
+		for (let i = 0; i < docs.length && i < 10; ++i) {
+			let description = "To: " + docs[i].target_id + ", ";
+			description += UTILS.ago(new Date(docs[i].id_timestamp)) + " ago, ";
+			if (docs[i].ban) {
+				description += docs[i].date == 0 ? "Permanent Ban Issued" : "Temporary Ban Issued, duration " + UTILS.duration(new Date(docs[i].id_timestamp), new Date(docs[i].date));
+			}
+			else if (docs[i].reason.substring(0, 9) == ":warning:") description += "Warning Issued";
+			else if (docs[i].reason.substring(0, 15) == ":no_entry_sign:") description += "Bans Cleared (unbanned)";
+			else description += "Note Added";
+			newEmbed.addField(description, docs[i].reason);
+		}
 		return newEmbed;
 	}
 }

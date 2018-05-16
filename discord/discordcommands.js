@@ -126,6 +126,12 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":no_entry_sign: User unbanned, id " + parameter + " by " + msg.author.tag);
 		}).catch(console.error);
 	});
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "actionreport "], true, true, (original, index, parameter) => {
+		//Lactionreport <uid>
+		lolapi.getActions(parameter).then(results => {
+			reply_embed(embedgenerator.actionReport(CONFIG, parameter, results[parameter]));
+		}).catch();
+	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "permissionstest", CONFIG.DISCORD_COMMAND_PREFIX + "pt"], false, false, () => {
 		reply("You have " + (isOwner(undefined, false) ? "owner" : "normal") + " permissions.");
 	});

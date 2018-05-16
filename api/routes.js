@@ -240,8 +240,23 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			//send unban message
 		});
 	}, true);
-	serveWebRequest("/gethistory", (req, res, next) => {//boolean-user, string-id
-		disciplinary_model.find({ user: req.query.user == "true", target_id: req.query.id }, null, { sort: { "_id": -1 } }, (err, docs) => {
+	serveWebRequest("/gethistory", (req, res, next) => {//boolean-user, string-id, number-limit (optional)
+		let options = { sort: { "_id": -1 } };
+		if (UTILS.exists(req.query.limit) && !isNaN(parseInt(req.query.limit))) options.limit = parseInt(req.query.limit);
+		disciplinary_model.find({ user: req.query.user == "true", target_id: req.query.id }, null, options, (err, docs) => {
+			let answer = {};
+			answer[req.query.id] = docs.map(d => {
+				d = d.toObject();
+				d.id_timestamp = apicache.Types.ObjectId(d._id).getTimestamp().getTime();
+				return d;
+			});//add creation timestamp, convert doc to object
+			res.json(answer);
+		});
+	}, true);
+	serveWebRequest("/getactions", (req, res, next) => {//string-id, number-limit(optional)
+		let options = { sort: { "_id": -1 } };
+		if (UTILS.exists(req.query.limit) && !isNaN(parseInt(req.query.limit))) options.limit = parseInt(req.query.limit);
+		disciplinary_model.find({ issuer_id: req.query.id }, null, options, (err, docs) => {
 			let answer = {};
 			answer[req.query.id] = docs.map(d => {
 				d = d.toObject();

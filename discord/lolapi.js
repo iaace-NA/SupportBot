@@ -281,10 +281,13 @@ module.exports = class LOLAPI {
 	unbanServer(sid, issuer, issuer_tag, issuer_avatarURL) {
 		return this.getIAPI("unban", { id: sid, user: false, issuer, issuer_tag, issuer_avatarURL });
 	}
-	userHistory(uid) {
-		return this.getIAPI("gethistory", { id: uid, user: true });
+	userHistory(uid, complete = false) {
+		return complete ? this.getIAPI("gethistory", { id: uid, user: true }) : this.getIAPI("gethistory", { id: uid, user: true, limit: 10 });
 	}
-	serverHistory(sid) {
-		return this.getIAPI("gethistory", { id: sid, user: false });
+	serverHistory(sid, complete = false) {
+		return complete ? this.getIAPI("gethistory", { id: sid, user: false }) : this.getIAPI("gethistory", { id: sid, user: false, limit: 10 });
+	}
+	getActions(uid, complete = false) {
+		return complete ? this.getIAPI("getactions", { id: uid }) : this.getIAPI("getactions", { id: uid, limit: 10 });
 	}
 }
