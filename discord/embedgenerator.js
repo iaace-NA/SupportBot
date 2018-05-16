@@ -680,7 +680,7 @@ module.exports = class EmbedGenerator {
 			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active temporary ban. It expires in " + UTILS.until(new Date(active_ban)) + ".\nHere are the 10 most recent events:");
 		}
 		for (let i = 0; i < docs.length && i < 10; ++i) {
-			newEmbed.addField("By " + CONFIG.OWNER_DISCORD_IDS[docs[i].issuer_id].name + ", " + UTILS.ago(new Date(docs[i].id_timestamp)) + (docs[i].ban && docs[i].active ? (docs[i].date == 0 ? ", Permanent Ban" : ", Ban Expires in " + UTILS.until(new Date(docs[i].date))) : ""), docs[i].reason);
+			newEmbed.addField("By " + CONFIG.OWNER_DISCORD_IDS[docs[i].issuer_id].name + ", " + UTILS.ago(new Date(docs[i].id_timestamp)) + (docs[i].ban && docs[i].active ? (new Date(docs[i].date).getTime() == 0 ? ", Permanent Ban" : ", Ban Expires in " + UTILS.until(new Date(docs[i].date))) : ""), docs[i].reason);
 		}
 		newEmbed.setAuthor(id);
 		return newEmbed;
@@ -694,7 +694,7 @@ module.exports = class EmbedGenerator {
 			let description = "To: " + docs[i].target_id + ", ";
 			description += UTILS.ago(new Date(docs[i].id_timestamp)) + " ago, ";
 			if (docs[i].ban) {
-				description += docs[i].date == 0 ? "Permanent Ban Issued" : "Temporary Ban Issued, duration " + UTILS.duration(new Date(docs[i].id_timestamp), new Date(docs[i].date));
+				description += new Date(docs[i].date).getTime() == 0 ? "Permanent Ban Issued" : "Temporary Ban Issued, duration " + UTILS.duration(new Date(docs[i].id_timestamp), new Date(docs[i].date));
 			}
 			else if (docs[i].reason.substring(0, 9) == ":warning:") description += "Warning Issued";
 			else if (docs[i].reason.substring(0, 15) == ":no_entry_sign:") description += "Bans Cleared (unbanned)";
