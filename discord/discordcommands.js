@@ -86,6 +86,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
 		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
 		lolapi.noteUser(id, reason, msg.author.id).then(result => {
+			reply(":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
 		}).catch(console.error);
 	});
@@ -95,7 +96,8 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
 		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
 		lolapi.noteServer(id, reason, msg.author.id).then(result => {
-			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
+			reply(":information_source: Server note added, id " + id + " by " + msg.author.tag + ": " + reason);
+			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: Server note added, id " + id + " by " + msg.author.tag + ": " + reason);
 		}).catch(console.error);
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "userhistory "], true, true, (original, index, parameter) => {
