@@ -116,8 +116,13 @@ module.exports = class EmbedGenerator {
 				"RANKED_FLEX_TT": "Flex 3v3"
 			}[ranks[i].queueType] + ": ";
 			title += UTILS.english(ranks[i].tier) + " ";
-			title += ranks[i].rank;
-			title += " " + ranks[i].leaguePoints + "LP";
+			if (ranks[i].tier != "CHALLENGER") title += ranks[i].rank + " ";
+			else {
+				challengers[i].entries.sort((a, b) => b.leaguePoints - a.leaguePoints);//sort by LP
+				const candidate = challengers[i].entries.findIndex(cr => summoner.id == cr.playerOrTeamId);//find placing
+				if (candidate != -1) title += "#" + (candidate + 1) + " ";//add placing if index found
+			}
+			title += ranks[i].leaguePoints + "LP";
 			newEmbed.addField(title, description, true);
 			if (RANK_ORDER.indexOf(ranks[i].tier) > highest_rank) highest_rank = RANK_ORDER.indexOf(ranks[i].tier);
 		}
