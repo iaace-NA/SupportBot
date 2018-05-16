@@ -128,7 +128,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "actionreport "], true, true, (original, index, parameter) => {
 		//Lactionreport <uid>
-		if (!UTILS.exists(COFIG.OWNER_DISCORD_IDS[parameter])) return reply(":x: This user is not a current or previously registered admin.");
+		if (!UTILS.exists(CONFIG.OWNER_DISCORD_IDS[parameter])) return reply(":x: This user is not a current or previously registered admin.");
 		lolapi.getActions(parameter).then(results => {
 			reply_embed(embedgenerator.actionReport(CONFIG, parameter, results[parameter]));
 		}).catch();
