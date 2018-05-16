@@ -221,7 +221,7 @@ module.exports = function(CONFIG, serveWebRequest, response_type, load_average, 
 			active: false,
 			issuer_id: req.query.issuer
 		});
-		new_doc.save(console.error);
+		new_doc.save(console.error);//save a note that the user was unbanned
 		disciplinary_model.find({ user: req.query.user == "true", target_id: req.query.id, active: true }, (err, docs) => {
 			let errored = false;
 			docs.forEach(doc => {
@@ -236,7 +236,8 @@ module.exports = function(CONFIG, serveWebRequest, response_type, load_average, 
 			errored ? res.status(500).end() : res.json({ success: true });
 			getBans(req.query.user == "true", bans => {
 				shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });
-			});
+			});//update shards with new ban list
+			//send unban message
 		});
 	}, true);
 	serveWebRequest("/gethistory", (req, res, next) => {//boolean-user, string-id
@@ -246,7 +247,7 @@ module.exports = function(CONFIG, serveWebRequest, response_type, load_average, 
 				d = d.toObject();
 				d.id_timestamp = apicache.Types.ObjectId(d._id).getTimestamp().getTime();
 				return d;
-			});
+			});//add creation timestamp, convert doc to object
 			res.json(answer);
 		});
 	}, true);

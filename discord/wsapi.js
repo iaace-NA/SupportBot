@@ -58,6 +58,12 @@ module.exports = class WSAPI {
 
 		26: IAPI wants to issue server warning message
 		27: unimplemented
+
+		28: IAPI wants to send user an unban message
+		29: unimplemented
+
+		30: IAPI wants to send server an unban message
+		31: unimplemented
 	*/
 	constructor(INIT_CONFIG, discord_client) {
 		this.client = discord_client;
@@ -168,6 +174,32 @@ module.exports = class WSAPI {
 						}).catch(e => {
 							console.error(e);
 							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x::warning: Owner could not be notified");
+						});
+					}
+					break;
+				case 28:
+					this.client.users.get(data.uid).send(embedgenerator.userUnban(this.CONFIG, data.issuer_tag, data.issuer_avatarURL)).then(() => {
+						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail::no_entry_sign: User notified");
+					}).catch(e => {
+						console.error(e);
+						that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x::no_entry_sign: User could not be notified");
+					});
+					break;
+				case 30:
+					if (UTILS.exists(this.client.guilds.get(data.sid))) {
+						const notification = embedgenerator.serverUnban(this.CONFIG, this.client.guilds.get(data.sid), data.issuer_tag, data.issuer_avatarURL);
+						let candidate = UTILS.preferredTextChannel(this.client, this.client.guilds.get(data.sid).channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
+						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).then(() => {
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail::no_entry_sign: Server notified in channel " + candidate.name);
+						}).catch(e => {
+							console.error(e);
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x::no_entry_sign: Server could not be notified");
+						});
+						this.client.guilds.get(data.sid).owner.send("", { embed: notification }).then(() => {
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":e_mail::no_entry_sign: Owner notified");
+						}).catch(e => {
+							console.error(e);
+							that.sendTextToChannel(that.CONFIG.LOG_CHANNEL_ID, ":x::no_entry_sign: Owner could not be notified");
 						});
 					}
 					break;

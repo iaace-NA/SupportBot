@@ -619,4 +619,57 @@ module.exports = class EmbedGenerator {
 		newEmbed.setDescription("The reason given was: " + reason);
 		return newEmbed;
 	}
+	serverUnban(CONFIG, server, issuer_tag, issuer_avatarURL) {
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setTitle("This server (" + server.name + ") has been unbanned");
+		newEmbed.setColor([0, 255, 0]);
+		newEmbed.setTimestamp();
+		newEmbed.addField("Please ensure you are familiar with our Terms and Conditions" + "which you can read about by sending `" + CONFIG.DISCORD_COMMAND_PREFIX + "help`. For more assistance, please visit " + CONFIG.HELP_SERVER_INVITE_LINK + " .");
+		newEmbed.setAuthor(issuer_tag, issuer_avatarURL);
+		return newEmbed;
+	}
+	userUnban(CONFIG, issuer_tag, issuer_avatarURL) {
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setTitle("You have been unbanned");
+		newEmbed.setColor([0, 255, 0]);
+		newEmbed.setTimestamp();
+		newEmbed.addField("Please ensure you are familiar with our Terms and Conditions" + "which you can read about by sending `" + CONFIG.DISCORD_COMMAND_PREFIX + "help`. For more assistance, please visit " + CONFIG.HELP_SERVER_INVITE_LINK + " .");
+		newEmbed.setAuthor(issuer_tag, issuer_avatarURL);
+		return newEmbed;
+	}
+	disciplinaryHistory(CONFIG, user, docs) {
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setTitle("Disciplinary History");
+		let active_ban = -1;
+		let now = new Date().getTime();
+		for (let b in docs) {
+			if (docs[b].ban && docs[b].active) {
+				const ban_date = new Date(docs[b].date);
+				if (ban_date.getTime() == 0) {
+					active_ban = 0;
+					break;
+				}
+				else if (ban_date.getTime() > now) {
+					if (ban_date.getTime() > active_ban) active_ban = ban_date.getTime();
+				}
+			}
+		}
+		if (active_ban == 0) {
+			newEmbed.setColor([1, 1, 1]);
+			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active permanent ban.");
+		}
+		else if (active_ban == -1) {
+			newEmbed.setColor([0, 255, 0]);
+			newEmbed.setDescription("This " + (user ? "user" : "server") + " has no active bans.");
+		}
+		else {
+			newEmbed.setColor([255, 0, 0]);
+			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active temporary ban. It expires in " + UTILS.until(new Date(active_ban)) + ".");
+		}
+		for (let i = 0; i < docs.length && i < 10; ++i) {
+			newEmbed.addField("By " + CONFIG.OWNER_DISCORD_IDS[docs[i].issuer_id].name + ", " + UTILS.ago(new Date(docs[i].id_timestamp)) + (docs[i].ban && docs[i].active ? (docs[i].date == 0 ? ", Permanent Ban" : ", Ban Expires in " + UTILS.until(new Date(docs[i].date))) : ""), docs[i].reason);
+		}
+		newEmbed.setAuthor(docs[i].id);
+		return newEmbed;
+	}
 }

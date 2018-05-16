@@ -81,12 +81,15 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		});
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "noteuser "], true, true, (original, index, parameter) => {
+		//Lnoteuser <uid> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
 		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
+		lolapi.noteUser(id, reason, msg.author.id);
 		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "noteserver "], true, true, (original, index, parameter) => {
+		//Lnoteserver <sid> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
 		if (id.length < 1 || reason.length < 1) return reply(":x: The id or the reason could not be found.");
@@ -94,10 +97,16 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "userhistory "], true, true, (original, index, parameter) => {
-		s
+		//Luserhistory <uid>
+		lolapi.userHistory(parameter).then(results => {
+			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, true, results));
+		}).catch();
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "serverhistory "], true, true, (original, index, parameter) => {
-		s
+		//Lserverhistory <sid>
+		lolapi.serverHistory(parameter).then(results => {
+			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, false, results));
+		}).catch();
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "unbanserver "], true, true, (original, index, parameter) => {
 		const id = parameter.substring(0, parameter.indexOf(" "));
