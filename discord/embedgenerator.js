@@ -666,8 +666,14 @@ module.exports = class EmbedGenerator {
 			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active permanent ban.\nHere are the 10 most recent events:");
 		}
 		else if (active_ban == -1) {
-			newEmbed.setColor(recent_warning ? [255, 255, 0] : [0, 255, 0]);
-			newEmbed.setDescription("This " + (user ? "user" : "server") + " has no active bans.\nHere are the 10 most recent events:");
+			if (recent_warning) {
+				newEmbed.setColor([255, 255, 0]);
+				newEmbed.setDescription("This " + (user ? "user" : "server") + " has been warned recently.\nHere are the 10 most recent events:");
+			}
+			else {
+				newEmbed.setColor([0, 255, 0]);
+				newEmbed.setDescription("This " + (user ? "user" : "server") + " has no active bans.\nHere are the 10 most recent events:");
+			}
 		}
 		else {
 			newEmbed.setColor([255, 0, 0]);
