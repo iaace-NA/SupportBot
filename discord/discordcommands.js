@@ -103,13 +103,13 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "userhistory "], true, true, (original, index, parameter) => {
 		//Luserhistory <uid>
 		lolapi.userHistory(parameter).then(results => {
-			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, parameter, true, results));
+			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, parameter, true, results[parameter]));
 		}).catch();
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "serverhistory "], true, true, (original, index, parameter) => {
 		//Lserverhistory <sid>
 		lolapi.serverHistory(parameter).then(results => {
-			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, parameter, false, results));
+			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, parameter, false, results[parameter]));
 		}).catch();
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "unbanserver "], true, true, (original, index, parameter) => {
