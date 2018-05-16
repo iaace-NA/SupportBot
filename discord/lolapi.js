@@ -207,6 +207,9 @@ module.exports = class LOLAPI {
 	getStatus(region, maxage) {
 		return this.get(region, "status/v3/shard-data", {}, this.CONFIG.API_CACHETIME.GET_STATUS, maxage);
 	}
+	getChallengerRanks(region, queue, maxage) {
+		return this.get(region, "league/v3/challengerleagues/by-queue/" + queue, {}, this.CONFIG.API_CACHEIME.GET_CHALLENGERS, maxage);
+	}
 	getSummonerCard(region, username) {
 		const that = this;
 		return new Promise((resolve, reject) => {
@@ -215,9 +218,11 @@ module.exports = class LOLAPI {
 				result.guess = username;
 				if (!UTILS.exists(result.id)) reject();
 				that.getRanks(region, result.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RANKS).then(result2 => {
-					that.getChampionMastery(region, result.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHAMPION_MASTERY).then(result3 => {
-						that.getLiveMatch(region, result.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.LIVE_MATCH).then(result4 => {
-							resolve([result, result2, result3, result4]);
+					Promise.all(result2.map(r => that.getChallengerRanks(region, r.queueType, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHALLENGERS))).then(result5 => {
+						that.getChampionMastery(region, result.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHAMPION_MASTERY).then(result3 => {
+							that.getLiveMatch(region, result.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.LIVE_MATCH).then(result4 => {
+								resolve([result, result2, result3, result4, result5]);
+							}).catch(reject);
 						}).catch(reject);
 					}).catch(reject);
 				}).catch(reject);

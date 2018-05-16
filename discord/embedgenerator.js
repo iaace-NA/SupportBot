@@ -92,7 +92,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;
 	}
-	detailedSummoner(CONFIG, summoner, ranks, championmastery, region, match) {//region username command
+	detailedSummoner(CONFIG, summoner, ranks, championmastery, region, match, challengers) {//region username command
 		let newEmbed = new Discord.RichEmbed();
 		if (!UTILS.exists(summoner.id)) {
 			newEmbed.setAuthor(summoner.guess);
@@ -107,15 +107,19 @@ module.exports = class EmbedGenerator {
 		else if (match.gameStartTime != 0) newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Playing:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => { return p.summonerId == summoner.id; }).championId].emoji + "** on " + queues[match.gameQueueConfigId] + " for `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
 		else newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Game Loading:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => p.summonerId == summoner.id).championId].emoji + "** on " + queues[match.gameQueueConfigId]);
 		let highest_rank = -1;
-		for (let b in ranks) {
-			let description = (ranks[b].wins + ranks[b].losses) + "G (" + UTILS.round(100 * ranks[b].wins / (ranks[b].wins + ranks[b].losses), 2) + "%) = " + ranks[b].wins + "W + " + ranks[b].losses + "L";
-			if (UTILS.exists(ranks[b].miniSeries)) description += "\nSeries in Progress: " + ranks[b].miniSeries.progress.replaceAll("N", "\\➖").replaceAll("W", CONFIG.EMOJIS.win).replaceAll("L", CONFIG.EMOJIS.loss);
-			newEmbed.addField(CONFIG.EMOJIS.ranks[RANK_ORDER.indexOf(ranks[b].tier)] + {
+		for (let i = 0; i < ranks.length; ++i) {
+			let description = (ranks[i].wins + ranks[i].losses) + "G (" + UTILS.round(100 * ranks[i].wins / (ranks[i].wins + ranks[i].losses), 2) + "%) = " + ranks[i].wins + "W + " + ranks[i].losses + "L";
+			if (UTILS.exists(ranks[i].miniSeries)) description += "\nSeries in Progress: " + ranks[i].miniSeries.progress.replaceAll("N", "\\➖").replaceAll("W", CONFIG.EMOJIS.win).replaceAll("L", CONFIG.EMOJIS.loss);
+			let title = CONFIG.EMOJIS.ranks[RANK_ORDER.indexOf(ranks[i].tier)] + {
 				"RANKED_FLEX_SR": "Flex 5v5",
 				"RANKED_SOLO_5x5": "Solo 5v5",
 				"RANKED_FLEX_TT": "Flex 3v3"
-			}[ranks[b].queueType] + ": " + UTILS.english(ranks[b].tier) + " " + ranks[b].rank + " " + ranks[b].leaguePoints + "LP", description, true);
-			highest_rank = (RANK_ORDER.indexOf(ranks[b].tier) > highest_rank ? RANK_ORDER.indexOf(ranks[b].tier) : highest_rank);
+			}[ranks[i].queueType] + ": ";
+			title += UTILS.english(ranks[i].tier) + " ";
+			title += ranks[i].rank;
+			title += " " + ranks[i].leaguePoints + "LP";
+			newEmbed.addField(title, description, true);
+			if (RANK_ORDER.indexOf(ranks[i].tier) > highest_rank) highest_rank = RANK_ORDER.indexOf(ranks[i].tier);
 		}
 		if (highest_rank > -1) newEmbed.setColor(RANK_COLOR[highest_rank]);
 		let cm_description = [];

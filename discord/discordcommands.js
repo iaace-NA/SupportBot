@@ -182,7 +182,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 				summoner.region = region;
 				summoner.guess = parameter.substring(parameter.indexOf(" ") + 1);
 				if (UTILS.exists(summoner.status)) return reply(":x: The username appears to be invalid.");
-				lolapi.setLink(msg.author.id, summoner.name).then(result => { 
+				lolapi.setLink(msg.author.id, summoner.name).then(result => {
 					result.success ? reply(":white_check_mark: Your discord account is now linked to " + summoner.name) : reply(":x: Something went wrong.");
 				}).catch(console.error);
 			}).catch(console.error);
@@ -192,7 +192,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 				summoner.region = region;
 				summoner.guess = parameter.substring(parameter.indexOf(" ") + 1, parameter.indexOf(" <"));
 				if (UTILS.exists(summoner.status)) return reply(":x: The username appears to be invalid. Follow the format: `" + CONFIG.DISCORD_COMMAND_PREFIX + "link <region> <username> <@mention>`");
-				lolapi.setLink(msg.mentions.users.first().id, summoner.name).then(result => { 
+				lolapi.setLink(msg.mentions.users.first().id, summoner.name).then(result => {
 					result.success ? reply(":white_check_mark: " + msg.mentions.users.first().tag + "'s discord account is now linked to " + summoner.name) : reply(":x: Something went wrong.");
 				}).catch(console.error);
 			}).catch(console.error);
@@ -277,7 +277,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 	});
 	commandGuessUsername([""], false, (region, username, parameter) => {
 		lolapi.getSummonerCard(region, username).then(result => {
-			reply_embed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter, result[3]));
+			reply_embed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter, result[3], result[4]));
 		}).catch(() => reply(":x: No results for `" + username + "`. Please revise your request."));
 	});
 	commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter) => {
@@ -358,7 +358,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 				else {
 					lolapi.getShortcut(msg.author.id, u.substring(1)).then(result => {
 						resolve(result[u.substring(1)]);
-					}).catch(result => { 
+					}).catch(result => {
 						resolve(u.substring(1));
 						});
 				}
