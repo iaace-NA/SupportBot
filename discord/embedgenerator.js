@@ -624,7 +624,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.setTitle("This server (" + server.name + ") has been unbanned");
 		newEmbed.setColor([0, 255, 0]);
 		newEmbed.setTimestamp();
-		newEmbed.addField("Please ensure you are familiar with our Terms and Conditions" + "which you can read about by sending `" + CONFIG.DISCORD_COMMAND_PREFIX + "help`. For more assistance, please visit " + CONFIG.HELP_SERVER_INVITE_LINK + " .");
+		newEmbed.addField("Please ensure you are familiar with our Terms and Conditions", "which you can read about by sending `" + CONFIG.DISCORD_COMMAND_PREFIX + "help`. For more assistance, please visit " + CONFIG.HELP_SERVER_INVITE_LINK + " .");
 		newEmbed.setAuthor(issuer_tag, issuer_avatarURL);
 		return newEmbed;
 	}
@@ -633,7 +633,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.setTitle("You have been unbanned");
 		newEmbed.setColor([0, 255, 0]);
 		newEmbed.setTimestamp();
-		newEmbed.addField("Please ensure you are familiar with our Terms and Conditions" + "which you can read about by sending `" + CONFIG.DISCORD_COMMAND_PREFIX + "help`. For more assistance, please visit " + CONFIG.HELP_SERVER_INVITE_LINK + " .");
+		newEmbed.addField("Please ensure you are familiar with our Terms and Conditions", "which you can read about by sending `" + CONFIG.DISCORD_COMMAND_PREFIX + "help`. For more assistance, please visit " + CONFIG.HELP_SERVER_INVITE_LINK + " .");
 		newEmbed.setAuthor(issuer_tag, issuer_avatarURL);
 		return newEmbed;
 	}
