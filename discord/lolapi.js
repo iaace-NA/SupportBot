@@ -208,7 +208,7 @@ module.exports = class LOLAPI {
 		return this.get(region, "status/v3/shard-data", {}, this.CONFIG.API_CACHETIME.GET_STATUS, maxage);
 	}
 	getChallengerRanks(region, queue, maxage) {
-		return this.get(region, "league/v3/challengerleagues/by-queue/" + queue, {}, this.CONFIG.API_CACHEIME.GET_CHALLENGERS, maxage);
+		return this.get(region, "league/v3/challengerleagues/by-queue/" + queue, {}, this.CONFIG.API_CACHETIME.GET_CHALLENGERS, maxage);
 	}
 	getSummonerCard(region, username) {
 		const that = this;
