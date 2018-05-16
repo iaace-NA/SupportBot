@@ -654,12 +654,19 @@ module.exports = class EmbedGenerator {
 				}
 			}
 		}
+		let recent_warning = false;
+		for (let b in docs) {
+			if (!docs[b].ban && docs[b].reason.substring(0, 9) == ":warning:") {
+				recent_warning = true;
+				break;
+			}
+		}
 		if (active_ban == 0) {
 			newEmbed.setColor([1, 1, 1]);
 			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active permanent ban.\nHere are the 10 most recent events:");
 		}
 		else if (active_ban == -1) {
-			newEmbed.setColor([0, 255, 0]);
+			newEmbed.setColor(recent_warning ? [255, 255, 0] : [0, 255, 0]);
 			newEmbed.setDescription("This " + (user ? "user" : "server") + " has no active bans.\nHere are the 10 most recent events:");
 		}
 		else {
