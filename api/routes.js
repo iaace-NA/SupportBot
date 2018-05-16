@@ -221,7 +221,9 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			active: false,
 			issuer_id: req.query.issuer
 		});
-		new_doc.save(e => console.error(e));//save a note that the user was unbanned
+		new_doc.save(e => {
+			if (UTILS.exists(e)) console.error(e);
+		});//save a note that the user was unbanned
 		disciplinary_model.find({ user: req.query.user == "true", target_id: req.query.id, active: true }, (err, docs) => {
 			let errored = false;
 			docs.forEach(doc => {
