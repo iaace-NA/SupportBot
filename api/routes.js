@@ -1,6 +1,6 @@
 "use strict";
 const UTILS = new (require("../utils.js"))();
-module.exports = function(CONFIG, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard) {
+module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard) {
 	serveWebRequest("/createshortcut/:uid", function(req, res, next) {
 		findShortcut(req.params.uid, res, doc => {
 			if (UTILS.exists(doc)) {
