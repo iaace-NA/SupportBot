@@ -305,47 +305,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 		request_profiler.begin("parsing usernames");
 		let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
 		let pre_usernames;
-		if (parameter.indexOf("\n") != -1) {//lobby text formatting
-			pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split("\n");
-			let present = [];//users present
-			let join_detected = false, leave_detected = false;
-			let joins = [], leaves = [];
-			const join_suffix = " joined the lobby";
-			const leave_suffix = " left the lobby";
-			for (let i = 0; i < pre_usernames.length; ++i) {
-				if (pre_usernames[i].substring(pre_usernames[i].length - join_suffix.length) === join_suffix) join_detected = true;
-				else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix) leave_detected = true;
-				else if (join_detected && leave_detected) break;//all necessary results recorded
-				else;//chat message
-			}
-			if (join_detected) {//champ select mode
-				UTILS.debug("champ select mode");
-				for (let i = 0; i < pre_usernames.length; ++i) {
-					if (pre_usernames[i].substring(pre_usernames[i].length - join_suffix.length) === join_suffix) {
-						present.push(pre_usernames[i].substring(0, pre_usernames[i].length - join_suffix.length).trim());//user joined, add to attendance
-					}
-					else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix) {
-						UTILS.removeAllOccurances(present, pre_usernames[i].substring(0, pre_usernames[i].length - leave_suffix.length).trim());//user left, delete from attendance
-					}
-					else;//chat message
-				}
-			}
-			else if (leave_detected) {//end game mode
-				UTILS.debug("end game lobby mode");
-				for (let i = 0; i < pre_usernames.length; ++i) {
-					if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix) {
-						present.push(pre_usernames[i].substring(0, pre_usernames[i].length - leave_suffix.length).trim());//user left, add to attendance
-					}
-					else;//chat message
-				}
-			}
-			UTILS.debug("attending: " + JSON.stringify(present));
-			/*
-			if (join) lobby/champ select, so joins add to usernames queried and leaves remove from usernames queried
-			if (leave) end game screen, so leaves add to usernames queried
-			*/
-			pre_usernames = present;
-		}
+		if (parameter.indexOf("\n") != -1) pre_usernames = UTILS.presentLobby(parameter.substring(parameter.indexOf(" ") + 1).split("\n"));//lobby text formatting
 		else if (parameter.indexOf(",") != -1) pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => s.trim());//CSV
 		else pre_usernames = [parameter.substring(parameter.indexOf(" ") + 1)];//single username
 		if (pre_usernames.length > 10) {
@@ -363,7 +323,7 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 						resolve(result[u.substring(1)]);
 					}).catch(result => {
 						resolve(u.substring(1));
-						});
+					});
 				}
 			});
 		})).then(usernames => {

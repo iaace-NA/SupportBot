@@ -148,7 +148,7 @@ function getBans(user, callback) {
 				if (ban.date.getTime() == 0) bans[ban.target_id] = 0;//overriding permaban
 				else if (ban.date.getTime() > bans[ban.target_id]) bans[ban.target_id] = ban.date.getTime();//overriding longer ban
 			}
-			else;//perma'd already
+			//else;//perma'd already
 		});
 		callback(bans);
 	});
