@@ -307,7 +307,7 @@ module.exports = class UTILS {
 					present.push(pre_usernames[i].substring(0, pre_usernames[i].length - join_suffix.length).trim());//user joined, add to attendance
 				}
 				else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix) {
-					UTILS.removeAllOccurances(present, pre_usernames[i].substring(0, pre_usernames[i].length - leave_suffix.length).trim());//user left, delete from attendance
+					this.removeAllOccurances(present, pre_usernames[i].substring(0, pre_usernames[i].length - leave_suffix.length).trim());//user left, delete from attendance
 				}
 				//else;//chat message
 			}
