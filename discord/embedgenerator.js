@@ -701,7 +701,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.setAuthor(CONFIG.OWNER_DISCORD_IDS[id].name + " (" + id + ")");
 		for (let i = 0; i < docs.length && i < 10; ++i) {
 			let description = "To: " + docs[i].target_id + ", ";
-			description += UTILS.ago(new Date(docs[i].id_timestamp)) + " ago, ";
+			description += UTILS.ago(new Date(docs[i].id_timestamp)) + ", ";
 			if (docs[i].ban) {
 				description += new Date(docs[i].date).getTime() == 0 ? "Permanent Ban Issued" : "Temporary Ban Issued, duration " + UTILS.duration(new Date(docs[i].id_timestamp), new Date(docs[i].date));
 			}
