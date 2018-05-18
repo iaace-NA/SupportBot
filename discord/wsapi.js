@@ -101,6 +101,7 @@ module.exports = class WSAPI {
 						this.CONFIG.STATIC.CHAMPIONS[b].emoji = UTILS.exists(candidate) ? candidate.code : this.CONFIG.STATIC.CHAMPIONS[b].name;
 					}
 					UTILS.output("champion emojis registered");
+					this.STATUS.CHAMPION_EMOJIS = true;
 					break;
 				case 6://send message to channel
 					const candidate = this.client.channels.get(data.cid);
