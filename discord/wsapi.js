@@ -74,6 +74,9 @@ module.exports = class WSAPI {
 		this.port = this.CONFIG.API_PORT;
 		UTILS.debug("wss address attempted: " + this.address + ":" + this.port + "/shard?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&id=" + process.env.SHARD_ID);
 		this.connect();
+		setInterval(() => {
+			if (this.connection.readyState > 1) this.connect();
+		}, 30000);
 		this.connection.on("open", () => {
 			UTILS.output("ws connected");
 		});
