@@ -5,7 +5,7 @@ let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
 let LOLAPI = require("./lolapi.js");
 let Profiler = require("../timeprofiler.js");
-module.exports = function (CONFIG, client, msg, wsapi) {
+module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 	if (UTILS.exists(msg.guild) && !msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) return;//dont read messages that can't be responded to
 	if (UTILS.exists(CONFIG.BANS.USERS[msg.author.id]) && (CONFIG.BANS.USERS[msg.author.id] == 0 || CONFIG.BANS.USERS[msg.author.id] > msg.createdTimestamp)) return;//ignore messages from banned users
@@ -640,8 +640,5 @@ module.exports = function (CONFIG, client, msg, wsapi) {
 				child_process.spawnSync("pm2", ["restart", "all"]);
 			}, 5000);
 		}
-	}
-	function sendToChannel(cid, text) {//duplicated in shard.js
-		wsapi.sendTextToChannel(cid, text);
 	}
 }

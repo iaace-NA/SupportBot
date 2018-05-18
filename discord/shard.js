@@ -55,7 +55,7 @@ client.on("disconnect", function () {
 });
 client.on("message", function (msg) {
 	try {
-		discordcommands(CONFIG, client, msg, wsapi);
+		discordcommands(CONFIG, client, msg, wsapi, sendToChannel);
 	}
 	catch (e) {
 		console.error(e);
