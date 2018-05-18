@@ -65,8 +65,9 @@ module.exports = class WSAPI {
 		30: IAPI wants to send server an unban message
 		31: unimplemented
 	*/
-	constructor(INIT_CONFIG, discord_client) {
+	constructor(INIT_CONFIG, discord_client, INIT_STATUS) {
 		this.client = discord_client;
+		this.STATUS = INIT_STATUS;
 		this.CONFIG = INIT_CONFIG;
 		if (!UTILS.exists(this.CONFIG)) throw new Error("config.json required.");
 		this.request = REQUEST;
@@ -240,5 +241,8 @@ module.exports = class WSAPI {
 	}
 	connect() {
 		this.connection = new ws(this.address + ":" + this.port + "/shard?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&id=" + process.env.SHARD_ID, agentOptions);
+	}
+	connected() {
+		return this.connection.readyState == 1;
 	}
 }

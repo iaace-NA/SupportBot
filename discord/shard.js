@@ -25,7 +25,10 @@ catch (e) {
 }
 const mode = process.env.NODE_ENV === "production" ? "PRODUCTION:warning:" : process.env.NODE_ENV;
 const LOLAPI = new (require("./lolapi.js"))(CONFIG, 0);
-const wsapi = new (require("./wsapi.js"))(CONFIG, client);
+let STATUS = {
+	CHAMPION_EMOJIS: false
+};
+const wsapi = new (require("./wsapi.js"))(CONFIG, client, STATUS);
 loadAllStaticResources(() => {
 	UTILS.output(process.env.NODE_ENV === "production" ? "PRODUCTION LOGIN" : "DEVELOPMENT LOGIN");
 	client.login().catch(console.error);
@@ -34,8 +37,10 @@ let initial_start = true;
 client.on("ready", function () {
 	if (initial_start) UTILS.output("discord user login success");
 	else UTILS.output("discord reconnected");
-	client.user.setStatus("online").catch(console.error);
-	client.user.setActivity("League of Legends").catch(console.error);
+	if (process.env.SHARD_ID == 0) {
+		client.user.setStatus("idle").catch(console.error);
+		client.user.setActivity("Starting Up").catch(console.error);
+	}
 	if (initial_start) sendToChannel(CONFIG.LOG_CHANNEL_ID, ":repeat:`$" + process.env.SHARD_ID + "`Bot started in " + UTILS.round((new Date().getTime() - start_time) / 1000, 0) + "s: version: " + CONFIG.VERSION + " mode: " + mode + " servers: " + client.guilds.size);
 	else sendToChannel(CONFIG.LOG_CHANNEL_ID, ":repeat:`$" + process.env.SHARD_ID + "`Bot reconnected");
 	wsapi.sendEmojis(allEmojis());
@@ -92,6 +97,9 @@ setInterval(() => {//long term maintenance loop
 	loadAllStaticResources();
 	wsapi.getUserBans();
 	wsapi.getServerBans();
+	if (process.env.SHARD_ID == 0) {//stuff that only 1 shard needs to do
+		setStatus();
+	}
 }, 60000 * 15);
 function allEmojis() {
 	let all_emojis = [];//collects all emojis from emoji servers
@@ -100,4 +108,15 @@ function allEmojis() {
 		if (UTILS.exists(candidate)) all_emojis = all_emojis.concat(candidate.emojis.array());
 	}
 	return all_emojis.map(e => { return { name: e.name.toLowerCase(), code: e.toString() }; });
+}
+function setStatus() {
+	if (STATUS.CHAMPION_EMOJIS) {
+		client.user.setStatus("online").catch(console.error);
+		client.user.setActivity("League of Legends").catch(console.error);
+	}
+	else {
+		for (let b in STATUS) UTILS.output("Service Degraded, check status: " + b);
+		client.user.setStatus("idle").catch(console.error);
+		client.user.setActivity("Service Degraded").catch(console.error);
+	}
 }
