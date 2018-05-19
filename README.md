@@ -1,4 +1,4 @@
-# SupportBot v1.2.3
+# SupportBot v1.3.0
 League of Legends Statistics for Discord
 
 <a href="https://discord.gg/MTqDXvB" target="_blank" rel="noopener"><img src="https://discordapp.com/api/guilds/384552678161645568/embed.png" alt="current users" /></a>
@@ -6,6 +6,11 @@ League of Legends Statistics for Discord
 - discord.js 11.3.2
 - mongoose 5.0.0-rc1
 - request 2.83.0
+## Minimum System Requirements
+- RAM: 250 MB+
+- HDD: 512 MB+
+- CPU: 2 Thread, Base clock 1GHz+
+- LAN: 10 Mbps Down/2 Mbps Up
 ## Commands
 see https://supportbot.tk/
 ## Installation
