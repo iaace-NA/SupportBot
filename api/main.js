@@ -1,9 +1,12 @@
 "use strict";
 const fs = require("fs");
+const argv_options = new (require("getopts"))(process.argv.slice(2), {
+	alias: { c: ["config"] },
+	default: { c: "config.json" }});
 let CONFIG;
 try {
-	CONFIG = JSON.parse(fs.readFileSync("../config.json", "utf-8"));
-	CONFIG.VERSION = "v1.2.0b";//b for non-release (in development)
+	CONFIG = JSON.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
+	CONFIG.VERSION = "v1.3.0";//b for non-release (in development)
 }
 catch (e) {
 	console.log("something's wrong with config.json");
@@ -14,18 +17,18 @@ catch (e) {
 let path = require('path');
 let crypto = require("crypto");
 let https = require('https');
-let http = require('http');
 let LoadAverage = require("../loadaverage.js");
-//const aes256 = require("aes256");
-//let cipher = aes256.createCipher(fs.readFileSync("./aes256.key", "utf-8"));
 const response_type = ["Total", "Uncachable", "Cache hit", "Cache hit expired", "Cache miss"];
 const load_average = [new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60)];
 const express = require("express");
 const website = express();
+
 const UTILS = new (require("../utils.js"))();
+let Profiler = require("../timeprofiler.js");
 let request = require("request");
-UTILS.assert(UTILS.exists(CONFIG.API_PORT_PRODUCTION));
-UTILS.assert(UTILS.exists(CONFIG.API_PORT_DEVELOPMENT));
+let wsRoutes = require("./websockets.js");
+let routes = require("./routes.js");
+UTILS.assert(UTILS.exists(CONFIG.API_PORT));
 UTILS.output("Modules loaded.");
 let apicache = require("mongoose");
 apicache.connect("mongodb://localhost/apicache");//cache of summoner object name lookups
@@ -40,240 +43,177 @@ api_doc.index({ url: "hashed" });
 let api_doc_model = apicache.model("api_doc_model", api_doc);
 let shortcut_doc = new apicache.Schema({
 	uid: String,
-	shortcuts: { type: apicache.Schema.Types.Mixed, default: {} }
+	shortcuts: { type: apicache.Schema.Types.Mixed, default: {} },
+	username: String
 }, { minimize: false });
 shortcut_doc.index({ uid: "hashed" });
 let shortcut_doc_model = apicache.model("shortcut_doc_model", shortcut_doc);
+let disciplinary_doc = new apicache.Schema({
+	user: { type: Boolean, required: true },//true for user, false for server
+	ban: { type: Boolean, required: true },//true for ban, false for warning/other note
+	target_id: { type: String, required: true },//target id: uid or sid
+	reason: { type: String, required: true },//text reason for disciplinary action
+	date: { type: Date, required: true },//new Date() set to 0 if permanent, set to date values for temporary
+	active: { type: Boolean, required: true },//true if active ban, false if overridden or warning
+	issuer_id: { type: String, required: true }//uid for the person who issued the ban
+});
+disciplinary_doc.index({ target_id: "hashed" });//direct username lookups
+disciplinary_doc.index({ issuer_id: "hashed" });//direct issuer lookups
+//disciplinary_doc.index({ target_id: 1 });//ranged username lookups
+disciplinary_doc.index({ active: 1, date: 1, user: 1, ban: 1 });//actives for broadcast to shards
+let disciplinary_model = apicache.model("disciplinary_model", disciplinary_doc);
 let region_limiters = {};
 let limiter = require("bottleneck");
 for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({ maxConcurrent: 1, minTime: CONFIG.API_PERIOD });
 let req_num = 0;
-ready();
 let irs = {};//individual request statistics
-function ready() {
-	if (process.argv.length === 2) {//production key
-		UTILS.output("IAPI ready and listening on port " + CONFIG.API_PORT_PRODUCTION);
-		website.listen(CONFIG.API_PORT_PRODUCTION);
-	}
-	else {//non-production key
-		UTILS.output("IAPI ready and listening on port " + CONFIG.API_PORT_DEVELOPMENT);
-		website.listen(CONFIG.API_PORT_DEVELOPMENT);
-	}
-	
-	website.use(function (req, res, next) {
-		res.removeHeader("X-Powered-By");
-		return next();
-	});
-	serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, res, next) {
-		if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
-		++irs[req.params.request_id][0];
-		get(req.params.region, req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage), req.params.request_id).then(result => res.json(result)).catch(e => {
-			console.error(e);
-			res.status(500);
-		});
-	});
-	serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
-		for (let b in irs) if (new Date().getTime - irs[b][5] > 1000 * 60 * 10) delete irs[b];//cleanup old requests
-		if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();//doesn't exist
-		let description = [];
-		for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[req.params.request_id][i] + "): " + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%");
-		description = description.join(", ");
-		UTILS.output("IAPI: request #" + req.params.request_id + " (" + (new Date().getTime() - irs[req.params.request_id][5]) + "ms): " + description);
-		console.log("");
-		delete irs[req.params.request_id];
-		res.status(200).end();
-	});
-	serveWebRequest("/createshortcut/:uid", function(req, res, next) {
-		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
-			if (err) {
-				console.error(err);
-				return res.status(500).end();
-			}
-			if (UTILS.exists(doc)) {
-				let shortcut_count = 0;
-				for (let b in doc.shortcuts) ++shortcut_count;
-				if (shortcut_count >= 50) return res.json({ success: false });
-				doc.shortcuts[req.query.from] = req.query.to;
-				doc.markModified("shortcuts");
-				doc.save(e => {
-					if (e) {
-						console.error(e);
-						return res.status(500).end();
-					}
-					else {
-						res.json({ success: true });
-					}
-				});
-			}
-			else {
-				let new_shortcuts = {
-					uid: req.params.uid,
-					shortcuts: {}
-				}
-				new_shortcuts.shortcuts[req.query.from] = req.query.to;
-				let new_document = new shortcut_doc_model(new_shortcuts);
-				new_document.save((e, doc) => {
-					if (e) {
-						console.error(e);
-						return res.status(500).end();
-					}
-					else {
-						res.json({ success: true });
-					}
-				});
-			}
-		});
-	});
-	serveWebRequest("/removeshortcut/:uid", function(req, res, next) {
-		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
-			if (err) {
-				console.error(err);
-				return res.status(500).end();
-			}
-			if (UTILS.exists(doc)) {
-				delete doc.shortcuts[req.query.from];
-				doc.markModified("shortcuts");
-				doc.save(e => {
-					if (e) {
-						console.error(e);
-						return res.status(500).end();
-					}
-					else {
-						res.json({ success: true });
-					}
-				});
-			}
-			else {
-				res.json({ success: true });
-			}
-		});
-	});
-	serveWebRequest("/removeallshortcuts/:uid", function(req, res, next) {
-		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
-			if (err) {
-				console.error(err);
-				return res.status(500).end();
-			}
-			if (UTILS.exists(doc)) {
-				doc.shortcuts = {};
-				doc.markModified("shortcuts");
-				doc.save(e => {
-					if (e) {
-						console.error(e);
-						return res.status(500).end();
-					}
-					else {
-						res.json({ success: true });
-					}
-				});
-			}
-			else {
-				res.json({ success: true });
-			}
-		});
-	});
-	serveWebRequest("/getshortcut/:uid", function(req, res, next) {
-		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
-			if (err) {
-				console.error(err);
-				return res.status(500).end();
-			}
-			if (UTILS.exists(doc)) {
-				if (UTILS.exists(doc.shortcuts[req.query.from])) {
-					let answer = {};
-					answer[req.query.from] = doc.shortcuts[req.query.from];
-					res.json(answer);
-				}
-				else res.status(404).end();
-			}
-			else {
-				res.status(404).end();
-			}
-		});
-	});
-	serveWebRequest("/getshortcuts/:uid", function(req, res, next) {
-		shortcut_doc_model.findOne({ uid: req.params.uid }, (err, doc) => {
-			if (err) {
-				console.error(err);
-				return res.status(500).end();
-			}
-			if (UTILS.exists(doc)) {
-				res.json(doc.toObject());
-			}
-			else {
-				res.send("{}");
-			}
-		});
-	});
-	//https.createServer({ key: fs.readFileSync("./privkey.pem"), cert: fs.readFileSync("./fullchain.pem") }, website).listen(443);
-	serveWebRequest("/ping", function (req, res, next) {
-		res.json({ received: new Date().getTime() });
-	});
-	serveWebRequest("/stats", function (req, res, next) {
-		let answer = {};
-		for (let i in load_average) {
-			answer[i + ""] = {};
-			answer[i + ""].description = response_type[i];
-			answer[i + ""].min1 = load_average[i].min1();
-			answer[i + ""].min5 = load_average[i].min5();
-			answer[i + ""].min15 = load_average[i].min15();
-			answer[i + ""].min30 = load_average[i].min30();
-			answer[i + ""].min60 = load_average[i].min60();
-			answer[i + ""].total_rate = load_average[i].total_rate();
-			answer[i + ""].total_count = load_average[i].total_count();
+let database_profiler = new Profiler("Database Profiler");
+let server = https.createServer({ key: fs.readFileSync("../data/keys/server.key"), 
+		cert: fs.readFileSync("../data/keys/server.crt"), 
+		ca: fs.readFileSync("../data/keys/ca.crt")}, website).listen(CONFIG.API_PORT);
+UTILS.output(CONFIG.VERSION + " IAPI " + process.env.NODE_ENV + " mode ready and listening on port " + CONFIG.API_PORT);
+let websocket = require("express-ws")(website, server);
+website.use(function (req, res, next) {
+	res.removeHeader("X-Powered-By");
+	return next();
+});
+const HEARTBEAT_INTERVAL = 60000;
+let shard_ws = {};
+let ws_request_id = 0;
+let message_handlers = {};
+website.ws("/shard", (ws, req) => {
+	UTILS.debug("/shard reached");
+	if (!UTILS.exists(req.query.k)) return ws.close(4401);//unauthenticated
+	if (req.query.k !== CONFIG.API_KEY) return ws.close(4403);//wrong key
+	UTILS.debug("ws connected $" + req.query.id);
+	shard_ws[req.query.id] = ws;
+	//send bans
+	ws.on("message", data => {
+		data = JSON.parse(data);
+		UTILS.debug("ws message received: $" + data.id + " type: " + data.type);
+		wsRoutes(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans);
+		if (UTILS.exists(data.request_id) && UTILS.exists(message_handlers[data.request_id])) {
+			let nMsg = UTILS.copy(data);
+			delete nMsg.request_id;
+			message_handlers[data.request_id](nMsg);
+			delete message_handlers[data.request_id];
 		}
-		res.json(answer);
+		for (let b in message_handlers) if (parseInt(b.substring(0, b.indexOf(":"))) < new Date().getTime() - (15 * 60 * 1000)) delete message_handlers[b];//cleanup old message handlers
 	});
-	serveWebRequest("/", function (req, res, next) {
-		res.send("You have reached the online api's testing page.");
+	ws.on("close", (code, reason) => {
+		UTILS.output("ws $" + req.query.id + " closed: " + code + ", " + reason);
 	});
-	serveWebRequest("*", function (req, res, next) {
-		res.status(404).end();
+	//ws.close(4200);//OK
+});
+function sendExpectReplyRaw(message, destination, callback) {
+	let request = UTILS.copy(message);
+	if (request.request_id != undefined) throw new Error("request.request_id must be undefined for send and receive");
+	++ws_request_id;
+	request.request_id = new Date().getTime() + ":" + ws_request_id;
+	message_handlers[request.request_id] = callback;
+	sendToShard(request, destination);
+	UTILS.debug("request " + ws_request_id + " sent with contents" + JSON.stringify(request, null, "\t"));
+}
+function sendExpectReply(message, destination, timeout = 5000) {
+	return new Promise((resolve, reject) => {
+		sendExpectReplyRaw(message, destination, resolve);
+		setTimeout(function () {
+			reject(new Error("timed out waiting for response from shard"));
+		}, timeout);
 	});
-	function serveWebRequest(branch, callback) {
-		if (typeof(branch) == "string") {
-			website.get(branch, function (req, res, next) {
+}
+function sendExpectReplyBroadcast(message, timeout = 5000) {
+	let shard_numbers = [];
+	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) shard_numbers.push(i);
+	return Promise.all(shard_numbers.map(n => sendExpectReply(message, n)));
+}
+
+setInterval(() => {
+	shardBroadcast({ type: 0 });
+}, HEARTBEAT_INTERVAL);
+function shardBroadcast(message, exclusions = []) {
+	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) if (exclusions.indexOf(i) == -1) sendToShard(message, i);
+	UTILS.debug("ws broadcast message sent: type: " + message.type);
+}
+function sendToShard(message, id, callback) {
+	if (UTILS.exists(shard_ws[id + ""]) && shard_ws[id + ""].readyState == 1) shard_ws[id + ""].send(JSON.stringify(message), callback);
+}
+function getBans(user, callback) {
+	disciplinary_model.find({ user, ban: true, active: true, $or: [{ date : { $eq: new Date(0) } }, { date: { $gte: new Date() } }] }, "target_id date", (err, docs) => {
+		if (err) console.error(err);
+		let bans = {};
+		docs.forEach(ban => {
+			if (!UTILS.exists(bans[ban.target_id])) bans[ban.target_id] = ban.date.getTime();
+			else if (bans[ban.target_id] != 0) {//has a current temporary ban
+				if (ban.date.getTime() == 0) bans[ban.target_id] = 0;//overriding permaban
+				else if (ban.date.getTime() > bans[ban.target_id]) bans[ban.target_id] = ban.date.getTime();//overriding longer ban
+			}
+			//else;//perma'd already
+		});
+		callback(bans);
+	});
+}
+serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, res, next) {
+	if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
+	++irs[req.params.request_id][0];
+	get(req.params.region, req.query.url, parseInt(req.params.cachetime), parseInt(req.params.maxage), req.params.request_id).then(result => res.json(result)).catch(e => {
+		console.error(e);
+		res.status(500);
+	});
+}, true);
+serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
+	for (let b in irs) if (new Date().getTime() - irs[b][5] > 1000 * 60 * 10) delete irs[b];//cleanup old requests
+	if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();//doesn't exist
+	let description = [];
+	for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[req.params.request_id][i] + "): " + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%");
+	description = description.join(", ");
+	UTILS.output("IAPI: request #" + req.params.request_id + " (" + (new Date().getTime() - irs[req.params.request_id][5]) + "ms): " + description);
+	console.log("");
+	delete irs[req.params.request_id];
+	res.status(200).end();
+	UTILS.debug(database_profiler.endAll(), false);
+}, true);
+
+serveWebRequest("/eval/:script", function (req, res, next) {
+	let result = {};
+	try {
+		result.string = eval(req.params.script);
+	}
+	catch (e) {
+		result.string = e;
+	}
+	res.json(result).end();
+}, true);
+routes(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard);
+function serveWebRequest(branch, callback, validate = false) {
+	if (typeof(branch) == "string") {
+		website.get(branch, function (req, res, next) {
+			//UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
+			if (validate && !UTILS.exists(req.query.k)) return res.status(401).end();//no key
+			if (validate && req.query.k !== CONFIG.API_KEY) return res.status(403).end();//wrong key
+			++req_num;
+			load_average[0].add();
+			callback(req, res, next);
+		});
+	}
+	else {
+		for (let b in branch) {
+			website.get(branch[b], function(req, res, next){
 				//UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
+				if (validate && !UTILS.exists(req.query.k)) return res.status(401).end();//no key
+				if (validate && req.query.k !== CONFIG.API_KEY) return res.status(403).end();//wrong key
 				++req_num;
 				load_average[0].add();
 				callback(req, res, next);
 			});
 		}
-		else {
-			for (let b in branch) {
-				website.get(branch[b], function(req, res, next){
-					//UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
-					++req_num;
-					load_average[0].add();
-					callback(req, res, next);
-				});
-			}
-		}
 	}
-}
-function changeBaseTo62(number) {
-	number = parseInt(number);//convert to string
-	const dictionary = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	let answer = "";
-	while (number > 0) {
-		answer = dictionary.substring(number % 62, (number % 62) + 1) + answer;
-		number = (number - (number % 62)) / 62;
-	}
-	return answer;
-}
-function changeBaseTo55(number) {
-	number = parseInt(number);//convert to string
-	const dictionary = "23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
-	let answer = "";
-	while (number > 0) {
-		answer = dictionary.substring(number % 55, (number % 55) + 1) + answer;
-		number = (number - (number % 55)) / 55;
-	}
-	return answer;
 }
 function checkCache(url, maxage, request_id) {
 	return new Promise((resolve, reject) => {
+		database_profiler.begin(url + " cache check");
 		api_doc_model.findOne({ url }, (err, doc) => {
+			database_profiler.end(url + " cache check");
 			if (err) return reject(err);
 			if (UTILS.exists(doc)) {
 				if (UTILS.exists(maxage) && apicache.Types.ObjectId(doc.id).getTimestamp().getTime() < new Date().getTime() - (maxage * 1000)) {//if expired

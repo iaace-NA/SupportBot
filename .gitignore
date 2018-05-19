@@ -6,3 +6,4 @@ config.json
 /data/keys/*
 !data/keys/.gitkeep
 *.bat
+devconfig.json

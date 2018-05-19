@@ -4,7 +4,7 @@ let seq = require("./promise-sequential.js");
 String.prototype.replaceAll = function(search, replacement) {
 	let target = this;
 	return target.replace(new RegExp(search, 'g'), replacement);
-};
+}
 Number.prototype.pad = function(size) {
 	let s = String(this);
 	while (s.length < (size || 2)) {s = "0" + s;}
@@ -14,8 +14,14 @@ module.exports = class UTILS {
 	output(t) {//general utility function
 		if (this.exists(t)) {
 			let n = new Date().toISOString().slice(0, 19).replace('T', ' ');;
-			console.log(n + "." + new Date().getMilliseconds().pad(3) + " : " + t);
+			console.log(n + "." + new Date().getMilliseconds().pad(3) + " " + (this.exists(process.env.SHARD_ID) ? "$" + process.env.SHARD_ID : "") + ": " + t);
 		}
+	}
+	debug(t, override) {
+		if (this.exists(override)) {
+			if (override) this.output(t);
+		}
+		else if (process.env.DEBUG == "true") this.output(t);
 	}
 	exists(anyObject) {//general utility function
 		if (anyObject !== null && anyObject !== undefined) return true;
@@ -40,13 +46,25 @@ module.exports = class UTILS {
 	ago(date) {
 		return ta.ago(date);
 	}
+	until(date) {
+		const now = new Date().getTime();
+		let answer = ta.ago(now - (date.getTime() - now));
+		answer = answer.substring(0, answer.length - 4);
+		return answer;
+	}
+	duration(now, date) {
+		now = now.getTime();
+		let answer = ta.ago(now - (date.getTime() - now));
+		answer = answer.substring(0, answer.length - 4);
+		return answer;
+	}
 	teamParticipant(summonerID, match) {
-		const participantID = match.participantIdentities.find(pI => { return pI.player.summonerId == summonerID; }).participantId;
-		const stats = match.participants.find(p => { return p.participantId == participantID; });
+		const participantID = match.participantIdentities.find(pI => pI.player.summonerId == summonerID).participantId;
+		const stats = match.participants.find(p => p.participantId == participantID);
 		return stats;
 	}
 	findParticipantIdentityFromPID(match, pid) {
-		return match.participantIdentities.find(pI => { return pI.participantId == pid; });
+		return match.participantIdentities.find(pI => pI.participantId == pid);
 	}
 	stats(summonerID, match) {
 		return this.teamParticipant(summonerID, match).stats;
@@ -62,33 +80,23 @@ module.exports = class UTILS {
 		};
 	}
 	determineWin(summonerID, match) {
-		const participantID = match.participantIdentities.find(pI => { return pI.player.summonerId == summonerID; }).participantId;
-		const teamID = match.participants.find(p => { return p.participantId == participantID; }).teamId;
-		return match.teams.find(t => { return t.teamId == teamID; }).win == "Win";
+		const participantID = match.participantIdentities.find(pI => pI.player.summonerId == summonerID).participantId;
+		const teamID = match.participants.find(p => p.participantId == participantID).teamId;
+		return match.teams.find(t => t.teamId == teamID).win == "Win";
 	}
 	english(text) {
-		return text.split("_").map(t => { return t.substring(0, 1).toUpperCase() + t.substring(1).toLowerCase(); }).join(" ");
+		return text.split("_").map(t => t.substring(0, 1).toUpperCase() + t.substring(1).toLowerCase()).join(" ");
 	}
 	standardTimestamp(sec) {
 		let mins = Math.floor(parseInt(sec) / 60);
 		let hours = Math.floor(parseInt(mins) / 60);
 		mins = mins % 60;
 		let secs = Math.floor(parseInt(sec) % 60);
-		if (secs < 10) {
-			secs = "0" + secs;
-		}
-		if (mins < 10) {
-			mins = "0" + mins;
-		}
-		if (hours < 10) {
-			hours = "0" + hours
-		}
-		if (hours == "00") {
-			return mins + ":" + secs;
-		}
-		else {
-			return hours + ":" + mins + ":" + secs;
-		}
+		if (secs < 10) secs = "0" + secs;
+		if (mins < 10) mins = "0" + mins;
+		if (hours < 10) hours = "0" + hours;
+		if (hours == "00") return mins + ":" + secs;
+		else return hours + ":" + mins + ":" + secs;
 	}
 	gold(number) {
 		number /= 1000;
@@ -150,16 +158,13 @@ module.exports = class UTILS {
 	opgg(region, username) {
 		return "http://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
 	}
-	opggShort(base, region, username) {
-		return base.replace("%region%", region).replace("%username%", encodeURIComponent(username));
-	}
 	shortRank(info) {
 		//****** unranked
 		//██████ unranked
-		//G W--- Gold promotion, 1 win
+		//G↑W--- Gold promotion, 1 win
 		//G2 +00 Gold 2, 0 LP
 		//G2 +56 Gold 2, 56LP
-		//G2P L_ Gold 2 promotion, 1 loss
+		//G2↑ L_ Gold 2 promotion, 1 loss
 		//C +256 Challenger, 256LP
 		//C+1256 Challenger 1256 LP
 		if (!this.exists(info)) return "******";
@@ -167,10 +172,10 @@ module.exports = class UTILS {
 		answer += info.tier[0];
 		if (this.exists(info.miniSeries)) {//series
 			if (info.miniSeries.progress.length == 5) {//BO5
-				answer += " " + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
+				answer += "↑" + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
 			}
 			else {//BO3
-				answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank] + "P " + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
+				answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank] + "↑ " + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
 			}
 		}
 		else {//no series
@@ -194,11 +199,15 @@ module.exports = class UTILS {
 		return answer;
 	}
 	getSingleChampionMastery(all, singleID) {
-		return this.exists(all.find(cmi => { return cmi.championId == singleID; })) ? all.find(cmi => { return cmi.championId == singleID; }).championLevel : 0;
+		return this.exists(all.find(cmi => cmi.championId == singleID)) ? all.find(cmi => cmi.championId == singleID).championLevel : 0;
 	}
 	KDAFormat(num) {
 		if (isNaN(num) || num == Infinity) return "Perfect";
-		else return this.round(num, 2);
+		else return this.round(num, 2).toFixed("2");
+	}
+	KPFormat(num) {
+		if (isNaN(num)) return 0;
+		else return this.round(num, 0);
 	}
 	iMMR(rank) {//internal MMR Representation
 		/*
@@ -223,16 +232,28 @@ module.exports = class UTILS {
 		return answer;
 	}
 	iMMRtoEnglish(mmr) {
-		if (mmr < 100) mmr = 100;
+		//6-char representation
+		if (mmr < 100) return "******";
 		let answer = "";
-		if (mmr < 600) answer += "BRONZE ";
-		else if (mmr < 1100) answer += "SILVER ";
-		else if (mmr < 1600) answer += "GOLD ";
-		else if (mmr < 2100) answer += "PLATINUM ";
-		else if (mmr < 2600) answer += "DIAMOND ";
-		else answer += "MASTER/CHALLENGER ";
-		if (mmr < 2600) answer += ["V", "IV", "III", "II", "I"][Math.floor(((mmr - 100) % 500) / 100)] + " " + this.round(mmr % 100) + "LP";
-		else answer += this.round((mmr - 2600) * 5) + "LP";
+		if (mmr < 600) answer += "B";
+		else if (mmr < 1100) answer += "S";
+		else if (mmr < 1600) answer += "G";
+		else if (mmr < 2100) answer += "P";
+		else if (mmr < 2600) answer += "D";
+		else if (mmr < 2700) answer += "M";//arbitrary M/C threshold
+		else answer += "C";
+		let LP;
+		if (mmr < 2600) {
+			answer += ["5", "4", "3", "2", "1"][Math.floor(((mmr - 100) % 500) / 100)];
+			LP = " +" + this.round(mmr % 100).pad(2);
+			answer += LP;
+		}
+		else {
+			LP = this.round((mmr - 2600) * 5);
+			if (LP < 100) answer += "  +" + LP.pad(2);
+			else if (LP < 1000) answer += " +" + LP;
+			else answer += "+" + LP;
+		}
 		return answer;
 	}
 	averageMatchMMR(ranks) {
@@ -254,5 +275,58 @@ module.exports = class UTILS {
 	}
 	copy(obj) {//no functions
 		return JSON.parse(JSON.stringify(obj));
+	}
+	removeAllOccurances(arr, deletable) {
+		while (arr.indexOf(deletable) != -1) arr.splice(arr.indexOf(deletable), 1);
+	}
+	defaultChannelNames() {
+		return ["general", "bot", "bots", "bot-commands", "botcommands", "commands", "league", "lol", "games", "spam"];
+	}
+	durationParse(duration) {
+		let multiplier = duration.substring(duration.length - 1, duration.length).toUpperCase();
+		if (multiplier == "D") multiplier = 24 * 60 * 60 * 1000;//days
+		else if (multiplier == "H") multiplier = 60 * 60 * 1000;//hours
+		else return NaN;
+		return parseInt(duration) * multiplier;
+	}
+	presentLobby(pre_usernames) {
+		let present = [];//users present
+		let join_detected = false, leave_detected = false;
+		let joins = [], leaves = [];
+		const join_suffix = " joined the lobby";
+		const leave_suffix = " left the lobby";
+		for (let i = 0; i < pre_usernames.length; ++i) {
+			if (pre_usernames[i].substring(pre_usernames[i].length - join_suffix.length) === join_suffix) join_detected = true;
+			else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix) leave_detected = true;
+			else if (join_detected && leave_detected) break;//all necessary results recorded
+			//else;//chat message
+		}
+		if (join_detected) {//champ select mode
+			for (let i = 0; i < pre_usernames.length; ++i) {
+				if (pre_usernames[i].substring(pre_usernames[i].length - join_suffix.length) === join_suffix) {
+					present.push(pre_usernames[i].substring(0, pre_usernames[i].length - join_suffix.length).trim());//user joined, add to attendance
+				}
+				else if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix) {
+					this.removeAllOccurances(present, pre_usernames[i].substring(0, pre_usernames[i].length - leave_suffix.length).trim());//user left, delete from attendance
+				}
+				//else;//chat message
+			}
+		}
+		else if (leave_detected) {//end game mode
+			for (let i = 0; i < pre_usernames.length; ++i) {
+				if (pre_usernames[i].substring(pre_usernames[i].length - leave_suffix.length) === leave_suffix) {
+					present.push(pre_usernames[i].substring(0, pre_usernames[i].length - leave_suffix.length).trim());//user left, add to attendance
+				}
+				//else;//chat message
+			}
+		}
+		/*
+		if (join) lobby/champ select, so joins add to usernames queried and leaves remove from usernames queried
+		if (leave) end game screen, so leaves add to usernames queried
+		*/
+		return present;
+	}
+	map(x, in_min, in_max, out_min, out_max) {
+		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 	}
 }
