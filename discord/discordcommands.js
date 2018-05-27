@@ -478,32 +478,15 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 		callback) {//optional callback only if successful
 		//returns (region, username, parameter)
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
-			try {//username explicitly provided
+			try {//username provided
 				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
-				if (parameter.substring(parameter.indexOf(" ") + 1).length < 35) {//longest query should be less than 35 characters
+				if (parameter.substring(parameter.indexOf(" ") + 1).length < 35) {
 					if (parameter.substring(parameter.indexOf(" ") + 1)[0] == "$") {
 						lolapi.getShortcut(msg.author.id, parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)).then(result => {
 							callback(region, result[parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)], parameter.substring(0, parameter.indexOf(" ")));
 						}).catch(e => {
 							if (e) reply(":x: An error has occurred. The shortcut may not exist.");
 						});
-					}
-					else if (parameter.substring(parameter.indexOf(" ") + 1) == "^") {
-						msg.channel.fetchMessages({ before: msg.id, limit: 30 }).then(msgs => {
-							msgs = msgs.array();
-							let username;
-							for (let i = 0; i < msgs.length; ++i) {
-								if (msg[i].author.id == client.user.id && //message was sent by bot
-									msgs[i].embeds.length == 1 && //embedded response
-									UTILS.exists(msgs[i].embeds[0].url) && //url present
-									msgs[i].embeds[0].url.substring(msgs[i].embeds[0].url.indexOf(".") + 1, msgs[i].embeds[0].url.indexOf(".") + 25) == "op.gg/summoner/userName=") {//http://na.op.gg/summoner/userName=iaace
-									username = decodeURIComponent(msgs[i].embeds[0].url.substring(msgs[i].embeds[0].url.indexOf("/summoner/userName=") + 19));
-									break;
-								}
-							}
-							if (!UTILS.exists(username)) reply(":x: Could not find a recent username queried.");
-							else callback(region, username, parameter.substring(0, parameter.indexOf(" ")));
-						}).catch(console.error);
 					}
 					else callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")));
 				}
@@ -529,32 +512,15 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			const number = parseInt(parameter.substring(0, parameter.indexOf(" ")));
 			if (isNaN(number)) return;
-			try {//username explicitly provided
+			try {//username provided
 				const region = assert_region(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
-				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) {//longest query should be less than 35 characters
+				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) {
 					if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1)[0] == "$") {
 						lolapi.getShortcut(msg.author.id, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)).then(result => {
 							callback(region, result[parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)], number);
 						}).catch(e => {
 							if (e) reply(":x: An error has occurred. The shortcut may not exist.");
 						});
-					}
-					else if (parameter.substring(parameter.indexOf(" ") + 1) == "^") {
-						msg.channel.fetchMessages({ before: msg.id, limit: 30 }).then(msgs => {
-							msgs = msgs.array();
-							let username;
-							for (let i = 0; i < msgs.length; ++i) {
-								if (msg[i].author.id == client.user.id && //message was sent by bot
-									msgs[i].embeds.length == 1 && //embedded response
-									UTILS.exists(msgs[i].embeds[0].url) && //url present
-									msgs[i].embeds[0].url.substring(msgs[i].embeds[0].url.indexOf(".") + 1, msgs[i].embeds[0].url.indexOf(".") + 25) == "op.gg/summoner/userName=") {//http://na.op.gg/summoner/userName=iaace
-									username = decodeURIComponent(msgs[i].embeds[0].url.substring(msgs[i].embeds[0].url.indexOf("/summoner/userName=") + 19));
-									break;
-								}
-							}
-							if (!UTILS.exists(username)) reply(":x: Could not find a recent username queried.");
-							else callback(region, username, number);
-						}).catch(console.error);
 					}
 					else callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number);
 				}
