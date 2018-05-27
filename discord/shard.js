@@ -15,7 +15,7 @@ const client = new Discord.Client({ disabledEvents: ["TYPING_START"] });
 let CONFIG;
 try {
 	CONFIG = JSON.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.3.1";//b for non-release (in development)
+	CONFIG.VERSION = "v1.4.0b";//b for non-release (in development)
 	CONFIG.BANS = {};
 }
 catch (e) {
