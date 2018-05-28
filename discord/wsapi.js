@@ -87,7 +87,7 @@ module.exports = class WSAPI {
 		this.connection.on("message", data => {
 			UTILS.debug(data);
 			data = JSON.parse(data);
-			UTILS.output("ws message received: type: " + data.type);
+			UTILS.debug("ws message received: type: " + data.type);
 			const that = this;
 			switch(data.type) {//client receives even values only
 				case 0://reserved/heartbeat
