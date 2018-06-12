@@ -1,4 +1,9 @@
 {
+	"CONSTANTS": {
+		"SCM_FULL": 2,
+		"SCM_REDUCED": 1,
+		"SCM_COMPACT": 0
+	},
 	"DISCORD_API_KEY": "",
 	"RIOT_API_KEY": "",
 	"OWNER_DISCORD_IDS": {
