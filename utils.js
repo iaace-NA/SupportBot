@@ -256,19 +256,23 @@ module.exports = class UTILS {
 		}
 		return answer;
 	}
+	averageUserMMR(rank) {
+		let individual_iMMR = 0;
+		let individual_games = 0;
+		for (let c in rank) {//queue
+			individual_iMMR += this.iMMR(rank) * (rank.wins + rank.losses);
+			individual_games += rank[c].wins + rank[c].losses;
+		}
+		return individual_games == 0 ? 0 : individual_iMMR / individual_games;
+	}
 	averageMatchMMR(ranks) {
 		let total_iMMR = 0;
 		let total_users = 0;
-		for (let b in ranks) {
-			let individual_iMMR = 0;
-			let individual_games = 0;
-			for (let c in ranks[b]) {
-				individual_iMMR += this.iMMR(ranks[b][c]) * (ranks[b][c].wins + ranks[b][c].losses);
-				individual_games += ranks[b][c].wins + ranks[b][c].losses;
-			}
-			if (individual_iMMR > 0) {
+		for (let b in ranks) {//user
+			const individual_weighted_MMR = this.averageUserMMR(ranks[b]);
+			if (individual_weighted_MMR > 0) {
 				++total_users;
-				total_iMMR += individual_iMMR / individual_games;
+				total_iMMR += individual_weighted_MMR;
 			}
 		}
 		return total_users === 0 ? 0 : total_iMMR / total_users;
