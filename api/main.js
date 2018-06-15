@@ -65,7 +65,6 @@ let disciplinary_model = apicache.model("disciplinary_model", disciplinary_doc);
 let region_limiters = {};
 let limiter = require("bottleneck");
 for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({ maxConcurrent: 1, minTime: CONFIG.API_PERIOD });
-let req_num = 0;
 let irs = {};//individual request statistics
 let database_profiler = new Profiler("Database Profiler");
 let server = https.createServer({ key: fs.readFileSync("../data/keys/server.key"),
@@ -191,7 +190,6 @@ function serveWebRequest(branch, callback, validate = false) {
 			//UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
 			if (validate && !UTILS.exists(req.query.k)) return res.status(401).end();//no key
 			if (validate && req.query.k !== CONFIG.API_KEY) return res.status(403).end();//wrong key
-			++req_num;
 			load_average[0].add();
 			callback(req, res, next);
 		});
@@ -202,7 +200,6 @@ function serveWebRequest(branch, callback, validate = false) {
 				//UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
 				if (validate && !UTILS.exists(req.query.k)) return res.status(401).end();//no key
 				if (validate && req.query.k !== CONFIG.API_KEY) return res.status(403).end();//wrong key
-				++req_num;
 				load_average[0].add();
 				callback(req, res, next);
 			});
