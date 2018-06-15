@@ -292,7 +292,6 @@ module.exports = class UTILS {
 	presentLobby(pre_usernames) {
 		let present = [];//users present
 		let join_detected = false, leave_detected = false;
-		let joins = [], leaves = [];
 		const join_suffix = " joined the lobby";
 		const leave_suffix = " left the lobby";
 		for (let i = 0; i < pre_usernames.length; ++i) {
