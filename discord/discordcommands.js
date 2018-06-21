@@ -481,7 +481,14 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 			try {//username explicitly provided
 				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
 				if (parameter.substring(parameter.indexOf(" ") + 1).length < 35) {//longest query should be less than 35 characters
-					if (parameter.substring(parameter.indexOf(" ") + 1)[0] == "$") {
+					if (msg.mentions.users.size == 1) {
+						lolapi.getLink(msg.mentions.users.first().id).then(result => {
+							let username = msg.mentions.users.first().username;//suppose the link doesn't exist in the database
+							if (UTILS.exists(result.username) && result.username != "") username = result.username;//link exists
+							callback(region, username, parameter);
+						}).catch(console.error);
+					}
+					else if (parameter.substring(parameter.indexOf(" ") + 1)[0] == "$") {
 						lolapi.getShortcut(msg.author.id, parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)).then(result => {
 							callback(region, result[parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)], parameter.substring(0, parameter.indexOf(" ")));
 						}).catch(e => {
