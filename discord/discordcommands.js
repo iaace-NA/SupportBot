@@ -500,7 +500,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 							msgs = msgs.array();
 							let username;
 							for (let i = 0; i < msgs.length; ++i) {
-								if (msg[i].author.id == client.user.id && //message was sent by bot
+								if (msgs[i].author.id == client.user.id && //message was sent by bot
 									msgs[i].embeds.length == 1 && //embedded response
 									UTILS.exists(msgs[i].embeds[0].url) && //url present
 									msgs[i].embeds[0].url.substring(msgs[i].embeds[0].url.indexOf(".") + 1, msgs[i].embeds[0].url.indexOf(".") + 25) == "op.gg/summoner/userName=") {//http://na.op.gg/summoner/userName=iaace
@@ -551,7 +551,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 							msgs = msgs.array();
 							let username;
 							for (let i = 0; i < msgs.length; ++i) {
-								if (msg[i].author.id == client.user.id && //message was sent by bot
+								if (msgs[i].author.id == client.user.id && //message was sent by bot
 									msgs[i].embeds.length == 1 && //embedded response
 									UTILS.exists(msgs[i].embeds[0].url) && //url present
 									msgs[i].embeds[0].url.substring(msgs[i].embeds[0].url.indexOf(".") + 1, msgs[i].embeds[0].url.indexOf(".") + 25) == "op.gg/summoner/userName=") {//http://na.op.gg/summoner/userName=iaace
