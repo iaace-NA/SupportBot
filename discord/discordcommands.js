@@ -451,7 +451,6 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 							console.error(e);
 						}
 					}
-					return true;
 				}
 			}
 			else if (!parameters_expected && msg.content.trim().toLowerCase() === trigger_array[i].toLowerCase()) {
@@ -466,11 +465,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 							console.error(e);
 						}
 					}
-					return true;
 				}
 			}
 		}
-		return false;
 	}
 
 	function commandGuessUsername(trigger_array,//array of command aliases, prefix needs to be included
