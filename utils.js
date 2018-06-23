@@ -337,7 +337,7 @@ module.exports = class UTILS {
 	}
 	accessLevel(CONFIG, msg) {
 		if (this.exists(CONFIG.OWNER_DISCORD_IDS[msg.author.id]) && CONFIG.OWNER_DISCORD_IDS[msg.author.id].active) return CONFIG.CONSTANTS.BOTOWNERS;
-		else if (!exists(msg.member)) return CONFIG.CONSTANTS.NORMALMEMBERS;//PM
+		else if (!this.exists(msg.member)) return CONFIG.CONSTANTS.NORMALMEMBERS;//PM
 		else if (msg.member.id === msg.guild.ownerID) return CONFIG.CONSTANTS.SERVEROWNERS;
 		else if (msg.member.hasPermission(["BAN_MEMBERS", "KICK_MEMBERS", "MANAGE_MESSAGES", "MANAGE_ROLES", "MANAGE_CHANNELS"])) return CONFIG.CONSTANTS.ADMINISTRATORS;
 		else if (msg.member.hasPermission(["KICK_MEMBERS", "MANAGE_MESSAGES"])) return CONFIG.CONSTANTS.MODERATORS;
