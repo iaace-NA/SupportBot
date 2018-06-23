@@ -240,7 +240,7 @@ module.exports = class UTILS {
 		else if (mmr < 1600) answer += "G";
 		else if (mmr < 2100) answer += "P";
 		else if (mmr < 2600) answer += "D";
-		else if (mmr < 2700) answer += "M";//arbitrary M/C threshold
+		else if (mmr < 2700) answer += "M";//arbitrary M/C threshold @ 500LP
 		else answer += "C";
 		let LP;
 		if (mmr < 2600) {
