@@ -5,13 +5,14 @@ const fs = require("fs");
 const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt") };
 let cache = {};
 module.exports = class Preferences {
-	constructor(INIT_CONFIG, lolapi, sid) {
+	constructor(INIT_CONFIG, lolapi, guild) {
 		this.CONFIG = INIT_CONFIG;
 		this.lolapi = lolapi;
 		if (!UTILS.exists(this.CONFIG)) throw new Error("config.json required.");
 		this.request = REQUEST;
 		this.address = "https://" + this.CONFIG.API_ADDRESS;
 		this.port = this.CONFIG.API_PORT;
+		this.sid
 		if (!UTILS.exists(cache[sid])) {
 			//check if db entry exists
 			//otherwise make a new one
