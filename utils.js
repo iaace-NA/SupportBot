@@ -335,13 +335,15 @@ module.exports = class UTILS {
 	conditionalFormat(text, surrounds, condition = true) {
 		return condition ? surrounds + text + surrounds : text;
 	}
-	accessLevel(CONFIG, msg) {
-		if (this.exists(CONFIG.OWNER_DISCORD_IDS[msg.author.id]) && CONFIG.OWNER_DISCORD_IDS[msg.author.id].active) return CONFIG.CONSTANTS.BOTOWNERS;
-		else if (!this.exists(msg.member)) return CONFIG.CONSTANTS.NORMALMEMBERS;//PM
-		else if (msg.member.id === msg.guild.ownerID) return CONFIG.CONSTANTS.SERVEROWNERS;
-		else if (msg.member.hasPermission(["BAN_MEMBERS", "KICK_MEMBERS", "MANAGE_MESSAGES", "MANAGE_ROLES", "MANAGE_CHANNELS"])) return CONFIG.CONSTANTS.ADMINISTRATORS;
-		else if (msg.member.hasPermission(["KICK_MEMBERS", "MANAGE_MESSAGES"])) return CONFIG.CONSTANTS.MODERATORS;
-		else if (this.exists(msg.member.roles.find(r => r.name.toLowerCase() === "bot commander"))) return CONFIG.CONSTANTS.BOTCOMMANDERS;
+	accessLevel(CONFIG, msg, uid) {
+		if (!this.exists(uid)) uid = msg.author.id;
+		if (this.exists(CONFIG.OWNER_DISCORD_IDS[uid]) && CONFIG.OWNER_DISCORD_IDS[uid].active) return CONFIG.CONSTANTS.BOTOWNERS;
+		const MEMBER = uid === msg.author.id ? msg.member : msg.guild.members.get(uid);
+		if (!this.exists(MEMBER)) return CONFIG.CONSTANTS.NORMALMEMBERS;//PM
+		else if (MEMBER.id === msg.guild.ownerID) return CONFIG.CONSTANTS.SERVEROWNERS;
+		else if (MEMBER.hasPermission(["BAN_MEMBERS", "KICK_MEMBERS", "MANAGE_MESSAGES", "MANAGE_ROLES", "MANAGE_CHANNELS"])) return CONFIG.CONSTANTS.ADMINISTRATORS;
+		else if (MEMBER.hasPermission(["KICK_MEMBERS", "MANAGE_MESSAGES"])) return CONFIG.CONSTANTS.MODERATORS;
+		else if (this.exists(MEMBER.roles.find(r => r.name.toLowerCase() === "bot commander"))) return CONFIG.CONSTANTS.BOTCOMMANDERS;
 		else return CONFIG.CONSTANTS.NORMALMEMBERS;
 	}
 }
