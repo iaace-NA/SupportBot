@@ -55,7 +55,8 @@ client.on("disconnect", function () {
 });
 client.on("message", function (msg) {
 	try {
-		discordcommands(CONFIG, client, msg, wsapi, sendToChannel);
+		const ACCESS_LEVEL = UTILS.accessLevel(CONFIG, msg);
+		discordcommands(CONFIG, client, msg, wsapi, sendToChannel, ACCESS_LEVEL);
 	}
 	catch (e) {
 		console.error(e);

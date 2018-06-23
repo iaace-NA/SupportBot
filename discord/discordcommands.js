@@ -5,7 +5,7 @@ let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
 let LOLAPI = require("./lolapi.js");
 let Profiler = require("../timeprofiler.js");
-module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
+module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, ACCESS_LEVEL) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 	if (UTILS.exists(msg.guild) && !msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) return;//dont read messages that can't be responded to
 	if (UTILS.exists(CONFIG.BANS.USERS[msg.author.id]) && (CONFIG.BANS.USERS[msg.author.id] == 0 || CONFIG.BANS.USERS[msg.author.id] > msg.createdTimestamp)) return;//ignore messages from banned users
@@ -27,7 +27,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 	request_profiler.mark("lolapi instantiated");
 
 	//respondable server message or PM
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "banuser "], true, true, (original, index, parameter) => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "banuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lbanuser <uid> <duration> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1);
@@ -44,7 +44,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 			reply(":no_entry: User banned, id " + id + " by " + msg.author.tag + " for : " + reason);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "banserver "], true, true, (original, index, parameter) => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "banserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lbanserver <sid> <duration> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1);
@@ -58,7 +58,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 			reply(":no_entry: Server banned, id " + id + " by " + msg.author.tag + " for " + duration + ": " + reason);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "warnuser "], true, true, (original, index, parameter) => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "warnuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lwarnuser <uid> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
@@ -70,7 +70,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 			reply(":warning: User warned, id " + id + " by " + msg.author.tag + ": " + reason);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "warnserver "], true, true, (original, index, parameter) => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "warnserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lwarnserver <uid> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
@@ -80,7 +80,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 			reply(CONFIG.LOG_CHANNEL_ID, ":warning: Server warned, id " + id + " by " + msg.author.tag + ": " + reason);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "noteuser "], true, true, (original, index, parameter) => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "noteuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lnoteuser <uid> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
@@ -90,7 +90,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "noteserver "], true, true, (original, index, parameter) => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "noteserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lnoteserver <sid> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
@@ -100,33 +100,33 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: Server note added, id " + id + " by " + msg.author.tag + ": " + reason);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "userhistory "], true, true, (original, index, parameter) => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "userhistory "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Luserhistory <uid>
 		lolapi.userHistory(parameter).then(results => {
 			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, parameter, true, results[parameter]));
 		}).catch();
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "serverhistory "], true, true, (original, index, parameter) => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "serverhistory "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lserverhistory <sid>
 		lolapi.serverHistory(parameter).then(results => {
 			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, parameter, false, results[parameter]));
 		}).catch();
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "unbanserver "], true, true, (original, index, parameter) => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "unbanserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lunbanserver <sid>
 		lolapi.unbanServer(parameter, msg.author.id, msg.author.tag, msg.author.displayAvatarURL).then(result => {
 			reply(":no_entry_sign: Server unbanned, id " + parameter + " by " + msg.author.tag);
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":no_entry_sign: Server unbanned, id " + parameter + " by " + msg.author.tag);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "unbanuser "], true, true, (original, index, parameter) => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "unbanuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lunbanuser <uid>
 		lolapi.unbanUser(parameter, msg.author.id, msg.author.tag, msg.author.displayAvatarURL).then(result => {
 			reply(":no_entry_sign: User unbanned, id " + parameter + " by " + msg.author.tag);
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":no_entry_sign: User unbanned, id " + parameter + " by " + msg.author.tag);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "actionreport "], true, true, (original, index, parameter) => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "actionreport "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lactionreport <uid>
 		if (!UTILS.exists(CONFIG.OWNER_DISCORD_IDS[parameter])) return reply(":x: This user is not a current or previously registered admin.");
 		lolapi.getActions(parameter).then(results => {
@@ -140,7 +140,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 		if (msg.mentions.users.size != 1) return reply(":x: A user must be mentioned.");
 		reply(msg.mentions.users.first().tag + " has " + (isOwner(msg.mentions.users.first().id, false) ? "owner" : "normal") + " permissions.");
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "stats"], false, true, () => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "stats"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 		reply("This is shard " + process.env.SHARD_ID);
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {
@@ -152,7 +152,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "ping "], true, false, function (original, index, parameter) {
 		reply("you said: " + parameter);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "eval "], true, true, function (original, index, parameter) {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "eval "], true, CONFIG.CONSTANTS.BOTOWNERS, function (original, index, parameter) {
 		try {
 			reply("```" + eval(parameter) + "```");
 		}
@@ -160,10 +160,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 			reply("```" + e + "```");
 		}
 	});
-	command(["iapi eval "], true, true, (original, index, parameter) => {
+	command(["iapi eval "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		lolapi.IAPIEval(parameter).then(result => reply("```" + result.string + "```")).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "notify "], true, true, (original, index, parameter) => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "notify "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		wsapi.lnotify(msg.author.username, msg.author.displayAvatarURL, parameter);
 	});
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, () => {
@@ -203,7 +203,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 			result.success ? reply(":white_check_mark: Your discord account is no longer associated with any username. We'll try to use your discord username when you use a username-optional LoL stats command.") : reply(":x: Something went wrong.");
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "unlink ", CONFIG.DISCORD_COMMAND_PREFIX + "removelink "], true, true, (original, index) => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "unlink ", CONFIG.DISCORD_COMMAND_PREFIX + "removelink "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index) => {
 		if (!UTILS.exists(msg.mentions.users.first())) return reply(":x: No user mention specified.");
 		lolapi.setLink(msg.mentions.users.first().id, "").then(result => {
 			result.success ? reply(":white_check_mark: " + msg.mentions.users.first().tag + "'s discord account is no longer associated with any username.") : reply(":x: Something went wrong.");
@@ -215,7 +215,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 			else reply(":x: No records for user id " + msg.author.id);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "gl ", CONFIG.DISCORD_COMMAND_PREFIX + "getlink "], true, true, (original, index) => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "gl ", CONFIG.DISCORD_COMMAND_PREFIX + "getlink "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index) => {
 		if (!UTILS.exists(msg.mentions.users.first())) return reply(":x: No user mention specified.");
 		lolapi.getLink(msg.mentions.users.first().id).then(result => {
 			if (UTILS.exists(result.username) && result.username != "") reply(":white_check_mark: " + msg.mentions.users.first().tag + " is `" + result.username + "`");
@@ -417,13 +417,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 	});*/
 
 	if (UTILS.exists(msg.guild)) {//respondable server message only
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "shutdown"], false, true, () => {
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "shutdown"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 			reply(":white_check_mark: shutdown initiated", shutdown, shutdown);
 		});
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "restart"], false, true, () => {
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "restart"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 			reply(":white_check_mark: restart initiated", restart, restart);
 		});
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "refresh", CONFIG.DISCORD_COMMAND_PREFIX + "clearcache"], false, true, () => {
+		command([CONFIG.DISCORD_COMMAND_PREFIX + "refresh", CONFIG.DISCORD_COMMAND_PREFIX + "clearcache"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 			reply(":white_check_mark: restart initiated + clearing cache", step2, step2);
 			function step2() {
 				lolapi.clearCache();
@@ -440,7 +440,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 		callback) {//optional callback only if successful
 		for (let i in trigger_array) {
 			if (parameters_expected && msg.content.trim().toLowerCase().substring(0, trigger_array[i].length) === trigger_array[i].toLowerCase()) {
-				if (elevated_permissions && !isOwner()) return false
+				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
 					if (elevated_permissions) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
 					if (UTILS.exists(callback)) {
@@ -454,7 +454,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 				}
 			}
 			else if (!parameters_expected && msg.content.trim().toLowerCase() === trigger_array[i].toLowerCase()) {
-				if (elevated_permissions && !isOwner()) return false;
+				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
 					if (elevated_permissions) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
 					if (UTILS.exists(callback)) {
@@ -575,6 +575,24 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 				catch (e) { }
 			}
 		});
+	}
+	function is(PLEVEL, candidate = msg.author.id, notify = true) {
+		if (candidate === msg.author.id) {
+			if (ACCESS_LEVEL >= PLEVEL) return true;
+			else if (notify) {
+				if (PLEVEL === CONFIG.CONSTANTS.BOTOWNERS);//do not notify when this permission fails
+				else if (PLEVEL === CONFIG.CONSTANTS.SERVEROWNERS) reply(":x: Server Owner permissions required. You must be the owner of this server to use this command.");
+				else if (PLEVEL === CONFIG.CONSTANTS.ADMINISTRATORS) reply(":x: Server Administrator permissions required.");
+				else if (PLEVEL === CONFIG.CONSTANTS.MODERATORS) reply(":x: Server Moderator permissions required.");
+				else if (PLEVEL === CONFIG.CONSTANTS.BOTCOMMANDERS) reply(":x: Bot Commander permissions required.");
+				else;//normal member permissions
+			}
+			return false;
+		}
+		else {
+			const other_ACCESS_LEVEL = UTILS.accessLevel(CONFIG, msg);
+			return other_ACCESS_LEVEL >= PLEVEL;//never notifies
+		}
 	}
 	function isOwner(candidate = msg.author.id, notify = true) {
 		const answer = UTILS.exists(CONFIG.OWNER_DISCORD_IDS[candidate]) && CONFIG.OWNER_DISCORD_IDS[candidate].active;
