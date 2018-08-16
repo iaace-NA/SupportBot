@@ -130,7 +130,7 @@ module.exports = class LOLAPI {
 		UTILS.output("STATIC SPELLS: " + region);
 		return this.get(region, "static-data/v3/summoner-spells", { locale: "en_US", dataById: true, spellListData: "all", tags: "all" }, this.CONFIG.API_CACHETIME.STATIC_SPELLS, this.CONFIG.API_CACHETIME.STATIC_SPELLS);
 	}
-	getStaticSummonerSpellsNew(region) {
+	getStaticSummonerSpellsNew(region, locale = "en_US") {
 		UTILS.output("STATIC SPELLS: " + region);
 		return new Promise((resolve, reject) => {
 			this.getStatic("realms/" + this.CONFIG.REGIONS_REVERSE[region].toLowerCase() + ".json").then(realm => {
