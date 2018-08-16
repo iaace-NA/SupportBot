@@ -169,8 +169,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, () => {
 		reply_embed(embedgenerator.test());
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "sd ", CONFIG.DISCORD_COMMAND_PREFIX + "summonerdebug "], true, false, (original, index, parameter) => {
-		lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.SD).then(result => {
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "summonerdebug ", CONFIG.DISCORD_COMMAND_PREFIX + "sd "], true, false, (original, index, parameter) => {
+		lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" ")), index < 1), parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.SD).then(result => {
 			result.guess = parameter.substring(parameter.indexOf(" ") + 1);
 			reply_embed(embedgenerator.summoner(CONFIG, result));
 		}).catch(console.error);
@@ -269,8 +269,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 			}).catch();
 		}
 	});
-	command(["service status ", "servicestatus ", "ss ", "status "], true, false, (original, index, parameter) => {
-		let region = assert_region(parameter);
+	command(["service status ", "servicestatus ", "status ", "ss "], true, false, (original, index, parameter) => {
+		let region = assert_region(parameter, index < 2);
 		lolapi.getStatus(region, 60).then((status_object) => {
 			reply_embed(embedgenerator.status(status_object));
 		}).catch(console.error);
@@ -300,10 +300,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	command(["m ", "multi ", "c ", "compare "], true, false, (original, index, parameter) => {
+	command(["compare ", "multi ", "m ", "c "], true, false, (original, index, parameter) => {
 		request_profiler.mark("multi command recognized");
 		request_profiler.begin("parsing usernames");
-		let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
+		let region = assert_region(parameter.substring(0, parameter.indexOf(" ")), index < 2);
 		let pre_usernames;
 		if (parameter.indexOf("\n") != -1) pre_usernames = UTILS.presentLobby(parameter.substring(parameter.indexOf(" ") + 1).split("\n"));//lobby text formatting
 		else if (parameter.indexOf(",") != -1) pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => s.trim());//CSV
