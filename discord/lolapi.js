@@ -134,7 +134,7 @@ module.exports = class LOLAPI {
 		UTILS.output("STATIC SPELLS: " + region);
 		return new Promise((resolve, reject) => {
 			this.getStatic("realms/" + this.CONFIG.REGIONS_REVERSE[region].toLowerCase() + ".json").then(realm => {
-				then.getStatic("cdn/" + realm.v + "/data/" + locale + "/summoner.json").then(sd => {//spell data
+				this.getStatic("cdn/" + realm.v + "/data/" + locale + "/summoner.json").then(sd => {//spell data
 					for (let b in sd.data) {
 						sd.data[sd.data[b].key] = sd.data[b];//add key as duplicate of data
 						delete sd.data[b];//delete original
