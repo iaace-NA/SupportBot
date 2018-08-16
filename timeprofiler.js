@@ -31,7 +31,7 @@ module.exports = class Profiler {
 	diff(now, prev) {//returns ns
 		return ((now[0] - prev[0]) * 1e9) + (now[1] - prev[1]);
 	}
-	ms(nsn) {
+	ms(nsn) {//returns ms.ns
 		return (nsn / 1000000).toFixed(3);
 	}
 }
