@@ -38,11 +38,12 @@ const queues = {
 	"940": "SR Nexus Siege",
 	"950": "SR Doom Bots Voting",
 	"960": "SR Doom Bots Standard",
-	"980": "VCP Star Guardian Invasion: Normal",
-	"990": "VCP Star Guardian Invasion: Onslaught",
-	"1000": "O Project: Hunters",
+	"980": "VP Star Guardian Invasion: Normal",
+	"990": "VP Star Guardian Invasion: Onslaught",
+	"1000": "OC Project: Hunters",
 	"1010": "SR Snow ARURF",
-	"1020": "SR One for All"
+	"1020": "SR One for All",
+	"1200": "NB Nexus Blitz"
 };
 const RANK_ORDER = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "CHALLENGER"];
 const RANK_COLOR = [[153, 51, 0], [179, 179, 179], [255, 214, 51], [0, 255, 152], [179, 240, 255], [255, 153, 255], [255, 0, 0]];
