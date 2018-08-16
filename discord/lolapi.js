@@ -112,18 +112,37 @@ module.exports = class LOLAPI {
 		UTILS.output("STATIC CHAMPIONS: " + region);
 		return this.get(region, "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" }, this.CONFIG.API_CACHETIME.STATIC_CHAMPIONS, this.CONFIG.API_CACHETIME.STATIC_CHAMPIONS);
 	}
-	getStaticChampionsNew(region) {
+	getStaticChampionsNew(region, locale = "en_US") {
 		UTILS.output("STATIC CHAMPIONS: " + region);
 		return new Promise((resolve, reject) => {
 			this.getStatic("realms/" + region + ".json").then(realm => {
-				this.getStatic("cdn/" + realm.v + "/data/en_US/champion.json")
+				this.getStatic("cdn/" + realm.v + "/data/" + locale + "/champion.json").then(cd => {//champion data
+					for (let b in cd.data) {
+						cd.data[cd.data[b].key] = cd.data[b];//add key as duplicate of data
+						delete cd.data[b];//delete original
+					}
+					resolve(cd);
+				}).catch(reject);
 			}).catch(reject);
-			this.get(region, "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" }, this.CONFIG.API_CACHETIME.STATIC_CHAMPIONS, this.CONFIG.API_CACHETIME.STATIC_CHAMPIONS);
 		});
 	}
 	getStaticSummonerSpells(region) {
 		UTILS.output("STATIC SPELLS: " + region);
 		return this.get(region, "static-data/v3/summoner-spells", { locale: "en_US", dataById: true, spellListData: "all", tags: "all" }, this.CONFIG.API_CACHETIME.STATIC_SPELLS, this.CONFIG.API_CACHETIME.STATIC_SPELLS);
+	}
+	getStaticSummonerSpellsNew(region) {
+		UTILS.output("STATIC SPELLS: " + region);
+		return new Promise((resolve, reject) => {
+			this.getStatic("realms/" + region + ".json").then(realm => {
+				then.getStatic("cdn/" + realm.v + "/data/" + locale + "/summoner.json").then(sd => {//spell data
+					for (let b in sd.data) {
+						sd.data[sd.data[b].key] = sd.data[b];//add key as duplicate of data
+						delete sd.data[b];//delete original
+					}
+					resolve(sd);
+				}).catch(reject);
+			}).catch(reject);
+		});
 	}
 	getSummonerIDFromName(region, username, maxage) {
 		return this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage);
