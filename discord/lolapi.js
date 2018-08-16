@@ -108,7 +108,23 @@ module.exports = class LOLAPI {
 			});
 		});
 	}
-	//get(path, options) {}
+	getStaticChampions(region) {
+		UTILS.output("STATIC CHAMPIONS: " + region);
+		return this.get(region, "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" }, this.CONFIG.API_CACHETIME.STATIC_CHAMPIONS, this.CONFIG.API_CACHETIME.STATIC_CHAMPIONS);
+	}
+	getStaticChampionsNew(region) {
+		UTILS.output("STATIC CHAMPIONS: " + region);
+		return new Promise((resolve, reject) => {
+			this.getStatic("realms/" + region + ".json").then(realm => {
+				this.getStatic("cdn/" + realm.v + "/data/en_US/champion.json")
+			}).catch(reject);
+			this.get(region, "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" }, this.CONFIG.API_CACHETIME.STATIC_CHAMPIONS, this.CONFIG.API_CACHETIME.STATIC_CHAMPIONS);
+		});
+	}
+	getStaticSummonerSpells(region) {
+		UTILS.output("STATIC SPELLS: " + region);
+		return this.get(region, "static-data/v3/summoner-spells", { locale: "en_US", dataById: true, spellListData: "all", tags: "all" }, this.CONFIG.API_CACHETIME.STATIC_SPELLS, this.CONFIG.API_CACHETIME.STATIC_SPELLS);
+	}
 	getSummonerIDFromName(region, username, maxage) {
 		return this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage);
 	}
@@ -159,14 +175,6 @@ module.exports = class LOLAPI {
 		let requests = [];
 		for (let i in summonerIDs) requests.push(that.getChampionMastery(region, summonerIDs[i], maxage));
 		return Promise.all(requests);
-	}
-	getStaticChampions(region) {
-		UTILS.output("STATIC CHAMPIONS: " + region);
-		return this.get(region, "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" }, this.CONFIG.API_CACHETIME.STATIC_CHAMPIONS, this.CONFIG.API_CACHETIME.STATIC_CHAMPIONS);
-	}
-	getStaticSummonerSpells(region) {
-		UTILS.output("STATIC SPELLS: " + region);
-		return this.get(region, "static-data/v3/summoner-spells", { locale: "en_US", dataById: true, spellListData: "all", tags: "all" }, this.CONFIG.API_CACHETIME.STATIC_SPELLS, this.CONFIG.API_CACHETIME.STATIC_SPELLS);
 	}
 	getRecentGames(region, accountID, maxage) {
 		return this.get(region, "match/v3/matchlists/by-account/" + accountID, { endIndex: 20 }, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage);
