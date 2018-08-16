@@ -531,7 +531,7 @@ module.exports = class EmbedGenerator {
 				if (streak_result == results[j]) streak_count++;
 				else break;
 			}
-			individual_description += (streak_count + "").padStart(2, " ") + (streak_result ? "Ws " : "Ls ");//streak information
+			individual_description += (streak_count + "").padStart(3, " ") + (streak_result ? "Ws " : "Ls ");//streak information
 			const total_wins = results.reduce((total, increment) => total + (increment ? 1 : 0), 0) + "";
 			const total_losses = results.reduce((total, increment) => total + (increment ? 0 : 1), 0) + "";
 			individual_description += total_wins.padStart(2, " ") + "W/" + total_losses.padStart(2, " ") + "L ";//20 game W/L record
