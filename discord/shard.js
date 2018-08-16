@@ -81,9 +81,9 @@ function loadAllStaticResources(callback = () => {}) {
 		CONFIG.STATIC = result;
 		let temp_regions = [];
 		for (let i in CONFIG.REGIONS) temp_regions.push(CONFIG.REGIONS[i]);
-		Promise.all(temp_regions.map(tr => LOLAPI.getStaticChampions(tr))).then(results => {
+		Promise.all(temp_regions.map(tr => LOLAPI.getStaticChampionsNew(tr))).then(results => {
 			CONFIG.STATIC.CHAMPIONS = results[0].data;
-			LOLAPI.getStaticSummonerSpells("na1").then(result => {
+			LOLAPI.getStaticSummonerSpellsNew("na1").then(result => {
 				CONFIG.STATIC.SUMMONERSPELLS = result.data;
 				for (let b in CONFIG.STATIC.CHAMPIONS) CONFIG.STATIC.CHAMPIONS[b].emoji = CONFIG.STATIC.CHAMPIONS[b].name;
 				UTILS.output("API STATIC RESOURCES LOADED");

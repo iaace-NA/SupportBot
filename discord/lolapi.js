@@ -115,7 +115,7 @@ module.exports = class LOLAPI {
 	getStaticChampionsNew(region, locale = "en_US") {
 		UTILS.output("STATIC CHAMPIONS: " + region);
 		return new Promise((resolve, reject) => {
-			this.getStatic("realms/" + region + ".json").then(realm => {
+			this.getStatic("realms/" + this.CONFIG.REGIONS_REVERSE[region].toLowerCase() + ".json").then(realm => {
 				this.getStatic("cdn/" + realm.v + "/data/" + locale + "/champion.json").then(cd => {//champion data
 					for (let b in cd.data) {
 						cd.data[cd.data[b].key] = cd.data[b];//add key as duplicate of data
@@ -133,7 +133,7 @@ module.exports = class LOLAPI {
 	getStaticSummonerSpellsNew(region) {
 		UTILS.output("STATIC SPELLS: " + region);
 		return new Promise((resolve, reject) => {
-			this.getStatic("realms/" + region + ".json").then(realm => {
+			this.getStatic("realms/" + this.CONFIG.REGIONS_REVERSE[region].toLowerCase() + ".json").then(realm => {
 				then.getStatic("cdn/" + realm.v + "/data/" + locale + "/summoner.json").then(sd => {//spell data
 					for (let b in sd.data) {
 						sd.data[sd.data[b].key] = sd.data[b];//add key as duplicate of data
