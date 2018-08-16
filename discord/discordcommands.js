@@ -275,21 +275,21 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 			replyEmbed(embedgenerator.status(status_object));
 		}).catch(console.error);
 	});
-	commandGuessUsername([""], false, (region, username, parameter) => {
+	commandGuessUsername([""], false, (region, username, parameter, guess_method) => {
 		lolapi.getSummonerCard(region, username).then(result => {
 			replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter, result[3], result[4]));
 		}).catch(e => {
 			if (UTILS.exists(e)) console.error(e);
-			reply(":x: No results for `" + username + "`. Please revise your request.");
+			reply(":x: No results for `" + username + "`." + suggestLink(guess_method));
 		});
 	});
-	commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter) => {
+	commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter, guess_method) => {
 		request_profiler.mark("mh command recognized");
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.MH.SUMMONER_ID).then(result => {
 			result.region = region;
-			if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`.");
+			if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
 			lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.MH.RECENT_GAMES).then(matchhistory => {
-				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`.");
+				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`." + suggestLink(guess_method));
 				lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m =>  m.gameId), CONFIG.API_MAXAGE.MH.MULTIPLE_MATCH).then(matches => {
 					request_profiler.begin("generating embed");
 					const answer = embedgenerator.match(CONFIG, result, matchhistory.matches, matches);
@@ -343,15 +343,15 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {//new
+	commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter, guess_method) => {//new
 		request_profiler.mark("lg command recognized");
 		//reply(":warning:We are processing the latest information for your command: if this message does not update within 5 minutes, try the same command again. Thank you for your patience.", nMsg => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.LG.SUMMONER_ID).then(result => {
 			result.region = region;
 			result.guess = username;
-			if (!UTILS.exists(result.id)) return reply(":x: No username found for `" + username + "`.");
+			if (!UTILS.exists(result.id)) return reply(":x: No username found for `" + username + "`." + suggestLink(guess_method));
 			lolapi.getLiveMatch(region, result.id, CONFIG.API_MAXAGE.LG.LIVE_MATCH).then(match => {
-				if (UTILS.exists(match.status)) return reply(":x: No current matches found for `" + username + "`.");
+				if (UTILS.exists(match.status)) return reply(":x: No current matches found for `" + username + "`." + suggestLink(guess_method));
 				lolapi.getMultipleSummonerFromSummonerID(region, match.participants.map(p => p.summonerId), CONFIG.API_MAXAGE.LG.OTHER_SUMMONER_ID).then(pSA => {//participant summoner array
 					lolapi.getMultipleRecentGames(region, pSA.map(pS => pS.accountId), CONFIG.API_MAXAGE.LG.RECENT_GAMES).then(mhA => {//matchhistory array
 						let mIDA = [];//match id array;
@@ -377,14 +377,14 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 		}).catch(console.error);
 		//});
 	});
-	commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number) => {
+	commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number, guess_method) => {
 		request_profiler.mark("dmh command recognized");
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.DMH.SUMMONER_ID).then(result => {
 			result.region = region;
 			result.guess = username;
-			if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`.");
+			if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
 			lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.DMH.RECENT_GAMES).then(matchhistory => {
-				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply(":x: No recent matches found for `" + username + "`.");
+				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
 				if (number < 1 || number > 20 || !UTILS.exists(matchhistory.matches[number - 1])) return reply(":x: This number is out of range.");
 				lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId, CONFIG.API_MAXAGE.DMH.MATCH_INFORMATION).then(match => {
 					const pIDA = match.participantIdentities.map(pI => {
@@ -476,19 +476,24 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 	function commandGuessUsername(trigger_array,//array of command aliases, prefix needs to be included
 		elevated_permissions,//requires owner permissions
 		callback) {//optional callback only if successful
-		//returns (region, username, parameter)
+		/*returns (region, username, parameter, username guess method)
+		username guess method 0: username provided
+		username guess method 1: shortcut provided
+		username guess method 2: link
+		username guess method 3: discord username
+		*/
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			try {//username provided
 				const region = assertRegion(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
 				if (parameter.substring(parameter.indexOf(" ") + 1).length < 35) {
 					if (parameter.substring(parameter.indexOf(" ") + 1)[0] == "$") {
 						lolapi.getShortcut(msg.author.id, parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)).then(result => {
-							callback(region, result[parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)], parameter.substring(0, parameter.indexOf(" ")));
+							callback(region, result[parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)], parameter.substring(0, parameter.indexOf(" ")), 1);
 						}).catch(e => {
 							if (e) reply(":x: An error has occurred. The shortcut may not exist.");
 						});
 					}
-					else callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")));
+					else callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")), 0);
 				}
 			}
 			catch (e) {//username not provided
@@ -496,8 +501,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 					const region = assertRegion(parameter, false);
 					lolapi.getLink(msg.author.id).then(result => {
 						let username = msg.author.username;//suppose the link doesn't exist in the database
-						if (UTILS.exists(result.username) && result.username != "") username = result.username;//link exists
-						callback(region, username, parameter);
+						if (UTILS.exists(result.username) && result.username != "") {
+							username = result.username;//link exists
+							callback(region, username, parameter, 2);
+						}
+						else callback(region, username, parameter, 3);
 					}).catch(console.error);
 				}
 				catch (e) { }
@@ -508,7 +516,12 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 	function commandGuessUsernameNumber(trigger_array,//array of command aliases, prefix needs to be included
 		elevated_permissions,//requires owner permissions
 		callback) {//optional callback only if successful
-		//returns (region, username, number)
+		/*returns (region, username, number, username guess method)
+		username guess method 0: username provided
+		username guess method 1: shortcut provided
+		username guess method 2: link
+		username guess method 3: discord username
+		*/
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			const number = parseInt(parameter.substring(0, parameter.indexOf(" ")));
 			if (isNaN(number)) return;
@@ -517,12 +530,12 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) {
 					if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1)[0] == "$") {
 						lolapi.getShortcut(msg.author.id, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)).then(result => {
-							callback(region, result[parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)], number);
+							callback(region, result[parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)], number, 1);
 						}).catch(e => {
 							if (e) reply(":x: An error has occurred. The shortcut may not exist.");
 						});
 					}
-					else callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number);
+					else callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number, 0);
 				}
 			}
 			catch (e) {//username not provided
@@ -530,8 +543,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 					const region = assertRegion(parameter.substring(parameter.indexOf(" ") + 1), false);
 					lolapi.getLink(msg.author.id).then(result => {
 						let username = msg.author.username;//suppose the link doesn't exist in the database
-						if (UTILS.exists(result.username) && result.username != "") username = result.username;//link exists
-						callback(region, username, number);
+						if (UTILS.exists(result.username) && result.username != "") {
+							username = result.username;//link exists
+							callback(region, username, number, 2);
+						}
+						else callback(region, username, number, 3);
 					}).catch(console.error);
 				}
 				catch (e) { }
@@ -618,6 +634,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel) {
 		else {
 			return CONFIG.REGIONS[test_string.toUpperCase()];
 		}
+	}
+	function suggestLink(guess_method) {
+		return guess_method === 3 ? " We tried using your discord username but could not find a summoner with the same name. Let us know what your LoL username is using `" + CONFIG.DISCORD_COMMAND_PREFIX + "link <region> <ign>` and we'll remember it for next time!" : "";
 	}
 	function shutdown() {
 		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x: Shutdown initiated.");
