@@ -566,7 +566,7 @@ module.exports = class EmbedGenerator {
 	}
 	fairTeam(CONFIG, region, summoners, ranks, masteries) {
 		function formatDescriptionString(team, side) {
-			return "\n**Min:** `" + team.min[side] + "` **Max:** `" + team.max[side] + "`\n**μ:** `" + UTILS.round(team.avg[side], 2) + "` **σ:** `" + UTILS.round(team.stdev[side], 2) + "`\n**Σ:** `" + team.sum[side] + "` **Δ:** `" + team.abs + "`";
+			return "\n**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.sum[side]) + "` **Δ:** `" + UTILS.numberWithCommas(team.abs) + "` **%Δ:** `" + UTILS.round((100 * team.abs) / (team.sum[0] + team.sum[1]), 1) + "`";
 		}
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Fair Team Generator");
