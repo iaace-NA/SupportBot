@@ -566,7 +566,10 @@ module.exports = class EmbedGenerator {
 	}
 	fairTeam(CONFIG, region, summoners, ranks, masteries) {
 		function formatDescriptionString(team, side) {
-			return "\n**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.diff[side]) + "` **Δ:** `" + UTILS.numberWithCommas(team.abs) + "` **%Δ:** `" + UTILS.round((100 * team.diff) / (team.sum[0] + team.sum[1]), 1) + "`";
+			return "**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.diff[side]) + "` **Δ:** `" + UTILS.numberWithCommas(team.abs) + "` **%Δ:** `" + UTILS.round((100 * team.diff) / (team.sum[0] + team.sum[1]), 1) + "`";
+		}
+		function formatDescriptionStringRanks(team, side) {
+			return "**Min:** `" + UTILS.iMMRtoEnglish(team.min[side]) + "` **Max:** `" + UTILS.iMMRtoEnglish(team.max[side]) + "`\n**μ:** `" + UTILS.iMMRtoEnglish(team.avg[side]) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "LP`\n**Σ:** `" + UTILS.round(team.diff[side], 0) + "LP` **Δ:** `" + team.abs + "LP` **%Δ:** `" + UTILS.round((100 * team.diff) / (team.sum[0] + team.sum[1]), 1) + "`";
 		}
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Fair Team Generator");
@@ -618,9 +621,25 @@ module.exports = class EmbedGenerator {
 		team_by_total_mastery_team_1_description += formatDescriptionString(team_by_total_mastery[team_by_total_mastery_best], 1);
 		newEmbed.addField("By Experience", team_by_total_mastery_team_0_description, true);
 		newEmbed.addField("(Total Champion Mastery) id: " + team_by_total_mastery_best, team_by_total_mastery_team_1_description, true);
+		newEmbed.addBlankField(false);
+
+		let team_by_all_ranks = [];//array of stats objects
+		for (let b in TEAM_COMBINATIONS) team_by_all_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], ranks.map(r => UTILS.averageUserMMR(r))));
+		const team_by_all_ranks_lowest_diff = mathjs.min(team_by_all_ranks.map(t => t.abs));
+		const team_by_all_ranks_best = team_by_all_ranks.findIndex(t => t.abs === team_by_all_ranks_lowest_diff);//team arrangement index
+		let team_by_all_ranks_team_0_description = "**__Team " + (team_by_all_ranks[team_by_all_ranks_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
+		let team_by_all_ranks_team_1_description = "**__Team " + (team_by_all_ranks[team_by_all_ranks_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
+		for (let i = 0; i < TEAM_COMBINATIONS[team_by_all_ranks_best].length; ++i) {
+			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` " + summoners[i].name + "\n";
+			TEAM_COMBINATIONS[team_by_all_ranks_best][i] === "0" ? team_by_all_ranks_team_0_description += individual_description : team_by_all_ranks_team_1_description += individual_description;
+		}
+		team_by_all_ranks_team_0_description += formatDescriptionStringRanks(team_by_all_ranks[team_by_all_ranks_best], 0);
+		team_by_all_ranks_team_1_description += formatDescriptionStringRanks(team_by_all_ranks[team_by_all_ranks_best], 1);
+		newEmbed.addField("By Experience", team_by_all_ranks_team_0_description, true);
+		newEmbed.addField("(Total Champion Mastery) id: " + team_by_all_ranks_best, team_by_all_ranks_team_1_description, true);
+		newEmbed.addField("By Skill", , true);
+		newEmbed.addField("(All Ranks)", , true);
 		/*
-		newEmbed.addField("By Skill (All Ranks) Team ", , true);
-		newEmbed.addField("Team ", , true);
 		newEmbed.addField("By Skill (Summoner's Rift Ranks) Team ", , true);
 		newEmbed.addField("Team ", , true);
 
