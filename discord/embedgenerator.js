@@ -585,7 +585,8 @@ module.exports = class EmbedGenerator {
 		team_by_level_team_0_description += formatDescriptionString(team_by_level[team_by_level_best], 0);
 		team_by_level_team_1_description += formatDescriptionString(team_by_level[team_by_level_best], 1);
 		newEmbed.addField("By Experience", team_by_level_team_0_description, true);
-		newEmbed.addField("(Level)", team_by_level_team_1_description, false);
+		newEmbed.addField("(Level)", team_by_level_team_1_description, true);
+		newEmbed.addBlankField(false);
 
 		let team_by_highest_mastery = [];//array of stats objects
 		for (let b in TEAM_COMBINATIONS) team_by_highest_mastery.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], masteries.map(m => (m[0].championPoints || 0))));
