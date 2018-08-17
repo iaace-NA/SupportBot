@@ -572,8 +572,8 @@ module.exports = class EmbedGenerator {
 		for (let b in TEAM_COMBINATIONS) team_by_level.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], summoners.map(s => s.summonerLevel)));
 		const team_by_level_lowest_diff = mathjs.min(team_by_level.map(t => t.abs));
 		const team_by_level_best = team_by_level.findIndex(t => t.diff === team_by_level_lowest_diff);//team arrangement index
-		let team_by_level_team_0_description = "Team " + (team_by_level[team_by_level_best].diff > 0 ? "Purple" : "Blue");
-		let team_by_level_team_1_description = "Team " + (team_by_level[team_by_level_best].diff > 0 ? "Blue" : "Purple");
+		let team_by_level_team_0_description = "**__Team " + (team_by_level[team_by_level_best].diff > 0 ? "Purple" : "Blue") + "__**\n";
+		let team_by_level_team_1_description = "**__Team " + (team_by_level[team_by_level_best].diff > 0 ? "Blue" : "Purple") + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_level_best].length; ++i) {
 			const individual_description = "`" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
 			TEAM_COMBINATIONS[team_by_level_best][i] === "0" ? team_by_level_team_0_description += individual_description : team_by_level_team_1_description += individual_description;
