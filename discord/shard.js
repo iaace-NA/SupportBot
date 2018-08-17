@@ -97,9 +97,7 @@ setInterval(() => {//long term maintenance loop
 	loadAllStaticResources();
 	wsapi.getUserBans();
 	wsapi.getServerBans();
-	if (process.env.SHARD_ID == 0) {//stuff that only 1 shard needs to do
-		setStatus();
-	}
+	setStatus();
 }, 60000 * 15);
 function allEmojis() {
 	let all_emojis = [];//collects all emojis from emoji servers
