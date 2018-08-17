@@ -6,6 +6,7 @@ League of Legends Statistics for Discord
 ## Dependencies
 - mongodb 3.x
 ## npm Dependencies
+- pm2 (global)
 - discord.js 11.3.2
 - mongoose 5.0.0-rc1
 - request 2.83.0
