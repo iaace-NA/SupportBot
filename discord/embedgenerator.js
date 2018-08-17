@@ -565,26 +565,43 @@ module.exports = class EmbedGenerator {
 		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
 	}
 	fairTeam(CONFIG, region, summoners, ranks, masteries) {
+		function formatDescriptionString(team, side) {
+			return "\n**Min:** `" + team.min[side] + "` **Max:** `" + team.max[side] + "`\n**μ:** `" + UTILS.round(team.avg[side], 2) + "` **σ:** `" + UTILS.round(team.stdev[side], 2) + "`\n**Σ:** `" + team.sum[side] + "` **Δ:** `" + team.abs + "`";
+		}
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Fair Team Generator");
 		const TEAM_COMBINATIONS = UTILS.generateTeams(summoners);//array of binary team arrangements
+
 		let team_by_level = [];//array of stats objects
-		for (let b in TEAM_COMBINATIONS) team_by_level.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], summoners.map(s => s.summonerLevel)));
+		for (let b in TEAM_COMBINATIONS) team_by_level.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], masteries.map(m => (m[0].championPoints || 0))));
 		const team_by_level_lowest_diff = mathjs.min(team_by_level.map(t => t.abs));
 		const team_by_level_best = team_by_level.findIndex(t => t.diff === team_by_level_lowest_diff);//team arrangement index
 		let team_by_level_team_0_description = "**__Team " + (team_by_level[team_by_level_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_level_team_1_description = "**__Team " + (team_by_level[team_by_level_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_level_best].length; ++i) {
-			const individual_description = "`" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
+			const individual_description = CONFIG.STATIC.CHAPMIONS[masteries[i][0].championId].emoji + "`" + UTILS.gold(masteries[i][0].championPoints) + "` " + summoners[i].name + "\n";
 			TEAM_COMBINATIONS[team_by_level_best][i] === "0" ? team_by_level_team_0_description += individual_description : team_by_level_team_1_description += individual_description;
 		}
-		team_by_level_team_0_description += "\n**Min:** `" + team_by_level[team_by_level_best].min[0] + "` **Max:** `" + team_by_level[team_by_level_best].max[0] + "`\n**μ:** `" + UTILS.round(team_by_level[team_by_level_best].avg[0], 2) + "` **σ:** `" + UTILS.round(team_by_level[team_by_level_best].stdev[0], 2) + "`\n**Σ:** `" + team_by_level[team_by_level_best].sum[0] + "` **Δ:** `" + team_by_level[team_by_level_best].abs + "`";
-		team_by_level_team_1_description += "\n**Min:** `" + team_by_level[team_by_level_best].min[1] + "` **Max:** `" + team_by_level[team_by_level_best].max[1] + "`\n**μ:** `" + UTILS.round(team_by_level[team_by_level_best].avg[1], 2) + "` **σ:** `" + UTILS.round(team_by_level[team_by_level_best].stdev[1], 2) + "`\n**Σ:** `" + team_by_level[team_by_level_best].sum[1] + "` **Δ:** `" + team_by_level[team_by_level_best].abs + "`";
+		team_by_level_team_0_description += formatDescriptionString(team_by_level[team_by_level_best], 0);
+		team_by_level_team_1_description += formatDescriptionString(team_by_level[team_by_level_best], 1);
 		newEmbed.addField("By Experience", team_by_level_team_0_description, true);
 		newEmbed.addField("(Level)", team_by_level_team_1_description, true);
+
+		let team_by_highest_mastery = [];//array of stats objects
+		for (let b in TEAM_COMBINATIONS) team_by_highest_mastery.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], summoners.map(s => s.summonerLevel)));
+		const team_by_highest_mastery_lowest_diff = mathjs.min(team_by_highest_mastery.map(t => t.abs));
+		const team_by_highest_mastery_best = team_by_highest_mastery.findIndex(t => t.diff === team_by_highest_mastery_lowest_diff);//team arrangement index
+		let team_by_highest_mastery_team_0_description = "**__Team " + (team_by_highest_mastery[team_by_highest_mastery_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
+		let team_by_highest_mastery_team_1_description = "**__Team " + (team_by_highest_mastery[team_by_highest_mastery_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
+		for (let i = 0; i < TEAM_COMBINATIONS[team_by_highest_mastery_best].length; ++i) {
+			const individual_description = "`" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
+			TEAM_COMBINATIONS[team_by_highest_mastery_best][i] === "0" ? team_by_highest_mastery_team_0_description += individual_description : team_by_highest_mastery_team_1_description += individual_description;
+		}
+		team_by_highest_mastery_team_0_description += formatDescriptionString(team_by_highest_mastery[team_by_highest_mastery_best], 0);
+		team_by_highest_mastery_team_1_description += formatDescriptionString(team_by_highest_mastery[team_by_highest_mastery_best], 1);
+		newEmbed.addField("By Experience", team_by_highest_mastery_team_0_description, true);
+		newEmbed.addField("(Highest Mastery Champion)", team_by_highest_mastery_team_1_description, true);
 		/*
-		newEmbed.addField("By Experience (Highest Mastery Champion) Team ", , true);
-		newEmbed.addField("Team ", , true);
 		newEmbed.addField("By Experience (Total Champion Mastery) Team ", , true);
 		newEmbed.addField("Team ", , true);
 		newEmbed.addField("By Skill (All Ranks) Team ", , true);
