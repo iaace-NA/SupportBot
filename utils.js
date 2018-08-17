@@ -1,9 +1,13 @@
 "use strict";
 let ta = require("./timeago.js");
 let seq = require("./promise-sequential.js");
+let mathjs = require("mathjs")
 String.prototype.replaceAll = function(search, replacement) {
 	let target = this;
 	return target.replace(new RegExp(search, 'g'), replacement);
+}
+String.prototype.count = function(search) {
+	return (this.match(new RegExp(search, "g")) || []).length;
 }
 Number.prototype.pad = function(size) {
 	let s = String(this);
@@ -160,11 +164,12 @@ module.exports = class UTILS {
 	}
 	shortRank(info) {
 		//****** unranked
+		//XXXXXX unranked
 		//██████ unranked
 		//G↑W--- Gold promotion, 1 win
 		//G2 +00 Gold 2, 0 LP
 		//G2 +56 Gold 2, 56LP
-		//G2↑ L_ Gold 2 promotion, 1 loss
+		//G2↑ L- Gold 2 promotion, 1 loss
 		//C +256 Challenger, 256LP
 		//C+1256 Challenger 1256 LP
 		if (!this.exists(info)) return "******";
@@ -345,5 +350,60 @@ module.exports = class UTILS {
 		else if (MEMBER.hasPermission(["KICK_MEMBERS", "MANAGE_MESSAGES"])) return CONFIG.CONSTANTS.MODERATORS;
 		else if (this.exists(MEMBER.roles.find(r => r.name.toLowerCase() === "bot commander"))) return CONFIG.CONSTANTS.BOTCOMMANDERS;
 		else return CONFIG.CONSTANTS.NORMALMEMBERS;
+	}
+	generateTeams(summoners) {//generates all possible teams
+		/*summoners is an array of summoner objects from the API
+		summoners = [{
+			"profileIconId": 1110,
+			"name": "iaace",
+			"summonerLevel": 137,
+			"accountId": 49022274,
+			"id": 34565662,
+			"revisionDate": 1534387647000
+		}]
+		00000 00000: 0: invalid
+		00000 11111: 31: valid
+		00001 00000: 32: invalid
+		11111 00000: 992: valid
+		11111 00001: 993: invalid
+		team 0 is always the larger team
+		*/
+		let combinations = [];
+		let min_team_size = Math.trunc(summoners.length / 2);
+		let max_team_size = Math.ceil(summoners.length / 2);
+		for (let i = 0; i < Math.pow(2, summoners.length); ++i) {
+			const candidate = i.toString(2).padStart(summoners.length, "0");
+			if (candidate.count("1") == min_team_size) combinations.push(candidate);
+		}
+		return min_team_size === max_team_size ? combinations.slice(0, combinations.length / 2) : combinations;
+	}
+	calculateTeamStatistics(team, data) {
+		/*
+		team = "1100010011"
+		data = []
+		*/
+		let temp = {
+			raw: [[], []],//raw values
+			min: [[], []],//minimum values
+			max: [[], []],//maximum values
+			averages: [0, 0],//team averages
+			stdev: [0, 0],//standard deviation
+			sum: [0, 0],//team_0 sum, team_1 sum
+			diff: 0,//absolute difference of sum
+			abs: 0//team 0 - team 1
+		}
+		for (let i = 0; i < team.length; ++i) {
+			temp.sum[parseInt(team[i])] += data[i];
+			temp.raw[parseInt(team[i])].push(data[i]);
+		}
+		for (let t = 0; t < team.length; ++t) {
+			temp.min[t] = mathjs.min(temp.raw[t]);
+			temp.max[t] = mathjs.max(temp.raw[t]);
+			temp.avg[t] = mathjs.mean(temp.raw[t]);
+			temp.stdev[t] = mathjs.std(temp.raw[t], "uncorrected");//σ: population standard deviation
+		}
+		temp.diff = temp.sum[0] - temp.sum[1];//team 0 - team 1
+		temp.abs = Math.abs(temp.sum[0] - temp.sum[1]);
+		return temp;
 	}
 }

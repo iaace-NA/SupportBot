@@ -1,6 +1,7 @@
 "use strict";
 const Discord = require("discord.js");
 const UTILS = new (require("../utils.js"))();
+const mathjs = require("mathjs");
 const queues = {
 	"0": "Custom",
 	"70": "SR One for All",
@@ -562,6 +563,40 @@ module.exports = class EmbedGenerator {
 		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
 		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
 		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
+	}
+	fairTeam(CONFIG, region, summoners, ranks, masteries) {
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setTitle("Fair Team Generator");
+		const TEAM_COMBINATIONS = UTILS.generateTeams(summoners);//array of binary team arrangements
+		let team_by_level = [];//array of stats objects
+		for (let b in TEAM_COMBINATIONS) team_by_level.push(UTILS.calculateTeamStatistics(TEAM_COMBINATIONS[b], summoners.map(s => s.summonerLevel)));
+		const team_by_level_lowest_diff = mathjs.min(team_by_level.map(t => t.diff));
+		const team_by_level_best = team_by_level.findIndex(t => t.diff === team_by_level_lowest_diff);//team arrangement index
+		let team_by_level_team_0_description = "";
+		let team_by_level_team_1_description = "";
+		for (let i = 0; i < TEAM_COMBINATIONS[team_by_level_best].length; ++i) {
+			const individual_description = "`" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
+			TEAM_COMBINATIONS[team_by_level_best][i] === "0" ? team_by_level_team_0_description += individual_description : team_by_level_team_1_description += individual_description;
+		}
+		team_by_level_team_0_description += "Min"
+		newEmbed.addField("By Experience (Level) Team " + team_by_level[team_by_level_best].diff > 0 ? "Purple" : "Blue", team_by_level_team_0_description, true);
+		newEmbed.addField("Team " + team_by_level[team_by_level_best].diff > 0 ? "Blue" : "Purple", team_by_level_team_1_description, true);
+		/*
+		newEmbed.addField("By Experience (Highest Mastery Champion) Team ", , true);
+		newEmbed.addField("Team ", , true);
+		newEmbed.addField("By Experience (Total Champion Mastery) Team ", , true);
+		newEmbed.addField("Team ", , true);
+		newEmbed.addField("By Skill (All Ranks) Team ", , true);
+		newEmbed.addField("Team ", , true);
+		newEmbed.addField("By Skill (Summoner's Rift Ranks) Team ", , true);
+		newEmbed.addField("Team ", , true);
+
+		if (summoners.length <= 6) {
+			newEmbed.addField("By Skill (Twisted Treeline Ranks) Team ", , true);
+			newEmbed.addField("Team ", , true);
+		}
+		newEmbed.addField("Random", , true);*/
+		return newEmbed;
 	}
 	serverBan(CONFIG, server, reason, date, issuer_tag, issuer_avatarURL) {
 		let newEmbed = new Discord.RichEmbed();

@@ -344,6 +344,49 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, ACCESS_LEV
 			}).catch(console.error);
 		}).catch(console.error);
 	});
+	command(["fairteamgenerator ", "teamgenerator ", "tg ", "ftg "], true, false, (original, index, parameter) => {
+		request_profiler.mark("ftg command recognized");
+		request_profiler.begin("parsing usernames");
+		let region = assert_region(parameter.substring(0, parameter.indexOf(" ")), index < 2);
+		let pre_usernames;
+		if (parameter.indexOf("\n") != -1) pre_usernames = UTILS.presentLobby(parameter.substring(parameter.indexOf(" ") + 1).split("\n"));//lobby text formatting
+		else if (parameter.indexOf(",") != -1) pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => s.trim());//CSV
+		else pre_usernames = [parameter.substring(parameter.indexOf(" ") + 1)];//single username
+		if (pre_usernames.length > 10) {
+			reply(":warning: There are too many usernames to get data for. Only the first 10 results will be displayed.");
+			pre_usernames = pre_usernames.slice(0, 10);
+		}
+		if (pre_usernames.length < 1) return reply(":x: There are not enough usernames to get data for.");
+		request_profiler.end("parsing usernames");
+		UTILS.debug(request_profiler.endAll());
+		Promise.all(pre_usernames.map(u => {
+			return new Promise((resolve, reject) => {
+				if (u[0] !== "$") resolve(u);
+				else {
+					lolapi.getShortcut(msg.author.id, u.substring(1)).then(result => {
+						resolve(result[u.substring(1)]);
+					}).catch(result => {
+						resolve(u.substring(1));
+					});
+				}
+			});
+		})).then(usernames => {
+			lolapi.getMultipleSummonerIDFromName(region, usernames, CONFIG.API_MAXAGE.MULTI.MULTIPLE_SUMMONER_ID).then(summoners => {
+				const ids = summoners.map(s => s.id);
+				lolapi.getMultipleRanks(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_RANKS).then(ranks => {
+					lolapi.getMultipleChampionMastery(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_MASTERIES).then(masteries => {
+						lolapi.getMultipleRecentGames(region, summoners.map(s => s.accountId), CONFIG.API_MAXAGE.MULTI.MULTIPLE_RECENT_GAMES).then(mhA => {
+							let mIDA = [];//match id array;
+							for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
+							lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.MULTI.MULTIPLE_MATCH).then(matches => {
+								reply_embed(embedgenerator.multiSummoner(CONFIG, CONFIG.REGIONS_REVERSE[region], summoners, ranks, masteries, mhA, matches));
+							}).catch(console.error);
+						}).catch(console.error);
+					}).catch(console.error);
+				}).catch(console.error);
+			}).catch(console.error);
+		}).catch(console.error);
+	});
 	commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {//new
 		request_profiler.mark("lg command recognized");
 		//reply(":warning:We are processing the latest information for your command: if this message does not update within 5 minutes, try the same command again. Thank you for your patience.", nMsg => {
