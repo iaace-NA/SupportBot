@@ -1,7 +1,6 @@
 "use strict";
 let ta = require("./timeago.js");
 let seq = require("./promise-sequential.js");
-let mathjs = require("mathjs")
 String.prototype.replaceAll = function(search, replacement) {
 	let target = this;
 	return target.replace(new RegExp(search, 'g'), replacement);
@@ -377,7 +376,7 @@ module.exports = class UTILS {
 		}
 		return min_team_size === max_team_size ? combinations.slice(0, combinations.length / 2) : combinations;
 	}
-	calculateTeamStatistics(team, data) {
+	calculateTeamStatistics(mathjs, team, data) {
 		/*
 		team = "1100010011"
 		data = []
