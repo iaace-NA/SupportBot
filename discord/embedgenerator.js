@@ -602,9 +602,23 @@ module.exports = class EmbedGenerator {
 		team_by_highest_mastery_team_1_description += formatDescriptionString(team_by_highest_mastery[team_by_highest_mastery_best], 1);
 		newEmbed.addField("By Experience", team_by_highest_mastery_team_0_description, true);
 		newEmbed.addField("(Highest Mastery Champion)", team_by_highest_mastery_team_1_description, true);
+		newEmbed.addBlankField(false);
+
+		let team_by_total_mastery = [];//array of stats objects
+		for (let b in TEAM_COMBINATIONS) team_by_total_mastery.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], masteries.map(m => m.reduce((total, increment) => total + increment.championPoints, 0))));
+		const team_by_total_mastery_lowest_diff = mathjs.min(team_by_total_mastery.map(t => t.abs));
+		const team_by_total_mastery_best = team_by_total_mastery.findIndex(t => t.diff === team_by_total_mastery_lowest_diff);//team arrangement index
+		let team_by_total_mastery_team_0_description = "**__Team " + (team_by_total_mastery[team_by_total_mastery_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
+		let team_by_total_mastery_team_1_description = "**__Team " + (team_by_total_mastery[team_by_total_mastery_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
+		for (let i = 0; i < TEAM_COMBINATIONS[team_by_total_mastery_best].length; ++i) {
+			const individual_description = "`" + UTILS.gold(masteries[i].reduce((total, increment) => total + increment.championPoints, 0)) + "` " + summoners[i].name + "\n";
+			TEAM_COMBINATIONS[team_by_total_mastery_best][i] === "0" ? team_by_total_mastery_team_0_description += individual_description : team_by_total_mastery_team_1_description += individual_description;
+		}
+		team_by_total_mastery_team_0_description += formatDescriptionString(team_by_total_mastery[team_by_total_mastery_best], 0);
+		team_by_total_mastery_team_1_description += formatDescriptionString(team_by_total_mastery[team_by_total_mastery_best], 1);
+		newEmbed.addField("By Experience", team_by_total_mastery_team_0_description, true);
+		newEmbed.addField("(Total Champion Mastery)", team_by_total_mastery_team_1_description, true);
 		/*
-		newEmbed.addField("By Experience (Total Champion Mastery) Team ", , true);
-		newEmbed.addField("Team ", , true);
 		newEmbed.addField("By Skill (All Ranks) Team ", , true);
 		newEmbed.addField("Team ", , true);
 		newEmbed.addField("By Skill (Summoner's Rift Ranks) Team ", , true);
