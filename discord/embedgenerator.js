@@ -570,7 +570,7 @@ module.exports = class EmbedGenerator {
 		const TEAM_COMBINATIONS = UTILS.generateTeams(summoners);//array of binary team arrangements
 		let team_by_level = [];//array of stats objects
 		for (let b in TEAM_COMBINATIONS) team_by_level.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], summoners.map(s => s.summonerLevel)));
-		const team_by_level_lowest_diff = mathjs.min(team_by_level.map(t => t.diff));
+		const team_by_level_lowest_diff = mathjs.min(team_by_level.map(t => t.abs));
 		const team_by_level_best = team_by_level.findIndex(t => t.diff === team_by_level_lowest_diff);//team arrangement index
 		let team_by_level_team_0_description = "";
 		let team_by_level_team_1_description = "";
