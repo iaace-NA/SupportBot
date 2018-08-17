@@ -585,7 +585,7 @@ module.exports = class EmbedGenerator {
 		team_by_level_team_0_description += formatDescriptionString(team_by_level[team_by_level_best], 0);
 		team_by_level_team_1_description += formatDescriptionString(team_by_level[team_by_level_best], 1);
 		newEmbed.addField("By Experience", team_by_level_team_0_description, true);
-		newEmbed.addField("(Level)", team_by_level_team_1_description, true);
+		newEmbed.addField("(Level) id: " + team_by_level_best, team_by_level_team_1_description, true);
 		newEmbed.addBlankField(false);
 
 		let team_by_highest_mastery = [];//array of stats objects
@@ -601,7 +601,7 @@ module.exports = class EmbedGenerator {
 		team_by_highest_mastery_team_0_description += formatDescriptionString(team_by_highest_mastery[team_by_highest_mastery_best], 0);
 		team_by_highest_mastery_team_1_description += formatDescriptionString(team_by_highest_mastery[team_by_highest_mastery_best], 1);
 		newEmbed.addField("By Experience", team_by_highest_mastery_team_0_description, true);
-		newEmbed.addField("(Highest Mastery Champion)", team_by_highest_mastery_team_1_description, true);
+		newEmbed.addField("(Highest Mastery Champion) id: " + team_by_highest_mastery_best, team_by_highest_mastery_team_1_description, true);
 		newEmbed.addBlankField(false);
 
 		let team_by_total_mastery = [];//array of stats objects
@@ -617,7 +617,7 @@ module.exports = class EmbedGenerator {
 		team_by_total_mastery_team_0_description += formatDescriptionString(team_by_total_mastery[team_by_total_mastery_best], 0);
 		team_by_total_mastery_team_1_description += formatDescriptionString(team_by_total_mastery[team_by_total_mastery_best], 1);
 		newEmbed.addField("By Experience", team_by_total_mastery_team_0_description, true);
-		newEmbed.addField("(Total Champion Mastery)", team_by_total_mastery_team_1_description, true);
+		newEmbed.addField("(Total Champion Mastery) id: " + team_by_total_mastery_best, team_by_total_mastery_team_1_description, true);
 		/*
 		newEmbed.addField("By Skill (All Ranks) Team ", , true);
 		newEmbed.addField("Team ", , true);
