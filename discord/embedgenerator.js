@@ -625,7 +625,13 @@ module.exports = class EmbedGenerator {
 
 		let team_by_all_ranks = [];//array of stats objects
 		let iMMR = [];
-		for (let i = 0; i < ranks.length; ++i) iMMR.push(UTILS.averageUserMMR(ranks[i]));
+		for (let i = 0; i < ranks.length; ++i) {
+			UTILS.debug("ranks[" + i + "] is " + JSON.stringify(ranks[i], null, "\t"));
+			UTILS.assert(UTILS.exists(ranks[i]));
+			UTILS.debug("iMMR[" + i + "] is " + UTILS.averageUserMMR(ranks[i]));
+			UTILS.assert(UTILS.exists(UTILS.averageUserMMR(ranks[i])))
+			iMMR.push(UTILS.averageUserMMR(ranks[i]));
+		}
 		UTILS.debug(JSON.stringify(iMMR, null, "\t"));
 		for (let b in TEAM_COMBINATIONS) team_by_all_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], iMMR));
 		const team_by_all_ranks_lowest_diff = mathjs.min(team_by_all_ranks.map(t => t.abs));
