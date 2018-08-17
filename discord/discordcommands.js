@@ -356,7 +356,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, ACCESS_LEV
 			reply(":warning: There are too many usernames to get data for. Only the first 10 results will be displayed.");
 			pre_usernames = pre_usernames.slice(0, 10);
 		}
-		if (pre_usernames.length < 1) return reply(":x: There are not enough usernames to get data for.");
+		if (pre_usernames.length < 3) return reply(":x: There are not enough usernames to get data for.");
 		request_profiler.end("parsing usernames");
 		request_profiler.begin("api requests");
 		Promise.all(pre_usernames.map(u => {
