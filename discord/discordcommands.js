@@ -358,7 +358,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, ACCESS_LEV
 		}
 		if (pre_usernames.length < 1) return reply(":x: There are not enough usernames to get data for.");
 		request_profiler.end("parsing usernames");
-		UTILS.debug(request_profiler.endAll());
+		request_profiler.begin("api requests");
 		Promise.all(pre_usernames.map(u => {
 			return new Promise((resolve, reject) => {
 				if (u[0] !== "$") resolve(u);
@@ -375,7 +375,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, ACCESS_LEV
 				const ids = summoners.map(s => s.id);
 				lolapi.getMultipleRanks(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_RANKS).then(ranks => {
 					lolapi.getMultipleChampionMastery(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_MASTERIES).then(masteries => {
+						request_profiler.end("api requests");
+						request_profiler.begin("generate embed");
 						reply_embed(embedgenerator.fairTeam(CONFIG, CONFIG.REGIONS_REVERSE[region], summoners, ranks, masteries));
+						request_profiler.end("generate embed");
+						UTILS.debug(request_profiler.endAll());
 					}).catch(console.error);
 				}).catch(console.error);
 			}).catch(console.error);
