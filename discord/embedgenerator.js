@@ -566,10 +566,10 @@ module.exports = class EmbedGenerator {
 	}
 	fairTeam(CONFIG, region, summoners, ranks, masteries) {
 		function formatDescriptionString(team, side) {
-			return "**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.diff) + "` **Δ:** `" + UTILS.numberWithCommas(team.abs) + "` **%Δ:** `" + UTILS.round((100 * team.diff) / (team.sum[0] + team.sum[1]), 1) + "`";
+			return "**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.sum[side]) + "` **Δ:** `" + UTILS.numberWithCommas(team.abs) + "` **%Δ:** `" + UTILS.round((100 * team.diff) / (team.sum[0] + team.sum[1]), 1) + "`";
 		}
 		function formatDescriptionStringRanks(team, side) {
-			return "**Min:** `" + UTILS.iMMRtoEnglish(team.min[side]) + "` **Max:** `" + UTILS.iMMRtoEnglish(team.max[side]) + "`\n**μ:** `" + UTILS.iMMRtoEnglish(team.avg[side]) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "LP`\n**Σ:** `" + UTILS.round(team.diff, 0) + "LP` **Δ:** `" + UTILS.round(team.abs, 0) + "LP` **%Δ:** `" + UTILS.round((100 * team.diff) / (team.sum[0] + team.sum[1]), 1) + "`";
+			return "**Min:** `" + UTILS.iMMRtoEnglish(team.min[side]) + "` **Max:** `" + UTILS.iMMRtoEnglish(team.max[side]) + "`\n**μ:** `" + UTILS.iMMRtoEnglish(team.avg[side]) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "LP`\n**Σ:** `" + UTILS.round(team.sum[side], 0) + "LP` **Δ:** `" + UTILS.round(team.abs, 0) + "LP` **%Δ:** `" + UTILS.round((100 * team.diff) / (team.sum[0] + team.sum[1]), 1) + "`";
 		}
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Fair Team Generator");
@@ -630,7 +630,8 @@ module.exports = class EmbedGenerator {
 			UTILS.assert(UTILS.exists(ranks[i]));
 			UTILS.debug("iMMR[" + i + "] is " + UTILS.averageUserMMR(ranks[i]));
 			UTILS.assert(UTILS.exists(UTILS.averageUserMMR(ranks[i])))
-			iMMR.push(UTILS.averageUserMMR(ranks[i]));
+			if (UTILS.averageUserMMR(ranks[i]) < 100) iMMR.push(600);
+			else iMMR.push(UTILS.averageUserMMR(ranks[i]));
 		}
 		UTILS.debug(JSON.stringify(iMMR, null, "\t"));
 		for (let b in TEAM_COMBINATIONS) team_by_all_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], iMMR));
