@@ -7,3 +7,4 @@ config.json
 !data/keys/.gitkeep
 *.bat
 devconfig.json
+test.js
