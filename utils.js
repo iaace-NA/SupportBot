@@ -264,7 +264,7 @@ module.exports = class UTILS {
 		let individual_iMMR = 0;
 		let individual_games = 0;
 		for (let c in rank) {//queue
-			individual_iMMR += this.iMMR(rank) * (rank.wins + rank.losses);
+			individual_iMMR += this.iMMR(rank[c]) * (rank.wins + rank.losses);
 			individual_games += rank[c].wins + rank[c].losses;
 		}
 		return individual_games == 0 ? 0 : individual_iMMR / individual_games;
