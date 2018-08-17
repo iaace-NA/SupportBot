@@ -12,8 +12,8 @@ League of Legends Statistics for Discord
 - request 2.83.0
 - mathjs 5.1.0
 ## Minimum System Requirements
-- RAM: 250 MB+
-- HDD: 512 MB+
+- RAM: 1 GB
+- HDD: 1 GB
 - CPU: 2 Thread, Base clock 1GHz+
 - LAN: 10 Mbps Down/2 Mbps Up
 ## Commands
