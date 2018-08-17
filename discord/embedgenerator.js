@@ -575,7 +575,7 @@ module.exports = class EmbedGenerator {
 		let team_by_level = [];//array of stats objects
 		for (let b in TEAM_COMBINATIONS) team_by_level.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], summoners.map(s => s.summonerLevel)));
 		const team_by_level_lowest_diff = mathjs.min(team_by_level.map(t => t.abs));
-		const team_by_level_best = team_by_level.findIndex(t => t.diff === team_by_level_lowest_diff);//team arrangement index
+		const team_by_level_best = team_by_level.findIndex(t => t.abs === team_by_level_lowest_diff);//team arrangement index
 		let team_by_level_team_0_description = "**__Team " + (team_by_level[team_by_level_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_level_team_1_description = "**__Team " + (team_by_level[team_by_level_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_level_best].length; ++i) {
@@ -591,7 +591,7 @@ module.exports = class EmbedGenerator {
 		let team_by_highest_mastery = [];//array of stats objects
 		for (let b in TEAM_COMBINATIONS) team_by_highest_mastery.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], masteries.map(m => (m[0].championPoints || 0))));
 		const team_by_highest_mastery_lowest_diff = mathjs.min(team_by_highest_mastery.map(t => t.abs));
-		const team_by_highest_mastery_best = team_by_highest_mastery.findIndex(t => t.diff === team_by_highest_mastery_lowest_diff);//team arrangement index
+		const team_by_highest_mastery_best = team_by_highest_mastery.findIndex(t => t.abs === team_by_highest_mastery_lowest_diff);//team arrangement index
 		let team_by_highest_mastery_team_0_description = "**__Team " + (team_by_highest_mastery[team_by_highest_mastery_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_highest_mastery_team_1_description = "**__Team " + (team_by_highest_mastery[team_by_highest_mastery_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_highest_mastery_best].length; ++i) {
@@ -607,7 +607,7 @@ module.exports = class EmbedGenerator {
 		let team_by_total_mastery = [];//array of stats objects
 		for (let b in TEAM_COMBINATIONS) team_by_total_mastery.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], masteries.map(m => m.reduce((total, increment) => total + increment.championPoints, 0))));
 		const team_by_total_mastery_lowest_diff = mathjs.min(team_by_total_mastery.map(t => t.abs));
-		const team_by_total_mastery_best = team_by_total_mastery.findIndex(t => t.diff === team_by_total_mastery_lowest_diff);//team arrangement index
+		const team_by_total_mastery_best = team_by_total_mastery.findIndex(t => t.abs === team_by_total_mastery_lowest_diff);//team arrangement index
 		let team_by_total_mastery_team_0_description = "**__Team " + (team_by_total_mastery[team_by_total_mastery_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_total_mastery_team_1_description = "**__Team " + (team_by_total_mastery[team_by_total_mastery_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_total_mastery_best].length; ++i) {
