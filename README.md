@@ -7,6 +7,7 @@ League of Legends Statistics for Discord
 - discord.js 11.3.2
 - mongoose 5.0.0-rc1
 - request 2.83.0
+- mathjs 5.1.0
 ## Minimum System Requirements
 - RAM: 250 MB+
 - HDD: 512 MB+
