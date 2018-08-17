@@ -385,7 +385,7 @@ module.exports = class UTILS {
 			raw: [[], []],//raw values
 			min: [[], []],//minimum values
 			max: [[], []],//maximum values
-			averages: [0, 0],//team averages
+			avg: [0, 0],//team averages
 			stdev: [0, 0],//standard deviation
 			sum: [0, 0],//team_0 sum, team_1 sum
 			diff: 0,//absolute difference of sum
