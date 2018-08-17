@@ -626,7 +626,9 @@ module.exports = class EmbedGenerator {
 		let team_by_all_ranks = [];//array of stats objects
 		for (let b in TEAM_COMBINATIONS) team_by_all_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], ranks.map(r => UTILS.averageUserMMR(r))));
 		const team_by_all_ranks_lowest_diff = mathjs.min(team_by_all_ranks.map(t => t.abs));
+		UTILS.debug("rank lowest diff is " + team_by_all_ranks_lowest_diff);
 		const team_by_all_ranks_best = team_by_all_ranks.findIndex(t => t.abs === team_by_all_ranks_lowest_diff);//team arrangement index
+		UTILS.debug("rank lowest diff index is " + team_by_all_ranks_lowest_diff_best);
 		let team_by_all_ranks_team_0_description = "**__Team " + (team_by_all_ranks[team_by_all_ranks_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_all_ranks_team_1_description = "**__Team " + (team_by_all_ranks[team_by_all_ranks_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_all_ranks_best].length; ++i) {
