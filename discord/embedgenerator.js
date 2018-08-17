@@ -578,10 +578,10 @@ module.exports = class EmbedGenerator {
 			const individual_description = "`" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
 			TEAM_COMBINATIONS[team_by_level_best][i] === "0" ? team_by_level_team_0_description += individual_description : team_by_level_team_1_description += individual_description;
 		}
-		team_by_level_team_0_description += "\n**Min:** `" + team_by_level[team_by_level_best].min[0] + "`\n**Max:** `" + team_by_level[team_by_level_best].max[0] + "`\n**μ:** `" + UTILS.round(team_by_level[team_by_level_best].avg[0], 2) + "`\t**σ:** `" + UTILS.round(team_by_level[team_by_level_best].stdev[0], 2) + "`\n**Σ:** " + team_by_level[team_by_level_best].sum[0] + "\t**Δ:** `" + team_by_level[team_by_level_best].abs + "`";
-		team_by_level_team_1_description += "\n**Min:** `" + team_by_level[team_by_level_best].min[1] + "`\n**Max:** `" + team_by_level[team_by_level_best].max[1] + "`\n**μ:** `" + UTILS.round(team_by_level[team_by_level_best].avg[1], 2) + "`\t**σ:** `" + UTILS.round(team_by_level[team_by_level_best].stdev[1], 2) + "`\n**Σ:** " + team_by_level[team_by_level_best].sum[1] + "\t**Δ:** `" + team_by_level[team_by_level_best].abs + "`";
-		newEmbed.addField("By Experience (Level) Team " + team_by_level[team_by_level_best].diff > 0 ? "Purple" : "Blue", team_by_level_team_0_description, true);
-		newEmbed.addField("Team " + team_by_level[team_by_level_best].diff > 0 ? "Blue" : "Purple", team_by_level_team_1_description, true);
+		team_by_level_team_0_description += "\n**Min:** `" + team_by_level[team_by_level_best].min[0] + "`\t**Max:** `" + team_by_level[team_by_level_best].max[0] + "`\n**μ:** `" + UTILS.round(team_by_level[team_by_level_best].avg[0], 2) + "`\t**σ:** `" + UTILS.round(team_by_level[team_by_level_best].stdev[0], 2) + "`\n**Σ:** " + team_by_level[team_by_level_best].sum[0] + "\t**Δ:** `" + team_by_level[team_by_level_best].abs + "`";
+		team_by_level_team_1_description += "\n**Min:** `" + team_by_level[team_by_level_best].min[1] + "`\t**Max:** `" + team_by_level[team_by_level_best].max[1] + "`\n**μ:** `" + UTILS.round(team_by_level[team_by_level_best].avg[1], 2) + "`\t**σ:** `" + UTILS.round(team_by_level[team_by_level_best].stdev[1], 2) + "`\n**Σ:** " + team_by_level[team_by_level_best].sum[1] + "\t**Δ:** `" + team_by_level[team_by_level_best].abs + "`";
+		newEmbed.addField("By Experience (Level) Team " + (team_by_level[team_by_level_best].diff > 0 ? "Purple" : "Blue"), team_by_level_team_0_description, true);
+		newEmbed.addField("Team " + (team_by_level[team_by_level_best].diff > 0 ? "Blue" : "Purple"), team_by_level_team_1_description, true);
 		/*
 		newEmbed.addField("By Experience (Highest Mastery Champion) Team ", , true);
 		newEmbed.addField("Team ", , true);
