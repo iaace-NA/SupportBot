@@ -7,8 +7,8 @@ League of Legends Statistics for Discord
 - mongoose 5.0.0-rc1
 - request 2.83.0
 ## Minimum System Requirements
-- RAM: 250 MB+
-- HDD: 512 MB+
+- RAM: >256 MB free
+- HDD: >512 MB free
 - CPU: 2 Thread, Base clock 1GHz+
 - LAN: 10 Mbps Down/2 Mbps Up
 ## Commands
