@@ -573,7 +573,7 @@ module.exports = class EmbedGenerator {
 		const TEAM_COMBINATIONS = UTILS.generateTeams(summoners);//array of binary team arrangements
 
 		let team_by_level = [];//array of stats objects
-		for (let b in TEAM_COMBINATIONS) team_by_level.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], masteries.map(m => (m[0].championPoints || 0))));
+		for (let b in TEAM_COMBINATIONS) team_by_level.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], summoners.map(s => s.summonerLevel)));
 		const team_by_level_lowest_diff = mathjs.min(team_by_level.map(t => t.abs));
 		const team_by_level_best = team_by_level.findIndex(t => t.diff === team_by_level_lowest_diff);//team arrangement index
 		let team_by_level_team_0_description = "**__Team " + (team_by_level[team_by_level_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
@@ -588,7 +588,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.addField("(Level)", team_by_level_team_1_description, true);
 
 		let team_by_highest_mastery = [];//array of stats objects
-		for (let b in TEAM_COMBINATIONS) team_by_highest_mastery.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], summoners.map(s => s.summonerLevel)));
+		for (let b in TEAM_COMBINATIONS) team_by_highest_mastery.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], masteries.map(m => (m[0].championPoints || 0))));
 		const team_by_highest_mastery_lowest_diff = mathjs.min(team_by_highest_mastery.map(t => t.abs));
 		const team_by_highest_mastery_best = team_by_highest_mastery.findIndex(t => t.diff === team_by_highest_mastery_lowest_diff);//team arrangement index
 		let team_by_highest_mastery_team_0_description = "**__Team " + (team_by_highest_mastery[team_by_highest_mastery_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
@@ -599,7 +599,7 @@ module.exports = class EmbedGenerator {
 		}
 		team_by_highest_mastery_team_0_description += formatDescriptionString(team_by_highest_mastery[team_by_highest_mastery_best], 0);
 		team_by_highest_mastery_team_1_description += formatDescriptionString(team_by_highest_mastery[team_by_highest_mastery_best], 1);
-		newEmbed.addField("By Experience", team_by_highest_mastery_team_0_description, true);
+		newEmbed.addField("By Experience", team_by_highest_mastery_team_0_description, false);
 		newEmbed.addField("(Highest Mastery Champion)", team_by_highest_mastery_team_1_description, true);
 		/*
 		newEmbed.addField("By Experience (Total Champion Mastery) Team ", , true);
