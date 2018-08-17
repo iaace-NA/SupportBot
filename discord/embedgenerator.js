@@ -579,7 +579,7 @@ module.exports = class EmbedGenerator {
 		let team_by_level_team_0_description = "**__Team " + (team_by_level[team_by_level_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_level_team_1_description = "**__Team " + (team_by_level[team_by_level_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_level_best].length; ++i) {
-			const individual_description = CONFIG.STATIC.CHAPMIONS[masteries[i][0].championId].emoji + "`" + UTILS.gold(masteries[i][0].championPoints) + "` " + summoners[i].name + "\n";
+			const individual_description = "lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
 			TEAM_COMBINATIONS[team_by_level_best][i] === "0" ? team_by_level_team_0_description += individual_description : team_by_level_team_1_description += individual_description;
 		}
 		team_by_level_team_0_description += formatDescriptionString(team_by_level[team_by_level_best], 0);
@@ -594,7 +594,7 @@ module.exports = class EmbedGenerator {
 		let team_by_highest_mastery_team_0_description = "**__Team " + (team_by_highest_mastery[team_by_highest_mastery_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_highest_mastery_team_1_description = "**__Team " + (team_by_highest_mastery[team_by_highest_mastery_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_highest_mastery_best].length; ++i) {
-			const individual_description = "`" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
+			const individual_description = CONFIG.STATIC.CHAMPIONS[masteries[i][0].championId].emoji + " `" + UTILS.gold(masteries[i][0].championPoints) + "`" + summoners[i].name + "\n";
 			TEAM_COMBINATIONS[team_by_highest_mastery_best][i] === "0" ? team_by_highest_mastery_team_0_description += individual_description : team_by_highest_mastery_team_1_description += individual_description;
 		}
 		team_by_highest_mastery_team_0_description += formatDescriptionString(team_by_highest_mastery[team_by_highest_mastery_best], 0);
