@@ -375,13 +375,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, ACCESS_LEV
 				const ids = summoners.map(s => s.id);
 				lolapi.getMultipleRanks(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_RANKS).then(ranks => {
 					lolapi.getMultipleChampionMastery(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_MASTERIES).then(masteries => {
-						lolapi.getMultipleRecentGames(region, summoners.map(s => s.accountId), CONFIG.API_MAXAGE.MULTI.MULTIPLE_RECENT_GAMES).then(mhA => {
-							let mIDA = [];//match id array;
-							for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
-							lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.MULTI.MULTIPLE_MATCH).then(matches => {
-								reply_embed(embedgenerator.multiSummoner(CONFIG, CONFIG.REGIONS_REVERSE[region], summoners, ranks, masteries, mhA, matches));
-							}).catch(console.error);
-						}).catch(console.error);
+						reply_embed(embedgenerator.fairTeam(CONFIG, CONFIG.REGIONS_REVERSE[region], summoners, ranks, masteries));
 					}).catch(console.error);
 				}).catch(console.error);
 			}).catch(console.error);
