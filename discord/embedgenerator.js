@@ -624,8 +624,10 @@ module.exports = class EmbedGenerator {
 		newEmbed.addBlankField(false);
 
 		let team_by_all_ranks = [];//array of stats objects
-		for (let b in TEAM_COMBINATIONS) team_by_all_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], ranks.map(r => UTILS.averageUserMMR(r))));
-		UTILS.debug(JSON.stringify(ranks, null, "\t"));
+		let iMMR = [];
+		for (let i = 0; i < ranks.length; ++i) iMMR.push(UTILS.averageUserMMR(ranks[i]));
+		UTILS.debug(JSON.stringify(iMMR, null, "\t"));
+		for (let b in TEAM_COMBINATIONS) team_by_all_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], iMMR));
 		const team_by_all_ranks_lowest_diff = mathjs.min(team_by_all_ranks.map(t => t.abs));
 		UTILS.debug("rank lowest diff is " + team_by_all_ranks_lowest_diff);
 		const team_by_all_ranks_best = team_by_all_ranks.findIndex(t => t.abs === team_by_all_ranks_lowest_diff);//team arrangement index
