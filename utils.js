@@ -395,7 +395,7 @@ module.exports = class UTILS {
 			temp.sum[parseInt(team[i])] += data[i];
 			temp.raw[parseInt(team[i])].push(data[i]);
 		}
-		for (let t = 0; t < team.length; ++t) {
+		for (let t = 0; t < 2; ++t) {
 			temp.min[t] = mathjs.min(temp.raw[t]);
 			temp.max[t] = mathjs.max(temp.raw[t]);
 			temp.avg[t] = mathjs.mean(temp.raw[t]);
