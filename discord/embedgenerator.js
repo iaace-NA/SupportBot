@@ -568,6 +568,9 @@ module.exports = class EmbedGenerator {
 		function formatDescriptionString(team, side) {
 			return "**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.sum[side]) + "` **Δ:** `" + UTILS.numberWithCommas(side === 0 ? team.diff : (-1 * team.diff)) + "` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`";
 		}
+		function formatDescriptionStringLarge(team, side) {
+			return "**Min:** `" + UTILS.gold(team.min[side]) + "` **Max:** `" + UTILS.gold(team.max[side]) + "`\n**μ:** `" + UTILS.gold(team.avg[side]) + "` **σ:** `" + UTILS.gold(team.stdev[side]) + "`\n**Σ:** `" + UTILS.gold(team.sum[side]) + "` **Δ:** `" + UTILS.gold(side === 0 ? team.diff : (-1 * team.diff)) + "` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`";
+		}
 		function formatDescriptionStringRanks(team, side) {
 			return "**Min:** `" + UTILS.iMMRtoEnglish(team.min[side]) + "` **Max:** `" + UTILS.iMMRtoEnglish(team.max[side]) + "`\n**μ:** `" + UTILS.iMMRtoEnglish(team.avg[side]) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "LP`\n**Σ:** `" + UTILS.numberWithCommas(UTILS.round(team.sum[side], 0)) + "LP` **Δ:** `" + UTILS.numberWithCommas(UTILS.round(side === 0 ? team.diff : (-1 * team.diff), 0)) + "LP` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`";
 		}
@@ -601,8 +604,8 @@ module.exports = class EmbedGenerator {
 			const individual_description = CONFIG.STATIC.CHAMPIONS[masteries[i][0].championId].emoji + " `" + UTILS.gold(masteries[i][0].championPoints) + "` " + summoners[i].name + "\n";
 			TEAM_COMBINATIONS[team_by_highest_mastery_best][i] === "0" ? team_by_highest_mastery_team_0_description += individual_description : team_by_highest_mastery_team_1_description += individual_description;
 		}
-		team_by_highest_mastery_team_0_description += formatDescriptionString(team_by_highest_mastery[team_by_highest_mastery_best], 0);
-		team_by_highest_mastery_team_1_description += formatDescriptionString(team_by_highest_mastery[team_by_highest_mastery_best], 1);
+		team_by_highest_mastery_team_0_description += formatDescriptionStringLarge(team_by_highest_mastery[team_by_highest_mastery_best], 0);
+		team_by_highest_mastery_team_1_description += formatDescriptionStringLarge(team_by_highest_mastery[team_by_highest_mastery_best], 1);
 		newEmbed.addField("By Experience", team_by_highest_mastery_team_0_description, true);
 		newEmbed.addField("(Highest Mastery Champion) id: " + team_by_highest_mastery_best, team_by_highest_mastery_team_1_description, true);
 		newEmbed.addBlankField(false);
@@ -617,8 +620,8 @@ module.exports = class EmbedGenerator {
 			const individual_description = "`" + UTILS.gold(masteries[i].reduce((total, increment) => total + increment.championPoints, 0)) + "` " + summoners[i].name + "\n";
 			TEAM_COMBINATIONS[team_by_total_mastery_best][i] === "0" ? team_by_total_mastery_team_0_description += individual_description : team_by_total_mastery_team_1_description += individual_description;
 		}
-		team_by_total_mastery_team_0_description += formatDescriptionString(team_by_total_mastery[team_by_total_mastery_best], 0);
-		team_by_total_mastery_team_1_description += formatDescriptionString(team_by_total_mastery[team_by_total_mastery_best], 1);
+		team_by_total_mastery_team_0_description += formatDescriptionStringLarge(team_by_total_mastery[team_by_total_mastery_best], 0);
+		team_by_total_mastery_team_1_description += formatDescriptionStringLarge(team_by_total_mastery[team_by_total_mastery_best], 1);
 		newEmbed.addField("By Experience", team_by_total_mastery_team_0_description, true);
 		newEmbed.addField("(Total Champion Mastery) id: " + team_by_total_mastery_best, team_by_total_mastery_team_1_description, true);
 		newEmbed.addBlankField(false);
