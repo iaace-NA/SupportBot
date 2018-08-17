@@ -103,7 +103,7 @@ module.exports = class UTILS {
 	}
 	gold(number) {
 		number /= 1000;
-		return this.round(number, 1) + "k";
+		return number.toFixed(1) + "k";
 	}
 	level(summonerID, match) {
 		return this.stats(summonerID, match).championLevel;
