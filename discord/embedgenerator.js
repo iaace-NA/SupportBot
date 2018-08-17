@@ -635,10 +635,8 @@ module.exports = class EmbedGenerator {
 		}
 		team_by_all_ranks_team_0_description += formatDescriptionStringRanks(team_by_all_ranks[team_by_all_ranks_best], 0);
 		team_by_all_ranks_team_1_description += formatDescriptionStringRanks(team_by_all_ranks[team_by_all_ranks_best], 1);
-		newEmbed.addField("By Experience", team_by_all_ranks_team_0_description, true);
-		newEmbed.addField("(Total Champion Mastery) id: " + team_by_all_ranks_best, team_by_all_ranks_team_1_description, true);
-		newEmbed.addField("By Skill", , true);
-		newEmbed.addField("(All Ranks)", , true);
+		newEmbed.addField("By Skill", team_by_all_ranks_team_0_description, true);
+		newEmbed.addField("(All Ranks) id: " + team_by_all_ranks_best, team_by_all_ranks_team_1_description, true);
 		/*
 		newEmbed.addField("By Skill (Summoner's Rift Ranks) Team ", , true);
 		newEmbed.addField("Team ", , true);
