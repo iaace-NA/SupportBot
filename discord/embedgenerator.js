@@ -566,10 +566,10 @@ module.exports = class EmbedGenerator {
 	}
 	fairTeam(CONFIG, region, summoners, ranks, masteries) {
 		function formatDescriptionString(team, side) {
-			return "**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.diff[side]) + "` **Δ:** `" + UTILS.numberWithCommas(team.abs) + "` **%Δ:** `" + UTILS.round((100 * team.diff) / (team.sum[0] + team.sum[1]), 1) + "`";
+			return "**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.diff) + "` **Δ:** `" + UTILS.numberWithCommas(team.abs) + "` **%Δ:** `" + UTILS.round((100 * team.diff) / (team.sum[0] + team.sum[1]), 1) + "`";
 		}
 		function formatDescriptionStringRanks(team, side) {
-			return "**Min:** `" + UTILS.iMMRtoEnglish(team.min[side]) + "` **Max:** `" + UTILS.iMMRtoEnglish(team.max[side]) + "`\n**μ:** `" + UTILS.iMMRtoEnglish(team.avg[side]) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "LP`\n**Σ:** `" + UTILS.round(team.diff[side], 0) + "LP` **Δ:** `" + team.abs + "LP` **%Δ:** `" + UTILS.round((100 * team.diff) / (team.sum[0] + team.sum[1]), 1) + "`";
+			return "**Min:** `" + UTILS.iMMRtoEnglish(team.min[side]) + "` **Max:** `" + UTILS.iMMRtoEnglish(team.max[side]) + "`\n**μ:** `" + UTILS.iMMRtoEnglish(team.avg[side]) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "LP`\n**Σ:** `" + UTILS.round(team.diff, 0) + "LP` **Δ:** `" + UTILS.round(team.abs, 0) + "LP` **%Δ:** `" + UTILS.round((100 * team.diff) / (team.sum[0] + team.sum[1]), 1) + "`";
 		}
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Fair Team Generator");
