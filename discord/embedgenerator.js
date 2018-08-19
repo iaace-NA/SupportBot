@@ -655,17 +655,17 @@ module.exports = class EmbedGenerator {
 		newEmbed.addBlankField(false);
 
 		let team_by_sr_ranks = [];//array of stats objects
-		let iMMR = [];
+		let sr_iMMR = [];
 		for (let i = 0; i < ranks.length; ++i) {
 			UTILS.debug("ranks[" + i + "] is " + JSON.stringify(ranks[i], null, "\t"));
 			UTILS.assert(UTILS.exists(ranks[i]));
-			UTILS.debug("iMMR[" + i + "] is " + UTILS.summonersRiftMMR(ranks[i]));
+			UTILS.debug("sr_iMMR[" + i + "] is " + UTILS.summonersRiftMMR(ranks[i]));
 			UTILS.assert(UTILS.exists(UTILS.summonersRiftMMR(ranks[i])))
-			if (UTILS.summonersRiftMMR(ranks[i]) < 100) iMMR.push(600);
-			else iMMR.push(UTILS.summonersRiftMMR(ranks[i]));
+			if (UTILS.summonersRiftMMR(ranks[i]) < 100) sr_iMMR.push(600);
+			else sr_iMMR.push(UTILS.summonersRiftMMR(ranks[i]));
 		}
-		UTILS.debug(JSON.stringify(iMMR, null, "\t"));
-		for (let b in TEAM_COMBINATIONS) team_by_sr_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], iMMR));
+		UTILS.debug(JSON.stringify(sr_iMMR, null, "\t"));
+		for (let b in TEAM_COMBINATIONS) team_by_sr_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], sr_iMMR));
 		const team_by_sr_ranks_lowest_diff = mathjs.min(team_by_sr_ranks.map(t => t.abs));
 		UTILS.debug("rank lowest diff is " + team_by_sr_ranks_lowest_diff);
 		const team_by_sr_ranks_best = team_by_sr_ranks.findIndex(t => t.abs === team_by_sr_ranks_lowest_diff);//team arrangement index
