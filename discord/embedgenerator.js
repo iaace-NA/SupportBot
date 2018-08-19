@@ -742,8 +742,8 @@ module.exports = class EmbedGenerator {
 			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
 			TEAM_COMBINATIONS[team_by_random_best][i] === "0" ? team_by_random_team_0_description += individual_description : team_by_random_team_1_description += individual_description;
 		}
-		team_by_random_team_0_description += formatDescriptionString(team_by_random[team_by_random_best], 0);
-		team_by_random_team_1_description += formatDescriptionString(team_by_random[team_by_random_best], 1);
+		team_by_random_team_0_description += formatDescriptionStringRanks(team_by_random[team_by_random_best], 0);
+		team_by_random_team_1_description += formatDescriptionStringRanks(team_by_random[team_by_random_best], 1);
 		team_by_random_team_0_description = team_by_random_team_0_description.trim();
 		team_by_random_team_1_description = team_by_random_team_1_description.trim();
 		newEmbed.addField("Random", team_by_random_team_0_description, true);
