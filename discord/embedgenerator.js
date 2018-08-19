@@ -724,7 +724,17 @@ module.exports = class EmbedGenerator {
 
 		debug_mode = true;//force random statistics on
 		let team_by_random = [];//array of stats objects
-		for (let b in TEAM_COMBINATIONS) team_by_random.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], summoners.map(s => s.summonerLevel)));
+		let random_iMMR = [];
+		for (let i = 0; i < ranks.length; ++i) {
+			UTILS.debug("ranks[" + i + "] is " + JSON.stringify(ranks[i], null, "\t"));
+			UTILS.assert(UTILS.exists(ranks[i]));
+			UTILS.debug("random_iMMR[" + i + "] is " + UTILS.averageUserMMR(ranks[i]));
+			UTILS.assert(UTILS.exists(UTILS.averageUserMMR(ranks[i])))
+			if (UTILS.averageUserMMR(ranks[i]) < 100) random_iMMR.push(600);
+			else random_iMMR.push(UTILS.averageUserMMR(ranks[i]));
+		}
+		UTILS.debug(JSON.stringify(random_iMMR, null, "\t"));
+		for (let b in TEAM_COMBINATIONS) team_by_random.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], random_iMMR));
 		const team_by_random_best = Math.trunc(Math.random() * TEAM_COMBINATIONS.length);//team arrangement index
 		let team_by_random_team_0_description = "**__Team " + (team_by_random[team_by_random_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_random_team_1_description = "**__Team " + (team_by_random[team_by_random_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
