@@ -344,7 +344,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, ACCESS_LEV
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	command(["fairteamgenerator ", "teamgenerator ", "tg ", "ftg "], true, false, (original, index, parameter) => {
+	command(["fairteamgenerator ", "teamgenerator ", "tg ", "ftg ", "ftgd ", "tgd "], true, false, (original, index, parameter) => {
+		const debug_mode = index > 3;
 		request_profiler.mark("ftg command recognized");
 		request_profiler.begin("parsing usernames");
 		let region = assert_region(parameter.substring(0, parameter.indexOf(" ")), index < 2);
@@ -377,7 +378,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, ACCESS_LEV
 					lolapi.getMultipleChampionMastery(region, ids, CONFIG.API_MAXAGE.FTG.MULTIPLE_MASTERIES).then(masteries => {
 						request_profiler.end("api requests");
 						request_profiler.begin("generate embed");
-						reply_embed(embedgenerator.fairTeam(CONFIG, CONFIG.REGIONS_REVERSE[region], summoners, ranks, masteries));
+						reply_embed(embedgenerator.fairTeam(CONFIG, CONFIG.REGIONS_REVERSE[region], summoners, ranks, masteries, debug_mode));
 						request_profiler.end("generate embed");
 						UTILS.debug(request_profiler.endAll());
 					}).catch(console.error);

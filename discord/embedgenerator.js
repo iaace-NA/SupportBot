@@ -564,15 +564,15 @@ module.exports = class EmbedGenerator {
 		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
 		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
 	}
-	fairTeam(CONFIG, region, summoners, ranks, masteries) {
+	fairTeam(CONFIG, region, summoners, ranks, masteries, debug_mode = false) {
 		function formatDescriptionString(team, side) {
-			return "**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.sum[side]) + "` **Δ:** `" + UTILS.numberWithCommas(side === 0 ? team.diff : (-1 * team.diff)) + "` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`";
+			return debug_mode ? "**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.sum[side]) + "` **Δ:** `" + UTILS.numberWithCommas(side === 0 ? team.diff : (-1 * team.diff)) + "` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
 		}
 		function formatDescriptionStringLarge(team, side) {
-			return "**Min:** `" + UTILS.gold(team.min[side]) + "` **Max:** `" + UTILS.gold(team.max[side]) + "`\n**μ:** `" + UTILS.gold(team.avg[side]) + "` **σ:** `" + UTILS.gold(team.stdev[side]) + "`\n**Σ:** `" + UTILS.gold(team.sum[side]) + "` **Δ:** `" + UTILS.gold(side === 0 ? team.diff : (-1 * team.diff)) + "` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`";
+			return debug_mode ? "**Min:** `" + UTILS.gold(team.min[side]) + "` **Max:** `" + UTILS.gold(team.max[side]) + "`\n**μ:** `" + UTILS.gold(team.avg[side]) + "` **σ:** `" + UTILS.gold(team.stdev[side]) + "`\n**Σ:** `" + UTILS.gold(team.sum[side]) + "` **Δ:** `" + UTILS.gold(side === 0 ? team.diff : (-1 * team.diff)) + "` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
 		}
 		function formatDescriptionStringRanks(team, side) {
-			return "**Min:** `" + UTILS.iMMRtoEnglish(team.min[side]) + "` **Max:** `" + UTILS.iMMRtoEnglish(team.max[side]) + "`\n**μ:** `" + UTILS.iMMRtoEnglish(team.avg[side]) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "LP`\n**Σ:** `" + UTILS.numberWithCommas(UTILS.round(team.sum[side], 0)) + "LP` **Δ:** `" + UTILS.numberWithCommas(UTILS.round(side === 0 ? team.diff : (-1 * team.diff), 0)) + "LP` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`";
+			return debug_mode ? "**Min:** `" + UTILS.iMMRtoEnglish(team.min[side]) + "` **Max:** `" + UTILS.iMMRtoEnglish(team.max[side]) + "`\n**μ:** `" + UTILS.iMMRtoEnglish(team.avg[side]) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "LP`\n**Σ:** `" + UTILS.numberWithCommas(UTILS.round(team.sum[side], 0)) + "LP` **Δ:** `" + UTILS.numberWithCommas(UTILS.round(side === 0 ? team.diff : (-1 * team.diff), 0)) + "LP` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
 		}
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Fair Team Generator");
@@ -686,6 +686,7 @@ module.exports = class EmbedGenerator {
 			newEmbed.addField("Team ", , true);
 		}
 		newEmbed.addField("Random", , true);*/
+		debug_mode = true;//force random statistics on
 		return newEmbed;
 	}
 	serverBan(CONFIG, server, reason, date, issuer_tag, issuer_avatarURL) {
