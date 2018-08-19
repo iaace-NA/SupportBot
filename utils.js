@@ -260,6 +260,17 @@ module.exports = class UTILS {
 		}
 		return answer;
 	}
+	summonersRiftMMR(rank) {
+		let individual_iMMR = 0;
+		let individual_games = 0;
+		for (let c in rank) {//queue
+			if (rank[c].queueType !== "RANKED_FLEX_TT") {
+				individual_iMMR += this.iMMR(rank[c]) * (rank[c].wins + rank[c].losses);
+				individual_games += rank[c].wins + rank[c].losses;
+			}
+		}
+		return individual_games == 0 ? 0 : individual_iMMR / individual_games;
+	}
 	averageUserMMR(rank) {
 		let individual_iMMR = 0;
 		let individual_games = 0;

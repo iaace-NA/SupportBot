@@ -652,10 +652,35 @@ module.exports = class EmbedGenerator {
 		team_by_all_ranks_team_1_description += formatDescriptionStringRanks(team_by_all_ranks[team_by_all_ranks_best], 1);
 		newEmbed.addField("By Skill", team_by_all_ranks_team_0_description, true);
 		newEmbed.addField("(All Ranks) id: " + team_by_all_ranks_best, team_by_all_ranks_team_1_description, true);
-		/*
-		newEmbed.addField("By Skill (Summoner's Rift Ranks) Team ", , true);
-		newEmbed.addField("Team ", , true);
+		newEmbed.addBlankField(false);
 
+		let team_by_sr_ranks = [];//array of stats objects
+		let iMMR = [];
+		for (let i = 0; i < ranks.length; ++i) {
+			UTILS.debug("ranks[" + i + "] is " + JSON.stringify(ranks[i], null, "\t"));
+			UTILS.assert(UTILS.exists(ranks[i]));
+			UTILS.debug("iMMR[" + i + "] is " + UTILS.summonersRiftMMR(ranks[i]));
+			UTILS.assert(UTILS.exists(UTILS.summonersRiftMMR(ranks[i])))
+			if (UTILS.summonersRiftMMR(ranks[i]) < 100) iMMR.push(600);
+			else iMMR.push(UTILS.summonersRiftMMR(ranks[i]));
+		}
+		UTILS.debug(JSON.stringify(iMMR, null, "\t"));
+		for (let b in TEAM_COMBINATIONS) team_by_sr_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], iMMR));
+		const team_by_sr_ranks_lowest_diff = mathjs.min(team_by_sr_ranks.map(t => t.abs));
+		UTILS.debug("rank lowest diff is " + team_by_sr_ranks_lowest_diff);
+		const team_by_sr_ranks_best = team_by_sr_ranks.findIndex(t => t.abs === team_by_sr_ranks_lowest_diff);//team arrangement index
+		UTILS.debug("rank lowest diff index is " + team_by_sr_ranks_best);
+		let team_by_sr_ranks_team_0_description = "**__Team " + (team_by_sr_ranks[team_by_sr_ranks_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
+		let team_by_sr_ranks_team_1_description = "**__Team " + (team_by_sr_ranks[team_by_sr_ranks_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
+		for (let i = 0; i < TEAM_COMBINATIONS[team_by_sr_ranks_best].length; ++i) {
+			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.summonersRiftMMR(ranks[i])) + "` " + summoners[i].name + "\n";
+			TEAM_COMBINATIONS[team_by_sr_ranks_best][i] === "0" ? team_by_sr_ranks_team_0_description += individual_description : team_by_sr_ranks_team_1_description += individual_description;
+		}
+		team_by_sr_ranks_team_0_description += formatDescriptionStringRanks(team_by_sr_ranks[team_by_sr_ranks_best], 0);
+		team_by_sr_ranks_team_1_description += formatDescriptionStringRanks(team_by_sr_ranks[team_by_sr_ranks_best], 1);
+		newEmbed.addField("By Skill", team_by_sr_ranks_team_0_description, true);
+		newEmbed.addField("(Summoner's Rift Ranks) id: " + team_by_sr_ranks_best, team_by_sr_ranks_team_1_description, true);
+		/*
 		if (summoners.length <= 6) {
 			newEmbed.addField("By Skill (Twisted Treeline Ranks) Team ", , true);
 			newEmbed.addField("Team ", , true);
