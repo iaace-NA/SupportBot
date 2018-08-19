@@ -27,6 +27,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, ACCESS_LEV
 	let lolapi = new LOLAPI(CONFIG, msg.id);
 	request_profiler.mark("lolapi instantiated");
 
+	command([CONFIG.DISCORD_COMMAND_PREFIX + "owner", CONFIG.DISCORD_COMMAND_PREFIX + "owners"], false, false, (original, index) => {
+		reply_embed(textgenerator.owners(CONFIG));
+	});
 	//respondable server message or PM
 	command([CONFIG.DISCORD_COMMAND_PREFIX + "banuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lbanuser <uid> <duration> <reason>
