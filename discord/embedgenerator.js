@@ -680,13 +680,52 @@ module.exports = class EmbedGenerator {
 		team_by_sr_ranks_team_1_description += formatDescriptionStringRanks(team_by_sr_ranks[team_by_sr_ranks_best], 1);
 		newEmbed.addField("By Skill", team_by_sr_ranks_team_0_description, true);
 		newEmbed.addField("(Summoner's Rift Ranks) id: " + team_by_sr_ranks_best, team_by_sr_ranks_team_1_description, true);
-		/*
+		newEmbed.addBlankField(false);
+
 		if (summoners.length <= 6) {
-			newEmbed.addField("By Skill (Twisted Treeline Ranks) Team ", , true);
-			newEmbed.addField("Team ", , true);
+			let team_by_sr_ranks = [];//array of stats objects
+			let tt_iMMR = [];
+			for (let i = 0; i < ranks.length; ++i) {
+				UTILS.debug("ranks[" + i + "] is " + JSON.stringify(ranks[i], null, "\t"));
+				UTILS.assert(UTILS.exists(ranks[i]));
+				UTILS.debug("tt_iMMR[" + i + "] is " + UTILS.twistedTreelineMMR(ranks[i]));
+				UTILS.assert(UTILS.exists(UTILS.twistedTreelineMMR(ranks[i])))
+				if (UTILS.twistedTreelineMMR(ranks[i]) < 100) tt_iMMR.push(600);
+				else tt_iMMR.push(UTILS.twistedTreelineMMR(ranks[i]));
+			}
+			UTILS.debug(JSON.stringify(tt_iMMR, null, "\t"));
+			for (let b in TEAM_COMBINATIONS) team_by_sr_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], tt_iMMR));
+			const team_by_sr_ranks_lowest_diff = mathjs.min(team_by_sr_ranks.map(t => t.abs));
+			UTILS.debug("rank lowest diff is " + team_by_sr_ranks_lowest_diff);
+			const team_by_sr_ranks_best = team_by_sr_ranks.findIndex(t => t.abs === team_by_sr_ranks_lowest_diff);//team arrangement index
+			UTILS.debug("rank lowest diff index is " + team_by_sr_ranks_best);
+			let team_by_sr_ranks_team_0_description = "**__Team " + (team_by_sr_ranks[team_by_sr_ranks_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
+			let team_by_sr_ranks_team_1_description = "**__Team " + (team_by_sr_ranks[team_by_sr_ranks_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
+			for (let i = 0; i < TEAM_COMBINATIONS[team_by_sr_ranks_best].length; ++i) {
+				const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.twistedTreelineMMR(ranks[i])) + "` " + summoners[i].name + "\n";
+				TEAM_COMBINATIONS[team_by_sr_ranks_best][i] === "0" ? team_by_sr_ranks_team_0_description += individual_description : team_by_sr_ranks_team_1_description += individual_description;
+			}
+			team_by_sr_ranks_team_0_description += formatDescriptionStringRanks(team_by_sr_ranks[team_by_sr_ranks_best], 0);
+			team_by_sr_ranks_team_1_description += formatDescriptionStringRanks(team_by_sr_ranks[team_by_sr_ranks_best], 1);
+			newEmbed.addField("By Skill", team_by_sr_ranks_team_0_description, true);
+			newEmbed.addField("(Twisted Treeline Ranks)", team_by_sr_ranks_team_1_description, true);
+			newEmbed.addBlankField(false);
 		}
-		newEmbed.addField("Random", , true);*/
+
 		debug_mode = true;//force random statistics on
+		let team_by_random = [];//array of stats objects
+		for (let b in TEAM_COMBINATIONS) team_by_random.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], summoners.map(s => s.summonerLevel)));
+		const team_by_random_best = Math.trunc(Math.random() * TEAM_COMBINATIONS.length);//team arrangement index
+		let team_by_random_team_0_description = "**__Team " + (team_by_random[team_by_random_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
+		let team_by_random_team_1_description = "**__Team " + (team_by_random[team_by_random_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
+		for (let i = 0; i < TEAM_COMBINATIONS[team_by_random_best].length; ++i) {
+			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
+			TEAM_COMBINATIONS[team_by_random_best][i] === "0" ? team_by_random_team_0_description += individual_description : team_by_random_team_1_description += individual_description;
+		}
+		team_by_random_team_0_description += formatDescriptionString(team_by_random[team_by_random_best], 0);
+		team_by_random_team_1_description += formatDescriptionString(team_by_random[team_by_random_best], 1);
+		newEmbed.addField("Random", team_by_random_team_0_description, true);
+		newEmbed.addField("(Level/Rank information displayed)", team_by_random_team_1_description, true);
 		return newEmbed;
 	}
 	serverBan(CONFIG, server, reason, date, issuer_tag, issuer_avatarURL) {
