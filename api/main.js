@@ -71,7 +71,7 @@ let server_preferences_doc = new apicache.Schema({
 	prefix: { type: String, required: true, default: CONFIG.DISCORD_COMMAND_PREFIX },//default bot prefix
 	enabled: { type: Boolean, required: true, default: true },//whether or not the bot is enabled on the server
 	slow: { type: Number, required: true, default: 0 },//self slow mode
-	region: { type: String, required: true, default: "" },//default server region, LoL ("" = disabled)
+	//region: { type: String, required: true, default: "" },//default server region, LoL ("" = disabled)
 	auto_opgg: { type: Boolean, required: true, default: true }//automatically embed respond to op.gg links
 	//music
 	/*
