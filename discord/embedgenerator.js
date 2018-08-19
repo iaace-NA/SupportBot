@@ -718,7 +718,7 @@ module.exports = class EmbedGenerator {
 			team_by_sr_ranks_team_0_description = team_by_sr_ranks_team_0_description.trim();
 			team_by_sr_ranks_team_1_description = team_by_sr_ranks_team_1_description.trim();
 			newEmbed.addField("By Skill", team_by_sr_ranks_team_0_description, true);
-			newEmbed.addField("(Twisted Treeline Ranks)", team_by_sr_ranks_team_1_description, true);
+			newEmbed.addField("(Twisted Treeline Ranks) id: " + team_by_sr_ranks_best, team_by_sr_ranks_team_1_description, true);
 			newEmbed.addBlankField(false);
 		}
 
