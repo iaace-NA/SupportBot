@@ -566,13 +566,13 @@ module.exports = class EmbedGenerator {
 	}
 	fairTeam(CONFIG, region, summoners, ranks, masteries, debug_mode = false) {
 		function formatDescriptionString(team, side) {
-			return debug_mode ? "**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.sum[side]) + "` **Δ:** `" + UTILS.numberWithCommas(side === 0 ? team.diff : (-1 * team.diff)) + "` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
+			return debug_mode ? "\n**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.sum[side]) + "` **Δ:** `" + UTILS.numberWithCommas(side === 0 ? team.diff : (-1 * team.diff)) + "` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
 		}
 		function formatDescriptionStringLarge(team, side) {
-			return debug_mode ? "**Min:** `" + UTILS.gold(team.min[side]) + "` **Max:** `" + UTILS.gold(team.max[side]) + "`\n**μ:** `" + UTILS.gold(team.avg[side]) + "` **σ:** `" + UTILS.gold(team.stdev[side]) + "`\n**Σ:** `" + UTILS.gold(team.sum[side]) + "` **Δ:** `" + UTILS.gold(side === 0 ? team.diff : (-1 * team.diff)) + "` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
+			return debug_mode ? "\n**Min:** `" + UTILS.gold(team.min[side]) + "` **Max:** `" + UTILS.gold(team.max[side]) + "`\n**μ:** `" + UTILS.gold(team.avg[side]) + "` **σ:** `" + UTILS.gold(team.stdev[side]) + "`\n**Σ:** `" + UTILS.gold(team.sum[side]) + "` **Δ:** `" + UTILS.gold(side === 0 ? team.diff : (-1 * team.diff)) + "` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
 		}
 		function formatDescriptionStringRanks(team, side) {
-			return debug_mode ? "**Min:** `" + UTILS.iMMRtoEnglish(team.min[side]) + "` **Max:** `" + UTILS.iMMRtoEnglish(team.max[side]) + "`\n**μ:** `" + UTILS.iMMRtoEnglish(team.avg[side]) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "LP`\n**Σ:** `" + UTILS.numberWithCommas(UTILS.round(team.sum[side], 0)) + "LP` **Δ:** `" + UTILS.numberWithCommas(UTILS.round(side === 0 ? team.diff : (-1 * team.diff), 0)) + "LP` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
+			return debug_mode ? "\n**Min:** `" + UTILS.iMMRtoEnglish(team.min[side]) + "` **Max:** `" + UTILS.iMMRtoEnglish(team.max[side]) + "`\n**μ:** `" + UTILS.iMMRtoEnglish(team.avg[side]) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "LP`\n**Σ:** `" + UTILS.numberWithCommas(UTILS.round(team.sum[side], 0)) + "LP` **Δ:** `" + UTILS.numberWithCommas(UTILS.round(side === 0 ? team.diff : (-1 * team.diff), 0)) + "LP` **%Δ:** `" + UTILS.round((100 * (side === 0 ? team.diff : (-1 * team.diff))) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
 		}
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Fair Team Generator");
@@ -585,7 +585,7 @@ module.exports = class EmbedGenerator {
 		let team_by_level_team_0_description = "**__Team " + (team_by_level[team_by_level_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_level_team_1_description = "**__Team " + (team_by_level[team_by_level_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_level_best].length; ++i) {
-			const individual_description = "lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
+			const individual_description = "lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name + (i !== TEAM_COMBINATIONS[team_by_level_best].length - 1 ? "\n" : "");
 			TEAM_COMBINATIONS[team_by_level_best][i] === "0" ? team_by_level_team_0_description += individual_description : team_by_level_team_1_description += individual_description;
 		}
 		team_by_level_team_0_description += formatDescriptionString(team_by_level[team_by_level_best], 0);
@@ -601,7 +601,7 @@ module.exports = class EmbedGenerator {
 		let team_by_highest_mastery_team_0_description = "**__Team " + (team_by_highest_mastery[team_by_highest_mastery_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_highest_mastery_team_1_description = "**__Team " + (team_by_highest_mastery[team_by_highest_mastery_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_highest_mastery_best].length; ++i) {
-			const individual_description = CONFIG.STATIC.CHAMPIONS[masteries[i][0].championId].emoji + " `" + UTILS.gold(masteries[i][0].championPoints) + "` " + summoners[i].name + "\n";
+			const individual_description = CONFIG.STATIC.CHAMPIONS[masteries[i][0].championId].emoji + " `" + UTILS.gold(masteries[i][0].championPoints) + "` " + summoners[i].name + (i !== TEAM_COMBINATIONS[team_by_level_best].length - 1 ? "\n" : "");
 			TEAM_COMBINATIONS[team_by_highest_mastery_best][i] === "0" ? team_by_highest_mastery_team_0_description += individual_description : team_by_highest_mastery_team_1_description += individual_description;
 		}
 		team_by_highest_mastery_team_0_description += formatDescriptionStringLarge(team_by_highest_mastery[team_by_highest_mastery_best], 0);
@@ -617,7 +617,7 @@ module.exports = class EmbedGenerator {
 		let team_by_total_mastery_team_0_description = "**__Team " + (team_by_total_mastery[team_by_total_mastery_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_total_mastery_team_1_description = "**__Team " + (team_by_total_mastery[team_by_total_mastery_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_total_mastery_best].length; ++i) {
-			const individual_description = "`" + UTILS.gold(masteries[i].reduce((total, increment) => total + increment.championPoints, 0)) + "` " + summoners[i].name + "\n";
+			const individual_description = "`" + UTILS.gold(masteries[i].reduce((total, increment) => total + increment.championPoints, 0)) + "` " + summoners[i].name + (i !== TEAM_COMBINATIONS[team_by_level_best].length - 1 ? "\n" : "");
 			TEAM_COMBINATIONS[team_by_total_mastery_best][i] === "0" ? team_by_total_mastery_team_0_description += individual_description : team_by_total_mastery_team_1_description += individual_description;
 		}
 		team_by_total_mastery_team_0_description += formatDescriptionStringLarge(team_by_total_mastery[team_by_total_mastery_best], 0);
@@ -645,7 +645,7 @@ module.exports = class EmbedGenerator {
 		let team_by_all_ranks_team_0_description = "**__Team " + (team_by_all_ranks[team_by_all_ranks_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_all_ranks_team_1_description = "**__Team " + (team_by_all_ranks[team_by_all_ranks_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_all_ranks_best].length; ++i) {
-			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` " + summoners[i].name + "\n";
+			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` " + summoners[i].name + (i !== TEAM_COMBINATIONS[team_by_level_best].length - 1 ? "\n" : "");
 			TEAM_COMBINATIONS[team_by_all_ranks_best][i] === "0" ? team_by_all_ranks_team_0_description += individual_description : team_by_all_ranks_team_1_description += individual_description;
 		}
 		team_by_all_ranks_team_0_description += formatDescriptionStringRanks(team_by_all_ranks[team_by_all_ranks_best], 0);
@@ -673,7 +673,7 @@ module.exports = class EmbedGenerator {
 		let team_by_sr_ranks_team_0_description = "**__Team " + (team_by_sr_ranks[team_by_sr_ranks_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_sr_ranks_team_1_description = "**__Team " + (team_by_sr_ranks[team_by_sr_ranks_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_sr_ranks_best].length; ++i) {
-			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.summonersRiftMMR(ranks[i])) + "` " + summoners[i].name + "\n";
+			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.summonersRiftMMR(ranks[i])) + "` " + summoners[i].name + (i !== TEAM_COMBINATIONS[team_by_level_best].length - 1 ? "\n" : "");
 			TEAM_COMBINATIONS[team_by_sr_ranks_best][i] === "0" ? team_by_sr_ranks_team_0_description += individual_description : team_by_sr_ranks_team_1_description += individual_description;
 		}
 		team_by_sr_ranks_team_0_description += formatDescriptionStringRanks(team_by_sr_ranks[team_by_sr_ranks_best], 0);
@@ -702,7 +702,7 @@ module.exports = class EmbedGenerator {
 			let team_by_sr_ranks_team_0_description = "**__Team " + (team_by_sr_ranks[team_by_sr_ranks_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 			let team_by_sr_ranks_team_1_description = "**__Team " + (team_by_sr_ranks[team_by_sr_ranks_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 			for (let i = 0; i < TEAM_COMBINATIONS[team_by_sr_ranks_best].length; ++i) {
-				const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.twistedTreelineMMR(ranks[i])) + "` " + summoners[i].name + "\n";
+				const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.twistedTreelineMMR(ranks[i])) + "` " + summoners[i].name + (i !== TEAM_COMBINATIONS[team_by_level_best].length - 1 ? "\n" : "");
 				TEAM_COMBINATIONS[team_by_sr_ranks_best][i] === "0" ? team_by_sr_ranks_team_0_description += individual_description : team_by_sr_ranks_team_1_description += individual_description;
 			}
 			team_by_sr_ranks_team_0_description += formatDescriptionStringRanks(team_by_sr_ranks[team_by_sr_ranks_best], 0);
@@ -719,7 +719,7 @@ module.exports = class EmbedGenerator {
 		let team_by_random_team_0_description = "**__Team " + (team_by_random[team_by_random_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_random_team_1_description = "**__Team " + (team_by_random[team_by_random_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_random_best].length; ++i) {
-			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
+			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name + (i !== TEAM_COMBINATIONS[team_by_level_best].length - 1 ? "\n" : "");
 			TEAM_COMBINATIONS[team_by_random_best][i] === "0" ? team_by_random_team_0_description += individual_description : team_by_random_team_1_description += individual_description;
 		}
 		team_by_random_team_0_description += formatDescriptionString(team_by_random[team_by_random_best], 0);
