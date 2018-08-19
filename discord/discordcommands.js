@@ -542,9 +542,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, ACCESS_LEV
 							for (let i = 0; i < msgs.length; ++i) {
 								if (msgs[i].author.id == client.user.id && //message was sent by bot
 									msgs[i].embeds.length == 1 && //embedded response
-									UTILS.exists(msgs[i].embeds[0].url) && //url present
-									msgs[i].embeds[0].url.substring(msgs[i].embeds[0].url.indexOf(".") + 1, msgs[i].embeds[0].url.indexOf(".") + 25) == "op.gg/summoner/userName=") {//http://na.op.gg/summoner/userName=iaace
-									username = decodeURIComponent(msgs[i].embeds[0].url.substring(msgs[i].embeds[0].url.indexOf("/summoner/userName=") + 19));
+									UTILS.exists(msgs[i].embeds[0].author) && //author present
+									UTILS.exists(msgs[i].embeds[0].author.url) && //url present
+									msgs[i].embeds[0].author.url.substring(msgs[i].embeds[0].author.url.indexOf(".") + 1, msgs[i].embeds[0].author.url.indexOf(".") + 25) == "op.gg/summoner/userName=") {//http://na.op.gg/summoner/userName=iaace
+									username = decodeURIComponent(msgs[i].embeds[0].author.url.substring(msgs[i].embeds[0].author.url.indexOf("/summoner/userName=") + 19));
 									break;
 								}
 							}
@@ -593,9 +594,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, ACCESS_LEV
 							for (let i = 0; i < msgs.length; ++i) {
 								if (msgs[i].author.id == client.user.id && //message was sent by bot
 									msgs[i].embeds.length == 1 && //embedded response
-									UTILS.exists(msgs[i].embeds[0].url) && //url present
-									msgs[i].embeds[0].url.substring(msgs[i].embeds[0].url.indexOf(".") + 1, msgs[i].embeds[0].url.indexOf(".") + 25) == "op.gg/summoner/userName=") {//http://na.op.gg/summoner/userName=iaace
-									username = decodeURIComponent(msgs[i].embeds[0].url.substring(msgs[i].embeds[0].url.indexOf("/summoner/userName=") + 19));
+									UTILS.exists(msgs[i].embeds[0].author) && //author present
+									UTILS.exists(msgs[i].embeds[0].author.url) && //url present
+									msgs[i].embeds[0].author.url.substring(msgs[i].embeds[0].author.url.indexOf(".") + 1, msgs[i].embeds[0].author.url.indexOf(".") + 25) == "op.gg/summoner/userName=") {//http://na.op.gg/summoner/userName=iaace
+									username = decodeURIComponent(msgs[i].embeds[0].author.url.substring(msgs[i].embeds[0].author.url.indexOf("/summoner/userName=") + 19));
 									break;
 								}
 							}
