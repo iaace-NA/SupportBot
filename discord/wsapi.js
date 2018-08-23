@@ -97,7 +97,7 @@ module.exports = class WSAPI {
 				case 4://emoji
 					let all_emojis = data.emojis;
 					for (let b in this.CONFIG.STATIC.CHAMPIONS) {
-						const candidate = all_emojis.find(e => this.CONFIG.STATIC.CHAMPIONS[b].key.toLowerCase() == e.name);
+						const candidate = all_emojis.find(e => this.CONFIG.STATIC.CHAMPIONS[b].id.toLowerCase() == e.name);
 						this.CONFIG.STATIC.CHAMPIONS[b].emoji = UTILS.exists(candidate) ? candidate.code : this.CONFIG.STATIC.CHAMPIONS[b].name;
 					}
 					UTILS.output("champion emojis registered");

@@ -38,11 +38,12 @@ const queues = {
 	"940": "SR Nexus Siege",
 	"950": "SR Doom Bots Voting",
 	"960": "SR Doom Bots Standard",
-	"980": "VCP Star Guardian Invasion: Normal",
-	"990": "VCP Star Guardian Invasion: Onslaught",
-	"1000": "O Project: Hunters",
+	"980": "VP Star Guardian Invasion: Normal",
+	"990": "VP Star Guardian Invasion: Onslaught",
+	"1000": "OC Project: Hunters",
 	"1010": "SR Snow ARURF",
-	"1020": "SR One for All"
+	"1020": "SR One for All",
+	"1200": "NB Nexus Blitz"
 };
 const RANK_ORDER = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "CHALLENGER"];
 const RANK_COLOR = [[153, 51, 0], [179, 179, 179], [255, 214, 51], [0, 255, 152], [179, 240, 255], [255, 153, 255], [255, 0, 0]];
@@ -103,8 +104,11 @@ module.exports = class EmbedGenerator {
 		newEmbed.setAuthor(summoner.name, undefined, UTILS.opgg(region, summoner.name));
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) newEmbed.setDescription("Level " + summoner.summonerLevel);
-		else if (match.gameStartTime != 0) newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Playing:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => { return p.summonerId == summoner.id; }).championId].emoji + "** on " + queues[match.gameQueueConfigId] + " for `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
-		else newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Game Loading:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => p.summonerId == summoner.id).championId].emoji + "** on " + queues[match.gameQueueConfigId]);
+		else {
+			const game_type = match.gameType == "CUSTOM_GAME" ? "Custom" : queues[match.gameQueueConfigId];
+			if (match.gameStartTime != 0) newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Playing:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => { return p.summonerId == summoner.id; }).championId].emoji + "** on " + game_type + " for `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
+			else newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Game Loading:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => p.summonerId == summoner.id).championId].emoji + "** on " + game_type);
+		}
 		let highest_rank = -1;
 		for (let i = 0; i < ranks.length; ++i) {
 			let description = (ranks[i].wins + ranks[i].losses) + "G (" + UTILS.round(100 * ranks[i].wins / (ranks[i].wins + ranks[i].losses), 2) + "%) = " + ranks[i].wins + "W + " + ranks[i].losses + "L";
@@ -527,7 +531,7 @@ module.exports = class EmbedGenerator {
 				if (streak_result == results[j]) streak_count++;
 				else break;
 			}
-			individual_description += (streak_count + "").padStart(2, " ") + (streak_result ? "Ws " : "Ls ");//streak information
+			individual_description += (streak_count + "").padStart(3, " ") + (streak_result ? "Ws " : "Ls ");//streak information
 			const total_wins = results.reduce((total, increment) => total + (increment ? 1 : 0), 0) + "";
 			const total_losses = results.reduce((total, increment) => total + (increment ? 0 : 1), 0) + "";
 			individual_description += total_wins.padStart(2, " ") + "W/" + total_losses.padStart(2, " ") + "L ";//20 game W/L record
@@ -699,7 +703,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.setDescription("Showing 10 most recent events:");
 		newEmbed.setAuthor(CONFIG.OWNER_DISCORD_IDS[id].name + " (" + id + ")");
 		for (let i = 0; i < docs.length && i < 10; ++i) {
-			let description = "To: " + docs[i].target_id + ", ";
+			let description = docs[i].user ? "uid" : "sid" + ": " + docs[i].target_id + ", ";
 			description += UTILS.ago(new Date(docs[i].id_timestamp)) + ", ";
 			if (docs[i].ban) {
 				description += new Date(docs[i].date).getTime() == 0 ? "Permanent Ban Issued" : "Temporary Ban Issued, duration " + UTILS.duration(new Date(docs[i].id_timestamp), new Date(docs[i].date));
