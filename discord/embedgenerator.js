@@ -43,6 +43,11 @@ const queues = {
 	"1000": "OC Project: Hunters",
 	"1010": "SR Snow ARURF",
 	"1020": "SR One for All",
+	"1030": "OE Intro",
+	"1040": "OE Cadet",
+	"1050": "OE Crewmember",
+	"1060": "OE Captain",
+	"1070": "OE Onslaught",
 	"1200": "NB Nexus Blitz"
 };
 const RANK_ORDER = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "CHALLENGER"];
