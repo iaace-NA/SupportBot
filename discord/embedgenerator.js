@@ -109,6 +109,7 @@ module.exports = class EmbedGenerator {
 			if (match.gameStartTime != 0) newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Playing:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => { return p.summonerId == summoner.id; }).championId].emoji + "** on " + game_type + " for `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
 			else newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Game Loading:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => p.summonerId == summoner.id).championId].emoji + "** on " + game_type);
 		}
+		const will = (region === "na" && summoner.id == 50714503) ? true : false;
 		let highest_rank = -1;
 		for (let i = 0; i < ranks.length; ++i) {
 			let description = (ranks[i].wins + ranks[i].losses) + "G (" + UTILS.round(100 * ranks[i].wins / (ranks[i].wins + ranks[i].losses), 2) + "%) = " + ranks[i].wins + "W + " + ranks[i].losses + "L";
@@ -126,10 +127,20 @@ module.exports = class EmbedGenerator {
 				if (candidate != -1) title += "#" + (candidate + 1) + " ";//add placing if index found
 			}
 			title += ranks[i].leaguePoints + "LP";
-			newEmbed.addField(title, description, true);
+			newEmbed.addField((will ? "~~" : "") + title + (will ? "~~" : ""), (will ? "~~" : "") + description + (will ? "~~" : ""), true);
 			if (RANK_ORDER.indexOf(ranks[i].tier) > highest_rank) highest_rank = RANK_ORDER.indexOf(ranks[i].tier);
 		}
 		if (highest_rank > -1) newEmbed.setColor(RANK_COLOR[highest_rank]);
+		if (will) {
+			const challenger_rank = UTILS.round(UTILS.map(Math.random(), 0, 1, 5, 200));
+			const challenger_LP = UTILS.round(UTILS.map(Math.random(), 0, 1, 100, 1000));
+			const fake_games = UTILS.round(UTILS.map(Math.random(), 0, 1, 200, 700));
+			const fake_wins = UTILS.round(UTILS.map(Math.random(), 0, 1, fake_games / 2, fake_games));
+			const fake_losses = fake_games - fake_wins;
+			const fake_wr = UTILS.round(100 * fake_wins / (fake_wins + fake_losses), 2);
+			newEmbed.addField("<:Challenger:437262128282599424>True Rank: Challenger ~#" + challenger_rank + " " + challenger_LP + "LP", fake_games + "G (" + fake_wr + "%) = " + fake_wins + "W + " + fake_losses + "L", true);
+			newEmbed.setColor(RANK_COLOR[RANK_COLOR.length - 1]);
+		}
 		let cm_description = [];
 		let cm_total = 0;
 		for (let i = 0; i < championmastery.length; ++i) {
