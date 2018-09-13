@@ -29,6 +29,7 @@ let STATUS = {
 	CHAMPION_EMOJIS: false
 };
 const wsapi = new (require("./wsapi.js"))(CONFIG, client, STATUS);
+const Preferences = require("./preferences.js");
 loadAllStaticResources(() => {
 	UTILS.output(process.env.NODE_ENV === "production" ? "PRODUCTION LOGIN" : "DEVELOPMENT LOGIN");
 	client.login().catch(console.error);
@@ -54,7 +55,7 @@ client.on("disconnect", function () {
 client.on("message", function (msg) {
 	try {
 		const ACCESS_LEVEL = UTILS.accessLevel(CONFIG, msg);
-		discordcommands(CONFIG, client, msg, wsapi, sendToChannel, ACCESS_LEVEL);
+		new Preferences(CONFIG, LOLAPI, msg.guild, server_preferences => discordcommands(CONFIG, client, msg, wsapi, sendToChannel, server_preferences, ACCESS_LEVEL))
 	}
 	catch (e) {
 		console.error(e);

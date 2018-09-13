@@ -295,4 +295,7 @@ module.exports = class LOLAPI {
 	getActions(uid, complete = false) {
 		return complete ? this.getIAPI("getactions", { id: uid }) : this.getIAPI("getactions", { id: uid, limit: 10 });
 	}
+	getPreferences(sid) {
+		return this.getIAPI("getpreferences", { id: sid });
+	}
 }

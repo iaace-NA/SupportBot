@@ -100,6 +100,7 @@ let server_preferences_doc = new apicache.Schema({
 	*/
 }, { minimize: false });
 server_preferences_doc.index({ id: "hashed" });
+server_preferences_doc.index({ id: 1 });
 let server_preferences_model = apicache.model("server_preferences_doc", server_preferences_doc);
 
 let region_limiters = {};
@@ -223,7 +224,7 @@ serveWebRequest("/eval/:script", function (req, res, next) {
 	}
 	res.json(result).end();
 }, true);
-routes(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard);
+routes(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard, server_preferences_model);
 function serveWebRequest(branch, callback, validate = false) {
 	if (typeof(branch) == "string") {
 		website.get(branch, function (req, res, next) {

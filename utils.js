@@ -374,14 +374,6 @@ module.exports = class UTILS {
 	}
 	generateTeams(summoners) {//generates all possible teams
 		/*summoners is an array of summoner objects from the API
-		summoners = [{
-			"profileIconId": 1110,
-			"name": "iaace",
-			"summonerLevel": 137,
-			"accountId": 49022274,
-			"id": 34565662,
-			"revisionDate": 1534387647000
-		}]
 		00000 00000: 0: invalid
 		00000 11111: 31: valid
 		00001 00000: 32: invalid
