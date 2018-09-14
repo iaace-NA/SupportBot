@@ -500,7 +500,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		parameters_expected,//boolean
 		elevated_permissions,//requires owner permissions
 		callback) {//optional callback only if successful
-		for (let i in trigger_array) {
+		for (let i = 0; i < trigger_array.length; ++i) {
 			if (parameters_expected && msg.content.trim().toLowerCase().substring(0, trigger_array[i].length) === trigger_array[i].toLowerCase()) {
 				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
