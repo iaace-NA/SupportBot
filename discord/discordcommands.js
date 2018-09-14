@@ -462,7 +462,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	commandGuessUsername(forcePrefix(["championmastery ", "mastery ", "cm "]), false, (region, username, parameter) => {
+	commandGuessUsername(forcePrefix(["championmastery ", "mastery "]), false, (region, username, parameter) => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.CM.SUMMONER_ID).then(result => {
 			lolapi.getChampionMastery(region, result.id, CONFIG.API_MAXAGE.CM.CHAMPION_MASTERY).then(cm => {
 				replyEmbed(embedgenerator.mastery(CONFIG, result, cm));
