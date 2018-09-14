@@ -35,11 +35,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	command(["supportbotprefix"], false, CONFIG.CONSTANTS.ADMINISTRATORS, (original, index) => {
 		preferences.set("prefix", "").then(() => reply(":white_check_mark: Prefixless operation enabled")).catch(reply);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "owner", CONFIG.DISCORD_COMMAND_PREFIX + "owners"], false, false, (original, index) => {
+	command([preferences.get("prefix") + "owner", preferences.get("prefix") + "owners"], false, false, (original, index) => {
 		reply(textgenerator.owners(CONFIG));
 	});
 	//respondable server message or PM
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "banuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+	command([preferences.get("prefix") + "banuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lbanuser <uid> <duration> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1);
@@ -56,7 +56,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			reply(":no_entry: User banned, id " + id + " by " + msg.author.tag + " for : " + reason);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "banserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+	command([preferences.get("prefix") + "banserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lbanserver <sid> <duration> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1);
@@ -70,7 +70,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			reply(":no_entry: Server banned, id " + id + " by " + msg.author.tag + " for " + duration + ": " + reason);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "warnuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+	command([preferences.get("prefix") + "warnuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lwarnuser <uid> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
@@ -82,7 +82,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			reply(":warning: User warned, id " + id + " by " + msg.author.tag + ": " + reason);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "warnserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+	command([preferences.get("prefix") + "warnserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lwarnserver <uid> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
@@ -92,7 +92,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			reply(CONFIG.LOG_CHANNEL_ID, ":warning: Server warned, id " + id + " by " + msg.author.tag + ": " + reason);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "noteuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+	command([preferences.get("prefix") + "noteuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lnoteuser <uid> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
@@ -102,7 +102,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: User note added, id " + id + " by " + msg.author.tag + ": " + reason);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "noteserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+	command([preferences.get("prefix") + "noteserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lnoteserver <sid> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
 		const reason = parameter.substring(parameter.indexOf(" ") + 1);
@@ -112,59 +112,59 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":information_source: Server note added, id " + id + " by " + msg.author.tag + ": " + reason);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "userhistory "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+	command([preferences.get("prefix") + "userhistory "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Luserhistory <uid>
 		lolapi.userHistory(parameter).then(results => {
 			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, parameter, true, results[parameter]));
 		}).catch();
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "serverhistory "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+	command([preferences.get("prefix") + "serverhistory "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lserverhistory <sid>
 		lolapi.serverHistory(parameter).then(results => {
 			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, parameter, false, results[parameter]));
 		}).catch();
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "unbanserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+	command([preferences.get("prefix") + "unbanserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lunbanserver <sid>
 		lolapi.unbanServer(parameter, msg.author.id, msg.author.tag, msg.author.displayAvatarURL).then(result => {
 			reply(":no_entry_sign: Server unbanned, id " + parameter + " by " + msg.author.tag);
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":no_entry_sign: Server unbanned, id " + parameter + " by " + msg.author.tag);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "unbanuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+	command([preferences.get("prefix") + "unbanuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lunbanuser <uid>
 		lolapi.unbanUser(parameter, msg.author.id, msg.author.tag, msg.author.displayAvatarURL).then(result => {
 			reply(":no_entry_sign: User unbanned, id " + parameter + " by " + msg.author.tag);
 			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":no_entry_sign: User unbanned, id " + parameter + " by " + msg.author.tag);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "actionreport "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+	command([preferences.get("prefix") + "actionreport "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lactionreport <uid>
 		if (!UTILS.exists(CONFIG.OWNER_DISCORD_IDS[parameter])) return reply(":x: This user is not a current or previously registered admin.");
 		lolapi.getActions(parameter).then(results => {
 			reply_embed(embedgenerator.actionReport(CONFIG, parameter, results[parameter]));
 		}).catch();
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "permissionstest", CONFIG.DISCORD_COMMAND_PREFIX + "pt"], false, false, () => {
+	command([preferences.get("prefix") + "permissionstest", preferences.get("prefix") + "pt"], false, false, () => {
 		reply("You have " + (isOwner(undefined, false) ? "owner" : "normal") + " permissions.");
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "permissionstest ", CONFIG.DISCORD_COMMAND_PREFIX + "pt "], true, false, () => {
+	command([preferences.get("prefix") + "permissionstest ", preferences.get("prefix") + "pt "], true, false, () => {
 		if (msg.mentions.users.size != 1) return reply(":x: A user must be mentioned.");
 		reply(msg.mentions.users.first().tag + " has " + (isOwner(msg.mentions.users.first().id, false) ? "owner" : "normal") + " permissions.");
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "stats"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
+	command([preferences.get("prefix") + "stats"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 		reply("This is shard " + process.env.SHARD_ID);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "ping"], false, false, () => {
+	command([preferences.get("prefix") + "ping"], false, false, () => {
 		reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
 	});
 	command(["iping"], false, false, () => {
 		lolapi.ping().then(times => reply(textgenerator.internal_ping(times))).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "ping "], true, false, function (original, index, parameter) {
+	command([preferences.get("prefix") + "ping "], true, false, function (original, index, parameter) {
 		reply("you said: " + parameter);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "eval "], true, CONFIG.CONSTANTS.BOTOWNERS, function (original, index, parameter) {
+	command([preferences.get("prefix") + "eval "], true, CONFIG.CONSTANTS.BOTOWNERS, function (original, index, parameter) {
 		try {
 			reply("```" + eval(parameter) + "```");
 		}
@@ -175,19 +175,19 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	command(["iapi eval "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		lolapi.IAPIEval(parameter).then(result => reply("```" + result.string + "```")).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "notify "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+	command([preferences.get("prefix") + "notify "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		wsapi.lnotify(msg.author.username, msg.author.displayAvatarURL, parameter);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "testembed"], false, false, () => {
+	command([preferences.get("prefix") + "testembed"], false, false, () => {
 		reply_embed(embedgenerator.test());
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "sd ", CONFIG.DISCORD_COMMAND_PREFIX + "summonerdebug "], true, false, (original, index, parameter) => {
+	command([preferences.get("prefix") + "sd ", preferences.get("prefix") + "summonerdebug "], true, false, (original, index, parameter) => {
 		lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.SD).then(result => {
 			result.guess = parameter.substring(parameter.indexOf(" ") + 1);
 			reply_embed(embedgenerator.summoner(CONFIG, result));
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "link "], true, false, (original, index, parameter) => {
+	command([preferences.get("prefix") + "link "], true, false, (original, index, parameter) => {
 		let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
 		if (msg.mentions.users.size == 0) {
 			lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.LINK).then(summoner => {
@@ -203,45 +203,45 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1, parameter.indexOf(" <")), CONFIG.API_MAXAGE.LINK).then(summoner => {
 				summoner.region = region;
 				summoner.guess = parameter.substring(parameter.indexOf(" ") + 1, parameter.indexOf(" <"));
-				if (UTILS.exists(summoner.status)) return reply(":x: The username appears to be invalid. Follow the format: `" + CONFIG.DISCORD_COMMAND_PREFIX + "link <region> <username> <@mention>`");
+				if (UTILS.exists(summoner.status)) return reply(":x: The username appears to be invalid. Follow the format: `" + preferences.get("prefix") + "link <region> <username> <@mention>`");
 				lolapi.setLink(msg.mentions.users.first().id, summoner.name).then(result => {
 					result.success ? reply(":white_check_mark: " + msg.mentions.users.first().tag + "'s discord account is now linked to " + summoner.name) : reply(":x: Something went wrong.");
 				}).catch(console.error);
 			}).catch(console.error);
 		}
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "unlink", CONFIG.DISCORD_COMMAND_PREFIX + "removelink"], false, false, (original, index) => {
+	command([preferences.get("prefix") + "unlink", preferences.get("prefix") + "removelink"], false, false, (original, index) => {
 		lolapi.setLink(msg.author.id, "").then(result => {
 			result.success ? reply(":white_check_mark: Your discord account is no longer associated with any username. We'll try to use your discord username when you use a username-optional LoL stats command.") : reply(":x: Something went wrong.");
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "unlink ", CONFIG.DISCORD_COMMAND_PREFIX + "removelink "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index) => {
+	command([preferences.get("prefix") + "unlink ", preferences.get("prefix") + "removelink "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index) => {
 		if (!UTILS.exists(msg.mentions.users.first())) return reply(":x: No user mention specified.");
 		lolapi.setLink(msg.mentions.users.first().id, "").then(result => {
 			result.success ? reply(":white_check_mark: " + msg.mentions.users.first().tag + "'s discord account is no longer associated with any username.") : reply(":x: Something went wrong.");
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "gl", CONFIG.DISCORD_COMMAND_PREFIX + "getlink"], false, false, (original, index) => {
+	command([preferences.get("prefix") + "gl", preferences.get("prefix") + "getlink"], false, false, (original, index) => {
 		lolapi.getLink(msg.author.id).then(result => {
 			if (UTILS.exists(result.username) && result.username != "") reply(":white_check_mark: You're `" + result.username + "`");
 			else reply(":x: No records for user id " + msg.author.id);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "gl ", CONFIG.DISCORD_COMMAND_PREFIX + "getlink "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index) => {
+	command([preferences.get("prefix") + "gl ", preferences.get("prefix") + "getlink "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index) => {
 		if (!UTILS.exists(msg.mentions.users.first())) return reply(":x: No user mention specified.");
 		lolapi.getLink(msg.mentions.users.first().id).then(result => {
 			if (UTILS.exists(result.username) && result.username != "") reply(":white_check_mark: " + msg.mentions.users.first().tag + " is `" + result.username + "`");
 			else reply(":x: No records for user id " + msg.mentions.users.first().id);
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "invite"], false, false, (original, index) => {
+	command([preferences.get("prefix") + "invite"], false, false, (original, index) => {
 		reply("This is the link to add SupportBot to other servers: <" + CONFIG.BOT_ADD_LINK + ">\nAdding it requires the \"Manage Server\" permission.");
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "help"], false, false, (original, index) => {
+	command([preferences.get("prefix") + "help"], false, false, (original, index) => {
 		reply(":white_check_mark: A PM has been sent to you with information on how to use SupportBot.");
 		reply_embed_to_author(embedgenerator.help(CONFIG));
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "setshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "ss ", CONFIG.DISCORD_COMMAND_PREFIX + "createshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "cs ", CONFIG.DISCORD_COMMAND_PREFIX + "addshortcut "], true, false, (original, index, parameter) => {
+	command([preferences.get("prefix") + "setshortcut ", preferences.get("prefix") + "ss ", preferences.get("prefix") + "createshortcut ", preferences.get("prefix") + "cs ", preferences.get("prefix") + "addshortcut "], true, false, (original, index, parameter) => {
 		if (parameter[0] !== "$") return reply(":x: The shortcut must begin with an `$`. Please try again.");
 		if (parameter.indexOf(" ") === -1) return reply(":x: The shortcut word and the username must be separated by a space. Please try again.");
 		if (parameter.length > 60) return reply(":x: The shortcut name or the username is too long.");
@@ -254,7 +254,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			else reply(":x: You can only have up to 50 shortcuts. Please remove some and try again.");
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "removeshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "rs ", CONFIG.DISCORD_COMMAND_PREFIX + "deleteshortcut ", CONFIG.DISCORD_COMMAND_PREFIX + "ds "], true, false, (original, index, parameter) => {
+	command([preferences.get("prefix") + "removeshortcut ", preferences.get("prefix") + "rs ", preferences.get("prefix") + "deleteshortcut ", preferences.get("prefix") + "ds "], true, false, (original, index, parameter) => {
 		if (parameter[0] !== "$") return reply(":x: The shortcut must begin with an `$`. Please try again.");
 		const from = parameter.substring(1).toLowerCase();
 		if (from.length === 0) return reply(":x: The shortcut name was not specified. Please try again.");
@@ -262,12 +262,12 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			if (result.success) reply(":white_check_mark: `$" + from + "` removed (or it did not exist already).");
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "shortcuts", CONFIG.DISCORD_COMMAND_PREFIX + "shortcut"], false, false, (original, index) => {
+	command([preferences.get("prefix") + "shortcuts", preferences.get("prefix") + "shortcut"], false, false, (original, index) => {
 		lolapi.getShortcuts(msg.author.id).then(result => {
 			reply(textgenerator.shortcuts(CONFIG, result));
 		}).catch(console.error);
 	});
-	command([CONFIG.DISCORD_COMMAND_PREFIX + "removeallshortcuts"], false, false, (original, index) => {
+	command([preferences.get("prefix") + "removeallshortcuts"], false, false, (original, index) => {
 		lolapi.removeAllShortcuts(msg.author.id).then(result => {
 			reply(":white_check_mark: All shortcuts were removed.")
 		}).catch(console.error);
@@ -471,13 +471,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	});*/
 
 	if (UTILS.exists(msg.guild)) {//respondable server message only
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "shutdown"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
+		command([preferences.get("prefix") + "shutdown"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 			reply(":white_check_mark: shutdown initiated", shutdown, shutdown);
 		});
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "restart"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
+		command([preferences.get("prefix") + "restart"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 			reply(":white_check_mark: restart initiated", restart, restart);
 		});
-		command([CONFIG.DISCORD_COMMAND_PREFIX + "refresh", CONFIG.DISCORD_COMMAND_PREFIX + "clearcache"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
+		command([preferences.get("prefix") + "refresh", preferences.get("prefix") + "clearcache"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 			reply(":white_check_mark: restart initiated + clearing cache", step2, step2);
 			function step2() {
 				lolapi.clearCache();
