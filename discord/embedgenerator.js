@@ -918,7 +918,7 @@ module.exports = class EmbedGenerator {
 		}
 		return newEmbed;
 	}
-	mastery(CONFIG, summoner, championmastery) {
+	mastery(CONFIG, summoner, championmastery, region) {
 		let newEmbed = new Discord.RichEmbed();
 		if (!UTILS.exists(summoner.id)) {
 			newEmbed.setAuthor(summoner.guess);

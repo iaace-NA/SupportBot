@@ -465,7 +465,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	commandGuessUsername(forcePrefix(["championmastery ", "mastery "]), false, (region, username, parameter) => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.CM.SUMMONER_ID).then(result => {
 			lolapi.getChampionMastery(region, result.id, CONFIG.API_MAXAGE.CM.CHAMPION_MASTERY).then(cm => {
-				replyEmbed(embedgenerator.mastery(CONFIG, result, cm));
+				replyEmbed(embedgenerator.mastery(CONFIG, result, cm, CONFIG.REGIONS_REVERSE[region]));
 			}).catch(console.error);
 		}).catch(console.error);
 	});
