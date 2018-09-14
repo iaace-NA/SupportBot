@@ -228,7 +228,7 @@ routes(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplin
 function serveWebRequest(branch, callback, validate = false) {
 	if (typeof(branch) == "string") {
 		website.get(branch, function (req, res, next) {
-			//UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
+			UTILS.debug("\trequest received: " + req.originalUrl);
 			if (validate && !UTILS.exists(req.query.k)) return res.status(401).end();//no key
 			if (validate && req.query.k !== CONFIG.API_KEY) return res.status(403).end();//wrong key
 			load_average[0].add();
@@ -238,7 +238,7 @@ function serveWebRequest(branch, callback, validate = false) {
 	else {
 		for (let b in branch) {
 			website.get(branch[b], function(req, res, next){
-				//UTILS.output("\trequest received #" + req_num + ": " + req.originalUrl);
+				UTILS.debug("\trequest received: " + req.originalUrl);
 				if (validate && !UTILS.exists(req.query.k)) return res.status(401).end();//no key
 				if (validate && req.query.k !== CONFIG.API_KEY) return res.status(403).end();//wrong key
 				load_average[0].add();
