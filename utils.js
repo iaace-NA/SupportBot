@@ -42,8 +42,14 @@ module.exports = class UTILS {
 		return Math.round(num * Math.pow(10, decimal)) / Math.pow(10, decimal);
 	}
 	assert(condition) {
-		if (typeof (condition) != "boolean") throw new Error("asserting non boolean value: " + typeof (condition));
-		if (!condition) throw new Error("assertion false");
+		if (typeof (condition) != "boolean") {
+			console.trace();
+			throw new Error("asserting non boolean value: " + typeof (condition));
+		}
+		if (!condition) {
+			console.trace();
+			throw new Error("assertion false");
+		}
 		return true;
 	}
 	ago(date) {
