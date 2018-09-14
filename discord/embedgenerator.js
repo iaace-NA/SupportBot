@@ -933,7 +933,7 @@ module.exports = class EmbedGenerator {
 		let cm_total = 0;
 		let cms_total = 0;
 		for (let i = 0; i < championmastery.length; ++i) {
-			cm_description.push("#" + (i + 1) + ". `M" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + " `" + UTILS.gold(championmastery[i].championPoints) + "`pts");
+			cm_description.push("#`" + (i + 1).pad(2) + "`. `M" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + " `" + UTILS.gold(championmastery[i].championPoints) + "`pts");
 			cm_total += championmastery[i].championLevel;
 			cms_total += championmastery[i].championPoints;
 		}
