@@ -937,7 +937,7 @@ module.exports = class EmbedGenerator {
 			cm_total += championmastery[i].championLevel;
 			cms_total += championmastery[i].championPoints;
 		}
-		newEmbed.setDescription("Total Mastery Level: " + cm_total + "\tTotal Mastery Score: " + UTILS.gold(cms_total));
+		newEmbed.setDescription("Total Mastery Level: " + cm_total + "\nTotal Mastery Score: " + UTILS.gold(cms_total));
 		const SECTION_LENGTH = 15;
 		if (cm_description.length > 0) {
 			const sections = Math.trunc(cm_description.length / SECTION_LENGTH) + 1;
