@@ -115,13 +115,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	command([preferences.get("prefix") + "userhistory "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Luserhistory <uid>
 		lolapi.userHistory(parameter).then(results => {
-			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, parameter, true, results[parameter]));
+			replyEmbed(embedgenerator.disciplinaryHistory(CONFIG, parameter, true, results[parameter]));
 		}).catch();
 	});
 	command([preferences.get("prefix") + "serverhistory "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lserverhistory <sid>
 		lolapi.serverHistory(parameter).then(results => {
-			reply_embed(embedgenerator.disciplinaryHistory(CONFIG, parameter, false, results[parameter]));
+			replyEmbed(embedgenerator.disciplinaryHistory(CONFIG, parameter, false, results[parameter]));
 		}).catch();
 	});
 	command([preferences.get("prefix") + "unbanserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
@@ -142,7 +142,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		//Lactionreport <uid>
 		if (!UTILS.exists(CONFIG.OWNER_DISCORD_IDS[parameter])) return reply(":x: This user is not a current or previously registered admin.");
 		lolapi.getActions(parameter).then(results => {
-			reply_embed(embedgenerator.actionReport(CONFIG, parameter, results[parameter]));
+			replyEmbed(embedgenerator.actionReport(CONFIG, parameter, results[parameter]));
 		}).catch();
 	});
 	command([preferences.get("prefix") + "permissionstest", preferences.get("prefix") + "pt"], false, false, () => {
@@ -179,16 +179,16 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		wsapi.lnotify(msg.author.username, msg.author.displayAvatarURL, parameter);
 	});
 	command([preferences.get("prefix") + "testembed"], false, false, () => {
-		reply_embed(embedgenerator.test());
+		replyEmbed(embedgenerator.test());
 	});
 	command([preferences.get("prefix") + "sd ", preferences.get("prefix") + "summonerdebug "], true, false, (original, index, parameter) => {
-		lolapi.getSummonerIDFromName(assert_region(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.SD).then(result => {
+		lolapi.getSummonerIDFromName(assertRegion(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.SD).then(result => {
 			result.guess = parameter.substring(parameter.indexOf(" ") + 1);
-			reply_embed(embedgenerator.summoner(CONFIG, result));
+			replyEmbed(embedgenerator.summoner(CONFIG, result));
 		}).catch(console.error);
 	});
 	command([preferences.get("prefix") + "link "], true, false, (original, index, parameter) => {
-		let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
+		let region = assertRegion(parameter.substring(0, parameter.indexOf(" ")));
 		if (msg.mentions.users.size == 0) {
 			lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.LINK).then(summoner => {
 				summoner.region = region;
@@ -239,7 +239,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	});
 	command([preferences.get("prefix") + "help"], false, false, (original, index) => {
 		reply(":white_check_mark: A PM has been sent to you with information on how to use SupportBot.");
-		reply_embed_to_author(embedgenerator.help(CONFIG));
+		replyEmbedToAuthor(embedgenerator.help(CONFIG));
 	});
 	command([preferences.get("prefix") + "setshortcut ", preferences.get("prefix") + "ss ", preferences.get("prefix") + "createshortcut ", preferences.get("prefix") + "cs ", preferences.get("prefix") + "addshortcut "], true, false, (original, index, parameter) => {
 		if (parameter[0] !== "$") return reply(":x: The shortcut must begin with an `$`. Please try again.");
@@ -274,50 +274,50 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	});
 	if (preferences.get("auto_opgg")) {
 		command(["http://"], true, false, (original, index, parameter) => {
-			const region = assert_region(parameter.substring(0, parameter.indexOf(".")), false);
+			const region = assertRegion(parameter.substring(0, parameter.indexOf(".")), false);
 			if (parameter.substring(parameter.indexOf(".") + 1, parameter.indexOf(".") + 6) == "op.gg") {
 				let username = decodeURIComponent(msg.content.substring(msg.content.indexOf("userName=") + "userName=".length));
 				lolapi.getSummonerCard(region, username).then(result => {
-					reply_embed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter.substring(0, parameter.indexOf(".")), result[3]));
+					replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter.substring(0, parameter.indexOf(".")), result[3]));
 				}).catch();
 			}
 		});
 	}
 	command(["service status ", "servicestatus ", "ss ", "status "], true, false, (original, index, parameter) => {
-		let region = assert_region(parameter);
+		let region = assertRegion(parameter);
 		lolapi.getStatus(region, 60).then((status_object) => {
-			reply_embed(embedgenerator.status(status_object));
+			replyEmbed(embedgenerator.status(status_object));
 		}).catch(console.error);
 	});
-	commandGuessUsername([""], false, (region, username, parameter) => {
+	commandGuessUsername([""], false, (region, username, parameter, guess_method) => {
 		lolapi.getSummonerCard(region, username).then(result => {
-			reply_embed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter, result[3], result[4]));
+			replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter, result[3], result[4]));
 		}).catch(e => {
 			if (UTILS.exists(e)) console.error(e);
-			reply(":x: No results for `" + username + "`. Please revise your request.");
+			reply(":x: No results for `" + username + "`." + suggestLink(guess_method));
 		});
 	});
-	commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter) => {
+	commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter, guess_method) => {
 		request_profiler.mark("mh command recognized");
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.MH.SUMMONER_ID).then(result => {
 			result.region = region;
-			if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`.");
+			if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
 			lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.MH.RECENT_GAMES).then(matchhistory => {
-				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`.");
+				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`." + suggestLink(guess_method));
 				lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m =>  m.gameId), CONFIG.API_MAXAGE.MH.MULTIPLE_MATCH).then(matches => {
 					request_profiler.begin("generating embed");
 					const answer = embedgenerator.match(CONFIG, result, matchhistory.matches, matches);
 					request_profiler.end("generating embed");
 					UTILS.debug(request_profiler.endAll());
-					reply_embed(answer);
+					replyEmbed(answer);
 				}).catch(console.error);
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	command(["m ", "multi ", "c ", "compare "], true, false, (original, index, parameter) => {
+	command(["compare ", "multi ", "m ", "c "], true, false, (original, index, parameter) => {
 		request_profiler.mark("multi command recognized");
 		request_profiler.begin("parsing usernames");
-		let region = assert_region(parameter.substring(0, parameter.indexOf(" ")));
+		let region = assertRegion(parameter.substring(0, parameter.indexOf(" ")), index < 2);
 		let pre_usernames;
 		if (parameter.indexOf("\n") != -1) pre_usernames = UTILS.presentLobby(parameter.substring(parameter.indexOf(" ") + 1).split("\n"));//lobby text formatting
 		else if (parameter.indexOf(",") != -1) pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => s.trim());//CSV
@@ -349,7 +349,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 							let mIDA = [];//match id array;
 							for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
 							lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.MULTI.MULTIPLE_MATCH).then(matches => {
-								reply_embed(embedgenerator.multiSummoner(CONFIG, CONFIG.REGIONS_REVERSE[region], summoners, ranks, masteries, mhA, matches));
+								replyEmbed(embedgenerator.multiSummoner(CONFIG, CONFIG.REGIONS_REVERSE[region], summoners, ranks, masteries, mhA, matches));
 							}).catch(console.error);
 						}).catch(console.error);
 					}).catch(console.error);
@@ -361,7 +361,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		const debug_mode = index > 3;
 		request_profiler.mark("ftg command recognized");
 		request_profiler.begin("parsing usernames");
-		let region = assert_region(parameter.substring(0, parameter.indexOf(" ")), index < 2);
+		let region = assertRegion(parameter.substring(0, parameter.indexOf(" ")), index < 2);
 		let pre_usernames;
 		if (parameter.indexOf("\n") != -1) pre_usernames = UTILS.presentLobby(parameter.substring(parameter.indexOf(" ") + 1).split("\n"));//lobby text formatting
 		else if (parameter.indexOf(",") != -1) pre_usernames = parameter.substring(parameter.indexOf(" ") + 1).split(",").map(s => s.trim());//CSV
@@ -391,7 +391,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 					lolapi.getMultipleChampionMastery(region, ids, CONFIG.API_MAXAGE.FTG.MULTIPLE_MASTERIES).then(masteries => {
 						request_profiler.end("api requests");
 						request_profiler.begin("generate embed");
-						reply_embed(embedgenerator.fairTeam(CONFIG, CONFIG.REGIONS_REVERSE[region], summoners, ranks, masteries, debug_mode));
+						replyEmbed(embedgenerator.fairTeam(CONFIG, CONFIG.REGIONS_REVERSE[region], summoners, ranks, masteries, debug_mode));
 						request_profiler.end("generate embed");
 						UTILS.debug(request_profiler.endAll());
 					}).catch(console.error);
@@ -405,9 +405,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.LG.SUMMONER_ID).then(result => {
 			result.region = region;
 			result.guess = username;
-			if (!UTILS.exists(result.id)) return reply(":x: No username found for `" + username + "`.");
+			if (!UTILS.exists(result.id)) return reply(":x: No username found for `" + username + "`." + suggestLink(guess_method));
 			lolapi.getLiveMatch(region, result.id, CONFIG.API_MAXAGE.LG.LIVE_MATCH).then(match => {
-				if (UTILS.exists(match.status)) return reply(":x: No current matches found for `" + username + "`.");
+				if (UTILS.exists(match.status)) return reply(":x: No current matches found for `" + username + "`." + suggestLink(guess_method));
 				lolapi.getMultipleSummonerFromSummonerID(region, match.participants.map(p => p.summonerId), CONFIG.API_MAXAGE.LG.OTHER_SUMMONER_ID).then(pSA => {//participant summoner array
 					lolapi.getMultipleRecentGames(region, pSA.map(pS => pS.accountId), CONFIG.API_MAXAGE.LG.RECENT_GAMES).then(mhA => {//matchhistory array
 						let mIDA = [];//match id array;
@@ -420,10 +420,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 									const newEmbed = embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA);
 									request_profiler.end("generating embed");
 									UTILS.debug(request_profiler.endAll());
-									reply_embed(newEmbed, () => {
-										//reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false, true));
+									replyEmbed(newEmbed, () => {
+										//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false, true));
 									});
-									//reply_embed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false));//untrimmed output
+									//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false));//untrimmed output
 								}).catch();
 							}).catch();
 						});
@@ -433,14 +433,14 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		}).catch(console.error);
 		//});
 	});
-	commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number) => {
+	commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number, guess_method) => {
 		request_profiler.mark("dmh command recognized");
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.DMH.SUMMONER_ID).then(result => {
 			result.region = region;
 			result.guess = username;
-			if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`.");
+			if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
 			lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.DMH.RECENT_GAMES).then(matchhistory => {
-				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply(":x: No recent matches found for `" + username + "`.");
+				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
 				if (number < 1 || number > 20 || !UTILS.exists(matchhistory.matches[number - 1])) return reply(":x: This number is out of range.");
 				lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId, CONFIG.API_MAXAGE.DMH.MATCH_INFORMATION).then(match => {
 					const pIDA = match.participantIdentities.map(pI => {
@@ -454,7 +454,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 								const answer = embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match, ranks, masteries, pSA);
 								request_profiler.end("generating embed");
 								UTILS.debug(request_profiler.endAll());
-								reply_embed(answer);
+								replyEmbed(answer);
 							});
 						});
 					}).catch();
@@ -467,7 +467,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		lolapi.getSummonerIDFromName(region, username).then(result => {
 			result.region = region;
 			lolapi.getMMR(region, result.id).then(mmr => {
-				reply_embed(embedgenerator.mmr(CONFIG, result, mmr));
+				replyEmbed(embedgenerator.mmr(CONFIG, result, mmr));
 			}).catch();
 		});
 	});*/
@@ -534,10 +534,15 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	function commandGuessUsername(trigger_array,//array of command aliases, prefix needs to be included
 		elevated_permissions,//requires owner permissions
 		callback) {//optional callback only if successful
-		//returns (region, username, parameter)
+		/*returns (region, username, parameter, username guess method)
+		username guess method 0: username provided
+		username guess method 1: shortcut provided
+		username guess method 2: link
+		username guess method 3: discord username
+		*/
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			try {//username explicitly provided
-				const region = assert_region(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
+				const region = assertRegion(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
 				if (parameter.substring(parameter.indexOf(" ") + 1).length < 35) {//longest query should be less than 35 characters
 					if (msg.mentions.users.size == 1) {
 						lolapi.getLink(msg.mentions.users.first().id).then(result => {
@@ -548,7 +553,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 					}
 					else if (parameter.substring(parameter.indexOf(" ") + 1)[0] == "$") {
 						lolapi.getShortcut(msg.author.id, parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)).then(result => {
-							callback(region, result[parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)], parameter.substring(0, parameter.indexOf(" ")));
+							callback(region, result[parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)], parameter.substring(0, parameter.indexOf(" ")), 1);
 						}).catch(e => {
 							if (e) reply(":x: An error has occurred. The shortcut may not exist.");
 						});
@@ -576,11 +581,14 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			}
 			catch (e) {//username not provided
 				try {
-					const region = assert_region(parameter, false);
+					const region = assertRegion(parameter, false);
 					lolapi.getLink(msg.author.id).then(result => {
 						let username = msg.author.username;//suppose the link doesn't exist in the database
-						if (UTILS.exists(result.username) && result.username != "") username = result.username;//link exists
-						callback(region, username, parameter);
+						if (UTILS.exists(result.username) && result.username != "") {
+							username = result.username;//link exists
+							callback(region, username, parameter, 2);
+						}
+						else callback(region, username, parameter, 3);
 					}).catch(console.error);
 				}
 				catch (e) { }
@@ -591,16 +599,21 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	function commandGuessUsernameNumber(trigger_array,//array of command aliases, prefix needs to be included
 		elevated_permissions,//requires owner permissions
 		callback) {//optional callback only if successful
-		//returns (region, username, number)
+		/*returns (region, username, number, username guess method)
+		username guess method 0: username provided
+		username guess method 1: shortcut provided
+		username guess method 2: link
+		username guess method 3: discord username
+		*/
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			const number = parseInt(parameter.substring(0, parameter.indexOf(" ")));
 			if (isNaN(number)) return;
 			try {//username explicitly provided
-				const region = assert_region(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
+				const region = assertRegion(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
 				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) {//longest query should be less than 35 characters
 					if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1)[0] == "$") {
 						lolapi.getShortcut(msg.author.id, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)).then(result => {
-							callback(region, result[parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)], number);
+							callback(region, result[parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)], number, 1);
 						}).catch(e => {
 							if (e) reply(":x: An error has occurred. The shortcut may not exist.");
 						});
@@ -628,11 +641,14 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			}
 			catch (e) {//username not provided
 				try {
-					const region = assert_region(parameter.substring(parameter.indexOf(" ") + 1), false);
+					const region = assertRegion(parameter.substring(parameter.indexOf(" ") + 1), false);
 					lolapi.getLink(msg.author.id).then(result => {
 						let username = msg.author.username;//suppose the link doesn't exist in the database
-						if (UTILS.exists(result.username) && result.username != "") username = result.username;//link exists
-						callback(region, username, number);
+						if (UTILS.exists(result.username) && result.username != "") {
+							username = result.username;//link exists
+							callback(region, username, number, 2);
+						}
+						else callback(region, username, number, 3);
 					}).catch(console.error);
 				}
 				catch (e) { }
@@ -661,66 +677,66 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		const answer = UTILS.exists(CONFIG.OWNER_DISCORD_IDS[candidate]) && CONFIG.OWNER_DISCORD_IDS[candidate].active;
 		if (!answer) {
 			UTILS.output("insufficient permissions");
-			print_message();
+			printMessage();
 			if (notify) msg.channel.send(":x: Owner permissions required. Ask for help at " + CONFIG.HELP_SERVER_INVITE_LINK + " .").catch(console.error);
 		}
 		return answer;
 	}
-	function reply(reply_text, callback, error_callback) {
-		print_message();
+	function reply(reply_text, callback, errorCallback) {
+		printMessage();
 		lolapi.terminate();
 		console.log("reply (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
 		msg.channel.send(reply_text, { split: true }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
 			console.error(e);
-			if (UTILS.exists(error_callback)) error_callback(e);
+			if (UTILS.exists(errorCallback)) errorCallback(e);
 		});
 	}
 
-	function reply_to_author(reply_text, callback, error_callback) {
-		print_message();
+	function replyToAuthor(reply_text, callback, errorCallback) {
+		printMessage();
 		lolapi.terminate();
 		console.log("reply to author (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
 		msg.author.send(reply_text, { split: true }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
 			console.error(e);
-			if (UTILS.exists(error_callback)) error_callback(e);
+			if (UTILS.exists(errorCallback)) errorCallback(e);
 		});
 	}
 
-	function reply_embed(reply_embed, callback, error_callback) {
+	function replyEmbed(replyEmbed, callback, errorCallback) {
 		if (UTILS.exists(msg.guild) && !msg.channel.permissionsFor(client.user).has(["EMBED_LINKS"])) {//doesn't have permission to embed links in server
 			lolapi.terminate();
 			reply(":x: I cannot respond to your request without the \"embed links\" permission.");
 		}
 		else {//has permission to embed links, or is a DM/PM
-			print_message();
+			printMessage();
 			lolapi.terminate();
 			console.log("reply embedded (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
-			msg.channel.send("", { embed: reply_embed }).then((nMsg) => {
+			msg.channel.send("", { embed: replyEmbed }).then((nMsg) => {
 				if (UTILS.exists(callback)) callback(nMsg);
 			}).catch((e) => {
 				console.error(e);
-				if (UTILS.exists(error_callback)) error_callback(e);
+				if (UTILS.exists(errorCallback)) errorCallback(e);
 			});
 		}
 	}
 
-	function reply_embed_to_author(reply_embed, callback, error_callback) {
-		print_message();
+	function replyEmbedToAuthor(replyEmbed, callback, errorCallback) {
+		printMessage();
 		lolapi.terminate();
 		console.log("reply embedded to author (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
-		msg.author.send("", { embed: reply_embed }).then((nMsg) => {
+		msg.author.send("", { embed: replyEmbed }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
 			console.error(e);
-			if (UTILS.exists(error_callback)) error_callback(e);
+			if (UTILS.exists(errorCallback)) errorCallback(e);
 		});
 	}
 
-	function print_message() {
+	function printMessage() {
 		const basic = msg.id + "\ncontent: " + msg.content +
 			"\nauthor: " + msg.author.tag + " :: " + msg.author.id +
 			"\nchannel: " + msg.channel.name + " :: " + msg.channel.id;
@@ -729,7 +745,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			UTILS.output("received PM/DM message :: " + basic);
 		}
 	}
-	function assert_region(test_string, notify = true) {
+	function assertRegion(test_string, notify = true) {
 		if (!UTILS.exists(CONFIG.REGIONS[test_string.toUpperCase()])) {
 			if (notify) reply(":x: You need to specify a region.");
 			throw new Error("Region not specified");
@@ -737,6 +753,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		else {
 			return CONFIG.REGIONS[test_string.toUpperCase()];
 		}
+	}
+	function suggestLink(guess_method) {
+		return guess_method === 3 ? " We tried using your discord username but could not find a summoner with the same name. Let us know what your LoL username is using `" + CONFIG.DISCORD_COMMAND_PREFIX + "link <region> <ign>` and we'll remember it for next time!" : "";
 	}
 	function shutdown() {
 		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x: Shutdown initiated.");

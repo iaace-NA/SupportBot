@@ -213,7 +213,7 @@ module.exports = class UTILS {
 	}
 	KDAFormat(num) {
 		if (isNaN(num) || num == Infinity) return "Perfect";
-		else return this.round(num, 2).toFixed("2");
+		else return this.round(num, 2).toFixed(2);
 	}
 	KPFormat(num) {
 		if (isNaN(num)) return 0;
