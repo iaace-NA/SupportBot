@@ -487,7 +487,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 				restart();
 			}
 		});*/
-		command([preferences.get("auto_opgg") + "setting auto-opgg on", preferences.get("auto_opgg") + "setting auto-opgg off"], false, CONFIG.CONSTANTS.MODERATORS, (original, index) => {
+		command([preferences.get("prefix") + "setting auto-opgg on", preferences.get("prefix") + "setting auto-opgg off"], false, CONFIG.CONSTANTS.MODERATORS, (original, index) => {
 			const new_setting = index === 0 ? true : false;
 			preferences.set("auto_opgg", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will automatically show summoner information when an op.gg link is posted." : "SupportBot will not show summoner information when an op.gg link is posted."))).catch(reply);
 		});
