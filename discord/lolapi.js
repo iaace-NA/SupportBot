@@ -298,4 +298,7 @@ module.exports = class LOLAPI {
 	getPreferences(sid) {
 		return this.getIAPI("getpreferences", { id: sid });
 	}
+	setPreferences(sid, prop, val, type) {
+		return this.getIAPI("setpreferences", { id: sid, prop, val, type });
+	}
 }

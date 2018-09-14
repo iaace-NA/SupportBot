@@ -289,8 +289,40 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 		});
 	}, true);
 	serveWebRequest("/getpreferences", (req, res, next) => {
-
+		findPreferences(req.query.id, res, doc => {
+			if (!UTILS.exists(doc)) {//create new doc
+				let new_document = new shortcut_doc_model({});
+				new_document.save((e, doc) => {
+					res.json(doc.toObject());
+				});
+			}
+			else {//
+				res.json(doc.toObject());
+			}
+		});
 	}, true);
+	serveWebRequest("/setpreferences", (req, res, next) => {
+		findPreferences(req.query.id, res, doc => {
+			if(!UTILS.exists(doc)) return res.status(412).end();//precondition failed
+			let c_val = req.query.val;
+			if (req.query.type === "number") c_val = parseInt(type);
+			else if (req.query.type === "boolean") {
+				if (c_val === "true") c_val = true;
+				else if (c_val === "false") c_val = false;
+				else return res.status(400).end();
+			}
+			else;//string type do not change
+			doc[prop] = c_val;
+			doc.markModified(prop);
+			doc.save(e => {
+				if (e) {
+					console.error(e);
+					return res.status(500).end();
+				}
+				else res.json({ success: true });
+			});
+		});
+	});
 	serveWebRequest("/ping", function (req, res, next) {
 		res.json({ received: new Date().getTime() });
 	}, true);
