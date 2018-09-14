@@ -291,7 +291,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	});
 	commandGuessUsername([""], false, (region, username, parameter, guess_method) => {
 		lolapi.getSummonerCard(region, username).then(result => {
-			replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter, result[3], result[4]));
+			replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], CONFIG.REGIONS_REVERSE[region], result[3], result[4]));
 		}).catch(e => {
 			if (UTILS.exists(e)) console.error(e);
 			reply(":x: No results for `" + username + "`." + suggestLink(guess_method));
