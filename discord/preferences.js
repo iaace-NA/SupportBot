@@ -1,8 +1,9 @@
 "use strict";
 const UTILS = new (require("../utils.js"))();
-const REQUEST = require("request");
 const fs = require("fs");
-const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt") };
+const argv_options = new (require("getopts"))(process.argv.slice(2), {
+	alias: { c: ["config"] },
+	default: { c: "config.json" }});
 let cache = {};
 let CONFIG;
 try {
@@ -31,9 +32,6 @@ module.exports = class Preferences {
 	constructor(lolapi, guild, callback) {
 		this.lolapi = lolapi;
 		if (!UTILS.exists(CONFIG)) throw new Error("config.json required.");
-		this.request = REQUEST;
-		this.address = "https://" + CONFIG.API_ADDRESS;
-		this.port = CONFIG.API_PORT;
 		this.sid = UTILS.exists(guild) ? guild.id : undefined;
 		if (UTILS.exists(this.sid)) {//server id exists
 			this.server_message = true;
