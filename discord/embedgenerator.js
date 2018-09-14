@@ -933,14 +933,15 @@ module.exports = class EmbedGenerator {
 		let cm_total = 0;
 		let cms_total = 0;
 		for (let i = 0; i < championmastery.length; ++i) {
-			cm_description.push("#" + (i + 1) + ". `M" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + " `" + UTILS.numberWithCommas(championmastery[i].championPoints) + "`pts");
+			cm_description.push("#" + (i + 1) + ". `M" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + " `" + UTILS.gold(championmastery[i].championPoints) + "`pts");
 			cm_total += championmastery[i].championLevel;
 			cms_total += championmastery[i].championPoints;
 		}
 		newEmbed.setDescription("Total Mastery Level: " + cm_total + "\tTotal Mastery Score: " + UTILS.gold(cms_total));
+		const SECTION_LENGTH = 15;
 		if (cm_description.length > 0) {
-			const sections = Math.trunc(cm_description.length / 20) + 1;
-			for (let i = 0; i < sections; ++i) newEmbed.addField("Individual Champion Stats:" + cm_total, cm_description.slice(i * 20, (i + 1) * 20).join("\n"), true);
+			const sections = Math.trunc(cm_description.length / SECTION_LENGTH) + 1;
+			for (let i = 0; i < sections; ++i) newEmbed.addField("Individual Champion Stats:" + cm_total, cm_description.slice(i * SECTION_LENGTH, (i + 1) * SECTION_LENGTH).join("\n"), true);
 		}
 		return newEmbed;
 	}
