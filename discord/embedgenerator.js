@@ -918,4 +918,30 @@ module.exports = class EmbedGenerator {
 		}
 		return newEmbed;
 	}
+	mastery(CONFIG, summoner, championmastery) {
+		let newEmbed = new Discord.RichEmbed();
+		if (!UTILS.exists(summoner.id)) {
+			newEmbed.setAuthor(summoner.guess);
+			newEmbed.setTitle("This summoner does not exist.");
+			newEmbed.setDescription("Please revise your request.");
+			newEmbed.setColor([255, 0, 0]);
+			return newEmbed;
+		}
+		newEmbed.setAuthor(summoner.name, undefined, UTILS.opgg(region, summoner.name));
+		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
+		let cm_description = [];
+		let cm_total = 0;
+		let cms_total = 0;
+		for (let i = 0; i < championmastery.length; ++i) {
+			cm_description.push("#" + (i + 1) + ". `M" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + " `" + UTILS.numberWithCommas(championmastery[i].championPoints) + "`pts");
+			cm_total += championmastery[i].championLevel;
+			cms_total += championmastery[i].championPoints;
+		}
+		newEmbed.setDescription("Total Mastery Level: " + cm_total + "\tTotal Mastery Score: " + UTILS.gold(cms_total));
+		if (cm_description.length > 0) {
+			const sections = Math.trunc(cm_description.length / 20) + 1;
+			for (let i = 0; i < sections; ++i) newEmbed.addField("Individual Champion Stats:" + cm_total, cm_description.slice(i * 20, (i + 1) * 20).join("\n"), true);
+		}
+		return newEmbed;
+	}
 }
