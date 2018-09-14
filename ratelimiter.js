@@ -19,7 +19,7 @@ module.exports = class RateLimiter {
 		}
 		else return false;
 	}
-	check() {
+	check(ct = new Date().getTime()) {
 		for (let i in this.eventTimes) {//clean
 			if (this.eventTimes[i] < new Date().getTime() - this.timePeriod) {
 				this.eventTimes.shift();
@@ -32,6 +32,7 @@ module.exports = class RateLimiter {
 		this.eventTimes = [];
 	}
 	remainingEvents() {//remaining commands to use within the time period
+		this.check();
 		return this.timeFrequency - this.eventTimes.length - 1 >= 0 ? this.timeFrequency - this.eventTimes.length - 1 : 0;
 	}
 	remainingTime() {//time in seconds before next available command
