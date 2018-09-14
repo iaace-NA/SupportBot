@@ -312,8 +312,8 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 				else return res.status(400).end();
 			}
 			else;//string type do not change
-			doc[prop] = c_val;
-			doc.markModified(prop);
+			doc[req.query.prop] = c_val;
+			doc.markModified(req.query.prop);
 			doc.save(e => {
 				if (e) {
 					console.error(e);
