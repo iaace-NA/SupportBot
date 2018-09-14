@@ -322,7 +322,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 				else res.json({ success: true });
 			});
 		});
-	});
+	}, true);
 	serveWebRequest("/ping", function (req, res, next) {
 		res.json({ received: new Date().getTime() });
 	}, true);
