@@ -539,7 +539,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		username guess method 0: username provided
 		username guess method 1: shortcut provided
 		username guess method 2: link
-		username guess method 3: discord username
+		username guess method 3: implicit discord username
+		username guess method 4: explicit discord mention
+		username guess method 5: recently used command
 		*/
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			try {//username explicitly provided
@@ -549,7 +551,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 						lolapi.getLink(msg.mentions.users.first().id).then(result => {
 							let username = msg.mentions.users.first().username;//suppose the link doesn't exist in the database
 							if (UTILS.exists(result.username) && result.username != "") username = result.username;//link exists
-							callback(region, username, parameter);
+							callback(region, username, parameter, 4);
 						}).catch(console.error);
 					}
 					else if (parameter.substring(parameter.indexOf(" ") + 1)[0] == "$") {
@@ -574,10 +576,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 								}
 							}
 							if (!UTILS.exists(username)) reply(":x: Could not find a recent username queried.");
-							else callback(region, username, parameter.substring(0, parameter.indexOf(" ")));
+							else callback(region, username, parameter.substring(0, parameter.indexOf(" ")), 5);
 						}).catch(console.error);
 					}
-					else callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")));
+					else callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")), 0);
 				}
 			}
 			catch (e) {//username not provided
@@ -604,7 +606,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		username guess method 0: username provided
 		username guess method 1: shortcut provided
 		username guess method 2: link
-		username guess method 3: discord username
+		username guess method 3: implicit discord username
+		username guess method 4: explicit discord mention
+		username guess method 5: recently used command
 		*/
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			const number = parseInt(parameter.substring(0, parameter.indexOf(" ")));
@@ -612,7 +616,14 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			try {//username explicitly provided
 				const region = assertRegion(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
 				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) {//longest query should be less than 35 characters
-					if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1)[0] == "$") {
+					if (msg.mentions.users.size == 1) {
+						lolapi.getLink(msg.mentions.users.first().id).then(result => {
+							let username = msg.mentions.users.first().username;//suppose the link doesn't exist in the database
+							if (UTILS.exists(result.username) && result.username != "") username = result.username;//link exists
+							callback(region, username, number, 4);
+						}).catch(console.error);
+					}
+					else if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1)[0] == "$") {
 						lolapi.getShortcut(msg.author.id, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)).then(result => {
 							callback(region, result[parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)], number, 1);
 						}).catch(e => {
@@ -634,10 +645,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 								}
 							}
 							if (!UTILS.exists(username)) reply(":x: Could not find a recent username queried.");
-							else callback(region, username, number);
+							else callback(region, username, number, 5);
 						}).catch(console.error);
 					}
-					else callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number);
+					else callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number, 0);
 				}
 			}
 			catch (e) {//username not provided
