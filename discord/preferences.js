@@ -35,7 +35,7 @@ module.exports = class Preferences {
 		this.address = "https://" + CONFIG.API_ADDRESS;
 		this.port = CONFIG.API_PORT;
 		this.sid = UTILS.exists(guild) ? guild.id : undefined;
-		if (!UTILS.exists(this.sid)) {
+		if (UTILS.exists(this.sid)) {//server id exists
 			this.server_message = true;
 			if (!UTILS.exists(cache[this.sid])) {//doesn't exist in cache
 				UTILS.debug(this.sid + "preferences: cache miss");
@@ -60,11 +60,14 @@ module.exports = class Preferences {
 		return this.server_message ? cache[this.sid][prop] : newPreferences[prop];
 	}
 	set(prop, val) {
-		UTILS.debug("Attempting to set preferences[\"" + this.sid + "\"][\"" + prop + "\" = " + val + ";");
-		if (!this.server_message || !UTILS.exists(preferencesFormat[prop]) || typeof(val) !== preferencesFormat[prop]) return false;
-		cache[this.sid][prop] = val;
-		//db write
-		return true;
+		return new Promise((resolve, reject) => {
+			UTILS.debug("Attempting to set preferences[\"" + this.sid + "\"][\"" + prop + "\" = " + val + ";");
+			if (!this.server_message) return reject(":x: Cannot set preferences for DM channel.");
+			else if (!UTILS.exists(preferencesFormat[prop])) return reject(":x: Setting " + prop + " does not exist.");
+			else if (typeof(val) !== preferencesFormat[prop]) return reject(":x: Setting " + prop + " as " + val + " is invalid.");
+			cache[this.sid][prop] = val;
+			lolapi.setPreferences(this.sid, prop, val, preferencesFormat[prop]).then(() => resolve()).catch(e => reject(":x: Database operation failed."));//db write
+		});
 	}
 	clearAllCache() {
 		cache = {};
