@@ -782,7 +782,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		return guess_method === 3 ? " We tried using your discord username but could not find a summoner with the same name. Let us know what your LoL username is using `" + CONFIG.DISCORD_COMMAND_PREFIX + "link <region> <ign>` and we'll remember it for next time!" : "";
 	}
 	function forcePrefix(triggers) {
-		return triggers.map(t => preferences.get("force_prefix") ? preferences.get("prefix") + t : t);
+		return preferences.get("force_prefix") ? triggers.map(t => preferences.get("prefix") + t) : triggers;
 	}
 	function shutdown() {
 		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x: Shutdown initiated.");
