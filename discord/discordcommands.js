@@ -272,15 +272,17 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			reply(":white_check_mark: All shortcuts were removed.")
 		}).catch(console.error);
 	});
-	command(["http://"], true, false, (original, index, parameter) => {
-		const region = assert_region(parameter.substring(0, parameter.indexOf(".")), false);
-		if (parameter.substring(parameter.indexOf(".") + 1, parameter.indexOf(".") + 6) == "op.gg") {
-			let username = decodeURIComponent(msg.content.substring(msg.content.indexOf("userName=") + "userName=".length));
-			lolapi.getSummonerCard(region, username).then(result => {
-				reply_embed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter.substring(0, parameter.indexOf(".")), result[3]));
-			}).catch();
-		}
-	});
+	if (preferences.get("auto_opgg")) {
+		command(["http://"], true, false, (original, index, parameter) => {
+			const region = assert_region(parameter.substring(0, parameter.indexOf(".")), false);
+			if (parameter.substring(parameter.indexOf(".") + 1, parameter.indexOf(".") + 6) == "op.gg") {
+				let username = decodeURIComponent(msg.content.substring(msg.content.indexOf("userName=") + "userName=".length));
+				lolapi.getSummonerCard(region, username).then(result => {
+					reply_embed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter.substring(0, parameter.indexOf(".")), result[3]));
+				}).catch();
+			}
+		});
+	}
 	command(["service status ", "servicestatus ", "ss ", "status "], true, false, (original, index, parameter) => {
 		let region = assert_region(parameter);
 		lolapi.getStatus(region, 60).then((status_object) => {
@@ -485,6 +487,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 				restart();
 			}
 		});*/
+		command([preferences.get("auto_opgg") + "setting auto-opgg on", preferences.get("auto_opgg") + "setting auto-opgg off"], false, CONFIG.CONSTANTS.MODERATORS, (original, index) => {
+			const new_setting = index === 0 ? true : false;
+			preferences.set("auto_opgg", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will automatically show summoner information when an op.gg link is posted." : "SupportBot will not show summoner information when an op.gg link is posted."))).catch(reply);
+		});
 	}
 	else {//PM/DM only
 	}
