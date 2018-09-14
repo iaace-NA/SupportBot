@@ -718,7 +718,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		});
 	}
 
-	function replyEmbed(replyEmbed, callback, errorCallback) {
+	function replyEmbed(reply_embed, callback, errorCallback) {
 		if (UTILS.exists(msg.guild) && !msg.channel.permissionsFor(client.user).has(["EMBED_LINKS"])) {//doesn't have permission to embed links in server
 			lolapi.terminate();
 			reply(":x: I cannot respond to your request without the \"embed links\" permission.");
@@ -727,7 +727,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			printMessage();
 			lolapi.terminate();
 			console.log("reply embedded (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
-			msg.channel.send("", { embed: replyEmbed }).then((nMsg) => {
+			msg.channel.send("", { embed: reply_embed }).then((nMsg) => {
 				if (UTILS.exists(callback)) callback(nMsg);
 			}).catch((e) => {
 				console.error(e);
@@ -736,11 +736,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		}
 	}
 
-	function replyEmbedToAuthor(replyEmbed, callback, errorCallback) {
+	function replyEmbedToAuthor(reply_embed, callback, errorCallback) {
 		printMessage();
 		lolapi.terminate();
 		console.log("reply embedded to author (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
-		msg.author.send("", { embed: replyEmbed }).then((nMsg) => {
+		msg.author.send("", { embed: reply_embed }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
 			console.error(e);
