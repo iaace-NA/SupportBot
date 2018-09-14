@@ -36,7 +36,7 @@ module.exports = class Preferences {
 		if (UTILS.exists(this.sid)) {//server id exists
 			this.server_message = true;
 			if (!UTILS.exists(cache[this.sid])) {//doesn't exist in cache
-				UTILS.debug(this.sid + "preferences: cache miss");
+				UTILS.debug(this.sid + " preferences: cache miss");
 				this.lolapi.getPreferences(this.sid).then(preference_data => {//it will always exist because IAPI will create a new one if it doesn't
 					cache[this.sid] = preference_data;
 					callback(this);
@@ -59,7 +59,7 @@ module.exports = class Preferences {
 	}
 	set(prop, val) {
 		return new Promise((resolve, reject) => {
-			UTILS.debug("Attempting to set preferences[\"" + this.sid + "\"][\"" + prop + "\" = " + val + ";");
+			UTILS.debug("Attempting to set preferences[\"" + this.sid + "\"][\"" + prop + "\"] = " + val + ";");
 			if (!this.server_message) return reject(":x: Cannot set preferences for DM channel.");
 			else if (!UTILS.exists(preferencesFormat[prop])) return reject(":x: Setting " + prop + " does not exist.");
 			else if (typeof(val) !== preferencesFormat[prop]) return reject(":x: Setting " + prop + " as " + val + " is invalid.");
