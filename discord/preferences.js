@@ -37,7 +37,7 @@ module.exports = class Preferences {
 			this.server_message = true;
 			if (!UTILS.exists(cache[this.sid])) {//doesn't exist in cache
 				UTILS.debug(this.sid + "preferences: cache miss");
-				lolapi.getPreferences(this.sid).then(preference_data => {//it will always exist because IAPI will create a new one if it doesn't
+				this.lolapi.getPreferences(this.sid).then(preference_data => {//it will always exist because IAPI will create a new one if it doesn't
 					cache[this.sid] = preference_data;
 					callback(this);
 				}).catch(e => {
@@ -64,7 +64,7 @@ module.exports = class Preferences {
 			else if (!UTILS.exists(preferencesFormat[prop])) return reject(":x: Setting " + prop + " does not exist.");
 			else if (typeof(val) !== preferencesFormat[prop]) return reject(":x: Setting " + prop + " as " + val + " is invalid.");
 			cache[this.sid][prop] = val;
-			lolapi.setPreferences(this.sid, prop, val, preferencesFormat[prop]).then(() => resolve()).catch(e => reject(":x: Database operation failed."));//db write
+			this.lolapi.setPreferences(this.sid, prop, val, preferencesFormat[prop]).then(() => resolve()).catch(e => reject(":x: Database operation failed."));//db write
 		});
 	}
 	clearAllCache() {
