@@ -493,7 +493,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			if (parameters_expected && msg.content.trim().toLowerCase().substring(0, trigger_array[i].length) === trigger_array[i].toLowerCase()) {
 				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
-					if (elevated_permissions) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
+					if (elevated_permissions === CONFIG.CONSTANTS.BOTOWNERS) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
 					if (UTILS.exists(callback)) {
 						try {
 							callback(trigger_array[i], i, msg.content.trim().substring(trigger_array[i].length));
@@ -507,7 +507,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			else if (!parameters_expected && msg.content.trim().toLowerCase() === trigger_array[i].toLowerCase()) {
 				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
-					if (elevated_permissions) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
+					if (elevated_permissions === CONFIG.CONSTANTS.BOTOWNERS) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
 					if (UTILS.exists(callback)) {
 						try {
 							callback(trigger_array[i], i);
