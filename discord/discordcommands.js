@@ -619,7 +619,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 							if (e) reply(":x: An error has occurred. The shortcut may not exist.");
 						});
 					}
-					else if (parameter.substring(parameter.indexOf(" ") + 1) == "^") {
+					else if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1) == "^") {
 						msg.channel.fetchMessages({ before: msg.id, limit: 30 }).then(msgs => {
 							msgs = msgs.array();
 							let username;
