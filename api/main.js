@@ -72,7 +72,8 @@ let server_preferences_doc = new apicache.Schema({
 	enabled: { type: Boolean, required: true, default: true },//whether or not the bot is enabled on the server
 	slow: { type: Number, required: true, default: 0 },//self slow mode
 	//region: { type: String, required: true, default: "" },//default server region, LoL ("" = disabled)
-	auto_opgg: { type: Boolean, required: true, default: true }//automatically embed respond to op.gg links
+	auto_opgg: { type: Boolean, required: true, default: true },//automatically embed respond to op.gg links
+	force_prefix: { type: Boolean, required: true, default: false }
 	//music
 	/*
 	max_music_length: { type: Number, required: true, default: 360 },//in seconds

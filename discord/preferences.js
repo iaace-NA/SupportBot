@@ -19,14 +19,16 @@ const newPreferences = {
 	prefix: CONFIG.DISCORD_COMMAND_PREFIX,//default bot prefix
 	enabled: true,//whether or not the bot is enabled on the server
 	slow: 0,//self slow mode
-	auto_opgg: true //automatically embed respond to op.gg links
+	auto_opgg: true, //automatically embed respond to op.gg links
+	force_prefix: false//force commands that don't require a prefix to use a prefix
 };
 const preferencesFormat = {
 	id: "string",//id of server
 	prefix: "string",//default bot prefix
 	enabled: "boolean",//whether or not the bot is enabled on the server
 	slow: "number",//self slow mode
-	auto_opgg: "boolean"//automatically embed respond to op.gg links
+	auto_opgg: "boolean",//automatically embed respond to op.gg links
+	force_prefix: "boolean"
 };
 module.exports = class Preferences {
 	constructor(lolapi, guild, callback) {

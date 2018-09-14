@@ -283,13 +283,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			}
 		});
 	}
-	command(["service status ", "servicestatus ", "ss ", "status "], true, false, (original, index, parameter) => {
+	command(forcePrefix(["service status ", "servicestatus ", "ss ", "status "]), true, false, (original, index, parameter) => {
 		let region = assertRegion(parameter);
 		lolapi.getStatus(region, 60).then((status_object) => {
 			replyEmbed(embedgenerator.status(status_object));
 		}).catch(console.error);
 	});
-	commandGuessUsername([""], false, (region, username, parameter, guess_method) => {
+	commandGuessUsername(forcePrefix([""]), false, (region, username, parameter, guess_method) => {
 		lolapi.getSummonerCard(region, username).then(result => {
 			replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], CONFIG.REGIONS_REVERSE[region], result[3], result[4]));
 		}).catch(e => {
@@ -297,7 +297,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			reply(":x: No results for `" + username + "`." + suggestLink(guess_method));
 		});
 	});
-	commandGuessUsername(["mh ", "matchhistory "], false, (region, username, parameter, guess_method) => {
+	commandGuessUsername(forcePrefix(["mh ", "matchhistory "]), false, (region, username, parameter, guess_method) => {
 		request_profiler.mark("mh command recognized");
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.MH.SUMMONER_ID).then(result => {
 			result.region = region;
@@ -314,7 +314,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	command(["compare ", "multi ", "m ", "c "], true, false, (original, index, parameter) => {
+	command(forcePrefix(["compare ", "multi ", "m ", "c "]), true, false, (original, index, parameter) => {
 		request_profiler.mark("multi command recognized");
 		request_profiler.begin("parsing usernames");
 		let region = assertRegion(parameter.substring(0, parameter.indexOf(" ")), index < 2);
@@ -357,7 +357,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	command(["fairteamgenerator ", "teamgenerator ", "tg ", "ftg ", "ftgd ", "tgd "], true, false, (original, index, parameter) => {
+	command(forcePrefix(["fairteamgenerator ", "teamgenerator ", "tg ", "ftg ", "ftgd ", "tgd "]), true, false, (original, index, parameter) => {
 		const debug_mode = index > 3;
 		request_profiler.mark("ftg command recognized");
 		request_profiler.begin("parsing usernames");
@@ -399,7 +399,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	commandGuessUsername(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "], false, (region, username, parameter) => {//new
+	commandGuessUsername(forcePrefix(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "]), false, (region, username, parameter) => {//new
 		request_profiler.mark("lg command recognized");
 		//reply(":warning:We are processing the latest information for your command: if this message does not update within 5 minutes, try the same command again. Thank you for your patience.", nMsg => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.LG.SUMMONER_ID).then(result => {
@@ -433,7 +433,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		}).catch(console.error);
 		//});
 	});
-	commandGuessUsernameNumber(["mh", "matchhistory"], false, (region, username, number, guess_method) => {
+	commandGuessUsernameNumber(forcePrefix(["mh", "matchhistory"]), false, (region, username, number, guess_method) => {
 		request_profiler.mark("dmh command recognized");
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.DMH.SUMMONER_ID).then(result => {
 			result.region = region;
@@ -489,8 +489,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		});*/
 		command([preferences.get("prefix") + "setting auto-opgg on", preferences.get("prefix") + "setting auto-opgg off"], false, CONFIG.CONSTANTS.MODERATORS, (original, index) => {
 			const new_setting = index === 0 ? true : false;
-			UTILS.output("index is " + index + ", type of index is " + typeof(index) + ", new_setting is " + new_setting);
+			UTILS.debug("index is " + index + ", type of index is " + typeof(index) + ", new_setting is " + new_setting);
 			preferences.set("auto_opgg", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will automatically show summoner information when an op.gg link is posted." : "SupportBot will not show summoner information when an op.gg link is posted."))).catch(reply);
+		});
+		command([preferences.get("prefix") + "setting force-prefix on", preferences.get("prefix") + "setting force-prefix off"], false, CONFIG.CONSTANTS.ADMINISTRATORS, (original, index) => {
+			const new_setting = index === 0 ? true : false;
+			UTILS.debug("index is " + index + ", type of index is " + typeof(index) + ", new_setting is " + new_setting);
+			preferences.set("force_prefix", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will require prefixes on all LoL commands." : "SupportBot will not require prefixes on all LoL commands."))).catch(reply);
 		});
 	}
 	else {//PM/DM only
@@ -768,6 +773,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	}
 	function suggestLink(guess_method) {
 		return guess_method === 3 ? " We tried using your discord username but could not find a summoner with the same name. Let us know what your LoL username is using `" + CONFIG.DISCORD_COMMAND_PREFIX + "link <region> <ign>` and we'll remember it for next time!" : "";
+	}
+	function forcePrefix(triggers) {
+		return triggers.map(t => preferences.get("force_prefix") ? preferences.get("prefix") + t : t);
 	}
 	function shutdown() {
 		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x: Shutdown initiated.");
