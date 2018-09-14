@@ -241,7 +241,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		reply(":white_check_mark: A PM has been sent to you with information on how to use SupportBot.");
 		replyEmbedToAuthor(embedgenerator.help(CONFIG));
 	});
-	command([preferences.get("prefix") + "setshortcut ", preferences.get("prefix") + "ss ", preferences.get("prefix") + "createshortcut ", preferences.get("prefix") + "cs ", preferences.get("prefix") + "addshortcut "], true, false, (original, index, parameter) => {
+	command([preferences.get("prefix") + "setshortcut ", preferences.get("prefix") + "ss ", preferences.get("prefix") + "createshortcut ", preferences.get("prefix") + "addshortcut "], true, false, (original, index, parameter) => {
 		if (parameter[0] !== "$") return reply(":x: The shortcut must begin with an `$`. Please try again.");
 		if (parameter.indexOf(" ") === -1) return reply(":x: The shortcut word and the username must be separated by a space. Please try again.");
 		if (parameter.length > 60) return reply(":x: The shortcut name or the username is too long.");
