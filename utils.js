@@ -5,6 +5,9 @@ String.prototype.replaceAll = function(search, replacement) {
 	let target = this;
 	return target.replace(new RegExp(search, 'g'), replacement);
 }
+String.prototype.count = function(search) {
+	return (this.match(new RegExp(search, "g")) || []).length;
+}
 Number.prototype.pad = function(size) {
 	let s = String(this);
 	while (s.length < (size || 2)) {s = "0" + s;}
@@ -39,8 +42,14 @@ module.exports = class UTILS {
 		return Math.round(num * Math.pow(10, decimal)) / Math.pow(10, decimal);
 	}
 	assert(condition) {
-		if (typeof (condition) != "boolean") throw new Error("asserting non boolean value: " + typeof (condition));
-		if (!condition) throw new Error("assertion false");
+		if (typeof (condition) != "boolean") {
+			console.trace();
+			throw new Error("asserting non boolean value: " + typeof (condition));
+		}
+		if (!condition) {
+			console.trace();
+			throw new Error("assertion false");
+		}
 		return true;
 	}
 	ago(date) {
@@ -100,7 +109,7 @@ module.exports = class UTILS {
 	}
 	gold(number) {
 		number /= 1000;
-		return this.round(number, 1) + "k";
+		return number.toFixed(1) + "k";
 	}
 	level(summonerID, match) {
 		return this.stats(summonerID, match).championLevel;
@@ -160,11 +169,12 @@ module.exports = class UTILS {
 	}
 	shortRank(info) {
 		//****** unranked
+		//XXXXXX unranked
 		//██████ unranked
 		//G↑W--- Gold promotion, 1 win
 		//G2 +00 Gold 2, 0 LP
 		//G2 +56 Gold 2, 56LP
-		//G2↑ L_ Gold 2 promotion, 1 loss
+		//G2↑ L- Gold 2 promotion, 1 loss
 		//C +256 Challenger, 256LP
 		//C+1256 Challenger 1256 LP
 		if (!this.exists(info)) return "******";
@@ -240,7 +250,7 @@ module.exports = class UTILS {
 		else if (mmr < 1600) answer += "G";
 		else if (mmr < 2100) answer += "P";
 		else if (mmr < 2600) answer += "D";
-		else if (mmr < 2700) answer += "M";//arbitrary M/C threshold
+		else if (mmr < 2700) answer += "M";//arbitrary M/C threshold @ 500LP
 		else answer += "C";
 		let LP;
 		if (mmr < 2600) {
@@ -256,19 +266,45 @@ module.exports = class UTILS {
 		}
 		return answer;
 	}
+	summonersRiftMMR(rank) {
+		let individual_iMMR = 0;
+		let individual_games = 0;
+		for (let c in rank) {//queue
+			if (rank[c].queueType !== "RANKED_FLEX_TT") {
+				individual_iMMR += this.iMMR(rank[c]) * (rank[c].wins + rank[c].losses);
+				individual_games += rank[c].wins + rank[c].losses;
+			}
+		}
+		return individual_games == 0 ? 0 : individual_iMMR / individual_games;
+	}
+	twistedTreelineMMR(rank) {
+		let individual_iMMR = 0;
+		let individual_games = 0;
+		for (let c in rank) {//queue
+			if (rank[c].queueType === "RANKED_FLEX_TT") {
+				individual_iMMR += this.iMMR(rank[c]) * (rank[c].wins + rank[c].losses);
+				individual_games += rank[c].wins + rank[c].losses;
+			}
+		}
+		return individual_games == 0 ? 0 : individual_iMMR / individual_games;
+	}
+	averageUserMMR(rank) {
+		let individual_iMMR = 0;
+		let individual_games = 0;
+		for (let c in rank) {//queue
+			individual_iMMR += this.iMMR(rank[c]) * (rank[c].wins + rank[c].losses);
+			individual_games += rank[c].wins + rank[c].losses;
+		}
+		return individual_games == 0 ? 0 : individual_iMMR / individual_games;
+	}
 	averageMatchMMR(ranks) {
 		let total_iMMR = 0;
 		let total_users = 0;
-		for (let b in ranks) {
-			let individual_iMMR = 0;
-			let individual_games = 0;
-			for (let c in ranks[b]) {
-				individual_iMMR += this.iMMR(ranks[b][c]) * (ranks[b][c].wins + ranks[b][c].losses);
-				individual_games += ranks[b][c].wins + ranks[b][c].losses;
-			}
-			if (individual_iMMR > 0) {
+		for (let b in ranks) {//user
+			const individual_weighted_MMR = this.averageUserMMR(ranks[b]);
+			if (individual_weighted_MMR > 0) {
 				++total_users;
-				total_iMMR += individual_iMMR / individual_games;
+				total_iMMR += individual_weighted_MMR;
 			}
 		}
 		return total_users === 0 ? 0 : total_iMMR / total_users;
@@ -292,7 +328,6 @@ module.exports = class UTILS {
 	presentLobby(pre_usernames) {
 		let present = [];//users present
 		let join_detected = false, leave_detected = false;
-		let joins = [], leaves = [];
 		const join_suffix = " joined the lobby";
 		const leave_suffix = " left the lobby";
 		for (let i = 0; i < pre_usernames.length; ++i) {
@@ -328,5 +363,66 @@ module.exports = class UTILS {
 	}
 	map(x, in_min, in_max, out_min, out_max) {
 		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+	}
+	conditionalFormat(text, surrounds, condition = true) {
+		return condition ? surrounds + text + surrounds : text;
+	}
+	accessLevel(CONFIG, msg, uid) {
+		if (!this.exists(uid)) uid = msg.author.id;
+		if (this.exists(CONFIG.OWNER_DISCORD_IDS[uid]) && CONFIG.OWNER_DISCORD_IDS[uid].active) return CONFIG.CONSTANTS.BOTOWNERS;
+		const MEMBER = uid === msg.author.id ? msg.member : msg.guild.members.get(uid);
+		if (!this.exists(MEMBER)) return CONFIG.CONSTANTS.NORMALMEMBERS;//PM
+		else if (MEMBER.id === msg.guild.ownerID) return CONFIG.CONSTANTS.SERVEROWNERS;
+		else if (MEMBER.hasPermission(["BAN_MEMBERS", "KICK_MEMBERS", "MANAGE_MESSAGES", "MANAGE_ROLES", "MANAGE_CHANNELS"])) return CONFIG.CONSTANTS.ADMINISTRATORS;
+		else if (MEMBER.hasPermission(["KICK_MEMBERS", "MANAGE_MESSAGES"])) return CONFIG.CONSTANTS.MODERATORS;
+		else if (this.exists(MEMBER.roles.find(r => r.name.toLowerCase() === "bot commander"))) return CONFIG.CONSTANTS.BOTCOMMANDERS;
+		else return CONFIG.CONSTANTS.NORMALMEMBERS;
+	}
+	generateTeams(summoners) {//generates all possible teams
+		/*summoners is an array of summoner objects from the API
+		00000 00000: 0: invalid
+		00000 11111: 31: valid
+		00001 00000: 32: invalid
+		11111 00000: 992: valid
+		11111 00001: 993: invalid
+		team 0 is always the larger team
+		*/
+		let combinations = [];
+		let min_team_size = Math.trunc(summoners.length / 2);
+		let max_team_size = Math.ceil(summoners.length / 2);
+		for (let i = 0; i < Math.pow(2, summoners.length); ++i) {
+			const candidate = i.toString(2).padStart(summoners.length, "0");
+			if (candidate.count("1") == min_team_size) combinations.push(candidate);
+		}
+		return min_team_size === max_team_size ? combinations.slice(0, combinations.length / 2) : combinations;
+	}
+	calculateTeamStatistics(mathjs, team, data) {
+		/*
+		team = "1100010011"
+		data = []
+		*/
+		let temp = {
+			raw: [[], []],//raw values
+			min: [[], []],//minimum values
+			max: [[], []],//maximum values
+			avg: [0, 0],//team averages
+			stdev: [0, 0],//standard deviation
+			sum: [0, 0],//team_0 sum, team_1 sum
+			diff: 0,//absolute difference of sum
+			abs: 0//team 0 - team 1
+		}
+		for (let i = 0; i < team.length; ++i) {
+			temp.sum[parseInt(team[i])] += data[i];
+			temp.raw[parseInt(team[i])].push(data[i]);
+		}
+		for (let t = 0; t < 2; ++t) {
+			temp.min[t] = mathjs.min(temp.raw[t]);
+			temp.max[t] = mathjs.max(temp.raw[t]);
+			temp.avg[t] = mathjs.mean(temp.raw[t]);
+			temp.stdev[t] = mathjs.std(temp.raw[t], "uncorrected");//σ: population standard deviation
+		}
+		temp.diff = temp.sum[0] - temp.sum[1];//team 0 - team 1
+		temp.abs = Math.abs(temp.sum[0] - temp.sum[1]);
+		return temp;
 	}
 }

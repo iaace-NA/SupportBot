@@ -15,7 +15,7 @@ const client = new Discord.Client({ disabledEvents: ["TYPING_START"] });
 let CONFIG;
 try {
 	CONFIG = JSON.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.3.2";//b for non-release (in development)
+	CONFIG.VERSION = "v1.4.0";//b for non-release (in development)
 	CONFIG.BANS = {};
 }
 catch (e) {
@@ -29,20 +29,19 @@ let STATUS = {
 	CHAMPION_EMOJIS: false
 };
 const wsapi = new (require("./wsapi.js"))(CONFIG, client, STATUS);
+const Preferences = require("./preferences.js");
 loadAllStaticResources(() => {
 	UTILS.output(process.env.NODE_ENV === "production" ? "PRODUCTION LOGIN" : "DEVELOPMENT LOGIN");
 	client.login().catch(console.error);
 });
 let initial_start = true;
 client.on("ready", function () {
-	if (initial_start) UTILS.output("discord user login success");
-	else UTILS.output("discord reconnected");
+	UTILS.output(initial_start ? "discord user login success" : "discord reconnected");
 	if (process.env.SHARD_ID == 0) {
 		client.user.setStatus("idle").catch(console.error);
 		client.user.setActivity("Starting Up").catch(console.error);
 	}
-	if (initial_start) sendToChannel(CONFIG.LOG_CHANNEL_ID, ":repeat:`$" + process.env.SHARD_ID + "`Bot started in " + UTILS.round((new Date().getTime() - start_time) / 1000, 0) + "s: version: " + CONFIG.VERSION + " mode: " + mode + " servers: " + client.guilds.size);
-	else sendToChannel(CONFIG.LOG_CHANNEL_ID, ":repeat:`$" + process.env.SHARD_ID + "`Bot reconnected");
+	sendToChannel(CONFIG.LOG_CHANNEL_ID, initial_start ? ":repeat:`$" + process.env.SHARD_ID + "`Bot started in " + UTILS.round((new Date().getTime() - start_time) / 1000, 0) + "s: version: " + CONFIG.VERSION + " mode: " + mode + " servers: " + client.guilds.size : ":repeat:`$" + process.env.SHARD_ID + "`Bot reconnected");
 	wsapi.sendEmojis(allEmojis());
 	wsapi.getUserBans();
 	wsapi.getServerBans();
@@ -55,7 +54,8 @@ client.on("disconnect", function () {
 });
 client.on("message", function (msg) {
 	try {
-		discordcommands(CONFIG, client, msg, wsapi, sendToChannel);
+		const ACCESS_LEVEL = UTILS.accessLevel(CONFIG, msg);
+		new Preferences(LOLAPI, msg.guild, server_preferences => discordcommands(CONFIG, client, msg, wsapi, sendToChannel, server_preferences, ACCESS_LEVEL));
 	}
 	catch (e) {
 		console.error(e);

@@ -15,4 +15,9 @@ module.exports = class TextGenerator {
 		for (let b in obj.shortcuts) answer += "\n$" + b + " -> " + obj.shortcuts[b];
 		return answer + "```" + post_desc;
 	}
+	owners(CONFIG) {
+		let answer = "Here are my bot owners:\n`user id:name`";
+		for (let b in CONFIG.OWNER_DISCORD_IDS) if (CONFIG.OWNER_DISCORD_IDS[b].active) answer += "\n`" + b + ":" + CONFIG.OWNER_DISCORD_IDS[b].name + "`";
+		return answer;
+	}
 }

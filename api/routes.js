@@ -1,6 +1,6 @@
 "use strict";
 const UTILS = new (require("../utils.js"))();
-module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard) {
+module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard, server_preferences_model) {
 	serveWebRequest("/createshortcut/:uid", function(req, res, next) {
 		findShortcut(req.params.uid, res, doc => {
 			if (UTILS.exists(doc)) {
@@ -137,7 +137,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 				res.status(500).end();
 			}
 			else res.json({ success: true });
-			if (req.query.user != "true") shardBroadcast({ type: 18, 
+			if (req.query.user != "true") shardBroadcast({ type: 18,
 				sid: req.query.id,
 				reason: req.query.reason,
 				date: parseInt(req.query.date),
@@ -164,7 +164,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			getBans(req.query.user == "true", bans => {
 				shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });//updates all shards with new ban information
 			});
-			
+
 		});
 	}, true);
 	serveWebRequest("/warn", (req, res, next) => {//boolean-user, string-id, string-reason, string-issuer, boolean-notify, string-issuer_tag, string-issuer_avatarURL
@@ -184,7 +184,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			}
 			else {
 				res.json({ success: true });
-				if (req.query.notify == "true") 
+				if (req.query.notify == "true")
 				{
 					if (req.query.user == "true") sendExpectReplyBroadcast({ type: 20,
 					uid: req.query.id,
@@ -202,7 +202,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 							}
 						}
 					}).catch(console.error);
-					else shardBroadcast({ type: 18, 
+					else shardBroadcast({ type: 18,
 						sid: req.query.id,
 						reason: req.query.reason,
 						issuer_tag: req.query.issuer_tag,
@@ -239,7 +239,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			getBans(req.query.user == "true", bans => {
 				shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });
 			});//update shards with new ban list
-			if (req.query.user != "true") shardBroadcast({ type: 30, 
+			if (req.query.user != "true") shardBroadcast({ type: 30,
 				sid: req.query.id,
 				issuer_tag: req.query.issuer_tag,
 				issuer_avatarURL: req.query.issuer_avatarURL });
@@ -288,6 +288,41 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			res.json(answer);
 		});
 	}, true);
+	serveWebRequest("/getpreferences", (req, res, next) => {
+		findPreferences(req.query.id, res, doc => {
+			if (!UTILS.exists(doc)) {//create new doc
+				let new_document = new server_preferences_model({ id: req.query.id });
+				new_document.save((e, doc) => {
+					res.json(doc.toObject());
+				});
+			}
+			else {//
+				res.json(doc.toObject());
+			}
+		});
+	}, true);
+	serveWebRequest("/setpreferences", (req, res, next) => {
+		findPreferences(req.query.id, res, doc => {
+			if(!UTILS.exists(doc)) return res.status(412).end();//precondition failed
+			let c_val = req.query.val;
+			if (req.query.type === "number") c_val = parseInt(type);
+			else if (req.query.type === "boolean") {
+				if (c_val === "true") c_val = true;
+				else if (c_val === "false") c_val = false;
+				else return res.status(400).end();
+			}
+			else;//string type do not change
+			doc[req.query.prop] = c_val;
+			doc.markModified(req.query.prop);
+			doc.save(e => {
+				if (e) {
+					console.error(e);
+					return res.status(500).end();
+				}
+				else res.json({ success: true });
+			});
+		});
+	}, true);
 	serveWebRequest("/ping", function (req, res, next) {
 		res.json({ received: new Date().getTime() });
 	}, true);
@@ -314,6 +349,15 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 	});
 	function findShortcut(uid, res, callback) {
 		shortcut_doc_model.findOne({ uid }, (err, doc) => {
+			if (err) {
+				console.error(err);
+				return res.status(500).end();
+			}
+			callback(doc);
+		});
+	}
+	function findPreferences(id, res, callback) {
+		server_preferences_model.findOne({ id }, (err, doc) => {
 			if (err) {
 				console.error(err);
 				return res.status(500).end();

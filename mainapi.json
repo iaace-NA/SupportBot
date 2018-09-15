@@ -1,0 +1,19 @@
+{
+	"apps": [
+		{
+			"name": "api",
+			"script": "./api/main.js",
+			"cwd": "./api/",
+			"watch": false,
+			"min_uptime": 3000,
+			"max_restarts": 15,
+			"restart_delay": 2500,
+			"env": {
+				"NODE_ENV": "production",
+				"DEBUG": false
+			},
+			"node_args": "--trace-deprecation",
+			"args": "--config=config.json"
+		}
+	]
+}
