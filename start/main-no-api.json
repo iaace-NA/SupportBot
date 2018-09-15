@@ -2,8 +2,8 @@
 	"apps": [
 		{
 			"name": "main",
-			"script": "./discord/main.js",
-			"cwd": "./discord/",
+			"script": "../discord/main.js",
+			"cwd": "../discord/",
 			"watch": false,
 			"min_uptime": 3000,
 			"max_restarts": 15,
