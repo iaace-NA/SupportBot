@@ -74,6 +74,16 @@ client.on("guildDelete", function(guild) {
 	UTILS.output("Server Left: " + guild.id + " :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
 	sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x:`$" + process.env.SHARD_ID + "`Server Left: `" + guild.id + "` :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
 });
+let server_rate_limiters = {};
+let user_rate_limiters = {};
+function getServerRateLimiter(sid) {
+	if (!UTILS.exists(server_rate_limiters[sid])) server_rate_limiters[sid] = new RateLimiter(CONFIG.RATE_LIMIT.SERVER_MESSAGES, CONFIG.RATE_LIMIT.SERVER_TIME_S);
+	return server_rate_limiters[sid];
+}
+function getUserRateLimiter(uid) {
+	if (!UTILS.exists(user_rate_limiters[uid])) user_rate_limiters[uid] = new RateLimiter(CONFIG.RATE_LIMIT.USER_MESSAGES, CONFIG.RATE_LIMIT.USER_TIME_S);
+	return user_rate_limiters[uid];
+}
 function sendToChannel(cid, text) {//duplicated in discordcommands.js
 	wsapi.sendTextToChannel(cid, text);
 }

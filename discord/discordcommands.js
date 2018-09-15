@@ -399,7 +399,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	commandGuessUsername(forcePrefix(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "]), false, (region, username, parameter) => {//new
+	commandGuessUsername(forcePrefix(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "]), false, (region, username, parameter, guess_method) => {//new
 		request_profiler.mark("lg command recognized");
 		//reply(":warning:We are processing the latest information for your command: if this message does not update within 5 minutes, try the same command again. Thank you for your patience.", nMsg => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.LG.SUMMONER_ID).then(result => {
@@ -514,6 +514,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		callback) {//optional callback only if successful
 		for (let i = 0; i < trigger_array.length; ++i) {
 			if (parameters_expected && msg.content.trim().toLowerCase().substring(0, trigger_array[i].length) === trigger_array[i].toLowerCase()) {
+				if (!processRateLimit()) return;
 				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
 					if (elevated_permissions === CONFIG.CONSTANTS.BOTOWNERS) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
@@ -529,6 +530,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 				}
 			}
 			else if (!parameters_expected && msg.content.trim().toLowerCase() === trigger_array[i].toLowerCase()) {
+				if (!processRateLimit()) return;
 				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
 					if (elevated_permissions === CONFIG.CONSTANTS.BOTOWNERS) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
@@ -785,6 +787,41 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	}
 	function forcePrefix(triggers) {
 		return preferences.get("force_prefix") ? triggers.map(t => preferences.get("prefix") + t) : triggers;
+	}
+	function processRateLimit() {
+		//return true if valid. return false if limit reached.
+		if (is(CONFIG.CONSTANTS.BOTOWNERS, msg.author.id, false)) return true;//owners bypass rate limits
+		let valid = 0;//bitwise
+		if (!msg.PM) {
+			if (!server_RL.check()) {
+				sendToChannel(CONFIG.RATE_LIMIT.CHANNEL_ID, "Server exceeded rate limit. uID: `" + msg.author.id + "` sID: `" + msg.guild.id + "`");
+				valid += 1;//bit 0
+			}
+		}
+		if (!user_RL.check()) {
+			sendToChannel(CONFIG.RATE_LIMIT.CHANNEL_ID, "User exceeded rate limit. uID: `" + msg.author.id + "`");
+			valid += 2;//bit 1
+		}
+		if (valid === 0) {
+			if (!msg.PM) server_RL.add();
+			user_RL.add();
+		}
+		else if (valid === 3) {//both rate limits reached
+			if (!server_RL.warned && !user_RL.warned) {
+				reply(":x::alarm_clock: The server and user rate limits have been exceeded. Please wait a while before trying the next command.");
+			}
+			server_RL.warn();
+			user_RL.warn();
+		}
+		else if (valid === 2) {//user rate limit reached
+			if (!user_RL.warned) reply(":x::alarm_clock: The user rate limits have been exceeded. Please wait a while before trying the next command.");
+			user_RL.warn();
+		}
+		else if (valid === 1) {//server rate limit reached
+			if (!server_RL.warned) reply(":x::alarm_clock: The server rate limits have been exceeded. Please wait a while before trying the next command.");
+			server_RL.warn();
+		}
+		return valid === 0;
 	}
 	function shutdown() {
 		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x: Shutdown initiated.");
