@@ -51,6 +51,64 @@ const queues = {
 	"1070": "OE Onslaught",
 	"1200": "NB Nexus Blitz"
 };
+const mmrJokes = {
+	"UNRANKED_1": "a",
+	"UNRANKED_2": "b",
+	"UNRANKED_3": "c",
+	"UNRANKED_4": "d",
+	"UNRANKED_5": "e",
+	"UNRANKED_6": "f",
+	"UNRANKED_7": "g",
+	"BRONZE_1": "Consider watching a \"How not to play LoL\" stream.",
+	"BRONZE_2": "Keep your eyes peeled for Evelynn when she's invisible.",
+	"BRONZE_3": "h",
+	"BRONZE_4": "i",
+	"BRONZE_5": "j",
+	"BRONZE_6": "k",
+	"BRONZE_7": "l",
+	"SILVER_1": "m",
+	"SILVER_2": "n",
+	"SILVER_3": "o",
+	"SILVER_4": "p",
+	"SILVER_5": "q",
+	"SILVER_6": "r",
+	"SILVER_7": "s",
+	"GOLD_1": "t",
+	"GOLD_2": "u",
+	"GOLD_3": "v",
+	"GOLD_4": "w",
+	"GOLD_5": "x",
+	"GOLD_6": "y",
+	"GOLD_7": "z",
+	"PLATINUM_1": "aa",
+	"PLATINUM_2": "bb",
+	"PLATINUM_3": "cc",
+	"PLATINUM_4": "dd",
+	"PLATINUM_5": "ee",
+	"PLATINUM_6": "ff",
+	"PLATINUM_7": "gg",
+	"DIAMOND_1": "hh",
+	"DIAMOND_2": "ii",
+	"DIAMOND_3": "jj",
+	"DIAMOND_4": "kk",
+	"DIAMOND_5": "ll",
+	"DIAMOND_6": "mm",
+	"DIAMOND_7": "nn",
+	"MASTER_1": "oo",
+	"MASTER_2": "pp",
+	"MASTER_3": "qq",
+	"MASTER_4": "rr",
+	"MASTER_5": "ss",
+	"MASTER_6": "tt",
+	"MASTER_7": "uu",
+	"CHALLENGER_1": "vv",
+	"CHALLENGER_2": "ww",
+	"CHALLENGER_3": "xx",
+	"CHALLENGER_4": "yy",
+	"CHALLENGER_5": "zz",
+	"CHALLENGER_6": "You've ascended Mt. Everest six times. You should be even more proud of yourself than after the fifth time.",
+	"CHALLENGER_7": "Party like a former pro League rock star!",
+};
 const RANK_ORDER = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "CHALLENGER"];
 const RANK_COLOR = [[153, 51, 0], [179, 179, 179], [255, 214, 51], [0, 255, 152], [179, 240, 255], [255, 153, 255], [255, 0, 0]];
 const IMMR_THRESHOLD = [100, 600, 1100, 1600, 2100, 2600, 2700];
@@ -463,8 +521,29 @@ module.exports = class EmbedGenerator {
 		}
 		return newEmbed;
 	}
-	mmr(CONFIG, summoner, mmr) {
+	mmr(CONFIG, summoner) {
 		let newEmbed = new Discord.RichEmbed();
+		let tier = "";
+		let mmr = Math.floor(Math.random() * (IMMR_THRESHOLD[IMMR_THRESHOLD.length - 1] + 300));
+		if (mmr < IMMR_THRESHOLD[0]) {
+			tier = "UNRANKED";
+		} else if (mmr < IMMR_THRESHOLD[1]) {
+			tier = RANK_ORDER[0];
+		} else if (mmr < IMMR_THRESHOLD[2]) {
+			tier = RANK_ORDER[1];
+		} else if (mmr < IMMR_THRESHOLD[3]) {
+			tier = RANK_ORDER[2];
+		} else if (mmr < IMMR_THRESHOLD[4]) {
+			tier = RANK_ORDER[3];
+		} else if (mmr < IMMR_THRESHOLD[5]) {
+			tier = RANK_ORDER[4];
+		} else if (mmr < IMMR_THRESHOLD[6]) {
+			tier = RANK_ORDER[5];
+		} else if (mmr >= IMMR_THRESHOLD[6]) {
+			tier = RANK_ORDER[6];
+		}
+		let result = (tier + "_" + Math.floor(Math.random() * 7));
+		let analysis = mmrJokes[result];
 		if (!UTILS.exists(summoner.id)) {
 			newEmbed.setTitle("This summoner does not exist.");
 			newEmbed.setDescription("Please revise your request.");
@@ -474,9 +553,9 @@ module.exports = class EmbedGenerator {
 		newEmbed.setAuthor(summoner.name);
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		newEmbed.setDescription("Level " + summoner.summonerLevel);
-		newEmbed.addField("Official MMR Data", "Tier: " + UTILS.english(mmr.tier) + "\nMMR: `" + mmr.mmr + "`\n" + mmr.analysis);
-		if (RANK_ORDER.indexOf(mmr.tier) != -1) newEmbed.setColor(RANK_COLOR[RANK_ORDER.indexOf(mmr.tier)]);
-		newEmbed.setFooter("This information is subject to very frequent change.");
+		newEmbed.addField("Official MMR Data", "Tier: " + UTILS.english(tier) + "\nMMR: `" + mmr + "`\n" + analysis);
+		if (RANK_ORDER.indexOf(tier) != -1) newEmbed.setColor(RANK_COLOR[RANK_ORDER.indexOf(tier)]);
+		newEmbed.setFooter("This information does not reflect this summoner's actual MMR.");
 		return newEmbed;
 	}
 	notify(CONFIG, content, username, displayAvatarURL) {

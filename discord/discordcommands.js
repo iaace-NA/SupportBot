@@ -469,16 +469,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	/*
-	commandGuessUsername(["mmr "], false, (region, username, parameter) => {
-		lolapi.getSummonerIDFromName(region, username).then(result => {
+	commandGuessUsername(forcePrefix(["mmr"]), false, (region, username, parameter) => {
+		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.MH.SUMMONER_ID).then(result => {
 			result.region = region;
-			lolapi.getMMR(region, result.id).then(mmr => {
-				replyEmbed(embedgenerator.mmr(CONFIG, result, mmr));
-			}).catch();
-		});
-	});*/
-
+			result.guess = username;
+			reply_embed(embedgenerator.mmr(CONFIG, result));
+		}).catch(console.error);
+	});
 	if (UTILS.exists(msg.guild)) {//respondable server message only
 		command([preferences.get("prefix") + "shutdown"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 			reply(":white_check_mark: shutdown initiated", shutdown, shutdown);
