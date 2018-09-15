@@ -5,12 +5,12 @@ let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
 let LOLAPI = require("./lolapi.js");
 let Profiler = require("../timeprofiler.js");
-module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preferences, ACCESS_LEVEL) {
+module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preferences, ACCESS_LEVEL, server_RL, user_RL) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
-	if (UTILS.exists(msg.guild) && !msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) return;//dont read messages that can't be responded to
+	if (!msg.PM && !msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) return;//dont read messages that can't be responded to
 	if (!UTILS.exists(CONFIG.BANS) || !UTILS.exists(CONFIG.BANS.USERS) || !UTILS.exists(CONFIG.BANS.SERVERS)) return UTILS.output("message " + msg.id + " could not be processed because ban data has not been loaded yet");
 	if (UTILS.exists(CONFIG.BANS.USERS[msg.author.id]) && (CONFIG.BANS.USERS[msg.author.id] == 0 || CONFIG.BANS.USERS[msg.author.id] > msg.createdTimestamp)) return;//ignore messages from banned users
-	if (UTILS.exists(msg.guild) && UTILS.exists(CONFIG.BANS.SERVERS[msg.guild.id])) {
+	if (!msg.PM && UTILS.exists(CONFIG.BANS.SERVERS[msg.guild.id])) {
 		if (CONFIG.BANS.SERVERS[msg.guild.id] == 0) {//permanent ban
 			reply(":no_entry: This server is banned from using SupportBot. Please visit " + CONFIG.HELP_SERVER_INVITE_LINK + " for assistance.", () => {
 				msg.guild.leave().catch(console.error);//leave server
@@ -479,7 +479,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		});
 	});*/
 
-	if (UTILS.exists(msg.guild)) {//respondable server message only
+	if (!msg.PM) {//respondable server message only
 		command([preferences.get("prefix") + "shutdown"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 			reply(":white_check_mark: shutdown initiated", shutdown, shutdown);
 		});
@@ -520,6 +520,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 					if (UTILS.exists(callback)) {
 						try {
 							callback(trigger_array[i], i, msg.content.trim().substring(trigger_array[i].length));
+							return true;
 						}
 						catch (e) {
 							console.error(e);
@@ -534,6 +535,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 					if (UTILS.exists(callback)) {
 						try {
 							callback(trigger_array[i], i);
+							return true;
 						}
 						catch (e) {
 							console.error(e);
@@ -731,7 +733,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	}
 
 	function replyEmbed(reply_embed, callback, errorCallback) {
-		if (UTILS.exists(msg.guild) && !msg.channel.permissionsFor(client.user).has(["EMBED_LINKS"])) {//doesn't have permission to embed links in server
+		if (!msg.PM && !msg.channel.permissionsFor(client.user).has(["EMBED_LINKS"])) {//doesn't have permission to embed links in server
 			lolapi.terminate();
 			reply(":x: I cannot respond to your request without the \"embed links\" permission.");
 		}
@@ -764,7 +766,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		const basic = msg.id + "\ncontent: " + msg.content +
 			"\nauthor: " + msg.author.tag + " :: " + msg.author.id +
 			"\nchannel: " + msg.channel.name + " :: " + msg.channel.id;
-		if (UTILS.exists(msg.guild)) UTILS.output("received server message :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
+		if (!msg.PM) UTILS.output("received server message :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
 		else {
 			UTILS.output("received PM/DM message :: " + basic);
 		}

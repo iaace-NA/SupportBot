@@ -11,6 +11,7 @@ let discordcommands = require("./discordcommands.js");
 const UTILS = new (require("../utils.js"))();
 
 const client = new Discord.Client({ disabledEvents: ["TYPING_START"] });
+let RateLimiter = require("../ratelimiter.js");
 
 let CONFIG;
 try {
@@ -53,9 +54,10 @@ client.on("disconnect", function () {
 	UTILS.output("discord disconnected");
 });
 client.on("message", function (msg) {
+	msg.PM = !UTILS.exists(msg.guild);
 	try {
 		const ACCESS_LEVEL = UTILS.accessLevel(CONFIG, msg);
-		new Preferences(LOLAPI, msg.guild, server_preferences => discordcommands(CONFIG, client, msg, wsapi, sendToChannel, server_preferences, ACCESS_LEVEL));
+		new Preferences(LOLAPI, msg.guild, server_preferences => discordcommands(CONFIG, client, msg, wsapi, sendToChannel, server_preferences, ACCESS_LEVEL, msg.PM ? null : getServerRateLimiter(msg.guild.id), getUserRateLimiter(msg.author.id)));
 	}
 	catch (e) {
 		console.error(e);
