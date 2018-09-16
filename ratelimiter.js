@@ -21,14 +21,14 @@ module.exports = class RateLimiter {
 		}
 		else return false;
 	}
-	check(ct = new Date().getTime()) {
+	check(ct = new Date().getTime()) {//checks to see if another event can occur
 		for (let i in this.eventTimes) {//clean
 			if (this.eventTimes[i] < new Date().getTime() - this.timePeriod) {
 				this.eventTimes.shift();
 				i--;
 			}
 		}
-		return this.eventTimes.length - 1 < this.timeFrequency;
+		return this.eventTimes.length < this.timeFrequency;
 	}
 	clear() {
 		this.eventTimes = [];
