@@ -16,7 +16,7 @@ let RateLimiter = require("../ratelimiter.js");
 let CONFIG;
 try {
 	CONFIG = JSON.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.4.0";//b for non-release (in development)
+	CONFIG.VERSION = "v1.5.0b";//b for non-release (in development)
 	CONFIG.BANS = {};
 }
 catch (e) {
