@@ -799,12 +799,12 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		let valid = 0;//bitwise
 		if (!msg.PM) {
 			if (!server_RL.check()) {
-				sendToChannel(CONFIG.RATE_LIMIT.CHANNEL_ID, "Server exceeded rate limit. uID: `" + msg.author.id + "` sID: `" + msg.guild.id + "`");
+				sendToChannel(CONFIG.RATE_LIMIT.CHANNEL_ID, ":no_entry::busts_in_silhouette: Server exceeded rate limit. uID: `" + msg.author.id + "` sID: `" + msg.guild.id + "`\n" + msg.author.tag + " on " + msg.guild.name);
 				valid += 1;//bit 0
 			}
 		}
 		if (!user_RL.check()) {
-			sendToChannel(CONFIG.RATE_LIMIT.CHANNEL_ID, "User exceeded rate limit. uID: `" + msg.author.id + "`");
+			sendToChannel(CONFIG.RATE_LIMIT.CHANNEL_ID, ":no_entry::bust_in_silhouette: User exceeded rate limit. uID: `" + msg.author.id + "` sID: `" + (msg.PM ? "N/A" : msg.guild.id) + "`\n" + msg.author.tag + " on " + (msg.PM ? "N/A" : msg.guild.name));
 			valid += 2;//bit 1
 		}
 		if (valid === 0) {
@@ -813,17 +813,17 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		}
 		else if (valid === 3) {//both rate limits reached
 			if (!server_RL.warned && !user_RL.warned) {
-				reply(":x::alarm_clock: The server and user rate limits have been exceeded. Please wait a while before trying the next command.");
+				reply(":no_entry::alarm_clock::busts_in_silhouette::bust_in_silhouette: The server and user rate limits have been exceeded. Please wait a while before trying the next command.");
 			}
 			server_RL.warn();
 			user_RL.warn();
 		}
 		else if (valid === 2) {//user rate limit reached
-			if (!user_RL.warned) reply(":x::alarm_clock: The user rate limits have been exceeded. Please wait a while before trying the next command.");
+			if (!user_RL.warned) reply(":no_entry::alarm_clock::bust_in_silhouette: The user rate limits have been exceeded. Please wait a while before trying the next command.");
 			user_RL.warn();
 		}
 		else if (valid === 1) {//server rate limit reached
-			if (!server_RL.warned) reply(":x::alarm_clock: The server rate limits have been exceeded. Please wait a while before trying the next command.");
+			if (!server_RL.warned) reply(":no_entry::alarm_clock::busts_in_silhouette: The server rate limits have been exceeded. Please wait a while before trying the next command.");
 			server_RL.warn();
 		}
 		return valid === 0;
