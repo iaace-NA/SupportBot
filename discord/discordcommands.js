@@ -511,10 +511,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	function command(trigger_array,//array of command aliases, prefix needs to be included
 		parameters_expected,//boolean
 		elevated_permissions,//requires owner permissions
-		callback) {//optional callback only if successful
+		callback,//optional callback only if successful
+		external = true) {//external call means not inside commandGuessUsername & commandGuessUsernameNumber
 		for (let i = 0; i < trigger_array.length; ++i) {
 			if (parameters_expected && msg.content.trim().toLowerCase().substring(0, trigger_array[i].length) === trigger_array[i].toLowerCase()) {
-				if (!processRateLimit()) return;
+				if (external && !processRateLimit()) return;
 				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
 					if (elevated_permissions === CONFIG.CONSTANTS.BOTOWNERS) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
@@ -530,7 +531,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 				}
 			}
 			else if (!parameters_expected && msg.content.trim().toLowerCase() === trigger_array[i].toLowerCase()) {
-				if (!processRateLimit()) return;
+				if (external && !processRateLimit()) return;
 				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
 					if (elevated_permissions === CONFIG.CONSTANTS.BOTOWNERS) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
@@ -563,6 +564,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			try {//username explicitly provided
 				const region = assertRegion(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
 				if (parameter.substring(parameter.indexOf(" ") + 1).length < 35) {//longest query should be less than 35 characters
+					if (!processRateLimit()) return;
 					if (msg.mentions.users.size == 1) {
 						lolapi.getLink(msg.mentions.users.first().id).then(result => {
 							let username = msg.mentions.users.first().username;//suppose the link doesn't exist in the database
@@ -601,6 +603,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			catch (e) {//username not provided
 				try {
 					const region = assertRegion(parameter, false);
+					if (!processRateLimit()) return;
 					lolapi.getLink(msg.author.id).then(result => {
 						let username = msg.author.username;//suppose the link doesn't exist in the database
 						if (UTILS.exists(result.username) && result.username != "") {
@@ -612,7 +615,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 				}
 				catch (e) { }
 			}
-		});
+		}, false);
 	}
 
 	function commandGuessUsernameNumber(trigger_array,//array of command aliases, prefix needs to be included
@@ -631,6 +634,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			if (isNaN(number)) return;
 			try {//username explicitly provided
 				const region = assertRegion(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
+				if (!processRateLimit()) return;
 				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) {//longest query should be less than 35 characters
 					if (msg.mentions.users.size == 1) {
 						lolapi.getLink(msg.mentions.users.first().id).then(result => {
@@ -670,6 +674,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			catch (e) {//username not provided
 				try {
 					const region = assertRegion(parameter.substring(parameter.indexOf(" ") + 1), false);
+					if (!processRateLimit()) return;
 					lolapi.getLink(msg.author.id).then(result => {
 						let username = msg.author.username;//suppose the link doesn't exist in the database
 						if (UTILS.exists(result.username) && result.username != "") {
@@ -681,7 +686,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 				}
 				catch (e) { }
 			}
-		});
+		}, false);
 	}
 	function is(PLEVEL, candidate = msg.author.id, notify = true) {
 		if (candidate === msg.author.id) {
