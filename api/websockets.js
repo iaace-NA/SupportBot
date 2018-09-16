@@ -19,7 +19,7 @@ module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShar
 			shardBroadcast({ type: 6, content: data.content, cid: data.cid }, [data.id]);
 			break;
 		case 13:
-			shardBroadcast({ type: 12, content: data.content, username: data.username, displayAvatarURL: data.displayAvatarURL });
+			shardBroadcast({ type: 12, content: data.content, username: data.username, displayAvatarURL: data.displayAvatarURL, release: data.release });
 			break;
 		case 15:
 			getBans(true, bans => {

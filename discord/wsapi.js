@@ -5,6 +5,8 @@ const ws = require("ws");
 const fs = require("fs");
 const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt") };
 let embedgenerator = new (require("./embedgenerator.js"))();
+let Preferences = require("./preferences.js");
+let LOLAPI = require("./lolapi.js");
 module.exports = class WSAPI {
 	/*
 	Used for internal communication between shards and IAPI.
@@ -69,6 +71,7 @@ module.exports = class WSAPI {
 		this.client = discord_client;
 		this.STATUS = INIT_STATUS;
 		this.CONFIG = INIT_CONFIG;
+		this.lolapi = new LOLAPI(this.CONFIG, 0);
 		if (!UTILS.exists(this.CONFIG)) throw new Error("config.json required.");
 		this.request = REQUEST;
 		this.address = "wss://" + this.CONFIG.API_ADDRESS;
@@ -116,7 +119,11 @@ module.exports = class WSAPI {
 					const notification = embedgenerator.notify(this.CONFIG, data.content, data.username, data.displayAvatarURL);
 					this.client.guilds.forEach(g => {
 						let candidate = UTILS.preferredTextChannel(that.client, g.channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
-						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).catch(console.error);
+						if (UTILS.exists(candidate)) {
+							new Preferences(this.lolapi, g, preferences => {
+								if (!data.release || (data.release && preferences.get("release_notifications"))) candidate.send("", { embed: notification }).catch(console.error);
+							});
+						}
 					});
 					break;
 				case 14:
@@ -220,8 +227,8 @@ module.exports = class WSAPI {
 		if (UTILS.exists(this.client.channels.get(cid))) this.client.channels.get(cid).send(content).catch(console.error);
 		else this.send({ type: 7, content, cid });
 	}
-	lnotify(username, displayAvatarURL, content) {
-		this.send({ type: 13, content, username, displayAvatarURL });
+	lnotify(username, displayAvatarURL, content, release) {
+		this.send({ type: 13, content, username, displayAvatarURL, release });
 	}
 	getUserBans() {
 		this.send({ type: 15 });
