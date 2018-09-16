@@ -57,7 +57,9 @@ client.on("message", function (msg) {
 	msg.PM = !UTILS.exists(msg.guild);
 	try {
 		const ACCESS_LEVEL = UTILS.accessLevel(CONFIG, msg);
-		new Preferences(LOLAPI, msg.guild, server_preferences => discordcommands(CONFIG, client, msg, wsapi, sendToChannel, server_preferences, ACCESS_LEVEL, msg.PM ? null : getServerRateLimiter(msg.guild.id), getUserRateLimiter(msg.author.id)));
+		const SERVER_RL = msg.PM ? null : getServerRateLimiter(msg.guild.id);
+		if (!msg.PM) msg.guild.memberCount >= CONFIG.LARGE_SERVER_THRESHOLD ? SERVER_RL.setMode(CONFIG.RATE_LIMIT.LARGE_SERVER_MESSAGES, CONFIG.RATE_LIMIT.LARGE_SERVER_TIME_S) : SERVER_RL.setMode(CONFIG.RATE_LIMIT.SERVER_MESSAGES, CONFIG.RATE_LIMIT.SERVER_TIME_S);
+		new Preferences(LOLAPI, msg.guild, server_preferences => discordcommands(CONFIG, client, msg, wsapi, sendToChannel, server_preferences, ACCESS_LEVEL, SERVER_RL, getUserRateLimiter(msg.author.id)));
 	}
 	catch (e) {
 		console.error(e);
