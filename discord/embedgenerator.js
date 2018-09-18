@@ -52,62 +52,62 @@ const queues = {
 	"1200": "NB Nexus Blitz"
 };
 const mmrJokes = {
-	"UNRANKED_1": "a",
-	"UNRANKED_2": "b",
-	"UNRANKED_3": "c",
-	"UNRANKED_4": "d",
-	"UNRANKED_5": "e",
-	"UNRANKED_6": "f",
-	"UNRANKED_7": "g",
-	"BRONZE_1": "Consider watching a \"How not to play LoL\" stream.",
-	"BRONZE_2": "Keep your eyes peeled for Evelynn when she's invisible.",
-	"BRONZE_3": "h",
-	"BRONZE_4": "i",
-	"BRONZE_5": "j",
-	"BRONZE_6": "k",
-	"BRONZE_7": "l",
-	"SILVER_1": "m",
-	"SILVER_2": "n",
-	"SILVER_3": "o",
-	"SILVER_4": "p",
-	"SILVER_5": "q",
-	"SILVER_6": "r",
-	"SILVER_7": "s",
-	"GOLD_1": "t",
-	"GOLD_2": "u",
-	"GOLD_3": "v",
-	"GOLD_4": "w",
-	"GOLD_5": "x",
-	"GOLD_6": "y",
-	"GOLD_7": "z",
-	"PLATINUM_1": "aa",
-	"PLATINUM_2": "bb",
-	"PLATINUM_3": "cc",
-	"PLATINUM_4": "dd",
-	"PLATINUM_5": "ee",
-	"PLATINUM_6": "ff",
-	"PLATINUM_7": "gg",
-	"DIAMOND_1": "hh",
-	"DIAMOND_2": "ii",
-	"DIAMOND_3": "jj",
-	"DIAMOND_4": "kk",
-	"DIAMOND_5": "ll",
-	"DIAMOND_6": "mm",
-	"DIAMOND_7": "nn",
-	"MASTER_1": "oo",
-	"MASTER_2": "pp",
-	"MASTER_3": "qq",
-	"MASTER_4": "rr",
-	"MASTER_5": "ss",
-	"MASTER_6": "tt",
-	"MASTER_7": "uu",
-	"CHALLENGER_1": "vv",
-	"CHALLENGER_2": "ww",
-	"CHALLENGER_3": "xx",
-	"CHALLENGER_4": "yy",
-	"CHALLENGER_5": "zz",
-	"CHALLENGER_6": "You've ascended Mt. Everest six times. You should be even more proud of yourself than after the fifth time.",
-	"CHALLENGER_7": "Party like a former pro League rock star!",
+	"01": "We recommend using a mouse and keyboard when playing League of Legends.",
+	"02": "Brush, the grassy areas around Summoner's Rift, hides you from enemies.",
+	"03": "The monsters in the jungle won't hurt you unless you attack them.",
+	"04": "Normals are a less competitive environment to practice your skills.",
+	"05": "Never play League of Legends under the influence.",
+	"06": "Wards save lives.",
+	"07": "\"gg\" stands for \"Good golly!\"",
+	"11": "League of Legends is a team game.",
+	"12": "Don't waste a Summoner Spell on Smite. You can't use Smite on champions.",
+	"13": "Even bots use their Summoner Spells.",
+	"14": "Can't get demoted to Bronze if you never pass Silver promos.",
+	"15": "At least you are not Diamond.",
+	"16": "You can buy items in the shop.",
+	"17": "Having vision is important! Find missing enemies by exploring Fog of War.",
+	"21": "Zhonya's Hourglass cannot be activated while dead.",
+	"22": "You're beautiful the way you are!",
+	"23": "You gain the benefits of items right when you buy them. No need to equip!",
+	"24": "Use Flash to engage and earn more kills per minute.",
+	"25": "Keep your eyes peeled for Evelynn when she's invisible.",
+	"26": "Remember to kite enemy champions when playing a ranged carry.",
+	"27": "Ranged champions should hold their ground to deal the most damage in the shortest amount of time.",
+	"31": "Be like Daenerys: secure kills and still get three dragons.",
+	"32": "sudo apt-get gud",
+	"33": "Smite is a key Summoner Spell for jungling, allowing you to farm effectively.",
+	"34": "The enemy Nexus is worth 50g.",
+	"35": "Have you tried...not dying?",
+	"36": "What is dead may never die, like your MMR.",
+	"37": "Vision is important, but don't ward alone if your enemies are visible on the map.",
+	"41": "They say Platinum is a precious metal. Clearly they haven't seen you play.",
+	"42": "At least you are not Gold.",
+	"43": "Your lack of skins is holding you back.",
+	"44": "We're sorry you've been subjected to the real ELO hell.",
+	"45": "You're almost there! Just a few more promos and you'll stop hating your own Lee Sins!",
+	"46": "Always run back to base when you're losing a team fight.",
+	"47": "Consider watching a \"How not to play LoL\" stream.",
+	"51": "People rage at you when you don't carry in normals, huh?",
+	"52": "Let the salt flow through you.",
+	"53": "\"You shall not pass!\" - Voldemort, Star Wars",
+	"54": "Forged in the fires of Mount Targon, only promos can break you.",
+	"55": "If you keep playing like this, you'll be Bronze one day. Keep it up!",
+	"56": "Ah, so you're the guy smurfing in normals.",
+	"57": "I heard diamonds were hard...what happened to you?",
+	"61": "Baited and outsmarted.",
+	"62": "Boost Anomaly detected!",
+	"63": "Ask your friends if they'd rather you be a Pokémon Master.",
+	"64": "You've ascended Mount Targon six times. It's got nothing on Mount Everest, though. Keep climbing!",
+	"65": "You must feel good about destroying egos...unless, of course, you got boosted.",
+	"66": "You should consider coaching--and boosting other Challenger hopefuls, too.",
+	"67": "You're so metal, even Mordekaiser would crumple under your might.",
+	"71": "Never seen someone get boosted all the way to Challenger before. Must have been expensive.",
+	"72": "Hey qt!",
+	"73": "Losing is not an option.",
+	"74": "Challenjour!",
+	"75": "When's your AMA?",
+	"76": "Tell us when you join a pro team. We'll send you a Poro plushie to celebrate.",
+	"77": "Party like a former pro League rock star!"
 };
 const RANK_ORDER = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "CHALLENGER"];
 const RANK_COLOR = [[153, 51, 0], [179, 179, 179], [255, 214, 51], [0, 255, 152], [179, 240, 255], [255, 153, 255], [255, 0, 0]];
@@ -524,25 +524,34 @@ module.exports = class EmbedGenerator {
 	mmr(CONFIG, summoner) {
 		let newEmbed = new Discord.RichEmbed();
 		let tier = "";
+		let jokeNumber = "";
 		let mmr = Math.floor(Math.random() * (IMMR_THRESHOLD[IMMR_THRESHOLD.length - 1] + 300));
 		if (mmr < IMMR_THRESHOLD[0]) {
 			tier = "UNRANKED";
+			jokeNumber = 0;
 		} else if (mmr < IMMR_THRESHOLD[1]) {
 			tier = RANK_ORDER[0];
+			jokeNumber = 1;
 		} else if (mmr < IMMR_THRESHOLD[2]) {
 			tier = RANK_ORDER[1];
+			jokeNumber = 2;
 		} else if (mmr < IMMR_THRESHOLD[3]) {
 			tier = RANK_ORDER[2];
+			jokeNumber = 3;
 		} else if (mmr < IMMR_THRESHOLD[4]) {
 			tier = RANK_ORDER[3];
+			jokeNumber = 4;
 		} else if (mmr < IMMR_THRESHOLD[5]) {
 			tier = RANK_ORDER[4];
+			jokeNumber = 5;
 		} else if (mmr < IMMR_THRESHOLD[6]) {
 			tier = RANK_ORDER[5];
+			jokeNumber = 6;
 		} else if (mmr >= IMMR_THRESHOLD[6]) {
 			tier = RANK_ORDER[6];
+			jokeNumber = 7;
 		}
-		let result = (tier + "_" + Math.floor(Math.random() * 7));
+		let result = (jokeNumber.toString() + (Math.floor(Math.random() * 6) + 1).toString());
 		let analysis = mmrJokes[result];
 		if (!UTILS.exists(summoner.id)) {
 			newEmbed.setTitle("This summoner does not exist.");

@@ -5,12 +5,12 @@ let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
 let LOLAPI = require("./lolapi.js");
 let Profiler = require("../timeprofiler.js");
-module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preferences, ACCESS_LEVEL) {
+module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preferences, ACCESS_LEVEL, server_RL, user_RL) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
-	if (UTILS.exists(msg.guild) && !msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) return;//dont read messages that can't be responded to
+	if (!msg.PM && !msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) return;//dont read messages that can't be responded to
 	if (!UTILS.exists(CONFIG.BANS) || !UTILS.exists(CONFIG.BANS.USERS) || !UTILS.exists(CONFIG.BANS.SERVERS)) return UTILS.output("message " + msg.id + " could not be processed because ban data has not been loaded yet");
 	if (UTILS.exists(CONFIG.BANS.USERS[msg.author.id]) && (CONFIG.BANS.USERS[msg.author.id] == 0 || CONFIG.BANS.USERS[msg.author.id] > msg.createdTimestamp)) return;//ignore messages from banned users
-	if (UTILS.exists(msg.guild) && UTILS.exists(CONFIG.BANS.SERVERS[msg.guild.id])) {
+	if (!msg.PM && UTILS.exists(CONFIG.BANS.SERVERS[msg.guild.id])) {
 		if (CONFIG.BANS.SERVERS[msg.guild.id] == 0) {//permanent ban
 			reply(":no_entry: This server is banned from using SupportBot. Please visit " + CONFIG.HELP_SERVER_INVITE_LINK + " for assistance.", () => {
 				msg.guild.leave().catch(console.error);//leave server
@@ -399,7 +399,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	commandGuessUsername(forcePrefix(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "]), false, (region, username, parameter) => {//new
+	commandGuessUsername(forcePrefix(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "]), false, (region, username, parameter, guess_method) => {//new
 		request_profiler.mark("lg command recognized");
 		//reply(":warning:We are processing the latest information for your command: if this message does not update within 5 minutes, try the same command again. Thank you for your patience.", nMsg => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.LG.SUMMONER_ID).then(result => {
@@ -469,14 +469,15 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	commandGuessUsername(forcePrefix(["mmr"]), false, (region, username, parameter) => {
+	commandGuessUsername(forcePrefix(["mmr "]), false, (region, username, parameter) => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.MH.SUMMONER_ID).then(result => {
 			result.region = region;
 			result.guess = username;
-			reply_embed(embedgenerator.mmr(CONFIG, result));
+			replyEmbed(embedgenerator.mmr(CONFIG, result));
 		}).catch(console.error);
 	});
-	if (UTILS.exists(msg.guild)) {//respondable server message only
+
+	if (!msg.PM) {//respondable server message only
 		command([preferences.get("prefix") + "shutdown"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 			reply(":white_check_mark: shutdown initiated", shutdown, shutdown);
 		});
@@ -508,15 +509,18 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	function command(trigger_array,//array of command aliases, prefix needs to be included
 		parameters_expected,//boolean
 		elevated_permissions,//requires owner permissions
-		callback) {//optional callback only if successful
+		callback,//optional callback only if successful
+		external = true) {//external call means not inside commandGuessUsername & commandGuessUsernameNumber
 		for (let i = 0; i < trigger_array.length; ++i) {
 			if (parameters_expected && msg.content.trim().toLowerCase().substring(0, trigger_array[i].length) === trigger_array[i].toLowerCase()) {
+				if (external && !processRateLimit()) return;
 				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
 					if (elevated_permissions === CONFIG.CONSTANTS.BOTOWNERS) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
 					if (UTILS.exists(callback)) {
 						try {
 							callback(trigger_array[i], i, msg.content.trim().substring(trigger_array[i].length));
+							return true;
 						}
 						catch (e) {
 							console.error(e);
@@ -525,12 +529,14 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 				}
 			}
 			else if (!parameters_expected && msg.content.trim().toLowerCase() === trigger_array[i].toLowerCase()) {
+				if (external && !processRateLimit()) return;
 				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
 					if (elevated_permissions === CONFIG.CONSTANTS.BOTOWNERS) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
 					if (UTILS.exists(callback)) {
 						try {
 							callback(trigger_array[i], i);
+							return true;
 						}
 						catch (e) {
 							console.error(e);
@@ -556,6 +562,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			try {//username explicitly provided
 				const region = assertRegion(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
 				if (parameter.substring(parameter.indexOf(" ") + 1).length < 35) {//longest query should be less than 35 characters
+					if (!processRateLimit()) return;
 					if (msg.mentions.users.size == 1) {
 						lolapi.getLink(msg.mentions.users.first().id).then(result => {
 							let username = msg.mentions.users.first().username;//suppose the link doesn't exist in the database
@@ -594,6 +601,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			catch (e) {//username not provided
 				try {
 					const region = assertRegion(parameter, false);
+					if (!processRateLimit()) return;
 					lolapi.getLink(msg.author.id).then(result => {
 						let username = msg.author.username;//suppose the link doesn't exist in the database
 						if (UTILS.exists(result.username) && result.username != "") {
@@ -605,7 +613,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 				}
 				catch (e) { }
 			}
-		});
+		}, false);
 	}
 
 	function commandGuessUsernameNumber(trigger_array,//array of command aliases, prefix needs to be included
@@ -624,6 +632,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			if (isNaN(number)) return;
 			try {//username explicitly provided
 				const region = assertRegion(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
+				if (!processRateLimit()) return;
 				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) {//longest query should be less than 35 characters
 					if (msg.mentions.users.size == 1) {
 						lolapi.getLink(msg.mentions.users.first().id).then(result => {
@@ -663,6 +672,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			catch (e) {//username not provided
 				try {
 					const region = assertRegion(parameter.substring(parameter.indexOf(" ") + 1), false);
+					if (!processRateLimit()) return;
 					lolapi.getLink(msg.author.id).then(result => {
 						let username = msg.author.username;//suppose the link doesn't exist in the database
 						if (UTILS.exists(result.username) && result.username != "") {
@@ -674,7 +684,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 				}
 				catch (e) { }
 			}
-		});
+		}, false);
 	}
 	function is(PLEVEL, candidate = msg.author.id, notify = true) {
 		if (candidate === msg.author.id) {
@@ -728,7 +738,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	}
 
 	function replyEmbed(reply_embed, callback, errorCallback) {
-		if (UTILS.exists(msg.guild) && !msg.channel.permissionsFor(client.user).has(["EMBED_LINKS"])) {//doesn't have permission to embed links in server
+		if (!msg.PM && !msg.channel.permissionsFor(client.user).has(["EMBED_LINKS"])) {//doesn't have permission to embed links in server
 			lolapi.terminate();
 			reply(":x: I cannot respond to your request without the \"embed links\" permission.");
 		}
@@ -761,7 +771,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		const basic = msg.id + "\ncontent: " + msg.content +
 			"\nauthor: " + msg.author.tag + " :: " + msg.author.id +
 			"\nchannel: " + msg.channel.name + " :: " + msg.channel.id;
-		if (UTILS.exists(msg.guild)) UTILS.output("received server message :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
+		if (!msg.PM) UTILS.output("received server message :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
 		else {
 			UTILS.output("received PM/DM message :: " + basic);
 		}
@@ -780,6 +790,41 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	}
 	function forcePrefix(triggers) {
 		return preferences.get("force_prefix") ? triggers.map(t => preferences.get("prefix") + t) : triggers;
+	}
+	function processRateLimit() {
+		//return true if valid. return false if limit reached.
+		if (is(CONFIG.CONSTANTS.BOTOWNERS, msg.author.id, false)) return true;//owners bypass rate limits
+		let valid = 0;//bitwise
+		if (!msg.PM) {
+			if (!server_RL.check()) {
+				sendToChannel(CONFIG.RATE_LIMIT.CHANNEL_ID, ":no_entry::busts_in_silhouette: Server exceeded rate limit. uID: `" + msg.author.id + "` sID: `" + msg.guild.id + "`\n" + msg.author.tag + " on " + msg.guild.name);
+				valid += 1;//bit 0
+			}
+		}
+		if (!user_RL.check()) {
+			sendToChannel(CONFIG.RATE_LIMIT.CHANNEL_ID, ":no_entry::bust_in_silhouette: User exceeded rate limit. uID: `" + msg.author.id + "` sID: `" + (msg.PM ? "N/A" : msg.guild.id) + "`\n" + msg.author.tag + " on " + (msg.PM ? "N/A" : msg.guild.name));
+			valid += 2;//bit 1
+		}
+		if (valid === 0) {
+			if (!msg.PM) server_RL.add();
+			user_RL.add();
+		}
+		else if (valid === 3) {//both rate limits reached
+			if (!server_RL.warned && !user_RL.warned) {
+				reply(":no_entry::alarm_clock::busts_in_silhouette::bust_in_silhouette: The server and user rate limits have been exceeded. Please wait a while before trying the next command.");
+			}
+			server_RL.warn();
+			user_RL.warn();
+		}
+		else if (valid === 2) {//user rate limit reached
+			if (!user_RL.warned) reply(":no_entry::alarm_clock::bust_in_silhouette: The user rate limits have been exceeded. Please wait a while before trying the next command.");
+			user_RL.warn();
+		}
+		else if (valid === 1) {//server rate limit reached
+			if (!server_RL.warned) reply(":no_entry::alarm_clock::busts_in_silhouette: The server rate limits have been exceeded. Please wait a while before trying the next command.");
+			server_RL.warn();
+		}
+		return valid === 0;
 	}
 	function shutdown() {
 		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x: Shutdown initiated.");
