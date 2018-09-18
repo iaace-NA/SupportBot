@@ -11,11 +11,12 @@ let discordcommands = require("./discordcommands.js");
 const UTILS = new (require("../utils.js"))();
 
 const client = new Discord.Client({ disabledEvents: ["TYPING_START"] });
+let RateLimiter = require("../ratelimiter.js");
 
 let CONFIG;
 try {
 	CONFIG = JSON.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.4.0";//b for non-release (in development)
+	CONFIG.VERSION = "v1.5.0b";//b for non-release (in development)
 	CONFIG.BANS = {};
 }
 catch (e) {
@@ -53,9 +54,12 @@ client.on("disconnect", function () {
 	UTILS.output("discord disconnected");
 });
 client.on("message", function (msg) {
+	msg.PM = !UTILS.exists(msg.guild);
 	try {
 		const ACCESS_LEVEL = UTILS.accessLevel(CONFIG, msg);
-		new Preferences(LOLAPI, msg.guild, server_preferences => discordcommands(CONFIG, client, msg, wsapi, sendToChannel, server_preferences, ACCESS_LEVEL));
+		const SERVER_RL = msg.PM ? null : getServerRateLimiter(msg.guild.id);
+		if (!msg.PM) msg.guild.memberCount >= CONFIG.LARGE_SERVER_THRESHOLD ? SERVER_RL.setMode(CONFIG.RATE_LIMIT.LARGE_SERVER_MESSAGES, CONFIG.RATE_LIMIT.LARGE_SERVER_TIME_S) : SERVER_RL.setMode(CONFIG.RATE_LIMIT.SERVER_MESSAGES, CONFIG.RATE_LIMIT.SERVER_TIME_S);
+		new Preferences(LOLAPI, msg.guild, server_preferences => discordcommands(CONFIG, client, msg, wsapi, sendToChannel, server_preferences, ACCESS_LEVEL, SERVER_RL, getUserRateLimiter(msg.author.id)));
 	}
 	catch (e) {
 		console.error(e);
@@ -72,6 +76,16 @@ client.on("guildDelete", function(guild) {
 	UTILS.output("Server Left: " + guild.id + " :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
 	sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x:`$" + process.env.SHARD_ID + "`Server Left: `" + guild.id + "` :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
 });
+let server_rate_limiters = {};
+let user_rate_limiters = {};
+function getServerRateLimiter(sid) {
+	if (!UTILS.exists(server_rate_limiters[sid])) server_rate_limiters[sid] = new RateLimiter(CONFIG.RATE_LIMIT.SERVER_MESSAGES, CONFIG.RATE_LIMIT.SERVER_TIME_S);
+	return server_rate_limiters[sid];
+}
+function getUserRateLimiter(uid) {
+	if (!UTILS.exists(user_rate_limiters[uid])) user_rate_limiters[uid] = new RateLimiter(CONFIG.RATE_LIMIT.USER_MESSAGES, CONFIG.RATE_LIMIT.USER_TIME_S);
+	return user_rate_limiters[uid];
+}
 function sendToChannel(cid, text) {//duplicated in discordcommands.js
 	wsapi.sendTextToChannel(cid, text);
 }

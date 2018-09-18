@@ -176,7 +176,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		lolapi.IAPIEval(parameter).then(result => reply("```" + result.string + "```")).catch(console.error);
 	});
 	command([preferences.get("prefix") + "notify "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
-		wsapi.lnotify(msg.author.username, msg.author.displayAvatarURL, parameter);
+		wsapi.lnotify(msg.author.username, msg.author.displayAvatarURL, parameter, false);
+	});
+	command([preferences.get("prefix") + "releasenotify "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+		wsapi.lnotify(msg.author.username, msg.author.displayAvatarURL, parameter, true);
 	});
 	command([preferences.get("prefix") + "testembed"], false, false, () => {
 		replyEmbed(embedgenerator.test());
@@ -494,13 +497,15 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		});*/
 		command([preferences.get("prefix") + "setting auto-opgg on", preferences.get("prefix") + "setting auto-opgg off"], false, CONFIG.CONSTANTS.MODERATORS, (original, index) => {
 			const new_setting = index === 0 ? true : false;
-			UTILS.debug("index is " + index + ", type of index is " + typeof(index) + ", new_setting is " + new_setting);
 			preferences.set("auto_opgg", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will automatically show summoner information when an op.gg link is posted." : "SupportBot will not show summoner information when an op.gg link is posted."))).catch(reply);
 		});
 		command([preferences.get("prefix") + "setting force-prefix on", preferences.get("prefix") + "setting force-prefix off"], false, CONFIG.CONSTANTS.ADMINISTRATORS, (original, index) => {
 			const new_setting = index === 0 ? true : false;
-			UTILS.debug("index is " + index + ", type of index is " + typeof(index) + ", new_setting is " + new_setting);
 			preferences.set("force_prefix", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will require prefixes on all LoL commands." : "SupportBot will not require prefixes on all LoL commands."))).catch(reply);
+		});
+		command([preferences.get("prefix") + "setting release-notifications on", preferences.get("prefix") + "setting release-notifications off"], false, CONFIG.CONSTANTS.ADMINISTRATORS, (original, index) => {
+			const new_setting = index === 0 ? true : false;
+			preferences.set("release_notifications", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will show new release notifications." : "SupportBot will not show new release notifications."))).catch(reply);
 		});
 	}
 	else {//PM/DM only

@@ -875,7 +875,7 @@ module.exports = class EmbedGenerator {
 			newEmbed.setTimestamp(date_date);
 		}
 		newEmbed.addField("While this ban is effective", "SupportBot will ignore all messages sent from this server.", true);
-		newEmbed.addField("Help", "If you believe this is a mistake, please visit " + CONFIG.HELP_SERVER_INVITE_LINK, true);
+		newEmbed.addField("Help", "If you believe this is a mistake, please visit " + CONFIG.HELP_SERVER_INVITE_LINK + " and state your case to an admin.", true);
 		newEmbed.setAuthor(issuer_tag, issuer_avatarURL);
 		newEmbed.setDescription("The reason given was: " + reason);
 		return newEmbed;

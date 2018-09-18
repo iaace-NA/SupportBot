@@ -6,7 +6,7 @@ const argv_options = new (require("getopts"))(process.argv.slice(2), {
 let CONFIG;
 try {
 	CONFIG = JSON.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.4.0";//b for non-release (in development)
+	CONFIG.VERSION = "v1.5.0b";//b for non-release (in development)
 }
 catch (e) {
 	console.log("something's wrong with config.json");
@@ -73,7 +73,8 @@ let server_preferences_doc = new apicache.Schema({
 	slow: { type: Number, required: true, default: 0 },//self slow mode
 	//region: { type: String, required: true, default: "" },//default server region, LoL ("" = disabled)
 	auto_opgg: { type: Boolean, required: true, default: true },//automatically embed respond to op.gg links
-	force_prefix: { type: Boolean, required: true, default: false }
+	force_prefix: { type: Boolean, required: true, default: false },
+	release_notifications: { type: Boolean, required: true, default: true }
 	//music
 	/*
 	max_music_length: { type: Number, required: true, default: 360 },//in seconds
