@@ -947,4 +947,56 @@ module.exports = class EmbedGenerator {
 		newEmbed.setFooter("Showing a maximum of 60 champions");
 		return newEmbed;
 	}
+	feedback(CONFIG, type, destination, msg, guild) {
+		/*type = 0: general message from user (destination 1)
+		type = 1: complaint (destination 1->2)
+		type = 2: praise (destination 1->2)
+		type = 3: suggestion (destination 1->2)
+		type = 4: question (destination 1)
+		type = 5: general message to user (destination 0)
+		destination = 0: user PM
+		destination = 1: admin channel
+		destination = 2: public
+		*/
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setAuthor(msg.author.tag + (msg.PM ? " via PM" : " from server " + msg.guild.name + "::" + msg.guild.id), msg.author.displayAvatarURL);
+		newEmbed.setTimestamp();
+		newEmbed.setTitle("Message from a user");
+		newEmbed.setDescription(msg.cleanContent);
+		if (type === 0) {//Lsay
+			newEmbed.setColor("#ffffff");//white
+		}
+		else if (type === 1) {//Lcomplain
+			newEmbed.setColor("#ff0000");//red
+			newEmbed.setFooter(CONFIG.FEEDBACK.COMPLAINT_CID + ":" + msg.author.id);
+		}
+		else if (type === 2) {//Lpraise
+			newEmbed.setColor("#00ff00");//green
+			newEmbed.setFooter(CONFIG.FEEDBACK.PRAISE_CID + ":" + msg.author.id);
+		}
+		else if (type === 3) {//Lsuggest
+			newEmbed.setColor("#0000ff");//blue
+			newEmbed.setFooter(CONFIG.FEEDBACK.SUGGESTION_CID + ":" + msg.author.id);
+		}
+		else if (type === 4) {//Lask/Lquestion
+			newEmbed.setColor("#ff00ff");//magenta (yellow reserved for warnings)
+		}
+		else if (type === 5) {}//Lmail
+		if (destination === 0) {//Lmail
+			newEmbed.setTitle("Message from management to " + msg.author.username);//reset title
+			newEmbed.setURL(CONFIG.HELP_SERVER_INVITE_LINK);
+			newEmbed.addField("This is a private conversation with management.", "You can reply to this message by sending `!say <your response goes here>`");
+		}
+		else if (destination === 1) {
+			newEmbed.addField("Responses", "Send message response: `" + CONFIG.DISCORD_COMMAND_PREFIX + "mail " + msg.author.id + "`\nBan: `" + CONFIG.DISCORD_COMMAND_PREFIX + "banuser " + msg.author.id + " <duration> <reason>`\nWarn: `" + CONFIG.DISCORD_COMMAND_PREFIX + "warnuser " + msg.author.id + " <reason>`\nNote: `" + CONFIG.DISCORD_COMMAND_PREFIX + "noteuser " + msg.author.id + " <reason>`");
+		}
+		else if (destination === 2) {}
+		return newEmbed;
+	}
+	reviewFeedback(CONFIG, msg, approved) {
+		let newEmbed = new Discord.RichEmbed();
+		if (approved);
+		else;
+		return { toUser: newEmbed, edit: newEmbed, toPublic: newEmbed };
+	}
 }

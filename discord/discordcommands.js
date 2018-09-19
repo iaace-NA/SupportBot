@@ -145,6 +145,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			replyEmbed(embedgenerator.actionReport(CONFIG, parameter, results[parameter]));
 		}).catch();
 	});
+	command([preferences.get("prefix") + "complain"], false, false, (original, index) => {});
 	command([preferences.get("prefix") + "permissionstest", preferences.get("prefix") + "pt"], false, false, () => {
 		reply("You have " + (isOwner(undefined, false) ? "owner" : "normal") + " permissions.");
 	});

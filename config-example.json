@@ -178,5 +178,11 @@
 		"LARGE_SERVER_MESSAGES": 8,
 		"LARGE_SERVER_TIME_S": 60
 	},
-	"FEEDBACK_CHANNEL_ID": "channel id here"
+	"FEEDBACK": {
+		"EXTERNAL_CID": "channel id here",
+		"COMPLAINT_CID": "channel id here",
+		"PRAISE_CID": "channel id here",
+		"SUGGESTION_CID": "channel id here"
+	},
+	"LARGE_SERVER_THRESHOLD": 200
 }
