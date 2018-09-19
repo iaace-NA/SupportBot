@@ -147,7 +147,7 @@ module.exports = class LOLAPI {
 	}
 	getSummonerIDFromName(region, username, maxage) {
 		return new Promise((resolve, reject) => {
-			if(!(new XRegExp("/^[0-9\\p{L} _\\.]+$/").test(username))) {
+			if(!(new XRegExp("^[0-9\\p{L} _\\.]+$").test(username))) {
 				UTILS.debug("username " + username + " didn't pass regex filter");
 				return resolve({ status: "username didn't pass regex filter" });
 			}
