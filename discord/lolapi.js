@@ -146,7 +146,10 @@ module.exports = class LOLAPI {
 	}
 	getSummonerIDFromName(region, username, maxage) {
 		return new Promise((resolve, reject) => {
-			if(!/^[0-9\\p{L} _\\.]+$/.test(username)) return resolve({ status: "username didn't pass regex filter" });
+			if(!/^[0-9\\p{L} _\\.]+$/.test(username)) {
+				UTILS.output("username " + username + " didn't pass regex filter");
+				return resolve({ status: "username didn't pass regex filter" });
+			}
 			this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage);
 		});
 	}
