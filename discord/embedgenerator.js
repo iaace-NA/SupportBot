@@ -69,7 +69,8 @@ const MMR_JOKES = [
 	"You can only attack the nexus after you've destroyed the nexus turrets.",
 	"Enemies have a red health bar.",
 	"Make sure you have /all chat enabled. Enemies give the best advice and encouragement.",
-	"We had to make elo work with negative numbers because of you."],
+	"We had to make elo work with negative numbers because of you.",
+	"Don't worry, we've always ignored all \"Intentionally Feeding\" reports on your account."],
 	["You want another account now, don't you?",//bronze
 	"League of Legends is a team game.",
 	"Don't waste a Summoner Spell on Smite. You can't use Smite on champions.",
