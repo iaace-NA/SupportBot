@@ -2,6 +2,7 @@
 const UTILS = new (require("../utils.js"))();
 const fs = require("fs");
 const REQUEST = require("request");
+const XRegExp = require("xregexp");
 const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt") };
 module.exports = class LOLAPI {
 	constructor(INIT_CONFIG, request_id) {
@@ -146,8 +147,8 @@ module.exports = class LOLAPI {
 	}
 	getSummonerIDFromName(region, username, maxage) {
 		return new Promise((resolve, reject) => {
-			if(!/^[0-9\\p{L} _\\.]+$/.test(username)) {
-				UTILS.output("username " + username + " didn't pass regex filter");
+			if(!(new XRegExp(/^[0-9\\p{L} _\\.]+$/).test(username))) {
+				UTILS.debug("username " + username + " didn't pass regex filter");
 				return resolve({ status: "username didn't pass regex filter" });
 			}
 			this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage);
