@@ -425,4 +425,7 @@ module.exports = class UTILS {
 		temp.abs = Math.abs(temp.sum[0] - temp.sum[1]);
 		return temp;
 	}
+	randomOf(choices) {
+		return choices[Math.trunc(Math.random() * choices.length)];
+	}
 }
