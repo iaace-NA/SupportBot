@@ -588,7 +588,7 @@ module.exports = class EmbedGenerator {
 			jokeNumber = 7;
 		}
 		const analysis = UTILS.randomOf(MMR_JOKES[jokeNumber]);
-		newEmbed.setAuthor(summoner.name, null, UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region]));
+		newEmbed.setAuthor(summoner.name, null, UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		newEmbed.setDescription("Level " + summoner.summonerLevel);
 		newEmbed.addField("MMR Data", "Tier: " + UTILS.english(tier) + "\nMMR: `" + mmr + "`\n" + analysis);
