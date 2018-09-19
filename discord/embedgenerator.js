@@ -142,7 +142,7 @@ const MMR_JOKES = [
 const RANK_ORDER = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "CHALLENGER"];
 const RANK_COLOR = [[153, 51, 0], [179, 179, 179], [255, 214, 51], [0, 255, 152], [179, 240, 255], [255, 153, 255], [255, 0, 0]];
 const IMMR_THRESHOLD = [100, 600, 1100, 1600, 2100, 2600, 2700];
-const MMR_THRESHOLD = [400, 1150, 1400, 1650, 1900, 2150, 2400];
+const MMR_THRESHOLD = [400, 1150, 1400, 1650, 1900, 2150, 2400];//starting MMRs for each tier
 const PREMADE_EMOJIS = ["", "\\💙", "\\💛", "\\💚"];
 module.exports = class EmbedGenerator {
 	constructor() { }
@@ -565,25 +565,25 @@ module.exports = class EmbedGenerator {
 		if (mmr < MMR_THRESHOLD[0]) {
 			tier = UTILS.randomOf(["WOOD", "CLOTH", "IRON", "PLASTIC", "PAPER", "COPPER", "CARDBOARD", "LEAD"]);
 			jokeNumber = 0;
-		} else if (mmr < MMR_THRESHOLD[1]) {//bronze
+		} else if (mmr >= MMR_THRESHOLD[0]) {//bronze
 			tier = RANK_ORDER[0];
 			jokeNumber = 1;
-		} else if (mmr < MMR_THRESHOLD[2]) {//silver
+		} else if (mmr >= MMR_THRESHOLD[1]) {//silver
 			tier = RANK_ORDER[1];
-			jokeNumber = 2;
-		} else if (mmr < MMR_THRESHOLD[3]) {//gold
+			jokeNumber >= 2;
+		} else if (mmr < MMR_THRESHOLD[2]) {//gold
 			tier = RANK_ORDER[2];
 			jokeNumber = 3;
-		} else if (mmr < MMR_THRESHOLD[4]) {//plat
+		} else if (mmr >= MMR_THRESHOLD[3]) {//plat
 			tier = RANK_ORDER[3];
 			jokeNumber = 4;
-		} else if (mmr < MMR_THRESHOLD[5]) {//dia
+		} else if (mmr >= MMR_THRESHOLD[4]) {//dia
 			tier = RANK_ORDER[4];
 			jokeNumber = 5;
-		} else if (mmr < MMR_THRESHOLD[6]) {//master
+		} else if (mmr >= MMR_THRESHOLD[5]) {//master
 			tier = RANK_ORDER[5];
 			jokeNumber = 6;
-		} else if (mmr >= MMR_THRESHOLD[7]) {//challenger
+		} else if (mmr >= MMR_THRESHOLD[6]) {//challenger
 			tier = RANK_ORDER[6];
 			jokeNumber = 7;
 		}
