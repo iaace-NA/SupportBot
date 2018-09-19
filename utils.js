@@ -403,8 +403,9 @@ module.exports = class UTILS {
 		*/
 		let temp = {
 			raw: [[], []],//raw values
-			min: [[], []],//minimum values
-			max: [[], []],//maximum values
+			min: [0, 0],//minimum values
+			med: [0, 0],//median
+			max: [0, 0],//maximum values
 			avg: [0, 0],//team averages
 			stdev: [0, 0],//standard deviation
 			sum: [0, 0],//team_0 sum, team_1 sum
@@ -419,6 +420,7 @@ module.exports = class UTILS {
 			temp.min[t] = mathjs.min(temp.raw[t]);
 			temp.max[t] = mathjs.max(temp.raw[t]);
 			temp.avg[t] = mathjs.mean(temp.raw[t]);
+			temp.med[t] = mathjs.median(temp.raw[t]);
 			temp.stdev[t] = mathjs.std(temp.raw[t], "uncorrected");//σ: population standard deviation
 		}
 		temp.diff = temp.sum[0] - temp.sum[1];//team 0 - team 1
