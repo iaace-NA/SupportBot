@@ -2,7 +2,8 @@
 const fs = require("fs");
 const argv_options = new (require("getopts"))(process.argv.slice(2), {
 	alias: { c: ["config"] },
-	default: { c: "config.json" }});
+	default: { c: "config.json" }
+});
 
 const UTILS = new (require("../utils.js"))();
 const { ShardingManager } = require('discord.js');
