@@ -565,25 +565,25 @@ module.exports = class EmbedGenerator {
 		if (mmr < MMR_THRESHOLD[0]) {
 			tier = UTILS.randomOf(["WOOD", "CLOTH", "IRON", "PLASTIC", "PAPER", "COPPER", "CARDBOARD", "LEAD"]);
 			jokeNumber = 0;
-		} else if (mmr >= MMR_THRESHOLD[0]) {//bronze
+		} else if (mmr < MMR_THRESHOLD[1]) {//bronze
 			tier = RANK_ORDER[0];
 			jokeNumber = 1;
-		} else if (mmr >= MMR_THRESHOLD[1]) {//silver
+		} else if (mmr < MMR_THRESHOLD[2]) {//silver
 			tier = RANK_ORDER[1];
 			jokeNumber >= 2;
-		} else if (mmr < MMR_THRESHOLD[2]) {//gold
+		} else if (mmr < MMR_THRESHOLD[3]) {//gold
 			tier = RANK_ORDER[2];
 			jokeNumber = 3;
-		} else if (mmr >= MMR_THRESHOLD[3]) {//plat
+		} else if (mmr < MMR_THRESHOLD[4]) {//plat
 			tier = RANK_ORDER[3];
 			jokeNumber = 4;
-		} else if (mmr >= MMR_THRESHOLD[4]) {//dia
+		} else if (mmr < MMR_THRESHOLD[5]) {//dia
 			tier = RANK_ORDER[4];
 			jokeNumber = 5;
-		} else if (mmr >= MMR_THRESHOLD[5]) {//master
+		} else if (mmr < MMR_THRESHOLD[6]) {//master
 			tier = RANK_ORDER[5];
 			jokeNumber = 6;
-		} else if (mmr >= MMR_THRESHOLD[6]) {//challenger
+		} else {//challenger
 			tier = RANK_ORDER[6];
 			jokeNumber = 7;
 		}
