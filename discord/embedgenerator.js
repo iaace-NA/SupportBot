@@ -70,7 +70,8 @@ const MMR_JOKES = [
 	"Enemies have a red health bar.",
 	"Make sure you have /all chat enabled. Enemies give the best advice and encouragement.",
 	"We had to make elo work with negative numbers because of you."],
-	["League of Legends is a team game.",//bronze
+	["You want another account now, don't you?",//bronze
+	"League of Legends is a team game.",
 	"Don't waste a Summoner Spell on Smite. You can't use Smite on champions.",
 	"Even bots use their Summoner Spells.",
 	"Can't get demoted to Bronze if you never pass Silver promos.",
