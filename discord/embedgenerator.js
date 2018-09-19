@@ -122,7 +122,8 @@ const MMR_JOKES = [
 	"At least you're not plat.",
 	"Don't get that excited. Diamond 5 is garbage.",
 	"You're closer to bronze than you are to Diamond 3.",
-	"Does it even matter if no one thinks you deserve it?"],
+	"Does it even matter if no one thinks you deserve it?",
+	"You worked really hard for it- that is, to get enough money to pay for this boost."],
 	["Baited and outsmarted.",//master
 	"Boost Anomaly detected!",
 	"Ask your friends if they'd rather you be a Pokémon Master.",
