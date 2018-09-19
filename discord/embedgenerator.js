@@ -51,6 +51,64 @@ const queues = {
 	"1070": "OE Onslaught",
 	"1200": "NB Nexus Blitz"
 };
+const mmrJokes = {
+	"01": "We recommend using a mouse and keyboard when playing League of Legends.",
+	"02": "Brush, the grassy areas around Summoner's Rift, hides you from enemies.",
+	"03": "The monsters in the jungle won't hurt you unless you attack them.",
+	"04": "Normals are a less competitive environment to practice your skills.",
+	"05": "Never play League of Legends under the influence.",
+	"06": "Wards save lives.",
+	"07": "\"gg\" stands for \"Good golly!\"",
+	"11": "League of Legends is a team game.",
+	"12": "Don't waste a Summoner Spell on Smite. You can't use Smite on champions.",
+	"13": "Even bots use their Summoner Spells.",
+	"14": "Can't get demoted to Bronze if you never pass Silver promos.",
+	"15": "At least you are not Diamond.",
+	"16": "You can buy items in the shop.",
+	"17": "Having vision is important! Find missing enemies by exploring Fog of War.",
+	"21": "Zhonya's Hourglass cannot be activated while dead.",
+	"22": "You're beautiful the way you are!",
+	"23": "You gain the benefits of items right when you buy them. No need to equip!",
+	"24": "Use Flash to engage and earn more kills per minute.",
+	"25": "Keep your eyes peeled for Evelynn when she's invisible.",
+	"26": "Remember to kite enemy champions when playing a ranged carry.",
+	"27": "Ranged champions should hold their ground to deal the most damage in the shortest amount of time.",
+	"31": "Be like Daenerys: secure kills and still get three dragons.",
+	"32": "sudo apt-get gud",
+	"33": "Smite is a key Summoner Spell for jungling, allowing you to farm effectively.",
+	"34": "The enemy Nexus is worth 50g.",
+	"35": "Have you tried...not dying?",
+	"36": "What is dead may never die, like your MMR.",
+	"37": "Vision is important, but don't ward alone if your enemies are visible on the map.",
+	"41": "They say Platinum is a precious metal. Clearly they haven't seen you play.",
+	"42": "At least you are not Gold.",
+	"43": "Your lack of skins is holding you back.",
+	"44": "We're sorry you've been subjected to the real ELO hell.",
+	"45": "You're almost there! Just a few more promos and you'll stop hating your own Lee Sins!",
+	"46": "Always run back to base when you're losing a team fight.",
+	"47": "Consider watching a \"How not to play LoL\" stream.",
+	"51": "People rage at you when you don't carry in normals, huh?",
+	"52": "Let the salt flow through you.",
+	"53": "\"You shall not pass!\" - Voldemort, Star Wars",
+	"54": "Forged in the fires of Mount Targon, only promos can break you.",
+	"55": "If you keep playing like this, you'll be Bronze one day. Keep it up!",
+	"56": "Ah, so you're the guy smurfing in normals.",
+	"57": "I heard diamonds were hard...what happened to you?",
+	"61": "Baited and outsmarted.",
+	"62": "Boost Anomaly detected!",
+	"63": "Ask your friends if they'd rather you be a Pokémon Master.",
+	"64": "You've ascended Mount Targon six times. It's got nothing on Mount Everest, though. Keep climbing!",
+	"65": "You must feel good about destroying egos...unless, of course, you got boosted.",
+	"66": "You should consider coaching--and boosting other Challenger hopefuls, too.",
+	"67": "You're so metal, even Mordekaiser would crumple under your might.",
+	"71": "Never seen someone get boosted all the way to Challenger before. Must have been expensive.",
+	"72": "Hey qt!",
+	"73": "Losing is not an option.",
+	"74": "Challenjour!",
+	"75": "When's your AMA?",
+	"76": "Tell us when you join a pro team. We'll send you a Poro plushie to celebrate.",
+	"77": "Party like a former pro League rock star!"
+};
 const RANK_ORDER = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "CHALLENGER"];
 const RANK_COLOR = [[153, 51, 0], [179, 179, 179], [255, 214, 51], [0, 255, 152], [179, 240, 255], [255, 153, 255], [255, 0, 0]];
 const IMMR_THRESHOLD = [100, 600, 1100, 1600, 2100, 2600, 2700];
@@ -463,8 +521,38 @@ module.exports = class EmbedGenerator {
 		}
 		return newEmbed;
 	}
-	mmr(CONFIG, summoner, mmr) {
+	mmr(CONFIG, summoner) {
 		let newEmbed = new Discord.RichEmbed();
+		let tier = "";
+		let jokeNumber = "";
+		let mmr = Math.floor(Math.random() * (IMMR_THRESHOLD[IMMR_THRESHOLD.length - 1] + 300));
+		if (mmr < IMMR_THRESHOLD[0]) {
+			tier = "UNRANKED";
+			jokeNumber = 0;
+		} else if (mmr < IMMR_THRESHOLD[1]) {
+			tier = RANK_ORDER[0];
+			jokeNumber = 1;
+		} else if (mmr < IMMR_THRESHOLD[2]) {
+			tier = RANK_ORDER[1];
+			jokeNumber = 2;
+		} else if (mmr < IMMR_THRESHOLD[3]) {
+			tier = RANK_ORDER[2];
+			jokeNumber = 3;
+		} else if (mmr < IMMR_THRESHOLD[4]) {
+			tier = RANK_ORDER[3];
+			jokeNumber = 4;
+		} else if (mmr < IMMR_THRESHOLD[5]) {
+			tier = RANK_ORDER[4];
+			jokeNumber = 5;
+		} else if (mmr < IMMR_THRESHOLD[6]) {
+			tier = RANK_ORDER[5];
+			jokeNumber = 6;
+		} else if (mmr >= IMMR_THRESHOLD[6]) {
+			tier = RANK_ORDER[6];
+			jokeNumber = 7;
+		}
+		let result = (jokeNumber.toString() + (Math.floor(Math.random() * 6) + 1).toString());
+		let analysis = mmrJokes[result];
 		if (!UTILS.exists(summoner.id)) {
 			newEmbed.setTitle("This summoner does not exist.");
 			newEmbed.setDescription("Please revise your request.");
@@ -474,9 +562,9 @@ module.exports = class EmbedGenerator {
 		newEmbed.setAuthor(summoner.name);
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		newEmbed.setDescription("Level " + summoner.summonerLevel);
-		newEmbed.addField("Official MMR Data", "Tier: " + UTILS.english(mmr.tier) + "\nMMR: `" + mmr.mmr + "`\n" + mmr.analysis);
-		if (RANK_ORDER.indexOf(mmr.tier) != -1) newEmbed.setColor(RANK_COLOR[RANK_ORDER.indexOf(mmr.tier)]);
-		newEmbed.setFooter("This information is subject to very frequent change.");
+		newEmbed.addField("Official MMR Data", "Tier: " + UTILS.english(tier) + "\nMMR: `" + mmr + "`\n" + analysis);
+		if (RANK_ORDER.indexOf(tier) != -1) newEmbed.setColor(RANK_COLOR[RANK_ORDER.indexOf(tier)]);
+		newEmbed.setFooter("This information does not reflect this summoner's actual MMR.");
 		return newEmbed;
 	}
 	notify(CONFIG, content, username, displayAvatarURL) {
