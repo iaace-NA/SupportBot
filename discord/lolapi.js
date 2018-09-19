@@ -151,7 +151,7 @@ module.exports = class LOLAPI {
 				UTILS.debug("username " + username + " didn't pass regex filter");
 				return resolve({ status: "username didn't pass regex filter" });
 			}
-			this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage);
+			this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage).then(resolve).catch(reject);
 		});
 	}
 	getMultipleSummonerIDFromName(region, usernames, maxage) {
