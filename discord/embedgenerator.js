@@ -108,7 +108,8 @@ const MMR_JOKES = [
 	"Have you tried...not dying?",
 	"What is dead may never die, like your MMR.",
 	"Vision is important, but don't ward alone if your enemies are visible on the map.",
-	"At least you're not silver."],
+	"At least you're not silver.",
+	"Hey, at least you know how to use /all chat."],
 	["They say Platinum is a precious metal. Clearly they haven't seen you play.",//platinum
 	"At least you're not Gold.",
 	"Your lack of skins is holding you back.",
