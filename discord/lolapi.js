@@ -3,7 +3,7 @@ const UTILS = new (require("../utils.js"))();
 const fs = require("fs");
 const REQUEST = require("request");
 const XRegExp = require("xregexp");
-const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt") };
+const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt"), timeout: 120000 };
 module.exports = class LOLAPI {
 	constructor(INIT_CONFIG, request_id) {
 		this.CONFIG = INIT_CONFIG;
