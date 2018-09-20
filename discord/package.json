@@ -9,6 +9,7 @@
   "author": "iaace",
   "license": "MIT",
   "dependencies": {
+    "console.table": "^0.10.0",
     "discord.js": "^11.3.2",
     "getopts": "^2.0.6",
     "json5": "^2.0.1",
