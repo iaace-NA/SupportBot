@@ -23,10 +23,12 @@ League of Legends Statistics for Discord
 - mongodb 3.x
 ## npm Dependencies
 - pm2 (global)
-- discord.js 11.3.2
+- discord.js 11.4.2
 - mongoose 5.0.0-rc1
 - request 2.83.0
 - mathjs 5.1.0
+- console.table
+- json5
 ## Minimum System Requirements
 - RAM: 1 GB
 - HDD: 1 GB
