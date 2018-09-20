@@ -424,7 +424,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 									request_profiler.begin("generating embed");
 									const newEmbed = embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA);
 									request_profiler.end("generating embed");
-									UTILS.debug(ctable.getTable(request_profiler.endAllCtable()));
+									UTILS.debug("\n" + ctable.getTable(request_profiler.endAllCtable()));
 									replyEmbed(newEmbed, () => {
 										//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false, true));
 									});

@@ -35,20 +35,20 @@ module.exports = class Profiler {
 		for (let b = 0; b < this.events.length; ++b) {
 			let temp = {
 				name: this.events[b].name,
-				at: this.ms(this.diff(this.events[b].time, this.creation_time)),
+				at: this.ms(this.diff(0, this.events[b].time)),
 			};
 			if (b > 0) temp.last = this.ms(this.diff(this.events[b].time, this.events[b - 1].time)) + " ms ago";
 			if (this.events[b].type === 0);
 			else if (this.events[b].type === 1) {
 				temp.duration = this.ms(this.diff(this.events[b].time, this.events.find(e => { return e.name == this.events[b].name && e.type == 2; }).time)) + " ms";
-				temp.end = this.ms(this.diff(now, this.events.find(e => { return e.name == this.events[b].name && e.type == 2; }).time)) + " ms";
+				temp.end = this.ms(this.diff(this.events.find(e => { return e.name == this.events[b].name && e.type == 2; }).time), this.creation_time) + " ms";
 			}
 			answer.push(temp);
 		}
 		this.events = [];
 		return answer;
 	}
-	diff(now, prev) {//returns ns
+	diff(now, prev) {//returns ns (now - prev) (a - b)
 		return ((now[0] - prev[0]) * 1e9) + (now[1] - prev[1]);
 	}
 	ms(nsn) {//returns ms.ns
