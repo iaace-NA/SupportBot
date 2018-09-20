@@ -235,10 +235,10 @@ module.exports = class EmbedGenerator {
 		}
 		if (highest_rank > -1) newEmbed.setColor(RANK_COLOR[highest_rank]);
 		if (will) {
-			const challenger_rank = UTILS.round(UTILS.map(Math.random(), 0, 1, 5, 200));
-			const challenger_LP = UTILS.round(UTILS.map(Math.random(), 0, 1, 100, 1000));
-			const fake_games = UTILS.round(UTILS.map(Math.random(), 0, 1, 200, 700));
-			const fake_wins = UTILS.round(UTILS.map(Math.random(), 0, 1, fake_games / 2, fake_games));
+			const challenger_rank = UTILS.randomInt(5, 200);
+			const challenger_LP = UTILS.randomInt(100, 1000);
+			const fake_games = UTILS.randomInt(200, 700);
+			const fake_wins = UTILS.randomInt(fake_games / 2, fake_games);
 			const fake_losses = fake_games - fake_wins;
 			const fake_wr = UTILS.round(100 * fake_wins / (fake_wins + fake_losses), 2);
 			newEmbed.addField("<:Challenger:437262128282599424>True Rank: Challenger ~#" + challenger_rank + " " + challenger_LP + "LP", fake_games + "G (" + fake_wr + "%) = " + fake_wins + "W + " + fake_losses + "L", true);
@@ -568,9 +568,12 @@ module.exports = class EmbedGenerator {
 			return newEmbed;
 		}
 		let tier, jokeNumber;
-		const mmr = Math.floor(Math.random() * (MMR_THRESHOLD[MMR_THRESHOLD.length - 1] + 300 + 100)) - 100;
+		let mmr = UTILS.randomInt(-1, MMR_THRESHOLD.length);//pick a tier
+		if (mmr === -1) UTILS.randomInt(-100, MMR_THRESHOLD[0])
+		else if (mmr < MMR_THRESHOLD.length - 1) mmr = UTILS.randomInt(MMR_THRESHOLD[mmr], MMR_THRESHOLD[mmr + 1]);//-100 to 400
+		else UTILS.randomInt(MMR_THRESHOLD[mmr], MMR_THRESHOLD[mmr] + 300);
 		if (mmr < MMR_THRESHOLD[0]) {
-			tier = UTILS.randomOf(["WOOD", "CLOTH", "IRON", "PLASTIC", "PAPER", "COPPER", "CARDBOARD", "LEAD"]);
+			tier = UTILS.randomOf(["WOOD", "CLOTH", "IRON", "PLASTIC", "PAPER", "COPPER", "CARDBOARD", "LEAD", "DIRT", "GARBAGE"]);
 			jokeNumber = 0;
 		} else if (mmr < MMR_THRESHOLD[1]) {//bronze
 			tier = RANK_ORDER[0];
@@ -880,7 +883,7 @@ module.exports = class EmbedGenerator {
 		}
 		UTILS.debug(JSON.stringify(random_iMMR, null, "\t"));
 		for (let b in TEAM_COMBINATIONS) team_by_random.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], random_iMMR));
-		const team_by_random_best = Math.trunc(Math.random() * TEAM_COMBINATIONS.length);//team arrangement index
+		const team_by_random_best = UTILS.randomInt(0, TEAM_COMBINATIONS.length);//team arrangement index
 		let team_by_random_team_0_description = "**__Team " + (team_by_random[team_by_random_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
 		let team_by_random_team_1_description = "**__Team " + (team_by_random[team_by_random_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_random_best].length; ++i) {

@@ -431,4 +431,7 @@ module.exports = class UTILS {
 	randomOf(choices) {
 		return choices[Math.trunc(Math.random() * choices.length)];
 	}
+	randomInt(a, b) {//[a, b)
+		return Math.trunc(Math.random() * (b - a)) + a;
+	}
 }
