@@ -1,8 +1,8 @@
 {
 	"CONSTANTS": {
-		"SCM_FULL": 2,
-		"SCM_REDUCED": 1,
-		"SCM_COMPACT": 0,
+		"SCM_FULL": 2,//scorecardmode full
+		"SCM_REDUCED": 1,//scorecardmode full -> compact time delay
+		"SCM_COMPACT": 0,//scorecardmode compact
 		"NORMALMEMBERS": 0,
 		"BOTCOMMANDERS": 1,
 		"MODERATORS": 2,
@@ -13,9 +13,10 @@
 	"DISCORD_API_KEY": "",
 	"RIOT_API_KEY": "",
 	"OWNER_DISCORD_IDS": {
+		//key is owner uid
 		"109894307070083072": {
-			"name": "iaace",
-			"active": true
+			"name": "iaace",//common name
+			"active": true//account is active
 		},
 		"333384744483946508": {
 			"name": "routuro",
@@ -34,7 +35,7 @@
 			"active": true
 		}
 	},
-	"DISCORD_COMMAND_PREFIX": "l",
+	"DISCORD_COMMAND_PREFIX": "l",//not case sensitive
 	"REGIONS": {
 		"BR": "br1",
 		"EUNE": "eun1",
@@ -49,7 +50,7 @@
 		"RU": "ru",
 		"PBE": "pbe1"
 	},
-	"REGIONS_REVERSE": {
+	"REGIONS_REVERSE": {//mirror of above property
 		"br1": "BR",
 		"eun1": "EUNE",
 		"euw1": "EUW",
@@ -64,20 +65,20 @@
 		"pbe1": "PBE"
 	},
 	"HELP_SERVER_INVITE_LINK": "https://discord.gg/",
-	"LOG_CHANNEL_ID": "insert discord channel id here",
-	"BOT_ADD_LINK": "",
+	"LOG_CHANNEL_ID": "insert discord channel id here",//logs bot account events
+	"BOT_ADD_LINK": "",//link where people can add the bot to their servers
 	"SPELL_EMOJIS": {
-		"1": "<:CL:433055677032693761>",
-		"3": "<:EX:433055784071593985>",
-		"4": "<:FL:433055894415081482>",
-		"6": "<:GH:433056089551011843>",
-		"7": "<:HL:433056178743017474>",
-		"11": "<:SM:433056279909498880>",
-		"12": "<:TP:433056350285856780>",
-		"13": "<:CA:433056460235079682>",
-		"14": "<:IG:433056559212527616>",
-		"21": "<:BR:433056659087294464>",
-		"32": "<:MK:433056963820257290>"
+		"1": "<:CL:433055677032693761>",//cleanse
+		"3": "<:EX:433055784071593985>",//exhaust
+		"4": "<:FL:433055894415081482>",//flash
+		"6": "<:GH:433056089551011843>",//ghost
+		"7": "<:HL:433056178743017474>",//heal
+		"11": "<:SM:433056279909498880>",//smite
+		"12": "<:TP:433056350285856780>",//teleport
+		"13": "<:CA:433056460235079682>",//clarity
+		"14": "<:IG:433056559212527616>",//ignite
+		"21": "<:BR:433056659087294464>",//barrier
+		"32": "<:MK:433056963820257290>"//mark
 	},
 	"EMOJIS": {
 		"op.gg": "<:opgg:433455497044295681>",
@@ -102,9 +103,9 @@
 	"API_PORT": 56831,
 	"API_ADDRESS": "127.0.0.1",
 	"API_PERIOD": 250,
-	"API_KEY": "insert random string here",
-	"API_SEQUENTIAL": true,
-	"API_CACHETIME": {
+	"API_KEY": "insert random string here",//for internal api use only
+	"API_SEQUENTIAL": true,//whether or not multiple LoL api requests should be sequential or bursted
+	"API_CACHETIME": {//how long the api document should remain in cache
 		"GET_SUMMONER_ID_FROM_NAME": 86400,
 		"GET_SUMMONER_FROM_SUMMONER_ID": 86400,
 		"GET_RANKS": 14400,
@@ -118,7 +119,7 @@
 		"STATIC_SPELLS": 10800,
 		"GET_CHALLENGERS": 14400
 	},
-	"API_MAXAGE": {
+	"API_MAXAGE": {//maximum acceptable age of api data for a command
 		"SD": 60,
 		"LINK": 60,
 		"SUMMONER_CARD": {
@@ -170,10 +171,11 @@
 			"SUMMONER_ID": 3600
 		}
 	},
-	"CHAMP_EMOJI_SERVERS": ["437263625980215316", "437271022560083968"],
-	"SHARD_COUNT": 3,
+	"CHAMP_EMOJI_SERVERS": ["437263625980215316", "437271022560083968"],//servers that hold champion emojis
+	"SHARD_COUNT": 3,//amount of discord shards to spawn
 	"RATE_LIMIT": {
-		"CHANNEL_ID": "channel id here",
+		"CHANNEL_ID": "channel id here",//reports rate limit incidents in this channel
+		"LARGE_SERVER_THRESHOLD": 200,//the point where a server is large and the rate limit is increased
 		"USER_MESSAGES": 4,
 		"USER_TIME_S": 60,
 		"SERVER_MESSAGES": 6,
@@ -182,10 +184,9 @@
 		"LARGE_SERVER_TIME_S": 60
 	},
 	"FEEDBACK": {
-		"EXTERNAL_CID": "channel id here",
-		"COMPLAINT_CID": "channel id here",
-		"PRAISE_CID": "channel id here",
-		"SUGGESTION_CID": "channel id here"
-	},
-	"LARGE_SERVER_THRESHOLD": 200
+		"EXTERNAL_CID": "channel id here",//where external feedback comes to get approved
+		"COMPLAINT_CID": "channel id here",//approved public complaints channel
+		"PRAISE_CID": "channel id here",//approved public praise channel
+		"SUGGESTION_CID": "channel id here"//approved public suggestion channel
+	}
 }

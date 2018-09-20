@@ -4,7 +4,7 @@ const start_time = new Date().getTime();
 const fs = require("fs");
 const argv_options = new (require("getopts"))(process.argv.slice(2), {
 	alias: { c: ["config"] },
-	default: { c: "config.json" }});
+	default: { c: "config.json5" }});
 const Discord = require("discord.js");
 let discordcommands = require("./discordcommands.js");
 
@@ -14,8 +14,9 @@ const client = new Discord.Client({ disabledEvents: ["TYPING_START"] });
 let RateLimiter = require("../ratelimiter.js");
 
 let CONFIG;
+const JSON5 = require("json5");
 try {
-	CONFIG = JSON.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
+	CONFIG = JSON5.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
 	CONFIG.VERSION = "v1.5.0b";//b for non-release (in development)
 	CONFIG.BANS = {};
 }
@@ -58,7 +59,7 @@ client.on("message", function (msg) {
 	try {
 		const ACCESS_LEVEL = UTILS.accessLevel(CONFIG, msg);
 		const SERVER_RL = msg.PM ? null : getServerRateLimiter(msg.guild.id);
-		if (!msg.PM) msg.guild.memberCount >= CONFIG.LARGE_SERVER_THRESHOLD ? SERVER_RL.setMode(CONFIG.RATE_LIMIT.LARGE_SERVER_MESSAGES, CONFIG.RATE_LIMIT.LARGE_SERVER_TIME_S) : SERVER_RL.setMode(CONFIG.RATE_LIMIT.SERVER_MESSAGES, CONFIG.RATE_LIMIT.SERVER_TIME_S);
+		if (!msg.PM) msg.guild.memberCount >= CONFIG.RATE_LIMIT.LARGE_SERVER_THRESHOLD ? SERVER_RL.setMode(CONFIG.RATE_LIMIT.LARGE_SERVER_MESSAGES, CONFIG.RATE_LIMIT.LARGE_SERVER_TIME_S) : SERVER_RL.setMode(CONFIG.RATE_LIMIT.SERVER_MESSAGES, CONFIG.RATE_LIMIT.SERVER_TIME_S);
 		new Preferences(LOLAPI, msg.guild, server_preferences => discordcommands(CONFIG, client, msg, wsapi, sendToChannel, server_preferences, ACCESS_LEVEL, SERVER_RL, getUserRateLimiter(msg.author.id)));
 	}
 	catch (e) {
