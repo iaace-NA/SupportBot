@@ -3,11 +3,12 @@ const UTILS = new (require("../utils.js"))();
 const fs = require("fs");
 const argv_options = new (require("getopts"))(process.argv.slice(2), {
 	alias: { c: ["config"] },
-	default: { c: "config.json" }});
+	default: { c: "config.json5" }});
 let cache = {};
 let CONFIG;
+const JSON5 = require("json5");
 try {
-	CONFIG = JSON.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
+	CONFIG = JSON5.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
 }
 catch (e) {
 	UTILS.output("something's wrong with config.json");

@@ -8,3 +8,5 @@ config.json
 *.bat
 devconfig.json
 test.js
+config.json5
+devconfig.json5

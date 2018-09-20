@@ -13,7 +13,7 @@
 				"DEBUG": false
 			},
 			"node_args": "--trace-deprecation",
-			"args": "--config=config.json"
+			"args": "--config=config.json5"
 		},
 		{
 			"name": "main",
@@ -28,7 +28,7 @@
 				"DEBUG": false
 			},
 			"node_args": "--trace-deprecation",
-			"args": "--config=config.json"
+			"args": "--config=config.json5"
 		}
 	]
 }
