@@ -41,7 +41,7 @@ module.exports = class Profiler {
 			if (this.events[b].type === 0);
 			else if (this.events[b].type === 1) {
 				temp.duration = this.ms(this.diff(this.events[b].time, this.events.find(e => { return e.name == this.events[b].name && e.type == 2; }).time)) + " ms";
-				temp.end = this.ms(this.diff(this.events.find(e => { return e.name == this.events[b].name && e.type == 2; }).time), this.creation_time) + " ms";
+				temp.end = this.ms(this.diff(this.events.find(e => { return e.name == this.events[b].name && e.type == 2; }).time, this.creation_time)) + " ms";
 			}
 			answer.push(temp);
 		}
