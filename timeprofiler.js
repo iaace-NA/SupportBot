@@ -35,7 +35,7 @@ module.exports = class Profiler {
 		for (let b = 0; b < this.events.length; ++b) {
 			let temp = {
 				name: this.events[b].name,
-				at: this.ms(this.diff(this.events[b].time, this.creation_time)),
+				at: this.ms(this.diff(this.events[b].time, this.creation_time)) + " ms",
 			};
 			if (b > 0) temp.last = this.ms(this.diff(this.events[b].time, this.events[b - 1].time)) + " ms ago";
 			if (this.events[b].type === 0);
