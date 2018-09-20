@@ -21,11 +21,14 @@ catch (e) {
 const manager = new ShardingManager("./shard.js",
 	{ token: CONFIG.DISCORD_API_KEY,
 	totalShards: CONFIG.SHARD_COUNT,
-	respawn: true,
+	respawn: false,
 	shardArgs: process.argv.slice(2) });
 
 manager.on("launch", shard => {
 	UTILS.output("Launched shard " + shard.id);
+	shard.on("death", () => {
+		setTimeout(shard.spawn, 5000);
+	});
 });
 manager.spawn(undefined, 10000);
 UTILS.output("Sharding Manager started");
