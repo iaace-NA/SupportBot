@@ -88,7 +88,7 @@ const MMR_JOKES = [
 	"Consider learning new champions in Co-op vs. AI or Normal games.",
 	"You can ban Master Yi in draft pick!",
 	"If their team gets first blood, it's over. /ff at 15",
-	"Your teammates aren't yet using the MIA ping for what it's intended purpose is.",
+	"Your teammates aren't yet using the MIA ping for what its intended purpose is.",
 	"The warding totem gives you free wards to place throughout the entire game!"],
 	["Zhonya's Hourglass cannot be activated while dead.",//silver
 	"You're beautiful the way you are!",
