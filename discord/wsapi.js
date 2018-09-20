@@ -88,7 +88,7 @@ module.exports = class WSAPI {
 			UTILS.output("ws closed: " + code + ", " + reason);
 		});
 		this.connection.on("message", data => {
-			UTILS.debug(data);
+			//UTILS.debug(data);
 			data = JSON.parse(data);
 			UTILS.debug("ws message received: type: " + data.type);
 			const that = this;
