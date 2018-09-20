@@ -5,6 +5,7 @@ let child_process = require("child_process");
 const UTILS = new (require("../utils.js"))();
 let LOLAPI = require("./lolapi.js");
 let Profiler = require("../timeprofiler.js");
+let ctable = require("console.table");
 module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preferences, ACCESS_LEVEL, server_RL, user_RL) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 	if (!msg.PM && !msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) return;//dont read messages that can't be responded to
@@ -774,13 +775,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	}
 
 	function printMessage() {
-		const basic = msg.id + "\ncontent: " + msg.content +
-			"\nauthor: " + msg.author.tag + " :: " + msg.author.id +
-			"\nchannel: " + msg.channel.name + " :: " + msg.channel.id;
-		if (!msg.PM) UTILS.output("received server message :: " + basic + "\nguild: " + msg.guild.name + " :: " + msg.guild.id);
-		else {
-			UTILS.output("received PM/DM message :: " + basic);
-		}
+		if (!msg.PM) UTILS.output("\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, channel: msg.channel.name, guild: msg.guild.name }, { content: msg.id, author: msg.author.id, channel: msg.channel.id, guild: msg.guild.id }]));
+		else UTILS.output("\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, channel: msg.channel.name }, { content: msg.id, author: msg.author.id, channel: msg.channel.id }]));
+
 	}
 	function assertRegion(test_string, notify = true) {
 		if (!UTILS.exists(CONFIG.REGIONS[test_string.toUpperCase()])) {
