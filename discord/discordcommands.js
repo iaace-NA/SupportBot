@@ -714,16 +714,14 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	function isOwner(candidate = msg.author.id, notify = true) {
 		const answer = UTILS.exists(CONFIG.OWNER_DISCORD_IDS[candidate]) && CONFIG.OWNER_DISCORD_IDS[candidate].active;
 		if (!answer) {
-			UTILS.output("insufficient permissions");
-			printMessage();
+			printMessage("insufficient permissions");
 			if (notify) msg.channel.send(":x: Owner permissions required. Ask for help at " + CONFIG.HELP_SERVER_INVITE_LINK + " .").catch(console.error);
 		}
 		return answer;
 	}
 	function reply(reply_text, callback, errorCallback) {
-		printMessage();
+		printMessage("reply (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
 		lolapi.terminate();
-		console.log("reply (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
 		msg.channel.send(reply_text, { split: true }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
@@ -733,9 +731,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	}
 
 	function replyToAuthor(reply_text, callback, errorCallback) {
-		printMessage();
+		printMessage("reply to author (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
 		lolapi.terminate();
-		console.log("reply to author (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
 		msg.author.send(reply_text, { split: true }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
@@ -750,9 +747,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			reply(":x: I cannot respond to your request without the \"embed links\" permission.");
 		}
 		else {//has permission to embed links, or is a DM/PM
-			printMessage();
+			printMessage("reply embedded (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
 			lolapi.terminate();
-			console.log("reply embedded (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
 			msg.channel.send("", { embed: reply_embed }).then((nMsg) => {
 				if (UTILS.exists(callback)) callback(nMsg);
 			}).catch((e) => {
@@ -763,9 +759,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	}
 
 	function replyEmbedToAuthor(reply_embed, callback, errorCallback) {
-		printMessage();
+		printMessage("reply embedded to author (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
 		lolapi.terminate();
-		console.log("reply embedded to author (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
 		msg.author.send("", { embed: reply_embed }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
@@ -774,9 +769,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 		});
 	}
 
-	function printMessage() {
-		if (!msg.PM) UTILS.output("\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, channel: msg.channel.name, guild: msg.guild.name }, { content: msg.id, author: msg.author.id, channel: msg.channel.id, guild: msg.guild.id }]));
-		else UTILS.output("\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, channel: msg.channel.name }, { content: msg.id, author: msg.author.id, channel: msg.channel.id }]));
+	function printMessage(x = "") {
+		if (!msg.PM) UTILS.output(x + "\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, channel: msg.channel.name, guild: msg.guild.name }, { content: msg.id, author: msg.author.id, channel: msg.channel.id, guild: msg.guild.id }]));
+		else UTILS.output(x + "\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, channel: msg.channel.name }, { content: msg.id, author: msg.author.id, channel: msg.channel.id }]));
 
 	}
 	function assertRegion(test_string, notify = true) {
