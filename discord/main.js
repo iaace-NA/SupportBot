@@ -26,9 +26,12 @@ const manager = new ShardingManager("./shard.js",
 	shardArgs: process.argv.slice(2) });
 
 manager.on("launch", shard => {
+	const shard_id = shard.id;
 	UTILS.output("Launched shard " + shard.id);
 	shard.on("death", () => {
-		setTimeout(shard.spawn, 5000);
+		setTimeout(() => {
+			manager.createShard(shard_id);
+		}, 5000);
 	});
 });
 manager.spawn(undefined, 10000);
