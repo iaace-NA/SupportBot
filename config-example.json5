@@ -8,7 +8,8 @@
 		"MODERATORS": 2,
 		"ADMINISTRATORS": 3,
 		"SERVEROWNERS": 4,
-		"BOTOWNERS": 5
+		"BOTOWNERS": 5,
+		"PERMISSION_LEVEL_REVERSE": ["N", "B", "M", "A", "S", "G"]//normal, bot commander, moderator, administrator, server owner, god
 	},
 	"DISCORD_API_KEY": "",
 	"RIOT_API_KEY": "",
