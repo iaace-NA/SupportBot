@@ -429,7 +429,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 										//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false, true));
 									});
 									//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false));//untrimmed output
-								}).catch();
+								}).catch(console.error);
 							}).catch();
 						});
 					}).catch(console.error);
