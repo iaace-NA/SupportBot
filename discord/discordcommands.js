@@ -770,8 +770,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	}
 
 	function printMessage(x = "") {
-		if (!msg.PM) UTILS.output(x + "\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, channel: msg.channel.name, guild: msg.guild.name }, { content: msg.id, author: msg.author.id, channel: msg.channel.id, guild: msg.guild.id }]));
-		else UTILS.output(x + "\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, channel: msg.channel.name }, { content: msg.id, author: msg.author.id, channel: msg.channel.id }]));
+		if (!msg.PM) UTILS.output(x + "\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, p: PLEVEL, channel: msg.channel.name, guild: msg.guild.name }, { content: msg.id, author: msg.author.id, channel: msg.channel.id, guild: msg.guild.id }]));
+		else UTILS.output(x + "\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, p: PLEVEL, channel: msg.channel.name }, { content: msg.id, author: msg.author.id, channel: msg.channel.id }]));
 
 	}
 	function assertRegion(test_string, notify = true) {
