@@ -6,9 +6,9 @@ League of Legends Statistics for Discord
 
 ## Format of Repository
 ### Branches:
-- major: unstable, next major revision v+.0.0
-- minor: unstable, next minor revision vX.+.0
-- patch: unstable, next patch revision vX.X.+
+- major: unstable, next major revision v+.0.0 : we removed a feature
+- minor: unstable, next minor revision vX.+.0 : we added a feature
+- patch: unstable, next patch revision vX.X.+ : we fixed a problem
 - master: stable, most current release
 ### Folders:
 - api: internal api files
