@@ -770,8 +770,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 	}
 
 	function printMessage(x = "") {
-		if (!msg.PM) UTILS.output(x + "\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, P: ACCESS_LEVEL, channel: msg.channel.name, guild: msg.guild.name }, { content: msg.id, author: msg.author.id, P: CONFIG.PERMISSION_LEVEL_REVERSE[ACCESS_LEVEL], channel: msg.channel.id, guild: msg.guild.id }]));
-		else UTILS.output(x + "\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, P: ACCESS_LEVEL, channel: msg.channel.name }, { content: msg.id, author: msg.author.id, P: CONFIG.PERMISSION_LEVEL_REVERSE[ACCESS_LEVEL], channel: msg.channel.id }]));
+		if (!msg.PM) UTILS.output(x + "\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, P: CONFIG.PERMISSION_LEVEL_REVERSE[ACCESS_LEVEL], channel: msg.channel.name, guild: msg.guild.name }, { content: msg.id, author: msg.author.id, P: ACCESS_LEVEL, channel: msg.channel.id, guild: msg.guild.id }]));
+		else UTILS.output(x + "\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, P: CONFIG.PERMISSION_LEVEL_REVERSE[ACCESS_LEVEL], channel: msg.channel.name }, { content: msg.id, author: msg.author.id, P: ACCESS_LEVEL, channel: msg.channel.id }]));
 
 	}
 	function assertRegion(test_string, notify = true) {
