@@ -31,7 +31,7 @@ module.exports = class Profiler {
 	endAllCtable() {
 		const now = process.hrtime();
 		let answer = [];
-		answer.push({ name: "All", last: "0 ms", at: "0 ms", duration: this.ms(this.diff(now, this.creation_time)) + " ms", end: this.ms(this.diff(now, this.creation_time)) + " ms" });
+		answer.push({ name: this.name, last: "0 ms", at: "0 ms", duration: this.ms(this.diff(now, this.creation_time)) + " ms", end: this.ms(this.diff(now, this.creation_time)) + " ms" });
 		for (let b = 0; b < this.events.length; ++b) {
 			let temp = {
 				name: this.events[b].name,
