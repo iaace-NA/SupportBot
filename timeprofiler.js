@@ -43,7 +43,7 @@ module.exports = class Profiler {
 				temp.duration = this.ms(this.diff(this.events.find(e => { return e.name == this.events[b].name && e.type == 2; }).time, this.events[b].time)) + " ms";
 				temp.end = this.ms(this.diff(this.events.find(e => { return e.name == this.events[b].name && e.type == 2; }).time, this.creation_time)) + " ms";
 			}
-			answer.push(temp);
+			if (b !== 2) answer.push(temp);
 		}
 		this.events = [];
 		return answer;
