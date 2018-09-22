@@ -155,9 +155,10 @@ module.exports = class EmbedGenerator {
 	constructor() { }
 	test() {
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setTitle("Test");
-		newEmbed.setDescription("description");
-		newEmbed.addField("`j` `      ` test", "nothing");
+		newEmbed.setAuthor("Author 🇺🇸");
+		newEmbed.setTitle("Test 🇺🇸");
+		newEmbed.setDescription("description 🇺🇸");
+		newEmbed.addField("field title 🇺🇸", "field desc 🇺🇸");
 		return newEmbed;
 	}
 	help(CONFIG) {
