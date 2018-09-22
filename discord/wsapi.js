@@ -66,6 +66,9 @@ module.exports = class WSAPI {
 
 		30: IAPI wants to send server an unban message
 		31: unimplemented
+
+		32: IAPI wants to PM embed to user
+		33: shard wants to PM embed to user
 	*/
 	constructor(INIT_CONFIG, discord_client, INIT_STATUS) {
 		this.client = discord_client;
@@ -215,6 +218,14 @@ module.exports = class WSAPI {
 						});
 					}
 					break;
+				case 32:
+					this.client.users.get(data.uid).send(embedgenerator.raw(data.embed)).then(() => {
+						that.sendTextToChannel(that.CONFIG.FEEDBACK.EXTERNAL_CID, ":e_mail: User notified");
+					}).catch(e => {
+						console.error(e);
+						that.sendTextToChannel(that.CONFIG.FEEDBACK.EXTERNAL_CID, ":x::warning: User could not be notified");
+					});
+					break;
 				default:
 					UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
 			}
@@ -246,6 +257,9 @@ module.exports = class WSAPI {
 			}, 10000);
 		}
 		else this.connection.send(JSON.stringify(raw_object));
+	}
+	embedPM(uid, embed) {
+		this.send({ type: 33, uid, embed });
 	}
 	connect() {
 		this.connection = new ws(this.address + ":" + this.port + "/shard?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&id=" + process.env.SHARD_ID, agentOptions);
