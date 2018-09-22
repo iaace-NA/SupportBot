@@ -193,6 +193,8 @@
 		"EXTERNAL_CID": "channel id here",//where external feedback comes to get approved
 		"COMPLAINT_CID": "channel id here",//approved public complaints channel
 		"PRAISE_CID": "channel id here",//approved public praise channel
-		"SUGGESTION_CID": "channel id here"//approved public suggestion channel
+		"SUGGESTION_CID": "channel id here",//approved public suggestion channel
+		"APPROVED_IMAGE_LINK": "https://cdn.discordapp.com/emojis/382263196477685771.png?v=1",//footer image for approved feedback
+		"DENIED_IMAGE_LINK": "https://cdn.discordapp.com/emojis/493118209566965764.png?v=1"//footer image for denied feedback
 	}
 }
