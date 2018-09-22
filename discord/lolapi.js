@@ -320,10 +320,10 @@ module.exports = class LOLAPI {
 	unbanServer(sid, issuer, issuer_tag, issuer_avatarURL) {
 		return this.getIAPI("unban", { id: sid, user: false, issuer, issuer_tag, issuer_avatarURL });
 	}
-	userHistory(uid, complete = false) {
+	userHistory(uid, complete = true) {
 		return complete ? this.getIAPI("gethistory", { id: uid, user: true }) : this.getIAPI("gethistory", { id: uid, user: true, limit: 10 });
 	}
-	serverHistory(sid, complete = false) {
+	serverHistory(sid, complete = true) {
 		return complete ? this.getIAPI("gethistory", { id: sid, user: false }) : this.getIAPI("gethistory", { id: sid, user: false, limit: 10 });
 	}
 	getActions(uid, complete = false) {
