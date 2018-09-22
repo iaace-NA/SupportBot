@@ -1,7 +1,7 @@
 "use strict";
 const UTILS = new (require("../utils.js"))();
 let champ_emojis = {};
-module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans) {
+module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans, sendExpectReplyBroadcast) {
 	switch (data.type) {
 		case 1:
 			break;
@@ -32,6 +32,18 @@ module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShar
 			});
 			break;
 		case 21:
+			break;
+		case 33:
+			sendExpectReplyBroadcast({ type: 20, uid: data.uid, embed: data.embed }).then(results => {
+				for (let i = 0; i < results.length; ++i) {
+					if (results[i].connected) {
+						sendToShard({ type: 32,
+							uid: data.uid,
+							embed: data.embed }, i);
+						break;
+					}
+				}
+			}).catch(console.error);
 			break;
 		default:
 			UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
