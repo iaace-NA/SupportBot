@@ -169,7 +169,7 @@ function sendExpectReply(message, destination, timeout = 5000) {
 function sendExpectReplyBroadcast(message, timeout = 5000) {
 	let shard_numbers = [];
 	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) shard_numbers.push(i);
-	return Promise.all(shard_numbers.map(n => sendExpectReply(message, n)));
+	return Promise.all(shard_numbers.map(n => sendExpectReply(message, n, timeout)));
 }
 
 setInterval(() => {
