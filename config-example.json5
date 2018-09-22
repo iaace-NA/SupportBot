@@ -17,23 +17,28 @@
 		//key is owner uid
 		"109894307070083072": {
 			"name": "iaace",//common name
-			"active": true//account is active
+			"active": true,//account is active
+			"flags": "🇺🇸"//language flags appended at end of Lmail support messages
 		},
 		"333384744483946508": {
 			"name": "routuro",
-			"active": true
+			"active": true,
+			"flags": "🇺🇸"
 		},
 		"250698693982945282": {
 			"name": "K-den",
-			"active": true
+			"active": true,
+			"flags": "us"
 		},
 		"175003640111693824": {
 			"name": "WastedYoTimeReadingThis",
-			"active": true
+			"active": true,
+			"flags": "🇺🇸"
 		},
 		"66336882170015744": {
 			"name": "HiKomodo",
-			"active": true
+			"active": true,
+			"flags": "🇺🇸"
 		}
 	},
 	"DISCORD_COMMAND_PREFIX": "l",//not case sensitive

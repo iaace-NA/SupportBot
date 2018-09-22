@@ -1115,6 +1115,7 @@ module.exports = class EmbedGenerator {
 			newEmbed.setTitle("Message from management to " + msg.author.username);//reset title
 			newEmbed.setURL(CONFIG.HELP_SERVER_INVITE_LINK);
 			newEmbed.addField("This is a private conversation with management.", "You can reply to this message by sending `!say <your response goes here>`");
+			newEmbed.setDescription(msg.cleanContent + "\n" + CONFIG.OWNER_DISCORD_IDS[msg.author.id].flags);
 		}
 		else if (destination === 1) {
 			newEmbed.addField("Responses", "Send message response: `" + CONFIG.DISCORD_COMMAND_PREFIX + "mail " + msg.author.id + "`\nBan: `" + CONFIG.DISCORD_COMMAND_PREFIX + "banuser " + msg.author.id + " <duration> <reason>`\nWarn: `" + CONFIG.DISCORD_COMMAND_PREFIX + "warnuser " + msg.author.id + " <reason>`\nNote: `" + CONFIG.DISCORD_COMMAND_PREFIX + "noteuser " + msg.author.id + " <reason>`");
