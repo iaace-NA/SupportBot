@@ -434,4 +434,65 @@ module.exports = class UTILS {
 	randomInt(a, b) {//[a, b)
 		return Math.trunc(Math.random() * (b - a)) + a;
 	}
+	disciplinaryStatus(docs) {
+		const now = new Date().getTime();
+		let active_ban = -1;//-1 = no ban, 0 = perma, other = temp ban
+		for (let b in docs) {
+			if (docs[b].ban && docs[b].active) {
+				const ban_date = new Date(docs[b].date);
+				if (ban_date.getTime() == 0) {
+					active_ban = 0;
+					break;
+				}
+				else if (ban_date.getTime() > now) {
+					if (ban_date.getTime() > active_ban) active_ban = ban_date.getTime();
+				}
+			}
+		}
+		let recent_ban = false;
+		for (let b in docs) {
+			if (docs[b].ban) {
+				const ban_date = new Date(docs[b].date);
+				if (now - (180 * 24 * 60 * 60 * 1000) < ban_date.getTime()) {//180 day
+					recent_ban = true;
+					break;
+				}
+			}
+		}
+		let recent_warning = false;
+		for (let b in docs) {
+			if (!docs[b].ban && docs[b].reason.substring(0, 9) == ":warning:") {
+				const warn_date = new Date(docs[b].date);
+				if (now - (180 * 24 * 60 * 60 * 1000) < warn_date.getTime()) {//180 day
+					recent_warning = true;
+					break;
+				}
+			}
+		}
+		let most_recent_note;
+		for (let i = 0; i < docs.length; ++i) {
+			if (!docs[i].ban && docs[i].reason.substring(0, 20) == ":information_source:") {
+				most_recent_note = docs[i].reason;
+				break;
+			}
+		}
+		return { active_ban, recent_ban, recent_warning, most_recent_note };
+	}
+	disciplinaryStatusString(status, user) {
+		let answer = user ? "User: " : "Server: ";
+		if (status.active_ban == -1 && !status.recent_ban && !status.recent_warning) answer += ":white_check_mark: Good standing.";
+		else {
+			if (status.active_ban >= 0) {
+				if (status.active_ban == 0) answer += ":no_entry: Permabanned";
+				else answer += ":no_entry: Temporarily banned until " + this.until(new Date(status.active_ban));
+			}
+			else {
+				if (status.recent_ban && status.recent_warning) answer += ":warning: Recently banned\n:warning: Recently warned";
+				else if (status.recent_warning) answer += ":warning: Recently warned";
+				else if (status.recent_ban) answer += ":warning: Recently banned";
+			}
+		}
+		if (this.exists(most_recent_note)) answer += "\nMost recent note: " + status.most_recent_note;
+		return answer;
+	}
 }
