@@ -60,7 +60,7 @@ client.on("message", function (msg) {
 		const ACCESS_LEVEL = UTILS.accessLevel(CONFIG, msg);
 		const SERVER_RL = msg.PM ? null : getServerRateLimiter(msg.guild.id);
 		if (!msg.PM) msg.guild.memberCount >= CONFIG.RATE_LIMIT.LARGE_SERVER_THRESHOLD ? SERVER_RL.setMode(CONFIG.RATE_LIMIT.LARGE_SERVER_MESSAGES, CONFIG.RATE_LIMIT.LARGE_SERVER_TIME_S) : SERVER_RL.setMode(CONFIG.RATE_LIMIT.SERVER_MESSAGES, CONFIG.RATE_LIMIT.SERVER_TIME_S);
-		new Preferences(LOLAPI, msg.guild, server_preferences => discordcommands(CONFIG, client, msg, wsapi, sendToChannel, server_preferences, ACCESS_LEVEL, SERVER_RL, getUserRateLimiter(msg.author.id)));
+		new Preferences(LOLAPI, msg.guild, server_preferences => discordcommands(CONFIG, client, msg, wsapi, sendToChannel, sendEmbedToChannel, server_preferences, ACCESS_LEVEL, SERVER_RL, getUserRateLimiter(msg.author.id)));
 	}
 	catch (e) {
 		console.error(e);
@@ -89,6 +89,9 @@ function getUserRateLimiter(uid) {
 }
 function sendToChannel(cid, text) {//duplicated in discordcommands.js
 	wsapi.sendTextToChannel(cid, text);
+}
+function sendEmbedToChannel(cid, embed, approvable = false) {
+	wsapi.sendEmbedToChannel(cid, embed, approvable);
 }
 function loadAllStaticResources(callback = () => {}) {
 	LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version

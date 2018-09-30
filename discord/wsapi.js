@@ -69,6 +69,9 @@ module.exports = class WSAPI {
 
 		32: IAPI wants to PM embed to user
 		33: shard wants to PM embed to user
+
+		34: IAPI wants to send an embed
+		35: shard wants to send an embed
 	*/
 	constructor(INIT_CONFIG, discord_client, INIT_STATUS) {
 		this.client = discord_client;
@@ -226,6 +229,20 @@ module.exports = class WSAPI {
 						that.sendTextToChannel(that.CONFIG.FEEDBACK.EXTERNAL_CID, ":x::warning: User could not be notified");
 					});
 					break;
+				case 34:
+					const candidate = this.client.channels.get(data.cid);
+					if (UTILS.exists(candidate)) {
+						candidate.send(embedgenerator.raw(data.embed)).then(msg => {
+							if (approvable) {
+								setTimeout(() => {
+									embed.fields[embed.fields.length - 1].value += "\nApprove: `" + this.CONFIG.DISCORD_COMMAND_PREFIX + "approve " + msg.id + "`";
+									msg.edit({ embed }).catch(console.error);
+								}, 5000);
+							}
+						}).catch(console.error);
+						UTILS.debug("embed sent to " + data.cid);
+					}
+					break;
 				default:
 					UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
 			}
@@ -237,6 +254,17 @@ module.exports = class WSAPI {
 	sendTextToChannel(cid, content) {
 		if (UTILS.exists(this.client.channels.get(cid))) this.client.channels.get(cid).send(content).catch(console.error);
 		else this.send({ type: 7, content, cid });
+	}
+	sendEmbedToChannel(cid, embed, approvable = false) {
+		if (UTILS.exists(this.client.channels.get(cid))) this.client.channels.get(cid).send(embedgenerator.raw(embed)).then(msg => {
+			if (approvable) {
+				setTimeout(() => {
+					embed.fields[embed.fields.length - 1].value += "\nApprove: `" + this.CONFIG.DISCORD_COMMAND_PREFIX + "approve " + msg.id + "`";
+					msg.edit({ embed }).catch(console.error);
+				}, 5000);
+			}
+		}).catch(console.error);
+		else this.send({ type: 35, embed, cid, approvable });
 	}
 	lnotify(username, displayAvatarURL, content, release) {
 		this.send({ type: 13, content, username, displayAvatarURL, release });

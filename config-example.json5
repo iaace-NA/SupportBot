@@ -118,7 +118,7 @@
 		"GET_CHAMPION_MASTERY": 86400,
 		"GET_RECENT_GAMES": 1800,
 		"GET_MATCH_INFORMATION": 2592000,
-		"GET_LIVE_MATCH": 60,
+		"GET_LIVE_MATCH": 90,
 		"GET_MMR": 120,
 		"GET_STATUS": 60,
 		"STATIC_CHAMPIONS": 10800,
@@ -132,7 +132,7 @@
 			"SUMMONER_ID": 3600,
 			"RANKS": 180,
 			"CHAMPION_MASTERY": 600,
-			"LIVE_MATCH": 60,
+			"LIVE_MATCH": 90,
 			"CHALLENGERS": 3600
 		},
 		"MH": {
@@ -142,7 +142,7 @@
 		},
 		"LG": {
 			"SUMMONER_ID": 3600,
-			"LIVE_MATCH": 60,
+			"LIVE_MATCH": 90,
 			"OTHER_SUMMONER_ID": 86400,
 			"RECENT_GAMES": 1800,
 			"MULTIPLE_MATCH": 2592000,
@@ -194,7 +194,7 @@
 		"COMPLAINT_CID": "channel id here",//approved public complaints channel
 		"PRAISE_CID": "channel id here",//approved public praise channel
 		"SUGGESTION_CID": "channel id here",//approved public suggestion channel
-		"APPROVED_IMAGE_LINK": "https://cdn.discordapp.com/emojis/382263196477685771.png?v=1",//footer image for approved feedback
-		"DENIED_IMAGE_LINK": "https://cdn.discordapp.com/emojis/493118209566965764.png?v=1"//footer image for denied feedback
+		"APPROVED_IMAGE_LINK": "https://cdn.discordapp.com/emojis/382263196477685771.png?v=1",//footer image for approved feedback (currently unused)
+		"DENIED_IMAGE_LINK": "https://cdn.discordapp.com/emojis/493118209566965764.png?v=1"//footer image for denied feedback (currently unused)
 	}
 }

@@ -6,7 +6,7 @@ const UTILS = new (require("../utils.js"))();
 let LOLAPI = require("./lolapi.js");
 let Profiler = require("../timeprofiler.js");
 let ctable = require("console.table");
-module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preferences, ACCESS_LEVEL, server_RL, user_RL) {
+module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedToChannel, preferences, ACCESS_LEVEL, server_RL, user_RL) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 	if (!msg.PM && !msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) return;//dont read messages that can't be responded to
 	if (!UTILS.exists(CONFIG.BANS) || !UTILS.exists(CONFIG.BANS.USERS) || !UTILS.exists(CONFIG.BANS.SERVERS)) return UTILS.output("message " + msg.id + " could not be processed because ban data has not been loaded yet");
@@ -146,7 +146,30 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			replyEmbed(embedgenerator.actionReport(CONFIG, parameter, results[parameter]));
 		}).catch();
 	});
-	command([preferences.get("prefix") + "complain"], false, false, (original, index) => {});
+	command([preferences.get("prefix") + "complain ", preferences.get("prefix") + "praise ", preferences.get("prefix") + "suggest "], true, false, (original, index) => {
+		lolapi.userHistory(msg.author.id).then(uH => {
+			if (!msg.PM) {
+				lolapi.serverHistory(msg.guild.id).then(gH => step2(gH[msg.guild.id]));
+			}
+			else step2(null);
+			function step2(gH) {
+				sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, index + 1, 1, msg, uH[msg.author.id], gH));
+				reply(":white_check_mark: Thank you for your feedback!");
+			}
+		});
+	});
+	command([preferences.get("prefix") + "question ", preferences.get("prefix") + "ask "], true, false, (original, index) => {
+		lolapi.userHistory(msg.author.id).then(uH => {
+			if (!msg.PM) {
+				lolapi.serverHistory(msg.guild.id).then(gH => step2(gH[msg.guild.id]));
+			}
+			else step2(null);
+			function step2(gH) {
+				sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, 4, 1, msg, uH[msg.author.id], gH));
+				reply(":white_check_mark: Thank you for your question! Someone from our staff will respond by SupportBot PM as soon as possible.");
+			}
+		});
+	});
 	command([preferences.get("prefix") + "permissionstest", preferences.get("prefix") + "pt"], false, false, () => {
 		reply("You have " + (isOwner(undefined, false) ? "owner" : "normal") + " permissions.");
 	});
@@ -509,8 +532,18 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, preference
 			const new_setting = index === 0 ? true : false;
 			preferences.set("release_notifications", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will show new release notifications." : "SupportBot will not show new release notifications."))).catch(reply);
 		});
+		command([preferences.get("prefix") + "mail "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+			sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, 5, 1, msg, null, null));
+			wsapi.embedPM(parameter.substring(0, parameter.indexOf(" ")), embedgenerator.feedback(CONFIG, 5, 0, msg, null, null));
+		});
 	}
 	else {//PM/DM only
+		command([preferences.get("prefix") + "say "], true, false, (original, index, parameter) => {
+			lolapi.userHistory(msg.author.id).then(uH => {
+				sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, index + 1, 1, msg, uH[msg.author.id]));
+				reply(":e_mail: Message delivered.");
+			});
+		});
 	}
 
 	function command(trigger_array,//array of command aliases, prefix needs to be included

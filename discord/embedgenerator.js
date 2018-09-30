@@ -985,33 +985,13 @@ module.exports = class EmbedGenerator {
 	disciplinaryHistory(CONFIG, id, user, docs) {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Disciplinary History");
-		let active_ban = -1;
-		const now = new Date().getTime();
-		for (let b in docs) {
-			if (docs[b].ban && docs[b].active) {
-				const ban_date = new Date(docs[b].date);
-				if (ban_date.getTime() == 0) {
-					active_ban = 0;
-					break;
-				}
-				else if (ban_date.getTime() > now) {
-					if (ban_date.getTime() > active_ban) active_ban = ban_date.getTime();
-				}
-			}
-		}
-		let recent_warning = false;
-		for (let b in docs) {
-			if (!docs[b].ban && docs[b].reason.substring(0, 9) == ":warning:") {
-				recent_warning = true;
-				break;
-			}
-		}
-		if (active_ban == 0) {
+		const status = UTILS.disciplinaryStatus(docs);
+		if (status.active_ban == 0) {
 			newEmbed.setColor([1, 1, 1]);
 			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active permanent ban.\nHere are the 10 most recent events:");
 		}
-		else if (active_ban == -1) {
-			if (recent_warning) {
+		else if (status.active_ban == -1) {
+			if (status.recent_warning) {
 				newEmbed.setColor([255, 255, 0]);
 				newEmbed.setDescription("This " + (user ? "user" : "server") + " has been warned recently.\nHere are the 10 most recent events:");
 			}
@@ -1022,7 +1002,7 @@ module.exports = class EmbedGenerator {
 		}
 		else {
 			newEmbed.setColor([255, 0, 0]);
-			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active temporary ban. It expires in " + UTILS.until(new Date(active_ban)) + ".\nHere are the 10 most recent events:");
+			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active temporary ban. It expires in " + UTILS.until(new Date(status.active_ban)) + ".\nHere are the 10 most recent events:");
 		}
 		for (let i = 0; i < docs.length && i < 10; ++i) {
 			newEmbed.addField("By " + CONFIG.OWNER_DISCORD_IDS[docs[i].issuer_id].name + ", " + UTILS.ago(new Date(docs[i].id_timestamp)) + (docs[i].ban && docs[i].active ? (new Date(docs[i].date).getTime() == 0 ? ", Permanent Ban" : ", Ban Expires in " + UTILS.until(new Date(docs[i].date))) : ""), docs[i].reason);
@@ -1076,7 +1056,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.setFooter("Showing a maximum of 60 champions");
 		return newEmbed;
 	}
-	feedback(CONFIG, type, destination, msg, guild) {
+	feedback(CONFIG, type, destination, msg, user_history, server_history) {
 		/*type = 0: general message from user (destination 1)
 		type = 1: complaint (destination 1->2)
 		type = 2: praise (destination 1->2)
@@ -1086,6 +1066,14 @@ module.exports = class EmbedGenerator {
 		destination = 0: user PM
 		destination = 1: admin channel
 		destination = 2: public
+		(t, d)
+		(0, 1): user to admin channel
+		(1-3, 1): feedback awaiting public approval in admin channel
+		X(1-3, 2): feedback approved, to be published publicly. handled by function below, reviewFeedback()
+		X(1-3, 0): feedback approved, to be sent to original user. handled by function below, reviewFeedback()
+		(4, 1): question submitted to admin channel
+		(5, 0): management to user
+		(5, 1): management to user admin channel audit
 		*/
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(msg.author.tag + (msg.PM ? " via PM" : " from server " + msg.guild.name + "::" + msg.guild.id), msg.author.displayAvatarURL);
@@ -1097,36 +1085,68 @@ module.exports = class EmbedGenerator {
 		}
 		else if (type === 1) {//Lcomplain
 			newEmbed.setColor("#ff0000");//red
-			newEmbed.setFooter(CONFIG.FEEDBACK.COMPLAINT_CID + ":" + msg.author.id);
+			newEmbed.setFooter(CONFIG.FEEDBACK.COMPLAINT_CID + ":" + msg.author.id + ":" + msg.author.username);
 		}
 		else if (type === 2) {//Lpraise
 			newEmbed.setColor("#00ff00");//green
-			newEmbed.setFooter(CONFIG.FEEDBACK.PRAISE_CID + ":" + msg.author.id);
+			newEmbed.setFooter(CONFIG.FEEDBACK.PRAISE_CID + ":" + msg.author.id + ":" + msg.author.username);
 		}
 		else if (type === 3) {//Lsuggest
 			newEmbed.setColor("#0000ff");//blue
-			newEmbed.setFooter(CONFIG.FEEDBACK.SUGGESTION_CID + ":" + msg.author.id);
+			newEmbed.setFooter(CONFIG.FEEDBACK.SUGGESTION_CID + ":" + msg.author.id + ":" + msg.author.username);
 		}
 		else if (type === 4) {//Lask/Lquestion
 			newEmbed.setColor("#ff00ff");//magenta (yellow reserved for warnings)
 		}
-		else if (type === 5) {}//Lmail
-		if (destination === 0) {//Lmail
+		else if (type === 5) {
+			newEmbed.setAuthor(msg.author.username, msg.author.displayAvatarURL);
 			newEmbed.setTitle("Message from management to " + msg.author.username);//reset title
-			newEmbed.setURL(CONFIG.HELP_SERVER_INVITE_LINK);
-			newEmbed.addField("This is a private conversation with management.", "You can reply to this message by sending `!say <your response goes here>`");
-			newEmbed.setDescription(msg.cleanContent + "\n" + CONFIG.OWNER_DISCORD_IDS[msg.author.id].flags);
+			if (destination === 0) {
+				newEmbed.setURL(CONFIG.HELP_SERVER_INVITE_LINK);
+				newEmbed.addField("This is a private conversation with management.", "You can reply to this message by sending `!say <your response goes here>`");
+				newEmbed.setDescription(msg.cleanContent + "\n\n" + CONFIG.OWNER_DISCORD_IDS[msg.author.id].flags);
+			}
+			else if (destination === 1) {}
+		}//Lmail
+		if (type < 5) {
+			let user_status = UTILS.disciplinaryStatusString(UTILS.disciplinaryStatus(user_history));
+			let server_status = UTILS.exists(server_history) ? "\n" + UTILS.disciplinaryStatusString(UTILS.disciplinaryStatus(server_history)) : "";
+			newEmbed.addField("Background Checks", user_status + server_status);
 		}
-		else if (destination === 1) {
+		if (destination === 1) {
 			newEmbed.addField("Responses", "Send message response: `" + CONFIG.DISCORD_COMMAND_PREFIX + "mail " + msg.author.id + "`\nBan: `" + CONFIG.DISCORD_COMMAND_PREFIX + "banuser " + msg.author.id + " <duration> <reason>`\nWarn: `" + CONFIG.DISCORD_COMMAND_PREFIX + "warnuser " + msg.author.id + " <reason>`\nNote: `" + CONFIG.DISCORD_COMMAND_PREFIX + "noteuser " + msg.author.id + " <reason>`");
 		}
-		else if (destination === 2) {}
 		return newEmbed;
 	}
-	reviewFeedback(CONFIG, msg, approved) {
-		let newEmbed = new Discord.RichEmbed();
-		if (approved);
-		else;
-		return { toUser: newEmbed, edit: newEmbed, toPublic: newEmbed };
+	reviewFeedback(CONFIG, msg, approver, approved) {
+		if (!UTILS.exists(msg.embed[0])) return 1;//no embed detected
+		if (!UTILS.exists(msg.embed[0].footer)) return 2;//not approvable
+		const c_location = msg.embed[0].footer.indexOf(":");
+		const c_location2 = UTILS.indexOfInstance(msg.embed[0].footer, ":", 2);
+		if (c_location == -1 || c_location2 == -1) return 2;//not approvable
+		if (approved) {
+			let public = new Discord.RichEmbed(msg.embed[0]);
+			let edit = new Discord.RichEmbed(msg.embed[0]);
+			let user = new Discord.RichEmbed(msg.embed[0]);
+			const cid = msg.embed[0].footer.substring(0, c_location);
+			const uid = msg.embed[0].footer.substring(c_location + 1, c_location2);
+			const username = msg.embed[0].footer.substring(c_location2 + 1);
+			public.setFooter("Approved by " + approver.username, approver.displayAvatarURL);
+			public.fields = [];
+			public.setAuthor(username, public.author.icon_url);
+			edit.setFooter("Approved by " + approver.username, approver.displayAvatarURL);
+			edit.fields = [];
+			edit.addField("Responses", "Send message response: `" + CONFIG.DISCORD_COMMAND_PREFIX + "mail " + uid + "`\nNote: `" + CONFIG.DISCORD_COMMAND_PREFIX + "noteuser " + uid + " <reason>`");
+			user.setFooter("Approved by " + approver.username, approver.displayAvatarURL);
+			user.fields = [];
+			user.setTitle("Your feedback was reviewed by our staff and approved for public viewing on our server- click to join");
+			user.setURL("https://discord.gg/57Z8Npg");
+			public.setAuthor(username, user.author.icon_url);
+			return { to_user: user, to_user_uid: uid, edit, to_public: public, to_public_cid: cid };
+		}
+		else return;
+	}
+	raw(embed_object) {
+		return new Discord.RichEmbed(embed_object);
 	}
 }
