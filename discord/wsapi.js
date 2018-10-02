@@ -113,10 +113,12 @@ module.exports = class WSAPI {
 					this.STATUS.CHAMPION_EMOJIS = true;
 					break;
 				case 6://send message to channel
-					const candidate = this.client.channels.get(data.cid);
-					if (UTILS.exists(candidate)) {
-						candidate.send(data.content).catch(console.error);
-						UTILS.debug("message sent to " + data.cid);
+					if (true) {//scope limiter
+						const candidate = this.client.channels.get(data.cid);
+						if (UTILS.exists(candidate)) {
+							candidate.send(data.content).catch(console.error);
+							UTILS.debug("message sent to " + data.cid);
+						}
 					}
 					break;
 				case 8://send message to default channel in server
@@ -230,17 +232,19 @@ module.exports = class WSAPI {
 					});
 					break;
 				case 34:
-					const candidate = this.client.channels.get(data.cid);
-					if (UTILS.exists(candidate)) {
-						candidate.send(embedgenerator.raw(data.embed)).then(msg => {
-							if (approvable) {
-								setTimeout(() => {
-									embed.fields[embed.fields.length - 1].value += "\nApprove: `" + this.CONFIG.DISCORD_COMMAND_PREFIX + "approve " + msg.id + "`";
-									msg.edit({ embed }).catch(console.error);
-								}, 5000);
-							}
-						}).catch(console.error);
-						UTILS.debug("embed sent to " + data.cid);
+					if (true) {//scope limiter
+						const candidate = this.client.channels.get(data.cid);
+						if (UTILS.exists(candidate)) {
+							candidate.send(embedgenerator.raw(data.embed)).then(msg => {
+								if (approvable) {
+									setTimeout(() => {
+										embed.fields[embed.fields.length - 1].value += "\nApprove: `" + this.CONFIG.DISCORD_COMMAND_PREFIX + "approve " + msg.id + "`";
+										msg.edit({ embed }).catch(console.error);
+									}, 5000);
+								}
+							}).catch(console.error);
+							UTILS.debug("embed sent to " + data.cid);
+						}
 					}
 					break;
 				default:
