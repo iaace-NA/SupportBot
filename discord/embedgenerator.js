@@ -1125,15 +1125,15 @@ module.exports = class EmbedGenerator {
 		const c_location2 = UTILS.indexOfInstance(msg.embed[0].footer, ":", 2);
 		if (c_location == -1 || c_location2 == -1) return 2;//not approvable
 		if (approved) {
-			let public = new Discord.RichEmbed(msg.embed[0]);
+			let public_e = new Discord.RichEmbed(msg.embed[0]);
 			let edit = new Discord.RichEmbed(msg.embed[0]);
 			let user = new Discord.RichEmbed(msg.embed[0]);
 			const cid = msg.embed[0].footer.substring(0, c_location);
 			const uid = msg.embed[0].footer.substring(c_location + 1, c_location2);
 			const username = msg.embed[0].footer.substring(c_location2 + 1);
-			public.setFooter("Approved by " + approver.username, approver.displayAvatarURL);
-			public.fields = [];
-			public.setAuthor(username, public.author.icon_url);
+			public_e.setFooter("Approved by " + approver.username, approver.displayAvatarURL);
+			public_e.fields = [];
+			public_e.setAuthor(username, public_e.author.icon_url);
 			edit.setFooter("Approved by " + approver.username, approver.displayAvatarURL);
 			edit.fields = [];
 			edit.addField("Responses", "Send message response: `" + CONFIG.DISCORD_COMMAND_PREFIX + "mail " + uid + "`\nNote: `" + CONFIG.DISCORD_COMMAND_PREFIX + "noteuser " + uid + " <reason>`");
@@ -1141,8 +1141,8 @@ module.exports = class EmbedGenerator {
 			user.fields = [];
 			user.setTitle("Your feedback was reviewed by our staff and approved for public viewing on our server- click to join");
 			user.setURL("https://discord.gg/57Z8Npg");
-			public.setAuthor(username, user.author.icon_url);
-			return { to_user: user, to_user_uid: uid, edit, to_public: public, to_public_cid: cid };
+			public_e.setAuthor(username, user.author.icon_url);
+			return { to_user: user, to_user_uid: uid, edit, to_public: public_e, to_public_cid: cid };
 		}
 		else return;
 	}
