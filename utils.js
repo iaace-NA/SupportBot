@@ -492,7 +492,7 @@ module.exports = class UTILS {
 				else if (status.recent_ban) answer += ":warning: Recently banned";
 			}
 		}
-		if (this.exists(most_recent_note)) answer += "\nMost recent note: " + status.most_recent_note;
+		if (this.exists(status.most_recent_note)) answer += "\nMost recent note: " + status.most_recent_note;
 		return answer;
 	}
 }
