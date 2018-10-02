@@ -863,7 +863,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	function getUsernameFromUID(uid) {
 		return new Promise((resolve, reject) => {
 			if (UTILS.isInt(uid)) {
-				client.shard.broadcastEval("let candidate_user = this.users.get(\"" + uid + "\"); return UTILS.exists(candidate_user) ? candidate_user.tag : null;").then(possible_usernames => {
+				client.shard.broadcastEval("let candidate_user = this.users.get(\"" + uid + "\"); UTILS.exists(candidate_user) ? candidate_user.tag : null;").then(possible_usernames => {
 					for (let b in possible_usernames) if (UTILS.exists(possible_usernames[b])) return resolve(possible_usernames[b]);
 					resolve(uid);
 				}).catch(reject);
