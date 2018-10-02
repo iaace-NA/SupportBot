@@ -1056,7 +1056,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.setFooter("Showing a maximum of 60 champions");
 		return newEmbed;
 	}
-	feedback(CONFIG, type, destination, msg, user_history, server_history) {
+	feedback(CONFIG, type, destination, msg, user_history, server_history, usertag) {
 		/*type = 0: general message from user (destination 1)
 		type = 1: complaint (destination 1->2)
 		type = 2: praise (destination 1->2)
@@ -1100,7 +1100,7 @@ module.exports = class EmbedGenerator {
 		}
 		else if (type === 5) {
 			newEmbed.setAuthor(msg.author.username, msg.author.displayAvatarURL);
-			newEmbed.setTitle("Message from management to " + msg.author.username);//reset title
+			newEmbed.setTitle("Message from management to " + usertag);//reset title
 			if (destination === 0) {
 				newEmbed.setURL(CONFIG.HELP_SERVER_INVITE_LINK);
 				newEmbed.addField("This is a private conversation with management.", "You can reply to this message by sending `" + CONFIG.DISCORD_COMMAND_PREFIX + "say <your response goes here>`");

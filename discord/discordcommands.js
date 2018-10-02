@@ -533,8 +533,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			preferences.set("release_notifications", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will show new release notifications." : "SupportBot will not show new release notifications."))).catch(reply);
 		});
 		command([preferences.get("prefix") + "mail "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
-			sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, 5, 1, msg, null, null));
-			wsapi.embedPM(parameter.substring(0, parameter.indexOf(" ")), embedgenerator.feedback(CONFIG, 5, 0, msg, null, null));
+			const uid = parameter.substring(0, parameter.indexOf(" "))
+			getUsernameFromUID(uid).then(usertag => {
+				sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, 5, 1, msg, null, null, usertag));
+				wsapi.embedPM(uid, embedgenerator.feedback(CONFIG, 5, 0, msg, null, null, usertag));
+			}).catch(console.error);
 		});
 	}
 	else {//PM/DM only
@@ -856,6 +859,17 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			server_RL.warn();
 		}
 		return valid === 0;
+	}
+	function getUsernameFromUID(uid) {
+		return new Promise((resolve, reject) => {
+			if (UTILS.isInt(uid)) {
+				client.shard.broadcastEval("let candidate_user = this.users.get(\"" + uid + "\"); return UTILS.exists(candidate_user) ? candidate_user.tag : null;").then(possible_usernames => {
+					for (let b in possible_usernames) if (UTILS.exists(possible_usernames[b])) return resolve(possible_usernames[b]);
+					resolve(uid);
+				}).catch(reject);
+			}
+			else resolve(uid);
+		});
 	}
 	function shutdown() {
 		sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x: Shutdown initiated.");

@@ -496,4 +496,13 @@ module.exports = class UTILS {
 		if (this.exists(status.most_recent_note)) answer += "\nMost recent note: " + status.most_recent_note;
 		return answer;
 	}
+	isInt(x) {
+		x = x + "";
+		let valid = false;
+		for (let i = 0; i < x.length; ++i) {
+			if (!isNaN(parseInt(x[i]))) valid = true;
+			else return false;
+		}
+		return valid;
+	}
 }
