@@ -540,7 +540,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	else {//PM/DM only
 		command([preferences.get("prefix") + "say "], true, false, (original, index, parameter) => {
 			lolapi.userHistory(msg.author.id).then(uH => {
-				sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, index + 1, 1, msg, uH[msg.author.id]));
+				sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, 0, 1, msg, uH[msg.author.id]));
 				reply(":e_mail: Message delivered.");
 			});
 		});
