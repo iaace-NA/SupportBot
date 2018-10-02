@@ -479,6 +479,7 @@ module.exports = class UTILS {
 		return { active_ban, recent_ban, recent_warning, most_recent_note };
 	}
 	disciplinaryStatusString(status, user) {
+		this.assert(this.exists(user));
 		let answer = user ? "User: " : "Server: ";
 		if (status.active_ban == -1 && !status.recent_ban && !status.recent_warning) answer += ":white_check_mark: Good standing.";
 		else {

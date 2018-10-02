@@ -1109,8 +1109,8 @@ module.exports = class EmbedGenerator {
 			else if (destination === 1) {}
 		}//Lmail
 		if (type < 5) {
-			let user_status = UTILS.disciplinaryStatusString(UTILS.disciplinaryStatus(user_history));
-			let server_status = UTILS.exists(server_history) ? "\n" + UTILS.disciplinaryStatusString(UTILS.disciplinaryStatus(server_history)) : "";
+			let user_status = UTILS.disciplinaryStatusString(UTILS.disciplinaryStatus(user_history, true));
+			let server_status = UTILS.exists(server_history) ? "\n" + UTILS.disciplinaryStatusString(UTILS.disciplinaryStatus(server_history, false)) : "";
 			newEmbed.addField("Background Checks", user_status + server_status);
 		}
 		if (destination === 1) {
