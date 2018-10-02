@@ -166,6 +166,7 @@ module.exports = class UTILS {
 	}
 	opgg(region, username) {
 		this.assert(this.exists(username));
+		if (region == "kr") region = "www";//account for kr region special www opgg link
 		return "http://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
 	}
 	shortRank(info) {
