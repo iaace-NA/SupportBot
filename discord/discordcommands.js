@@ -578,34 +578,34 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 		external = true) {//external call means not inside commandGuessUsername & commandGuessUsernameNumber
 		for (let i = 0; i < trigger_array.length; ++i) {
 			if (parameters_expected && msg.content.trim().toLowerCase().substring(0, trigger_array[i].length) === trigger_array[i].toLowerCase()) {
-				if (external && !processRateLimit()) return;
+				if (external && !processRateLimit()) return false;
 				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
 					if (elevated_permissions === CONFIG.CONSTANTS.BOTOWNERS) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
 					if (UTILS.exists(callback)) {
 						try {
 							callback(trigger_array[i], i, msg.content.trim().substring(trigger_array[i].length));
-							return true;
 						}
 						catch (e) {
 							console.error(e);
 						}
+						return true;
 					}
 				}
 			}
 			else if (!parameters_expected && msg.content.trim().toLowerCase() === trigger_array[i].toLowerCase()) {
-				if (external && !processRateLimit()) return;
+				if (external && !processRateLimit()) return false;
 				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
 					if (elevated_permissions === CONFIG.CONSTANTS.BOTOWNERS) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
 					if (UTILS.exists(callback)) {
 						try {
 							callback(trigger_array[i], i);
-							return true;
 						}
 						catch (e) {
 							console.error(e);
 						}
+						return true;
 					}
 				}
 			}
@@ -627,7 +627,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			try {//username explicitly provided
 				const region = assertRegion(parameter.substring(0, parameter.indexOf(" ")), false);//see if there is a region
 				if (parameter.substring(parameter.indexOf(" ") + 1).length < 35) {//longest query should be less than 35 characters
-					if (!processRateLimit()) return;
+					if (!processRateLimit()) return false;
 					if (msg.mentions.users.size == 1) {
 						lolapi.getLink(msg.mentions.users.first().id).then(result => {
 							let username = msg.mentions.users.first().username;//suppose the link doesn't exist in the database
@@ -661,12 +661,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 						}).catch(console.error);
 					}
 					else callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")), 0);
+					return true;
 				}
 			}
 			catch (e) {//username not provided
 				try {
 					const region = assertRegion(parameter, false);
-					if (!processRateLimit()) return;
+					if (!processRateLimit()) return false;
 					lolapi.getLink(msg.author.id).then(result => {
 						let username = msg.author.username;//suppose the link doesn't exist in the database
 						if (UTILS.exists(result.username) && result.username != "") {
@@ -675,8 +676,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 						}
 						else callback(region, username, parameter, 3);
 					}).catch(console.error);
+					return true;
 				}
-				catch (e) { }
+				catch (e) { return false; }
 			}
 		}, false);
 	}
@@ -694,10 +696,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 		*/
 		command(trigger_array, true, elevated_permissions, (original, index, parameter) => {
 			const number = parseInt(parameter.substring(0, parameter.indexOf(" ")));
-			if (isNaN(number)) return;
+			if (isNaN(number)) return false;
 			try {//username explicitly provided
 				const region = assertRegion(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
-				if (!processRateLimit()) return;
+				if (!processRateLimit()) return false;
 				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) {//longest query should be less than 35 characters
 					if (msg.mentions.users.size == 1) {
 						lolapi.getLink(msg.mentions.users.first().id).then(result => {
@@ -732,12 +734,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 						}).catch(console.error);
 					}
 					else callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number, 0);
+					return true;
 				}
 			}
 			catch (e) {//username not provided
 				try {
 					const region = assertRegion(parameter.substring(parameter.indexOf(" ") + 1), false);
-					if (!processRateLimit()) return;
+					if (!processRateLimit()) return false;
 					lolapi.getLink(msg.author.id).then(result => {
 						let username = msg.author.username;//suppose the link doesn't exist in the database
 						if (UTILS.exists(result.username) && result.username != "") {
@@ -745,9 +748,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 							callback(region, username, number, 2);
 						}
 						else callback(region, username, number, 3);
+						return true;
 					}).catch(console.error);
 				}
-				catch (e) { }
+				catch (e) { return false; }
 			}
 		}, false);
 	}
