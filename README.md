@@ -11,7 +11,9 @@ League of Legends Statistics for Discord
   - 3 shards implemented as separate processes
   - 1 parent process to control all 3 shards
   - 1 internal (stateful) API process to cache external API requests and to handle database operations
-    - HTTPS/wss
+    - HTTPS for database operations
+    - wss for bidirectional discord shard related communications
+    - api key authentication
 - Configurable API caching timeouts per endpoint, per command
 - Feedback commands
 - Configurable user and server rate limiting
