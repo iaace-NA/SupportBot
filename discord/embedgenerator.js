@@ -1119,18 +1119,18 @@ module.exports = class EmbedGenerator {
 		return newEmbed;
 	}
 	reviewFeedback(CONFIG, msg, approver, approved) {
-		if (!UTILS.exists(msg.embed[0])) return 1;//no embed detected
-		if (!UTILS.exists(msg.embed[0].footer)) return 2;//not approvable
-		const c_location = msg.embed[0].footer.indexOf(":");
-		const c_location2 = UTILS.indexOfInstance(msg.embed[0].footer, ":", 2);
+		if (!UTILS.exists(msg.embeds[0])) return 1;//no embed detected
+		if (!UTILS.exists(msg.embeds[0].footer)) return 2;//not approvable
+		const c_location = msg.embeds[0].footer.indexOf(":");
+		const c_location2 = UTILS.indexOfInstance(msg.embeds[0].footer, ":", 2);
 		if (c_location == -1 || c_location2 == -1) return 2;//not approvable
 		if (approved) {
-			let public_e = new Discord.RichEmbed(msg.embed[0]);
-			let edit = new Discord.RichEmbed(msg.embed[0]);
-			let user = new Discord.RichEmbed(msg.embed[0]);
-			const cid = msg.embed[0].footer.substring(0, c_location);
-			const uid = msg.embed[0].footer.substring(c_location + 1, c_location2);
-			const username = msg.embed[0].footer.substring(c_location2 + 1);
+			let public_e = new Discord.RichEmbed(msg.embeds[0]);
+			let edit = new Discord.RichEmbed(msg.embeds[0]);
+			let user = new Discord.RichEmbed(msg.embeds[0]);
+			const cid = msg.embeds[0].footer.substring(0, c_location);
+			const uid = msg.embeds[0].footer.substring(c_location + 1, c_location2);
+			const username = msg.embeds[0].footer.substring(c_location2 + 1);
 			public_e.setFooter("Approved by " + approver.username, approver.displayAvatarURL);
 			public_e.fields = [];
 			public_e.setAuthor(username, public_e.author.icon_url);
