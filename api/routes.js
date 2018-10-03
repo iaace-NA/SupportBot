@@ -288,6 +288,15 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			res.json(answer);
 		});
 	}, true);
+	serveWebRequest("/resetpreferences", (req, res, next) => {
+		server_preferences_model.deleteMany({ id: req.query.id }, (err) => {
+			if (UTILS.exists(err)) return res.status(500).json(err).end();
+			let new_document = new server_preferences_model({ id: req.query.id });
+			new_document.save(e, doc => {
+				res.json(doc.toObject());
+			});
+		});
+	}, true);
 	serveWebRequest("/getpreferences", (req, res, next) => {
 		findPreferences(req.query.id, res, doc => {
 			if (!UTILS.exists(doc)) {//create new doc

@@ -57,7 +57,12 @@ module.exports = class Preferences {
 		}
 	}
 	resetToDefault() {
-		;
+		return new Promise((resolve, reject) => {
+			this.lolapi.resetPreferences(this.sid).then(new_p => {
+				cache[this.sid] = new_p;
+				resolve();
+			}).catch(e => reject(":x: Database operation failed"));
+		});
 	}
 	get(prop) {
 		return this.server_message ? cache[this.sid][prop] : newPreferences[prop];
