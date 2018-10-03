@@ -111,7 +111,7 @@
 	"API_PERIOD": 250,//period (in ms) between requests to riot API servers. this is managed by the iapi
 	"API_KEY": "insert random string here",//for internal api use only
 	"API_SEQUENTIAL": true,//whether or not multiple LoL api requests should be sequential or bursted
-	"API_CACHETIME": {//how long (in seconds) the api document should remain in cache
+	"API_CACHETIME": {//how long (in seconds) the api document should remain in cache. set to 0 to never cache
 		"GET_SUMMONER_ID_FROM_NAME": 86400,
 		"GET_SUMMONER_FROM_SUMMONER_ID": 86400,
 		"GET_RANKS": 14400,
@@ -125,7 +125,7 @@
 		"STATIC_SPELLS": 10800,
 		"GET_CHALLENGERS": 14400
 	},
-	"API_MAXAGE": {//maximum acceptable age (in seconds) of api data for a command
+	"API_MAXAGE": {//maximum acceptable age (in seconds) of api data for a command. set to 0 to never use cached responses
 		"SD": 60,
 		"LINK": 60,
 		"SUMMONER_CARD": {
