@@ -149,14 +149,14 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	command([preferences.get("prefix") + "complain ", preferences.get("prefix") + "praise ", preferences.get("prefix") + "suggest "], true, false, (original, index) => {
 		lolapi.userHistory(msg.author.id).then(uH => {
 			if (!msg.PM) {
-				lolapi.serverHistory(msg.guild.id).then(gH => step2(gH[msg.guild.id]));
+				lolapi.serverHistory(msg.guild.id).then(gH => step2(gH[msg.guild.id])).catch(console.error);
 			}
 			else step2(null);
 			function step2(gH) {
 				sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, index + 1, 1, msg, uH[msg.author.id], gH), true);
 				reply(":white_check_mark: Thank you for your feedback!");
 			}
-		});
+		}).catch(console.error);
 	});
 	command([preferences.get("prefix") + "question ", preferences.get("prefix") + "ask "], true, false, (original, index) => {
 		lolapi.userHistory(msg.author.id).then(uH => {
