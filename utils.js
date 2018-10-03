@@ -507,13 +507,13 @@ module.exports = class UTILS {
 		return valid;
 	}
 	embedRaw(richembed) {
-		return { author: this.copy(richembed.author),
+		return { author: this.exists(richembed.author) ? this.copy(richembed.author) : undefined,
 		color: richembed.color,
 		description: richembed.description,
-		fields: this.copy(richembed.fields),
-		footer: this.copy(richembed.footer),
-		image: this.copy(richembed.image),
-		thumbnail: this.copy(richembed.thumbnail),
+		fields: this.exists(richembed.fields) ? this.copy(richembed.fields) : undefined,
+		footer: this.exists(richembed.footer) ? this.copy(richembed.footer) : undefined,
+		image: this.exists(richembed.image) ? this.copy(richembed.image) : undefined,
+		thumbnail: this.exists(richembed.thumbnail) ? this.copy(richembed.thumbnail) : undefined,
 		timestamp: this.exists(richembed.timestamp) ? new Date(richembed.timestamp) : undefined,
 		title: richembed.title,
 		url: richembed.url };
