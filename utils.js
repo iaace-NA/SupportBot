@@ -514,7 +514,7 @@ module.exports = class UTILS {
 		footer: this.copy(richembed.footer),
 		image: this.copy(richembed.image),
 		thumbnail: this.copy(richembed.thumbnail),
-		timestamp: new Date(richembed.timestamp.getTime()),
+		timestamp: this.exists(richembed.timestamp) ? new Date(richembed.timestamp.getTime()) : undefined,
 		title: richembed.title,
 		url: richembed.url };
 	}
