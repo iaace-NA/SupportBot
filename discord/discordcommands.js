@@ -532,6 +532,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			const new_setting = index === 0 ? true : false;
 			preferences.set("release_notifications", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will show new release notifications." : "SupportBot will not show new release notifications."))).catch(reply);
 		});
+		command(["supportbot settings reset all"], false, CONFIG.CONSTANTS.ADMINISTRATORS, reply(":warning: You are about to reset all the preferences associated with this server. To confirm this action, please send the command: `supportbot settings reset all confirm`"));
 		command([preferences.get("prefix") + "mail "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 			const uid = parameter.substring(0, parameter.indexOf(" "))
 			getUsernameFromUID(uid).then(usertag => {
