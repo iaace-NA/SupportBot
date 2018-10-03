@@ -1122,8 +1122,8 @@ module.exports = class EmbedGenerator {
 		if (!UTILS.exists(msg.embeds[0])) return 1;//no embed detected
 		if (!UTILS.exists(msg.embeds[0].footer) || !UTILS.exists(msg.embeds[0].footer.text)) return 2;//not approvable
 		const c_location = msg.embeds[0].footer.text.indexOf(":");
-		const c_location2 = UTILS.indexOfInstance(msg.embeds[0].footer, ":", 2);
-		if (c_location == -1 || c_location2 == -1) return 2;//not approvable
+		const c_location2 = UTILS.indexOfInstance(msg.embeds[0].footer.text, ":", 2);
+		if (c_location == -1 || c_location2 == -1) return 3;//not approvable
 		if (approved) {
 			let public_e = new Discord.RichEmbed(msg.embeds[0]);
 			let edit = new Discord.RichEmbed(msg.embeds[0]);

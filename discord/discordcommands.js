@@ -546,6 +546,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 				if (approvable.author.id != client.user.id) return reply(":x: Cannot approve messages not sent from this account.");
 				const candidate = embedgenerator.reviewFeedback(CONFIG, approvable, msg.author, true);
 				if (typeof(candidate) == "number") {
+					UTILS.debug(CONFIG.DISCORD_COMMAND_PREFIX + "approve error type " + candidate);
 					if (candidate == 1) return reply(":x: No embed found.");
 					else return reply(":x: This type of message is not approvable.");
 				}
