@@ -539,6 +539,23 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 				wsapi.embedPM(uid, embedgenerator.feedback(CONFIG, 5, 0, msg, null, null, usertag));
 			}).catch(console.error);
 		});
+		command([preferences.get("prefix") + "approve "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+			const mid = parameter;
+			if (!UTILS.isInt(mid)) return reply(":x: Message ID not recognizable.");
+			msg.channel.fetchMessage(mid).then(approvable => {
+				if (approvable.author.id != client.user.id) return reply(":x: Cannot approve messages not sent from this account.");
+				const candidate = embedgenerator.reviewFeedback(CONFIG, approvable, msg.author, true);
+				if (typeof(candidate) == "number") {
+					if (candidate == 1) return reply(":x: No embed found.");
+					else return reply(":x: This type of message is not approvable.");
+				}
+				else {//success
+					wsapi.embedPM(candidate.to_user_uid, candidate.to_user);//notify user of success
+					approvable.edit({ embed: candidate.edit });//change internal feedback message
+					sendEmbedToChannel(candidate.to_public_cid, candidate.to_public);//publish to public feedback channel
+				}
+			}).catch(console.error);
+		});
 	}
 	else {//PM/DM only
 		command([preferences.get("prefix") + "say "], true, false, (original, index, parameter) => {

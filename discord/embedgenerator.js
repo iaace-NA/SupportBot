@@ -1144,7 +1144,7 @@ module.exports = class EmbedGenerator {
 			public_e.setAuthor(username, user.author.icon_url);
 			return { to_user: user, to_user_uid: uid, edit, to_public: public_e, to_public_cid: cid };
 		}
-		else return;
+		else return {};
 	}
 	raw(embed_object) {
 		return new Discord.RichEmbed(embed_object);

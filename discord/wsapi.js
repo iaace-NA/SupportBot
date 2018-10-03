@@ -236,7 +236,7 @@ module.exports = class WSAPI {
 						const candidate = this.client.channels.get(data.cid);
 						if (UTILS.exists(candidate)) {
 							candidate.send(embedgenerator.raw(data.embed)).then(msg => {
-								if (approvable) {
+								if (data.approvable) {
 									setTimeout(() => {
 										embed.fields[embed.fields.length - 1].value += "\nApprove: `" + this.CONFIG.DISCORD_COMMAND_PREFIX + "approve " + msg.id + "`";
 										msg.edit({ embed }).catch(console.error);
