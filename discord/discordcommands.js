@@ -148,9 +148,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	command([preferences.get("prefix") + "complain ", preferences.get("prefix") + "praise ", preferences.get("prefix") + "suggest "], true, false, (original, index) => {
 		lolapi.userHistory(msg.author.id).then(uH => {
-			if (!msg.PM) {
-				lolapi.serverHistory(msg.guild.id).then(gH => step2(gH[msg.guild.id])).catch(console.error);
-			}
+			if (!msg.PM) lolapi.serverHistory(msg.guild.id).then(gH => step2(gH[msg.guild.id])).catch(console.error);
 			else step2(null);
 			function step2(gH) {
 				sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, index + 1, 1, msg, uH[msg.author.id], gH), true);
@@ -160,9 +158,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	command([preferences.get("prefix") + "question ", preferences.get("prefix") + "ask "], true, false, (original, index) => {
 		lolapi.userHistory(msg.author.id).then(uH => {
-			if (!msg.PM) {
-				lolapi.serverHistory(msg.guild.id).then(gH => step2(gH[msg.guild.id]));
-			}
+			if (!msg.PM) lolapi.serverHistory(msg.guild.id).then(gH => step2(gH[msg.guild.id]));
 			else step2(null);
 			function step2(gH) {
 				sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, 4, 1, msg, uH[msg.author.id], gH));
