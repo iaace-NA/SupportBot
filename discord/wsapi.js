@@ -260,6 +260,7 @@ module.exports = class WSAPI {
 		else this.send({ type: 7, content, cid });
 	}
 	sendEmbedToChannel(cid, embed, approvable = false) {
+		embed = UTILS.embedRaw(embed);
 		if (UTILS.exists(this.client.channels.get(cid))) this.client.channels.get(cid).send(embedgenerator.raw(embed)).then(msg => {
 			if (approvable) {
 				setTimeout(() => {
@@ -291,6 +292,7 @@ module.exports = class WSAPI {
 		else this.connection.send(JSON.stringify(raw_object));
 	}
 	embedPM(uid, embed) {
+		embed = UTILS.embedRaw(embed);
 		this.send({ type: 33, uid, embed });
 	}
 	connect() {

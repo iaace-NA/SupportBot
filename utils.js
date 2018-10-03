@@ -506,4 +506,16 @@ module.exports = class UTILS {
 		}
 		return valid;
 	}
+	embedRaw(richembed) {
+		return { author: this.copy(richembed.author),
+		color: richembed.color,
+		description: richembed.description,
+		fields: this.copy(richembed.fields),
+		footer: this.copy(richembed.footer),
+		image: this.copy(richembed.image),
+		thumbnail: this.copy(richembed.thumbnail),
+		timestamp: new Date(richembed.timestamp.getTime()),
+		title: richembed.title,
+		url: richembed.url };
+	}
 }
