@@ -3,7 +3,35 @@ League of Legends Statistics for Discord
 (c) 2018; source available, all rights reserved
 
 <a href="https://discord.gg/MTqDXvB" target="_blank" rel="noopener"><img src="https://discordapp.com/api/guilds/384552678161645568/embed.png" alt="current users" /></a>
-
+## General Features
+- Per server preferences
+  - custom prefixes
+- 2500-5000 server (guild) capacity with minimal initial configuration involved
+- Processes
+  - 3 shards implemented as separate processes
+  - 1 parent process to control all 3 shards
+  - 1 internal (stateful) API process to cache external API requests and to handle database operations
+- Configurable API caching timeouts per endpoint, per command
+- Feedback commands
+- Configurable user and server rate limiting
+  - Owners bypass rate limits
+  - Large servers have higher rate limits
+- Rate limit abuse watch
+- Global disciplinary commands for users and servers
+  - Permaban
+  - Temporary ban
+  - Warn
+  - Make internal note
+- Ability to set multiple owners
+- Ability to audit owner disciplinary actions
+- Ability to globally brodcast messages
+- Tiered permissions system
+  - Bot owners
+  - Server owners
+  - Server administrators
+  - Server moderators
+  - Server bot commanders
+  - Normal members
 ## Format of Repository
 ### Branches:
 - major: unstable, next major revision v+.0.0 : we removed a feature
