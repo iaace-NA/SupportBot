@@ -114,10 +114,11 @@ let database_profiler = new Profiler("Database Profiler");
 let server = https.createServer({ key: fs.readFileSync("../data/keys/server.key"),
 		cert: fs.readFileSync("../data/keys/server.crt"),
 		ca: fs.readFileSync("../data/keys/ca.crt")}, website).listen(CONFIG.API_PORT);
+server.setTimeout(120000);
 UTILS.output(CONFIG.VERSION + " IAPI " + process.env.NODE_ENV + " mode ready and listening on port " + CONFIG.API_PORT);
 let websocket = require("express-ws")(website, server);
 website.use(function (req, res, next) {
-	res.setTimeout(10000);
+	res.setTimeout(120000);
 	res.removeHeader("X-Powered-By");
 	return next();
 });
