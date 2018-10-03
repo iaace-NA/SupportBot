@@ -738,7 +738,7 @@ module.exports = class EmbedGenerator {
 		const team_by_level_best = team_by_level.findIndex(t => t.abs === team_by_level_lowest_diff);//team arrangement index
 		let team_by_level_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_level_best].length; ++i) {
-			const individual_description = "lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
+			const individual_description = "lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name;
 			team_by_level_description[TEAM_COMBINATIONS[team_by_level_best][i] === "0" ? 0 : 1].push([summoners[i].summonerLevel, individual_description]);
 		}
 		for (let i = 0; i < team_by_level_description.length; ++i) {
@@ -756,7 +756,7 @@ module.exports = class EmbedGenerator {
 		const team_by_highest_mastery_best = team_by_highest_mastery.findIndex(t => t.abs === team_by_highest_mastery_lowest_diff);//team arrangement index
 		let team_by_highest_mastery_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_highest_mastery_best].length; ++i) {
-			const individual_description = CONFIG.STATIC.CHAMPIONS[masteries[i][0].championId].emoji + " `" + UTILS.gold(masteries[i][0].championPoints) + "` " + summoners[i].name + "\n";
+			const individual_description = CONFIG.STATIC.CHAMPIONS[masteries[i][0].championId].emoji + " `" + UTILS.gold(masteries[i][0].championPoints) + "` " + summoners[i].name;
 			team_by_highest_mastery_description[TEAM_COMBINATIONS[team_by_highest_mastery_best][i] === "0" ? 0 : 1].push([masteries[i][0].championPoints, individual_description]);
 		}
 		for (let i = 0; i < team_by_highest_mastery_description.length; ++i) {
@@ -774,7 +774,7 @@ module.exports = class EmbedGenerator {
 		const team_by_total_mastery_best = team_by_total_mastery.findIndex(t => t.abs === team_by_total_mastery_lowest_diff);//team arrangement index
 		let team_by_total_mastery_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_total_mastery_best].length; ++i) {
-			const individual_description = "`" + UTILS.gold(masteries[i].reduce((total, increment) => total + increment.championPoints, 0)) + "` " + summoners[i].name + "\n";
+			const individual_description = "`" + UTILS.gold(masteries[i].reduce((total, increment) => total + increment.championPoints, 0)) + "` " + summoners[i].name;
 			team_by_total_mastery_description[TEAM_COMBINATIONS[team_by_total_mastery_best][i] === "0" ? 0 : 1].push([masteries[i].reduce((total, increment) => total + increment.championPoints, 0), individual_description]);
 		}
 		for (let i = 0; i < team_by_total_mastery_description.length; ++i) {
@@ -804,7 +804,7 @@ module.exports = class EmbedGenerator {
 		UTILS.debug("rank lowest diff index is " + team_by_all_ranks_best);
 		let team_by_all_ranks_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_all_ranks_best].length; ++i) {
-			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` " + summoners[i].name + "\n";
+			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` " + summoners[i].name;
 			team_by_all_ranks_description[TEAM_COMBINATIONS[team_by_all_ranks_best][i] === "0" ? 0 : 1].push([UTILS.averageUserMMR(ranks[i]), individual_description]);
 		}
 		for (let i = 0; i < team_by_all_ranks_description.length; ++i) {
@@ -834,7 +834,7 @@ module.exports = class EmbedGenerator {
 		UTILS.debug("rank lowest diff index is " + team_by_sr_ranks_best);
 		let team_by_sr_ranks_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_sr_ranks_best].length; ++i) {
-			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.summonersRiftMMR(ranks[i])) + "` " + summoners[i].name + "\n";
+			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.summonersRiftMMR(ranks[i])) + "` " + summoners[i].name;
 			team_by_sr_ranks_description[TEAM_COMBINATIONS[team_by_sr_ranks_best][i] === "0" ? 0 : 1].push([UTILS.summonersRiftMMR(ranks[i]), individual_description]);
 		}
 		for (let i = 0; i < team_by_sr_ranks_description.length; ++i) {
@@ -865,7 +865,7 @@ module.exports = class EmbedGenerator {
 			UTILS.debug("rank lowest diff index is " + team_by_tt_ranks_best);
 			let team_by_tt_ranks_description = [[], []];
 			for (let i = 0; i < TEAM_COMBINATIONS[team_by_tt_ranks_best].length; ++i) {
-				const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.twistedTreelineMMR(ranks[i])) + "` " + summoners[i].name + "\n";
+				const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.twistedTreelineMMR(ranks[i])) + "` " + summoners[i].name;
 				team_by_tt_ranks_description[TEAM_COMBINATIONS[team_by_tt_ranks_best][i] === "0" ? 0 : 1].push([UTILS.twistedTreelineMMR(ranks[i]), individual_description]);
 			}
 			for (let i = 0; i < team_by_tt_ranks_description.length; ++i) {
@@ -894,7 +894,7 @@ module.exports = class EmbedGenerator {
 		const team_by_random_best = UTILS.randomInt(0, TEAM_COMBINATIONS.length);//team arrangement index
 		let team_by_random_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_random_best].length; ++i) {
-			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
+			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name;
 			team_by_random_description[TEAM_COMBINATIONS[team_by_random_best][i] === "0" ? 0 : 1].push([UTILS.averageUserMMR(ranks[i]), individual_description]);
 		}
 		for (let i = 0; i < team_by_random_description.length; ++i) {
