@@ -77,7 +77,7 @@ module.exports = class LOLAPI {
 				}
 				else {
 					try {
-						UTILS.debug(body, true);
+						//UTILS.debug(body, true);
 						const answer = JSON.parse(body);
 						UTILS.output("IAPI req: " + url);
 						resolve(answer);

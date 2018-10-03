@@ -1137,7 +1137,7 @@ module.exports = class EmbedGenerator {
 			edit.setFooter("Approved by " + approver.username, approver.displayAvatarURL);
 			edit.fields = [];
 			edit.addField("Responses", "Send message response: `" + CONFIG.DISCORD_COMMAND_PREFIX + "mail " + uid + "`\nNote: `" + CONFIG.DISCORD_COMMAND_PREFIX + "noteuser " + uid + " <reason>`");
-			user.setAuthor(msg.embeds[0].author.name, msg.embeds[0].author.icon, msg.embeds[0].author.url);
+			user.setAuthor(username, msg.embeds[0].author.icon, msg.embeds[0].author.url);
 			user.setFooter("Approved by " + approver.username, approver.displayAvatarURL);
 			user.fields = [];
 			user.setTitle("Your feedback was reviewed by our staff and approved for public viewing on our server- click to join");
