@@ -772,7 +772,7 @@ module.exports = class EmbedGenerator {
 		for (let b in TEAM_COMBINATIONS) team_by_total_mastery.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], masteries.map(m => m.reduce((total, increment) => total + increment.championPoints, 0))));
 		const team_by_total_mastery_lowest_diff = mathjs.min(team_by_total_mastery.map(t => t.abs));
 		const team_by_total_mastery_best = team_by_total_mastery.findIndex(t => t.abs === team_by_total_mastery_lowest_diff);//team arrangement index
-		team_by_total_mastery_description = [[], []];
+		let team_by_total_mastery_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_total_mastery_best].length; ++i) {
 			const individual_description = "`" + UTILS.gold(masteries[i].reduce((total, increment) => total + increment.championPoints, 0)) + "` " + summoners[i].name + "\n";
 			team_by_total_mastery_description[TEAM_COMBINATIONS[team_by_total_mastery_best][i] === "0" ? 0 : 1].push([masteries[i].reduce((total, increment) => total + increment.championPoints, 0), individual_description]);
