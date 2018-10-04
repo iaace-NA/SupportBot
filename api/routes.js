@@ -320,7 +320,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 				else if (c_val === "false") c_val = false;
 				else return res.status(400).end();
 			}
-			else;//string type do not change
+			else if (req.query.type === "string" && !UTILS.exists(c_val)) c_val = "";
 			doc[req.query.prop] = c_val;
 			doc.markModified(req.query.prop);
 			doc.save(e => {
