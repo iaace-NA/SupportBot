@@ -292,7 +292,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 		server_preferences_model.deleteMany({ id: req.query.id }, (err) => {
 			if (UTILS.exists(err)) return res.status(500).json(err).end();
 			let new_document = new server_preferences_model({ id: req.query.id });
-			new_document.save(e, doc => {
+			new_document.save((e, doc) => {
 				res.json(doc.toObject());
 			});
 		});
