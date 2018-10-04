@@ -69,7 +69,7 @@ let disciplinary_model = apicache.model("disciplinary_model", disciplinary_doc);
 
 let server_preferences_doc = new apicache.Schema({
 	id: { type: String, required: true },//id of server
-	prefix: { type: String, required: true, default: CONFIG.DISCORD_COMMAND_PREFIX },//default bot prefix
+	prefix: { type: String, required: isString, default: CONFIG.DISCORD_COMMAND_PREFIX },//default bot prefix
 	enabled: { type: Boolean, required: true, default: true },//whether or not the bot is enabled on the server
 	slow: { type: Number, required: true, default: 0 },//self slow mode
 	//region: { type: String, required: true, default: "" },//default server region, LoL ("" = disabled)
@@ -336,4 +336,7 @@ function get(region, url, cachetime, maxage, request_id) {
 			}, null, () => {});
 		}
 	});
+}
+function isString(s) {
+	return typeof(s) === "string";
 }
