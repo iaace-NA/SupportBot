@@ -761,7 +761,7 @@ module.exports = class EmbedGenerator {
 		}
 		for (let i = 0; i < team_by_highest_mastery_description.length; ++i) {
 			team_by_highest_mastery_description[i].sort((a, b) => b[0] - a[0]);
-			team_by_highest_mastery_description[i] = "**__Team " + sideOfMap(team_by_highest_mastery[team_by_highest_mastery_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n" + team_by_highest_mastery_description[i].map(d => d[1]).join("\n") + "\n" + formatDescriptionStringLarge(team_by_highest_mastery[team_by_highest_mastery_best], i);
+			team_by_highest_mastery_description[i] = "**__Team " + sideOfMap(team_by_highest_mastery[team_by_highest_mastery_best].diff, i) + "__**\n" + team_by_highest_mastery_description[i].map(d => d[1]).join("\n") + "\n" + formatDescriptionStringLarge(team_by_highest_mastery[team_by_highest_mastery_best], i);
 			team_by_highest_mastery_description[i] = team_by_highest_mastery_description[i].trim();
 		}
 		newEmbed.addField("By Experience", team_by_highest_mastery_description[0], true);
