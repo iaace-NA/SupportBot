@@ -321,6 +321,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 				else return res.status(400).end();
 			}
 			else if (req.query.type === "string" && !UTILS.exists(c_val)) c_val = "";
+			UTILS.debug("typeof is " + typeof(c_val) + " while actual value is " + c_val);
 			doc[req.query.prop] = c_val;
 			doc.markModified(req.query.prop);
 			doc.save(e => {
