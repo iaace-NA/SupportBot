@@ -6,6 +6,9 @@ League of Legends Statistics for Discord
 ## General Features
 - Per server preferences
   - custom prefixes
+  - enable/disable release notifications
+  - enable/disable forced prefixes
+  - enable/disable automatic op.gg responses
 - 2500-5000 server (guild) capacity with minimal initial configuration involved
 - Processes
   - 3 shards implemented as separate processes (blocking)
