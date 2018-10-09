@@ -692,7 +692,7 @@ module.exports = class EmbedGenerator {
 			UTILS.debug("individual_description length: " + individual_description.length);
 			response_str.push(individual_description);
 		}
-		for (let i = 0; i < response_str.length; ++i) {
+		for (let i = 0; i < response_str.length;) {
 			let field_str = "";
 			for (; i < response_str.length; ++i) {
 				if (field_str.length + response_str[i].length < 1024) field_str += response_str[i] + "\n";
