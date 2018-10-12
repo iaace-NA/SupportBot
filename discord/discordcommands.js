@@ -298,7 +298,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	if (preferences.get("auto_opgg")) {
 		command(["http://"], true, false, (original, index, parameter) => {
-			const region = assertRegion(parameter.substring(0, parameter.indexOf(".")), false);
+			let r_copy = parameter.substring(0, parameter.indexOf("."));
+			if (r_copy === "www") r_copy = "kr";//handle www as kr region
+			const region = assertRegion(r_copy, false);
 			if (parameter.substring(parameter.indexOf(".") + 1, parameter.indexOf(".") + 6) == "op.gg") {
 				let username = decodeURIComponent(msg.content.substring(msg.content.indexOf("userName=") + "userName=".length));
 				lolapi.getSummonerCard(region, username).then(result => {

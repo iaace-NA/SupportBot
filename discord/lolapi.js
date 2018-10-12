@@ -4,6 +4,18 @@ const fs = require("fs");
 const REQUEST = require("request");
 const XRegExp = require("xregexp");
 const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt"), timeout: 120000 };
+const tags = {
+	match: "match",//matches, timelines
+	matchhistory: "matchlist",//matchlists
+	cmr: "cmr",//champions, masteries, runes
+	leagues: "league",//leagues, challenger, master
+	ranks: "league",//by summoner id
+	summoner: "summonerid",//summoners by name or id
+	account: "accountid",//summoners by account id
+	cm: "championmastery",//summoner champion mastery
+	spectator: "spectator",
+	status: "status"
+};
 module.exports = class LOLAPI {
 	constructor(INIT_CONFIG, request_id) {
 		this.CONFIG = INIT_CONFIG;
@@ -24,7 +36,8 @@ module.exports = class LOLAPI {
 			}).catch(reject);
 		});
 	}
-	get(region, path, options, cachetime, maxage) {
+	/*
+	getOld(region, path, options, cachetime, maxage) {
 		let that = this;
 		return new Promise((resolve, reject) => {
 			UTILS.assert(UTILS.exists(region));
@@ -35,7 +48,7 @@ module.exports = class LOLAPI {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
 			//UTILS.output("IAPI req sent: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
-			url = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) +"&url=" + encodeURIComponent(url);
+			url = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&url=" + encodeURIComponent(url);
 			this.request({ url, agentOptions }, (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);
@@ -44,6 +57,39 @@ module.exports = class LOLAPI {
 					try {
 						const answer = JSON.parse(body);
 						if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
+						resolve(answer);
+					}
+					catch (e) {
+						reject(e);
+					}
+				}
+			});
+		});
+	}*/
+	get(region, path, tag, options, cachetime, maxage) {
+		let that = this;
+		return new Promise((resolve, reject) => {
+			UTILS.assert(UTILS.exists(region));
+			UTILS.assert(UTILS.exists(cachetime));
+			UTILS.assert(UTILS.exists(maxage));
+			UTILS.assert(UTILS.exists(tag));
+			let endpoint = "/lol/" + path + "?iapimaxage=" + maxage + "&iapirequest_id=" + this.request_id;
+			for (let i in options) {
+				endpoint += "&" + i + "=" + encodeURIComponent(options[i]);
+			}
+			let url = "https://" + region + ".api.riotgames.com/lol/" + path + "?api_key=";
+			for (let i in options) {
+				url += "&" + i + "=" + encodeURIComponent(options[i]);
+			}
+			const iurl = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/" + tag + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&endpoint=" + encodeURIComponent(endpoint) + "&url=" + encodeURIComponent(url);
+			this.request({ iurl, agentOptions }, (error, response, body) => {
+				if (UTILS.exists(error)) {
+					reject(error);
+				}
+				else {
+					try {
+						const answer = JSON.parse(body);
+						if (UTILS.exists(answer.status)) UTILS.output(iurl + " : " + body);
 						resolve(answer);
 					}
 					catch (e) {
@@ -110,12 +156,8 @@ module.exports = class LOLAPI {
 			});
 		});
 	}
-	getStaticChampions(region) {
-		UTILS.output("STATIC CHAMPIONS: " + region);
-		return this.get(region, "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" }, this.CONFIG.API_CACHETIME.STATIC_CHAMPIONS, this.CONFIG.API_CACHETIME.STATIC_CHAMPIONS);
-	}
 	getStaticChampionsNew(region, locale = "en_US") {
-		UTILS.output("STATIC CHAMPIONS: " + region);
+		UTILS.debug("STATIC CHAMPIONS: " + region);
 		return new Promise((resolve, reject) => {
 			this.getStatic("realms/" + this.CONFIG.REGIONS_REVERSE[region].toLowerCase() + ".json").then(realm => {
 				this.getStatic("cdn/" + realm.v + "/data/" + locale + "/champion.json").then(cd => {//champion data
@@ -127,10 +169,6 @@ module.exports = class LOLAPI {
 				}).catch(reject);
 			}).catch(reject);
 		});
-	}
-	getStaticSummonerSpells(region) {
-		UTILS.output("STATIC SPELLS: " + region);
-		return this.get(region, "static-data/v3/summoner-spells", { locale: "en_US", dataById: true, spellListData: "all", tags: "all" }, this.CONFIG.API_CACHETIME.STATIC_SPELLS, this.CONFIG.API_CACHETIME.STATIC_SPELLS);
 	}
 	getStaticSummonerSpellsNew(region, locale = "en_US") {
 		UTILS.output("STATIC SPELLS: " + region);
@@ -152,7 +190,7 @@ module.exports = class LOLAPI {
 				UTILS.debug("username " + username + " didn't pass regex filter");
 				return resolve({ status: "username didn't pass regex filter" });
 			}
-			this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage).then(resolve).catch(reject);
+			this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), tags.summoner, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage).then(resolve).catch(reject);
 		});
 	}
 	getMultipleSummonerIDFromName(region, usernames, maxage) {
@@ -169,7 +207,7 @@ module.exports = class LOLAPI {
 	}
 	getSummonerFromSummonerID(region, id, maxage) {
 		if (id === null) return new Promise((resolve, reject) => { resolve({}); });
-		return this.get(region, "summoner/v3/summoners/" + id, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_FROM_SUMMONER_ID, maxage);
+		return this.get(region, "summoner/v3/summoners/" + id, tags.summoner, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_FROM_SUMMONER_ID, maxage);
 	}
 	getMultipleSummonerFromSummonerID(region, ids, maxage) {
 		let that = this;
@@ -185,7 +223,7 @@ module.exports = class LOLAPI {
 	}
 	getRanks(region, summonerID, maxage) {
 		if (summonerID === null) return new Promise((resolve, reject) => { resolve([]); });
-		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_RANKS, maxage);
+		return this.get(region, "league/v3/positions/by-summoner/" + summonerID, tags.ranks, {}, this.CONFIG.API_CACHETIME.GET_RANKS, maxage);
 	}
 	getMultipleRanks(region, summonerIDs, maxage) {
 		let that = this;
@@ -195,7 +233,7 @@ module.exports = class LOLAPI {
 	}
 	getChampionMastery(region, summonerID, maxage) {
 		if (summonerID === null) return new Promise((resolve, reject) => { resolve([]); });
-		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_CHAMPION_MASTERY, maxage);
+		return this.get(region, "champion-mastery/v3/champion-masteries/by-summoner/" + summonerID, tags.cm, {}, this.CONFIG.API_CACHETIME.GET_CHAMPION_MASTERY, maxage);
 	}
 	getMultipleChampionMastery(region, summonerIDs, maxage) {
 		let that = this;
@@ -204,7 +242,7 @@ module.exports = class LOLAPI {
 		return Promise.all(requests);
 	}
 	getRecentGames(region, accountID, maxage) {
-		return this.get(region, "match/v3/matchlists/by-account/" + accountID, { endIndex: 20 }, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage);
+		return this.get(region, "match/v3/matchlists/by-account/" + accountID, tags.matchhistory, { endIndex: 20 }, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage);
 	}
 	getMultipleRecentGames(region, accountIDs, maxage) {
 		let that = this;
@@ -219,7 +257,7 @@ module.exports = class LOLAPI {
 		}
 	}
 	getMatchInformation(region, gameID, maxage) {
-		return this.get(region, "match/v3/matches/" + gameID, {}, this.CONFIG.API_CACHETIME.GET_MATCH_INFORMATION, maxage);
+		return this.get(region, "match/v3/matches/" + gameID, tags.match, {}, this.CONFIG.API_CACHETIME.GET_MATCH_INFORMATION, maxage);
 	}
 	getMultipleMatchInformation(region, gameIDs, maxage) {
 		let that = this;
@@ -234,16 +272,16 @@ module.exports = class LOLAPI {
 		}
 	}
 	getLiveMatch(region, summonerID, maxage) {
-		return this.get(region, "spectator/v3/active-games/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_LIVE_MATCH, maxage);
+		return this.get(region, "spectator/v3/active-games/by-summoner/" + summonerID, tags.spectator, {}, this.CONFIG.API_CACHETIME.GET_LIVE_MATCH, maxage);
 	}
 	getMMR(region, summonerID, maxage) {
-		return this.get(region, "league/v3/mmr-af/by-summoner/" + summonerID, {}, this.CONFIG.API_CACHETIME.GET_MMR, maxage);
+		return this.get(region, "league/v3/mmr-af/by-summoner/" + summonerID, "afmmr", {}, this.CONFIG.API_CACHETIME.GET_MMR, maxage);
 	}
 	getStatus(region, maxage) {
-		return this.get(region, "status/v3/shard-data", {}, this.CONFIG.API_CACHETIME.GET_STATUS, maxage);
+		return this.get(region, "status/v3/shard-data", tags.status, {}, this.CONFIG.API_CACHETIME.GET_STATUS, maxage);
 	}
 	getChallengerRanks(region, queue, maxage) {
-		return this.get(region, "league/v3/challengerleagues/by-queue/" + queue, {}, this.CONFIG.API_CACHETIME.GET_CHALLENGERS, maxage);
+		return this.get(region, "league/v3/challengerleagues/by-queue/" + queue, tags.leagues, {}, this.CONFIG.API_CACHETIME.GET_CHALLENGERS, maxage);
 	}
 	getSummonerCard(region, username) {
 		const that = this;
