@@ -837,9 +837,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			ctt = [{ content: msg.id, author: msg.author.id, P: ACCESS_LEVEL, channel: msg.channel.id, guild: msg.guild.id, size_region: msg.guild.memberCount }, { content: msg.cleanContent.substring(0, MSG_LEN), author: msg.author.tag, P: CONFIG.CONSTANTS.PERMISSION_LEVEL_REVERSE[ACCESS_LEVEL], channel: msg.channel.name, guild: msg.guild.name, size_region: msg.guild.region }];
 		}
 		else {
-			ctt = [{ content: msg.id, author: msg.author.id, P: ACCESS_LEVEL, channel: msg.channel.id }, { content: msg.cleanContent.substring(0, 60), author: msg.author.tag, P: CONFIG.CONSTANTS.PERMISSION_LEVEL_REVERSE[ACCESS_LEVEL], channel: msg.channel.name }];
+			ctt = [{ content: msg.id, author: msg.author.id, P: ACCESS_LEVEL, channel: msg.channel.id }, { content: msg.cleanContent.substring(0, MSG_LEN), author: msg.author.tag, P: CONFIG.CONSTANTS.PERMISSION_LEVEL_REVERSE[ACCESS_LEVEL], channel: msg.channel.name }];
 		}
-		for (let i = MSG_LEN; i < msg.cleanContent.length; i += MSG_LEN) ctt.push({ content: msg.cleanContent.substring(MSG_LEN, MSG_LEN + MSG_LEN) });
+		for (let i = MSG_LEN; i < msg.cleanContent.length; i += MSG_LEN) ctt.push({ content: msg.cleanContent.substring(MSG_LEN, i + MSG_LEN) });
 		answer += ctable.getTable(ctt);
 		UTILS.output(answer);
 	}
