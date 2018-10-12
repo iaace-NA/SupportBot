@@ -67,7 +67,7 @@ League of Legends Statistics for Discord
 - mathjs 5.2.0
 - console.table 0.10.0
 - json5 2.1.0
-- riot-lol-api 4.2.16
+- iaace-NA/riot-lol-api 4.2.16
 - express 4.6.3
 - express-ws 4.0.0
 - uws 9.148.0
