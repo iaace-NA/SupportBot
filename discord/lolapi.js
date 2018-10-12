@@ -36,36 +36,6 @@ module.exports = class LOLAPI {
 			}).catch(reject);
 		});
 	}
-	/*
-	getOld(region, path, options, cachetime, maxage) {
-		let that = this;
-		return new Promise((resolve, reject) => {
-			UTILS.assert(UTILS.exists(region));
-			UTILS.assert(UTILS.exists(cachetime));
-			UTILS.assert(UTILS.exists(maxage));
-			let url = "https://" + region + ".api.riotgames.com/lol/" + path + "?api_key=";
-			for (let i in options) {
-				url += "&" + i + "=" + encodeURIComponent(options[i]);
-			}
-			//UTILS.output("IAPI req sent: " + url.replace(that.CONFIG.RIOT_API_KEY, ""));
-			url = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&url=" + encodeURIComponent(url);
-			this.request({ url, agentOptions }, (error, response, body) => {
-				if (UTILS.exists(error)) {
-					reject(error);
-				}
-				else {
-					try {
-						const answer = JSON.parse(body);
-						if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
-						resolve(answer);
-					}
-					catch (e) {
-						reject(e);
-					}
-				}
-			});
-		});
-	}*/
 	get(region, path, tag, options, cachetime, maxage) {
 		let that = this;
 		return new Promise((resolve, reject) => {

@@ -338,62 +338,6 @@ function addCache(url, response, cachetime) {
 		if (e) console.error(e);
 	});
 }
-/*
-function get(region, url, cachetime, maxage, request_id) {
-	//cachetime in seconds, if cachetime is 0, do not cache
-	//maxage in seconds, if maxage is 0, force refresh
-	let that = this;
-	return new Promise((resolve, reject) => {
-		const url_with_key = url.replace("?api_key=", "?api_key=" + CONFIG.RIOT_API_KEY);
-		if (cachetime != 0) {//cache
-			checkCache(url, maxage, request_id).then((cached_result) => {
-				//UTILS.output("\tcache hit: " + url);
-				load_average[2].add();
-				if (UTILS.exists(irs[request_id])) ++irs[request_id][2];
-				resolve(JSON.parse(cached_result));
-			}).catch((e) => {
-				if (UTILS.exists(e)) console.error(e);
-				region_limiters[region].submit((no_use, cb) => {
-					cb();
-					request(url_with_key, (error, response, body) => {
-						if (UTILS.exists(error)) reject(error);
-						else {
-							try {
-								const answer = JSON.parse(body);
-								//UTILS.output("\tcache miss: " + url);
-								addCache(url, body, cachetime);
-								resolve(answer);
-							}
-							catch (e) {
-								reject(e);
-							}
-						}
-					});
-				}, null, () => {});
-			});
-		}
-		else {//don't cache
-			region_limiters[region].submit((no_use, cb) => {
-				cb();
-				request(url_with_key, (error, response, body) => {
-					if (UTILS.exists(error)) reject(error);
-					else {
-						try {
-							const answer = JSON.parse(body);
-							//UTILS.output("\tuncached: " + url);
-							load_average[1].add();
-							if (UTILS.exists(irs[request_id])) ++irs[request_id][1];
-							resolve(answer);
-						}
-						catch (e) {
-							reject(e);
-						}
-					}
-				});
-			}, null, () => {});
-		}
-	});
-}*/
 function isString(s) {
 	return typeof(s) === "string";
 }

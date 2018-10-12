@@ -1,8 +1,5 @@
 {
 	"CONSTANTS": {
-		"SCM_FULL": 2,//scorecardmode full
-		"SCM_REDUCED": 1,//scorecardmode full -> compact time delay
-		"SCM_COMPACT": 0,//scorecardmode compact
 		"NORMALMEMBERS": 0,
 		"BOTCOMMANDERS": 1,
 		"MODERATORS": 2,
@@ -108,7 +105,7 @@
 	},
 	"API_PORT": 56831,
 	"API_ADDRESS": "127.0.0.1",
-	"API_PERIOD": 250,//period (in ms) between requests to riot API servers. this is managed by the iapi
+	"API_PERIOD": 250,//period (in ms) between requests to riot API servers. this is managed by the iapi. this setting has no effect anymore
 	"API_KEY": "insert random string here",//for internal api use only
 	"API_SEQUENTIAL": true,//whether or not multiple LoL api requests should be sequential or bursted
 	"API_CACHETIME": {//how long (in seconds) the api document should remain in cache. set to 0 to never cache
@@ -142,7 +139,7 @@
 		},
 		"LG": {
 			"SUMMONER_ID": 3600,
-			"LIVE_MATCH": 90,
+			"LIVE_MATCH": 60,
 			"OTHER_SUMMONER_ID": 86400,
 			"RECENT_GAMES": 1800,
 			"MULTIPLE_MATCH": 2592000,
