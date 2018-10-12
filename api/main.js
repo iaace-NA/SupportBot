@@ -37,7 +37,7 @@ function endpointToURL(region, endpoint) {
 	return { url, maxage, endpoint: newEndpoint, request_id };
 }
 let https = require('https');
-let riotRequest = new (require("riot-lol-api"))(CONFIG.RIOT_API_KEY, {
+let riotRequest = new (require("riot-lol-api"))(CONFIG.RIOT_API_KEY, 12000, {
 	get: function(region, endpoint, callback) {
 		const oldFormat = endpointToURL(region, endpoint);
 		if (oldFormat.maxage != 0) {
