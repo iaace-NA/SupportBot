@@ -830,9 +830,18 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	}
 
 	function printMessage(x = "") {
-		if (!msg.PM) UTILS.output(x + "\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, P: CONFIG.CONSTANTS.PERMISSION_LEVEL_REVERSE[ACCESS_LEVEL], channel: msg.channel.name, guild: msg.guild.name, g_size_region: msg.guild.region }, { content: msg.id, author: msg.author.id, P: ACCESS_LEVEL, channel: msg.channel.id, guild: msg.guild.id, g_size_region: msg.guild.memberCount }]));
-		else UTILS.output(x + "\n" + ctable.getTable([{ content: msg.cleanContent, author: msg.author.tag, P: CONFIG.CONSTANTS.PERMISSION_LEVEL_REVERSE[ACCESS_LEVEL], channel: msg.channel.name }, { content: msg.id, author: msg.author.id, P: ACCESS_LEVEL, channel: msg.channel.id }]));
-
+		let answer = x + "\n";
+		const MSG_LEN = 60;
+		let ctt;
+		if (!msg.PM) {
+			ctt = [{ content: msg.id, author: msg.author.id, P: ACCESS_LEVEL, channel: msg.channel.id, guild: msg.guild.id, size_region: msg.guild.memberCount }, { content: msg.cleanContent.substring(0, MSG_LEN), author: msg.author.tag, P: CONFIG.CONSTANTS.PERMISSION_LEVEL_REVERSE[ACCESS_LEVEL], channel: msg.channel.name, guild: msg.guild.name, g_size_region: msg.guild.region }];
+		}
+		else {
+			ctt = [{ content: msg.id, author: msg.author.id, P: ACCESS_LEVEL, channel: msg.channel.id }, { content: msg.cleanContent.substring(0, 60), author: msg.author.tag, P: CONFIG.CONSTANTS.PERMISSION_LEVEL_REVERSE[ACCESS_LEVEL], channel: msg.channel.name }];
+		}
+		for (let i = MSG_LEN; i < msg.cleanContent.length; i += MSG_LEN) ctt.push({ content: msg.cleanContent.substring(MSG_LEN, MSG_LEN + MSG_LEN) });
+		answer += ctable.getTable(ctt);
+		UTILS.output(answer);
 	}
 	function assertRegion(test_string, notify = true) {
 		if (!UTILS.exists(CONFIG.REGIONS[test_string.toUpperCase()])) {
