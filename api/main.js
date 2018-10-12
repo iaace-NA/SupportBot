@@ -44,7 +44,7 @@ let riotRequest = new (require("riot-lol-api"))(CONFIG.RIOT_API_KEY, {
 	},
 	set: function(region, endpoint, cacheStrategy, data) {
 		const oldFormat = endpointToURL(region, endpoint);
-		addCache(oldFormat.url, data, cacheStrategy.cachetime);
+		addCache(oldFormat.url, JSON.stringify(data), cacheStrategy.cachetime);
 	}
 });
 
