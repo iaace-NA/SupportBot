@@ -259,7 +259,7 @@ serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/:tag/", (req, res, 
 		}
 		else res.status(200).type('application/json').send(data).end();
 	});
-});
+}, true);
 serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
 	for (let b in irs) if (new Date().getTime() - irs[b][5] > 1000 * 60 * 10) delete irs[b];//cleanup old requests
 	if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();//doesn't exist
