@@ -146,7 +146,7 @@ module.exports = class LOLAPI {
 					try {
 						const answer = JSON.parse(body);
 						if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
-						else UTILS.output(url);
+						else UTILS.debug(url);
 						resolve(answer);
 					}
 					catch (e) {
