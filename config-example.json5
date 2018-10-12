@@ -1,8 +1,5 @@
 {
 	"CONSTANTS": {
-		"SCM_FULL": 2,//scorecardmode full
-		"SCM_REDUCED": 1,//scorecardmode full -> compact time delay
-		"SCM_COMPACT": 0,//scorecardmode compact
 		"NORMALMEMBERS": 0,
 		"BOTCOMMANDERS": 1,
 		"MODERATORS": 2,
