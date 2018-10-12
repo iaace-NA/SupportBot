@@ -179,7 +179,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.addField("`multi <region> <comma separated list of usernames/lobby text>`", "Aliases:\n`m <region> <list of usernames or lobby text>`\n\nCompares multiple summoners in a region against each other.\n" + HORIZONTAL_SEPARATOR);
 		newEmbed.addField("`fairteamgenerator <region> <comma separated list of usernames/lobby text>`", "Aliases:\n`ftg <region> <list of usernames or lobby text>`\n\nGenerates fair teams from a list of summoners.\n" + HORIZONTAL_SEPARATOR);
 		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "shortcuts`", "Displays a list of nicknames you've set for friends with hard to spell names. Visit https://supportbot.tk/ for more information on this family of commands.\n" + HORIZONTAL_SEPARATOR);
-		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "setting <setting name> <value>", "Set server preferences for: prefix, auto-opgg, force-prefix, release-notifications. See our website for more details.");
+		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "setting <setting name> <value>`", "Set server preferences for: prefix, auto-opgg, force-prefix, release-notifications. See our website for more details.");
 		newEmbed.setFooter("SupportBot " + CONFIG.VERSION);
 		return newEmbed;
 	}
