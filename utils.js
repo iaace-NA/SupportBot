@@ -518,4 +518,24 @@ module.exports = class UTILS {
 		title: richembed.title,
 		url: richembed.url };
 	}
+	expectNumber(str) {
+		let newStr = "";
+		for (let i = 0; i < str.length; ++i) {
+			if (!isNaN(parseInt(str[i]))) {
+				newStr += str[i];
+			}
+		}
+		newStr = parseInt(newStr);
+		if (isNaN(newStr)) return NaN;
+		else return newStr;
+	}
+	parseQuery(queryString) {//do not pass in full URL
+		var query = {};
+		var pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&');
+		for (var i = 0; i < pairs.length; i++) {
+			var pair = pairs[i].split('=');
+			query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+		}
+		return query;
+	}
 }

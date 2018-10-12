@@ -14,10 +14,40 @@ catch (e) {
 	console.error(e);
 	process.exit(1);
 }
-
-let path = require('path');
-let crypto = require("crypto");
+function endpointToURL(region, endpoint) {
+	let options = UTILS.parseQuery(endpoint.substring(endpoint.indexOf("?")));
+	let maxage = parseInt(options.iapimaxage);
+	let request_id = options.iapirequest_id;
+	delete options.iapimaxage;
+	delete options.iapirequest_id;
+	let path = endpoint.substring(0, endpoint.indexOf("?"));
+	let newEndpoint = path;
+	let paramcount = 0;
+	for (let i in options) {
+		if (paramcount == 0) newEndpoint += "?" + i + "=" + encodeURIComponent(options[i]);
+		else newEndpoint += "&" + i + "=" + encodeURIComponent(options[i]);
+		++paramcount;
+	}
+	let query = endpoint.substring(endpoint.indexOf("?") + 1);//?date=0&iapi
+	let url = "https://" + region + ".api.riotgames.com" + path + "?api_key=";
+	for (let i in options) {
+		url += "&" + i + "=" + encodeURIComponent(options[i]);
+	}
+	UTILS.debug("endpointToURL result from (" + region + ", " + endpoint + "): url: " + url + " maxage: " + maxage + " endpoint: " + newEndpoint + " request_id" + request_id, true);
+	return { url, maxage, endpoint: newEndpoint, request_id };
+}
 let https = require('https');
+let riotRequest = new (require("riot-lol-api"))(CONFIG.RIOT_API_KEY, {
+	get: function(region, endpoint, callback) {
+		const oldFormat = endpointToURL(region, endpoint);
+		checkCache(oldFormat.url, oldFormat.maxage, oldFormat.request_id).then(data => callback(null, data)).catch(e => callback(null, null));
+	},
+	set: function(region, endpoint, cacheStrategy, data) {
+		const oldFormat = endpointToURL(region, endpoint);
+		addCache(oldFormat.url, data, cacheStrategy.cachetime);
+	}
+});
+
 let LoadAverage = require("../loadaverage.js");
 const response_type = ["Total", "Uncachable", "Cache hit", "Cache hit expired", "Cache miss"];
 const load_average = [new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60)];
@@ -90,16 +120,6 @@ let server_preferences_doc = new apicache.Schema({
 	ccid: { type: String, required: true, default: "" },//cleverbot conversation ID
 	welcome_cid: { type: String, required: true, default: "" },//welcome channel ID ("" = disabled)
 	farewell_cid: { type: String, required: true, default: "" },//farewell channel ID ("" = disabled)
-	faq: { type: Boolean, required: true, default: true },//FAQ responses
-	what: { type: [String], required: true, default: ["what", "wat", "wut", "wot", "uwot", "u wot", "u wat", "wha", "what?", "wat?", "wut?", "wot?", "uwot?", "u wot?", "u wat?", "huh?", "hmm?", "wha?", "u wot m8", "u wot m8?", "say that me again", "say that me again.", "what did you just say", "what did you just say?", "what did u just say", "what did u just say?", "shh"] },
-	nsc: { type: Boolean, required: true, default: true },//"what" triggers
-	scoreMute: { type: [String], required: true, default: [] },//scoremuted channels
-	atrank: { type: Number, required: true, default: 0 },//autotrack rank threshold (0 = disabled)
-	attop: { type: Number, required: true, default: 0 },//autotrack top threshold (0 = disabled)
-	atpp: { type: Number, required: true, default: 0 },//autotrack pp threshold (0 = disabled)
-	atcid: { type: String, required: true, default: "" },//autotrack channel id
-	scorecardmode: { type: Number, required: true, default: CONFIG.CONSTANTS.SCM_REDUCED },//scorecard mode
-	replaycount: { type: Boolean, required: true, default: true }//show replay count (or not)
 	*/
 }, { minimize: false });
 server_preferences_doc.index({ id: "hashed" });
@@ -198,6 +218,7 @@ function getBans(user, callback) {
 		callback(bans);
 	});
 }
+/*
 serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, res, next) {
 	if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
 	++irs[req.params.request_id][0];
@@ -205,7 +226,18 @@ serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, r
 		console.error(e);
 		res.status(500);
 	});
-}, true);
+}, true);*/
+serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/:tag/", (req, res, next) => {
+	if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
+	++irs[req.params.request_id][0];
+	riotRequest.request(req.params.region, req.params.tag, req.query.endpoint, { maxage: parseInt(req.params.maxage), cachetime: parseInt(req.params.cachetime), url: req.query.url }, (err, data) => {
+		if (err) {
+			res.status(500).end();
+			console.error(err);
+		}
+		else res.json(data);
+	});
+});
 serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
 	for (let b in irs) if (new Date().getTime() - irs[b][5] > 1000 * 60 * 10) delete irs[b];//cleanup old requests
 	if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();//doesn't exist
@@ -282,6 +314,7 @@ function addCache(url, response, cachetime) {
 		if (e) console.error(e);
 	});
 }
+/*
 function get(region, url, cachetime, maxage, request_id) {
 	//cachetime in seconds, if cachetime is 0, do not cache
 	//maxage in seconds, if maxage is 0, force refresh
@@ -336,7 +369,7 @@ function get(region, url, cachetime, maxage, request_id) {
 			}, null, () => {});
 		}
 	});
-}
+}*/
 function isString(s) {
 	return typeof(s) === "string";
 }
