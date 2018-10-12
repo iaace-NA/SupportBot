@@ -44,14 +44,15 @@ let riotRequest = new (require("riot-lol-api"))(CONFIG.RIOT_API_KEY, {
 			checkCache(oldFormat.url, oldFormat.maxage, oldFormat.request_id).then(data => {
 				callback(null, data);
 				load_average[2].add();
-				if (UTILS.exists(irs[request_id])) ++irs[request_id][2];
+				if (UTILS.exists(irs[oldFormat.request_id])) ++irs[oldFormat.request_id][2];
 			}).catch(e => {
-				callback(null, null)
+				callback(null, null);
 			});
 		}
 		else {
 			load_average[1].add();
-			if (UTILS.exists(irs[request_id])) ++irs[request_id][1];
+			if (UTILS.exists(irs[oldFormat.request_id])) ++irs[oldFormat.request_id][1];
+			callback(null, null);
 		}
 	},
 	set: function(region, endpoint, cacheStrategy, data) {
@@ -249,7 +250,7 @@ serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/:tag/", (req, res, 
 			res.status(err.status).type('application/json').send(err.response.res.text).end();
 			const oldFormat = endpointToURL(req.params.region, req.query.endpoint);
 			if (cachetime != 0) addCache(oldFormat.url, err.response.res.text, cachetime);
-			console.error(err);
+			if (!err.riotInternal) console.error(err);
 		}
 		else res.status(200).type('application/json').send(data).end();
 	});
@@ -325,7 +326,7 @@ function checkCache(url, maxage, request_id) {
 	});
 }
 function addCache(url, response, cachetime) {
-	UTILS.debug("CACHE ADD: " + url + " is " + response.status);
+	UTILS.debug("CACHE ADD: " + url + " is " + JSON.parse(response).status);
 	let new_document = new api_doc_model({ url: url, response: response, expireAt: new Date(new Date().getTime() + (cachetime * 1000)) });
 	new_document.save((e, doc) => {
 		if (e) console.error(e);
