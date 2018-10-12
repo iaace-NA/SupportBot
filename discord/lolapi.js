@@ -82,7 +82,7 @@ module.exports = class LOLAPI {
 				url += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
 			const iurl = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/" + tag + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&endpoint=" + encodeURIComponent(endpoint) + "&url=" + encodeURIComponent(url);
-			this.request({ iurl, agentOptions }, (error, response, body) => {
+			this.request({ url: iurl, agentOptions }, (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);
 				}
