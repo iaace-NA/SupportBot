@@ -110,10 +110,6 @@ module.exports = class LOLAPI {
 			});
 		});
 	}
-	getStaticChampions(region) {
-		UTILS.output("STATIC CHAMPIONS: " + region);
-		return this.get(region, "static-data/v3/champions", { locale: "en_US", dataById: true, tags: "all" }, this.CONFIG.API_CACHETIME.STATIC_CHAMPIONS, this.CONFIG.API_CACHETIME.STATIC_CHAMPIONS);
-	}
 	getStaticChampionsNew(region, locale = "en_US") {
 		UTILS.output("STATIC CHAMPIONS: " + region);
 		return new Promise((resolve, reject) => {
@@ -127,10 +123,6 @@ module.exports = class LOLAPI {
 				}).catch(reject);
 			}).catch(reject);
 		});
-	}
-	getStaticSummonerSpells(region) {
-		UTILS.output("STATIC SPELLS: " + region);
-		return this.get(region, "static-data/v3/summoner-spells", { locale: "en_US", dataById: true, spellListData: "all", tags: "all" }, this.CONFIG.API_CACHETIME.STATIC_SPELLS, this.CONFIG.API_CACHETIME.STATIC_SPELLS);
 	}
 	getStaticSummonerSpellsNew(region, locale = "en_US") {
 		UTILS.output("STATIC SPELLS: " + region);
