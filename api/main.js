@@ -232,8 +232,8 @@ serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/:tag/", (req, res, 
 	++irs[req.params.request_id][0];
 	riotRequest.request(req.params.region, req.params.tag, req.query.endpoint, { maxage: parseInt(req.params.maxage), cachetime: parseInt(req.params.cachetime), url: req.query.url }, (err, data) => {
 		if (err) {
-			res.status(500).end();
-			console.error(err);
+			res.status(err.status).send(err.response.res.text).end();
+			//console.error(err);
 		}
 		else res.json(data);
 	});
