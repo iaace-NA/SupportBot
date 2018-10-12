@@ -235,7 +235,7 @@ serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/:tag/", (req, res, 
 			res.status(err.status).type('application/json').send(err.response.res.text).end();
 			console.error(err);
 		}
-		else res.json(data);
+		else res.status(200).type('application/json').send(data).end();
 	});
 });
 serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
