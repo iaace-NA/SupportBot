@@ -86,6 +86,7 @@ module.exports = class LOLAPI {
 					try {
 						const answer = JSON.parse(body);
 						if (UTILS.exists(answer.status)) UTILS.output(iurl + " : " + body);
+						UTILS.assert(typeof(answer) === "object");
 						resolve(answer);
 					}
 					catch (e) {
