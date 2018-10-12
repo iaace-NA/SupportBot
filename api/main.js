@@ -40,11 +40,24 @@ let https = require('https');
 let riotRequest = new (require("riot-lol-api"))(CONFIG.RIOT_API_KEY, {
 	get: function(region, endpoint, callback) {
 		const oldFormat = endpointToURL(region, endpoint);
-		checkCache(oldFormat.url, oldFormat.maxage, oldFormat.request_id).then(data => callback(null, data)).catch(e => callback(null, null));
+		if (oldFormat.maxage != 0) {
+			checkCache(oldFormat.url, oldFormat.maxage, oldFormat.request_id).then(data => {
+				callback(null, data);
+				load_average[2].add();
+				if (UTILS.exists(irs[request_id])) ++irs[request_id][2];
+			}).catch(e => {
+				callback(null, null)
+			});
+		}
+		else {
+			load_average[1].add();
+			if (UTILS.exists(irs[request_id])) ++irs[request_id][1];
+		}
 	},
 	set: function(region, endpoint, cacheStrategy, data) {
 		const oldFormat = endpointToURL(region, endpoint);
-		addCache(oldFormat.url, JSON.stringify(data), cacheStrategy.cachetime);
+		if (cacheStrategy.cachetime != 0) addCache(oldFormat.url, JSON.stringify(data), cacheStrategy.cachetime);
+		else;
 	}
 });
 
@@ -230,9 +243,12 @@ serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, r
 serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/:tag/", (req, res, next) => {
 	if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
 	++irs[req.params.request_id][0];
-	riotRequest.request(req.params.region, req.params.tag, req.query.endpoint, { maxage: parseInt(req.params.maxage), cachetime: parseInt(req.params.cachetime) }, (err, data) => {
+	const cachetime = parseInt(req.params.cachetime);
+	riotRequest.request(req.params.region, req.params.tag, req.query.endpoint, { maxage: parseInt(req.params.maxage), cachetime }, (err, data) => {
 		if (err) {
 			res.status(err.status).type('application/json').send(err.response.res.text).end();
+			const oldFormat = endpointToURL(req.params.region, req.query.endpoint);
+			if (cachetime != 0) addCache(oldFormat.url, err.response.res.text, cachetime);
 			console.error(err);
 		}
 		else res.status(200).type('application/json').send(data).end();
@@ -309,7 +325,7 @@ function checkCache(url, maxage, request_id) {
 	});
 }
 function addCache(url, response, cachetime) {
-	UTILS.debug("CACHE ADD: " + url + " is " + response);
+	UTILS.debug("CACHE ADD: " + url + " is " + response.status);
 	let new_document = new api_doc_model({ url: url, response: response, expireAt: new Date(new Date().getTime() + (cachetime * 1000)) });
 	new_document.save((e, doc) => {
 		if (e) console.error(e);
