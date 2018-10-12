@@ -77,11 +77,7 @@ module.exports = class LOLAPI {
 			for (let i in options) {
 				endpoint += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
-			let url = "https://" + region + ".api.riotgames.com/lol/" + path + "?api_key=";
-			for (let i in options) {
-				url += "&" + i + "=" + encodeURIComponent(options[i]);
-			}
-			const iurl = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/" + tag + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&endpoint=" + encodeURIComponent(endpoint) + "&url=" + encodeURIComponent(url);
+			const iurl = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/" + tag + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&endpoint=" + encodeURIComponent(endpoint);
 			this.request({ url: iurl, agentOptions }, (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);

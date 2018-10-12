@@ -33,7 +33,7 @@ function endpointToURL(region, endpoint) {
 	for (let i in options) {
 		url += "&" + i + "=" + encodeURIComponent(options[i]);
 	}
-	UTILS.debug("endpointToURL result from (" + region + ", " + endpoint + "): url: " + url + " maxage: " + maxage + " endpoint: " + newEndpoint + " request_id" + request_id, true);
+	//UTILS.debug("endpointToURL result from (" + region + ", " + endpoint + "): url: " + url + " maxage: " + maxage + " endpoint: " + newEndpoint + " request_id: " + request_id);
 	return { url, maxage, endpoint: newEndpoint, request_id };
 }
 let https = require('https');
@@ -230,7 +230,7 @@ serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, r
 serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/:tag/", (req, res, next) => {
 	if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
 	++irs[req.params.request_id][0];
-	riotRequest.request(req.params.region, req.params.tag, req.query.endpoint, { maxage: parseInt(req.params.maxage), cachetime: parseInt(req.params.cachetime), url: req.query.url }, (err, data) => {
+	riotRequest.request(req.params.region, req.params.tag, req.query.endpoint, { maxage: parseInt(req.params.maxage), cachetime: parseInt(req.params.cachetime) }, (err, data) => {
 		if (err) {
 			res.status(err.status).send(err.response.res.text).end();
 			//console.error(err);
@@ -309,6 +309,7 @@ function checkCache(url, maxage, request_id) {
 	});
 }
 function addCache(url, response, cachetime) {
+	UTILS.debug("CACHE ADD: " + url + " is " + response);
 	let new_document = new api_doc_model({ url: url, response: response, expireAt: new Date(new Date().getTime() + (cachetime * 1000)) });
 	new_document.save((e, doc) => {
 		if (e) console.error(e);
