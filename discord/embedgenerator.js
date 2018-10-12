@@ -1043,8 +1043,7 @@ module.exports = class EmbedGenerator {
 			newEmbed.setColor([255, 0, 0]);
 			return newEmbed;
 		}
-		newEmbed.setAuthor(summoner.name, undefined, UTILS.opgg(region, summoner.name));
-		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
+		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(region, summoner.name));
 		let cm_description = [];
 		let cm_total = 0;
 		let cms_total = 0;
@@ -1057,9 +1056,9 @@ module.exports = class EmbedGenerator {
 		const SECTION_LENGTH = 15;
 		if (cm_description.length > 0) {
 			const sections = Math.trunc(cm_description.length / SECTION_LENGTH) + 1;
-			for (let i = 0; i < sections && i < 4; ++i) newEmbed.addField("Individual Champion Stats:", cm_description.slice(i * SECTION_LENGTH, (i + 1) * SECTION_LENGTH).join("\n"), true);
+			for (let i = 0; i < sections && i < 6; ++i) newEmbed.addField("Individual Champion Stats:", cm_description.slice(i * SECTION_LENGTH, (i + 1) * SECTION_LENGTH).join("\n"), true);
 		}
-		newEmbed.setFooter("Showing a maximum of 60 champions");
+		newEmbed.setFooter("Showing a maximum of 100 champions");
 		return newEmbed;
 	}
 	feedback(CONFIG, type, destination, msg, user_history, server_history, usertag) {
