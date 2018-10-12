@@ -247,10 +247,15 @@ serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/:tag/", (req, res, 
 	const cachetime = parseInt(req.params.cachetime);
 	riotRequest.request(req.params.region, req.params.tag, req.query.endpoint, { maxage: parseInt(req.params.maxage), cachetime }, (err, data) => {
 		if (err) {
-			res.status(err.status).type('application/json').send(err.response.res.text).end();
-			const oldFormat = endpointToURL(req.params.region, req.query.endpoint);
-			if (cachetime != 0) addCache(oldFormat.url, err.response.res.text, cachetime);
-			if (!err.riotInternal) console.error(err);
+			if (!err.riotInternal) {//real error
+				res.status(500).end();
+				console.error(err);
+			}
+			else {
+				res.status(err.status).type('application/json').send(err.response.res.text).end();
+				const oldFormat = endpointToURL(req.params.region, req.query.endpoint);
+				if (cachetime != 0) addCache(oldFormat.url, err.response.res.text, cachetime);
+			}
 		}
 		else res.status(200).type('application/json').send(data).end();
 	});
@@ -259,6 +264,7 @@ serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
 	for (let b in irs) if (new Date().getTime() - irs[b][5] > 1000 * 60 * 10) delete irs[b];//cleanup old requests
 	if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();//doesn't exist
 	let description = [];
+	irs[req.params.request_id][4] = irs[req.params.request_id][0] - irs[req.params.request_id][1] - irs[req.params.request_id][2] - irs[req.params.request_id][3];
 	for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[req.params.request_id][i] + "): " + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%");
 	description = description.join(", ");
 	UTILS.output("IAPI: request #" + req.params.request_id + " (" + (new Date().getTime() - irs[req.params.request_id][5]) + "ms): " + description);
