@@ -3,7 +3,7 @@ let ta = require("./timeago.js");
 let seq = require("./promise-sequential.js");
 String.prototype.replaceAll = function(search, replacement) {
 	let target = this;
-	return target.replace(new RegExp(search, 'g'), replacement);
+	return target.replace(new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replacement);
 }
 String.prototype.count = function(search) {
 	return (this.match(new RegExp(search, "g")) || []).length;
