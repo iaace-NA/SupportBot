@@ -305,7 +305,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 				let username = decodeURIComponent(msg.content.substring(msg.content.indexOf("userName=") + "userName=".length)).replaceAll("+", "%20");//reformat spaces
 				lolapi.getSummonerCard(region, username).then(result => {
 					replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], parameter.substring(0, parameter.indexOf(".")), result[3]));
-				}).catch();
+				}).catch(console.error);
 			}
 		});
 	}
