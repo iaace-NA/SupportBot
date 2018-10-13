@@ -3,11 +3,12 @@ const UTILS = new (require("../utils.js"))();
 const fs = require("fs");
 const argv_options = new (require("getopts"))(process.argv.slice(2), {
 	alias: { c: ["config"] },
-	default: { c: "config.json" }});
+	default: { c: "config.json5" }});
 let cache = {};
 let CONFIG;
+const JSON5 = require("json5");
 try {
-	CONFIG = JSON.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
+	CONFIG = JSON5.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
 }
 catch (e) {
 	UTILS.output("something's wrong with config.json");
@@ -20,7 +21,8 @@ const newPreferences = {
 	enabled: true,//whether or not the bot is enabled on the server
 	slow: 0,//self slow mode
 	auto_opgg: true, //automatically embed respond to op.gg links
-	force_prefix: false//force commands that don't require a prefix to use a prefix
+	force_prefix: false,//force commands that don't require a prefix to use a prefix
+	release_notifications: true//accept Lnotifys for new releases
 };
 const preferencesFormat = {
 	id: "string",//id of server
@@ -28,7 +30,8 @@ const preferencesFormat = {
 	enabled: "boolean",//whether or not the bot is enabled on the server
 	slow: "number",//self slow mode
 	auto_opgg: "boolean",//automatically embed respond to op.gg links
-	force_prefix: "boolean"
+	force_prefix: "boolean",//
+	release_notifications: "boolean"//
 };
 module.exports = class Preferences {
 	constructor(lolapi, guild, callback) {
@@ -54,7 +57,12 @@ module.exports = class Preferences {
 		}
 	}
 	resetToDefault() {
-		;
+		return new Promise((resolve, reject) => {
+			this.lolapi.resetPreferences(this.sid).then(new_p => {
+				cache[this.sid] = new_p;
+				resolve();
+			}).catch(e => reject(":x: Database operation failed"));
+		});
 	}
 	get(prop) {
 		return this.server_message ? cache[this.sid][prop] : newPreferences[prop];

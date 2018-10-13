@@ -288,6 +288,15 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			res.json(answer);
 		});
 	}, true);
+	serveWebRequest("/resetpreferences", (req, res, next) => {
+		server_preferences_model.deleteMany({ id: req.query.id }, (err) => {
+			if (UTILS.exists(err)) return res.status(500).json(err).end();
+			let new_document = new server_preferences_model({ id: req.query.id });
+			new_document.save((e, doc) => {
+				res.json(doc.toObject());
+			});
+		});
+	}, true);
 	serveWebRequest("/getpreferences", (req, res, next) => {
 		findPreferences(req.query.id, res, doc => {
 			if (!UTILS.exists(doc)) {//create new doc
@@ -311,7 +320,8 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 				else if (c_val === "false") c_val = false;
 				else return res.status(400).end();
 			}
-			else;//string type do not change
+			else if (req.query.type === "string" && !UTILS.exists(c_val)) c_val = "";
+			UTILS.debug("typeof is " + typeof(c_val) + " while actual value is " + c_val);
 			doc[req.query.prop] = c_val;
 			doc.markModified(req.query.prop);
 			doc.save(e => {

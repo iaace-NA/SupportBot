@@ -1,9 +1,9 @@
 {
 	"apps": [
 		{
-			"name": "main",
-			"script": "./discord/main.js",
-			"cwd": "./discord/",
+			"name": "api",
+			"script": "../api/main.js",
+			"cwd": "../api/",
 			"watch": false,
 			"min_uptime": 3000,
 			"max_restarts": 15,
@@ -13,7 +13,7 @@
 				"DEBUG": false
 			},
 			"node_args": "--trace-deprecation",
-			"args": "--config=config.json"
+			"args": "--config=config.json5"
 		}
 	]
 }

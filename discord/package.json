@@ -9,13 +9,15 @@
   "author": "iaace",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^11.3.2",
+    "console.table": "^0.10.0",
+    "discord.js": "^11.4.2",
     "getopts": "^2.0.6",
+    "json5": "^2.1.0",
     "mathjs": "^5.1.0",
-    "mongoose": "^5.0.14",
-    "request": "^2.86.0",
+    "request": "^2.88.0",
     "uws": "^9.14.0",
-    "ws": "^5.1.1",
+    "ws": "^5.2.2",
+    "xregexp": "^4.2.0",
     "zlib-sync": "^0.1.4"
   }
 }

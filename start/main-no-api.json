@@ -1,19 +1,19 @@
 {
 	"apps": [
 		{
-			"name": "apidev",
-			"script": "./api/main.js",
-			"cwd": "./api/",
+			"name": "main",
+			"script": "../discord/main.js",
+			"cwd": "../discord/",
 			"watch": false,
 			"min_uptime": 3000,
 			"max_restarts": 15,
 			"restart_delay": 2500,
 			"env": {
-				"NODE_ENV": "development",
-				"DEBUG": true
+				"NODE_ENV": "production",
+				"DEBUG": false
 			},
 			"node_args": "--trace-deprecation",
-			"args": "--config=devconfig.json"
+			"args": "--config=config.json5"
 		}
 	]
 }

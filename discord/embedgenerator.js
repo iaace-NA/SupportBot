@@ -51,35 +51,135 @@ const queues = {
 	"1070": "OE Onslaught",
 	"1200": "NB Nexus Blitz"
 };
+const MMR_JOKES = [
+	["We recommend using a mouse and keyboard when playing League of Legends.",//below bronze
+	"Brush, the grassy areas around Summoner's Rift, hides you from enemies.",
+	"The monsters in the jungle won't hurt you unless you attack them.",
+	"Normals are a less competitive environment to practice your skills.",
+	"Never play League of Legends under the influence.",
+	"Wards save lives.",
+	"\"gg\" stands for \"Good golly!\"",
+	"Try \"Co-op vs. AI Intermediate\" for a challenge!",
+	"There are 3 lanes (top, mid, bot) and 5 roles (top, jungle, mid, support, bot) in a typical Summoner's Rift game.",
+	"Use right click to move around!",
+	"Press D to dance.",
+	"LOOOOOL",
+	"Unfortunate.",
+	"We recommend using a mouse and keyboard when playing League of Legends.",
+	"You can only attack the nexus after you've destroyed the nexus turrets.",
+	"Enemies have a red health bar.",
+	"Make sure you have /all chat enabled. Enemies give the best advice and encouragement.",
+	"We had to make elo work with negative numbers because of you.",
+	"Don't worry, we've always ignored all \"Intentionally Feeding\" reports on your account.",
+	"There is no I in team, but there is one in Iron.",
+	"You should try charity instead.",
+	"We see you've improved a lot!"],
+	["You want another account now, don't you?",//bronze
+	"League of Legends is a team game.",
+	"Don't waste a Summoner Spell on Smite. You can't use Smite on champions.",
+	"Even bots use their Summoner Spells.",
+	"Can't get demoted to Bronze if you never pass Silver promos.",
+	"At least you're not Diamond.",
+	"You can buy items in the shop.",
+	"Having vision is important! Find missing enemies by exploring Fog of War.",
+	"Killing the Dragon or Baron grants your team some buffs!",
+	"Your teams are holding you back.",
+	"Level up your ultimate `R` ability when you reach level 6 in game!",
+	"Consider learning new champions in Co-op vs. AI or Normal games.",
+	"You can ban Master Yi in draft pick!",
+	"If their team gets first blood, it's over. /ff at 15",
+	"Your teammates aren't yet using the MIA ping for what its intended purpose is.",
+	"The warding totem gives you free wards to place throughout the entire game!"],
+	["Zhonya's Hourglass cannot be activated while dead.",//silver
+	"You're beautiful the way you are!",
+	"You gain the benefits of items right when you buy them. No need to equip!",
+	"Use Flash to engage and earn more kills per minute.",
+	"Keep your eyes peeled for Evelynn when she's invisible.",
+	"Remember to kite enemy champions when playing a ranged carry.",
+	"Ranged champions should hold their ground to deal the most damage in the shortest amount of time.",
+	"At least you're not bronze.",
+	"You are secretly a diamond smurf.",
+	"Smite is a key Summoner Spell for jungling allowing you to farm effectively.",
+	"The less time you spend dead, the more time you can spend playing League in color."],
+	["Be like Daenerys: secure kills and still get three dragons.",//gold
+	"sudo apt-get gud",
+	"Smite is a key Summoner Spell for jungling, allowing you to farm effectively.",
+	"The enemy Nexus is worth 50g.",
+	"Have you tried...not dying?",
+	"What is dead may never die, like your MMR.",
+	"Vision is important, but don't ward alone if your enemies are visible on the map.",
+	"At least you're not silver.",
+	"Hey, at least you know how to use /all chat."],
+	["They say Platinum is a precious metal. Clearly they haven't seen you play.",//platinum
+	"At least you're not Gold.",
+	"Your lack of skins is holding you back.",
+	"We're sorry you've been subjected to the real ELO hell.",
+	"You're almost there! Just a few more promos and you'll stop hating your own Lee Sins!",
+	"Always run back to base when you're losing a team fight.",
+	"Consider watching a \"How not to play LoL\" stream.",
+	"Almost time for a montage video!"],
+	["People rage at you when you don't carry in normals, huh?",//diamond
+	"Let the salt flow through you.",
+	"\"You shall not pass!\" - Voldemort, Star Wars",
+	"Forged in the fires of Mount Targon, only promos can break you.",
+	"If you keep playing like this, you'll be Bronze one day. Keep it up!",
+	"Ah, so you're the guy smurfing in normals.",
+	"I heard diamonds were hard...what happened to you?",
+	"At least you're not plat.",
+	"Don't get that excited. Diamond 5 is garbage.",
+	"You're closer to bronze than you are to Diamond 3.",
+	"Does it even matter if no one thinks you deserve it?",
+	"You worked really hard for it- that is, to get enough money to pay for this boost."],
+	["Baited and outsmarted.",//master
+	"Boost Anomaly detected!",
+	"Ask your friends if they'd rather you be a Pokémon Master.",
+	"You've ascended Mount Targon six times. It's got nothing on Mount Everest, though. Keep climbing!",
+	"You must feel good about destroying egos...unless, of course, you got boosted.",
+	"You should consider coaching--and boosting other Challenger hopefuls, too.",
+	"You're so metal, even Mordekaiser would crumple under your might.",
+	"At least you're not diamond."],
+	["Never seen someone get boosted all the way to Challenger before. Must've been expensive.",//challenger
+	"Hey qt!",
+	"Losing is not an option.",
+	"Challenjour!",
+	"When's your AMA?",
+	"Tell us when you join a pro team. We'll send you a Poro plushie to celebrate.",
+	"Party like a former pro League rock star!"]
+];
 const RANK_ORDER = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "CHALLENGER"];
 const RANK_COLOR = [[153, 51, 0], [179, 179, 179], [255, 214, 51], [0, 255, 152], [179, 240, 255], [255, 153, 255], [255, 0, 0]];
 const IMMR_THRESHOLD = [100, 600, 1100, 1600, 2100, 2600, 2700];
+const MMR_THRESHOLD = [400, 1150, 1400, 1650, 1900, 2150, 2400];//starting MMRs for each tier
 const PREMADE_EMOJIS = ["", "\\💙", "\\💛", "\\💚"];
+const HORIZONTAL_SEPARATOR = "------------------------------"
 module.exports = class EmbedGenerator {
 	constructor() { }
 	test() {
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setTitle("Test");
-		newEmbed.setDescription("description");
-		newEmbed.addField("`j` `      ` test", "nothing");
+		newEmbed.setAuthor("Author \\🇺🇸");
+		newEmbed.setTitle("Test 🇺🇸");
+		newEmbed.setDescription("description 🇺🇸");
+		newEmbed.addField("field title 🇺🇸", "field desc 🇺🇸");
+		newEmbed.setFooter("Footer 🇺🇸");
 		return newEmbed;
 	}
 	help(CONFIG) {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Discord Commands");
 		newEmbed.setDescription("Terms of Service:\n- Don't be a bot on a user account and use SupportBot.\n- Don't abuse bugs. If you find a bug, please report it to us.\n- Don't spam useless feedback\n- If you do not want to use SupportBot, let us know and we'll opt you out of our services.\n- We reserve the right to ban users and servers from using SupportBot at our discretion.\nFor additional help, please visit <" + CONFIG.HELP_SERVER_INVITE_LINK + ">\n\n<required parameter> [optional parameter]");
-		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "help`", "Displays this information card.");
-		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "invite`", "Provides information on how to add SupportBot to a different server.");
-		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "link <region> <username>`", "If your LoL ign is different from your discord username, you can set your LoL ign using this command, and SupportBot will remember it.");
-		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "unlink`", "Aliases:\n`" + CONFIG.DISCORD_COMMAND_PREFIX + "removelink`\n\nSupportBot forgets your preferred username and region.");
-		newEmbed.addField("`<region> [username]`", "Aliases:\n`<op.gg link>`\n\nDisplays summoner information.");
-		newEmbed.addField("`matchhistory <region> [username]`", "Aliases:\n`mh <region> [username]`\n\nDisplays basic information about the 5 most recent games played.");
-		newEmbed.addField("`matchhistory<number> <region> [username]`", "Aliases:\n`mh<number> <region> [username]`\n\nDisplays detailed information about one of your most recently played games.");
-		newEmbed.addField("`livegame <region> [username]`", "Aliases:\n`lg <region> [username]`\n`currentgame <region> [username]`\n`cg <region> [username]`\n`livematch <region> [username]`\n`lm <region> [username]`\n`currentmatch <region> [username]`\n`cm <region> [username]`\n\nShows information about a game currently being played.");
-		newEmbed.addField("`service status <region>`", "Aliases:\n`servicestatus <region>`\n`status <region>`\n`ss <region>`\n\nShows information on the uptime of LoL services in a region.");
-		newEmbed.addField("multi <region> <comma separated list of usernames/lobby text>", "Aliases:\n`m <region> <list of usernames or lobby text>`\n\nCompares multiple summoners in a region against each other.");
-		newEmbed.addField("fairteamgenerator <region> <comma separated list of usernames/lobby text>", "Aliases:\n`ftg <region> <list of usernames or lobby text>`\n\nGenerates fair teams from a list of summoners.");
-		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "shortcuts`", "Displays a list of nicknames you've set for friends with hard to spell names. Visit https://supportbot.tk/ for more information on this family of commands.")
+		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "help`", "Displays this information card.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "invite`", "Provides information on how to add SupportBot to a different server.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "link <region> <username>`", "If your LoL ign is different from your discord username, you can set your LoL ign using this command, and SupportBot will remember it.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "unlink`", "Aliases:\n`" + CONFIG.DISCORD_COMMAND_PREFIX + "removelink`\n\nSupportBot forgets your preferred username and region.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`<region> [username]`", "Aliases:\n`<op.gg link>`\n\nDisplays summoner information.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`matchhistory <region> [username]`", "Aliases:\n`mh <region> [username]`\n\nDisplays basic information about the 5 most recent games played.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`matchhistory<number> <region> [username]`", "Aliases:\n`mh<number> <region> [username]`\n\nDisplays detailed information about one of your most recently played games.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`livegame <region> [username]`", "Aliases:\n`lg <region> [username]`\n`currentgame <region> [username]`\n`cg <region> [username]`\n`livematch <region> [username]`\n`lm <region> [username]`\n`currentmatch <region> [username]`\n`cm <region> [username]`\n\nShows information about a game currently being played.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`service status <region>`", "Aliases:\n`servicestatus <region>`\n`status <region>`\n`ss <region>`\n\nShows information on the uptime of LoL services in a region.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`multi <region> <comma separated list of usernames/lobby text>`", "Aliases:\n`m <region> <list of usernames or lobby text>`\n\nCompares multiple summoners in a region against each other.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`fairteamgenerator <region> <comma separated list of usernames/lobby text>`", "Aliases:\n`ftg <region> <list of usernames or lobby text>`\n\nGenerates fair teams from a list of summoners.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "shortcuts`", "Displays a list of nicknames you've set for friends with hard to spell names. Visit https://supportbot.tk/ for more information on this family of commands.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "setting <setting name> <value>`", "Set server preferences for: prefix, auto-opgg, force-prefix, release-notifications. See our website for more details.");
 		newEmbed.setFooter("SupportBot " + CONFIG.VERSION);
 		return newEmbed;
 	}
@@ -139,10 +239,10 @@ module.exports = class EmbedGenerator {
 		}
 		if (highest_rank > -1) newEmbed.setColor(RANK_COLOR[highest_rank]);
 		if (will) {
-			const challenger_rank = UTILS.round(UTILS.map(Math.random(), 0, 1, 5, 200));
-			const challenger_LP = UTILS.round(UTILS.map(Math.random(), 0, 1, 100, 1000));
-			const fake_games = UTILS.round(UTILS.map(Math.random(), 0, 1, 200, 700));
-			const fake_wins = UTILS.round(UTILS.map(Math.random(), 0, 1, fake_games / 2, fake_games));
+			const challenger_rank = UTILS.randomInt(5, 200);
+			const challenger_LP = UTILS.randomInt(100, 1000);
+			const fake_games = UTILS.randomInt(200, 700);
+			const fake_wins = UTILS.randomInt(fake_games / 2, fake_games);
 			const fake_losses = fake_games - fake_wins;
 			const fake_wr = UTILS.round(100 * fake_wins / (fake_wins + fake_losses), 2);
 			newEmbed.addField("<:Challenger:437262128282599424>True Rank: Challenger ~#" + challenger_rank + " " + challenger_LP + "LP", fake_games + "G (" + fake_wr + "%) = " + fake_wins + "W + " + fake_losses + "L", true);
@@ -154,7 +254,7 @@ module.exports = class EmbedGenerator {
 			if (i < 3) cm_description.push("`M" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + " `" + UTILS.numberWithCommas(championmastery[i].championPoints) + "`pts");
 			cm_total += championmastery[i].championLevel;
 		}
-		if (cm_description.length > 0) newEmbed.addField("Champion Mastery: " + cm_total, cm_description.join("\t") + "\n[op.gg](" + UTILS.opgg(region, summoner.name) + ") [lolnexus](https://lolnexus.com/" + region + "/search?name=" + encodeURIComponent(summoner.name) + "&region=" + region + ") [quickfind](https://quickfind.kassad.in/profile/" + region + "/" + encodeURIComponent(summoner.name) + ") [lolking](https://lolking.net/summoner/" + region + "/" + summoner.id + "/" + encodeURIComponent(summoner.name) + "#/profile) [lolprofile](https://lolprofile.net/summoner/" + region + "/" + encodeURIComponent(summoner.name) + "#update) [matchhistory](https://matchhistory." + region + ".leagueoflegends.com/en/#match-history/" + CONFIG.REGIONS[region.toUpperCase()].toUpperCase() + "/" + summoner.accountId + ") [wol](https://wol.gg/stats/" + region + "/" + encodeURIComponent(summoner.name) + "/)");
+		if (cm_description.length > 0) newEmbed.addField("Champion Mastery: " + cm_total, cm_description.join("\t") + "\n[op.gg](" + UTILS.opgg(region, summoner.name) + ") [lolnexus](https://lolnexus.com/" + region + "/search?name=" + encodeURIComponent(summoner.name) + "&region=" + region + ") [quickfind](https://quickfind.kassad.in/profile/" + region + "/" + encodeURIComponent(summoner.name) + ") [lolprofile](https://lolprofile.net/summoner/" + region + "/" + encodeURIComponent(summoner.name) + "#update) [matchhistory](https://matchhistory." + region + ".leagueoflegends.com/en/#match-history/" + CONFIG.REGIONS[region.toUpperCase()].toUpperCase() + "/" + summoner.accountId + ") [wol](https://wol.gg/stats/" + region + "/" + encodeURIComponent(summoner.name) + "/)");
 		newEmbed.setTimestamp(new Date(summoner.revisionDate));
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;
@@ -463,7 +563,7 @@ module.exports = class EmbedGenerator {
 		}
 		return newEmbed;
 	}
-	mmr(CONFIG, summoner, mmr) {
+	mmr(CONFIG, summoner) {
 		let newEmbed = new Discord.RichEmbed();
 		if (!UTILS.exists(summoner.id)) {
 			newEmbed.setTitle("This summoner does not exist.");
@@ -471,12 +571,43 @@ module.exports = class EmbedGenerator {
 			newEmbed.setColor([255, 0, 0]);
 			return newEmbed;
 		}
-		newEmbed.setAuthor(summoner.name);
+		let tier, jokeNumber;
+		let mmr = UTILS.randomInt(-1, MMR_THRESHOLD.length);//pick a tier
+		if (mmr === -1) UTILS.randomInt(-100, MMR_THRESHOLD[0])
+		else if (mmr < MMR_THRESHOLD.length - 1) mmr = UTILS.randomInt(MMR_THRESHOLD[mmr], MMR_THRESHOLD[mmr + 1]);//-100 to 400
+		else UTILS.randomInt(MMR_THRESHOLD[mmr], MMR_THRESHOLD[mmr] + 300);
+		if (mmr < MMR_THRESHOLD[0]) {
+			tier = UTILS.randomOf(["WOOD", "CLOTH", "IRON", "PLASTIC", "PAPER", "COPPER", "CARDBOARD", "LEAD", "DIRT", "GARBAGE"]);
+			jokeNumber = 0;
+		} else if (mmr < MMR_THRESHOLD[1]) {//bronze
+			tier = RANK_ORDER[0];
+			jokeNumber = 1;
+		} else if (mmr < MMR_THRESHOLD[2]) {//silver
+			tier = RANK_ORDER[1];
+			jokeNumber >= 2;
+		} else if (mmr < MMR_THRESHOLD[3]) {//gold
+			tier = RANK_ORDER[2];
+			jokeNumber = 3;
+		} else if (mmr < MMR_THRESHOLD[4]) {//plat
+			tier = RANK_ORDER[3];
+			jokeNumber = 4;
+		} else if (mmr < MMR_THRESHOLD[5]) {//dia
+			tier = RANK_ORDER[4];
+			jokeNumber = 5;
+		} else if (mmr < MMR_THRESHOLD[6]) {//master
+			tier = RANK_ORDER[5];
+			jokeNumber = 6;
+		} else {//challenger
+			tier = RANK_ORDER[6];
+			jokeNumber = 7;
+		}
+		const analysis = UTILS.randomOf(MMR_JOKES[jokeNumber]);
+		newEmbed.setAuthor(summoner.name, null, UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		newEmbed.setDescription("Level " + summoner.summonerLevel);
-		newEmbed.addField("Official MMR Data", "Tier: " + UTILS.english(mmr.tier) + "\nMMR: `" + mmr.mmr + "`\n" + mmr.analysis);
-		if (RANK_ORDER.indexOf(mmr.tier) != -1) newEmbed.setColor(RANK_COLOR[RANK_ORDER.indexOf(mmr.tier)]);
-		newEmbed.setFooter("This information is subject to very frequent change.");
+		newEmbed.addField("MMR Data", "Tier: " + UTILS.english(tier) + "\nMMR: `" + mmr + "`\n" + analysis);
+		if (RANK_ORDER.indexOf(tier) != -1) newEmbed.setColor(RANK_COLOR[RANK_ORDER.indexOf(tier)]);
+		newEmbed.setFooter("This information does not reflect this summoner's actual MMR.");
 		return newEmbed;
 	}
 	notify(CONFIG, content, username, displayAvatarURL) {
@@ -562,7 +693,7 @@ module.exports = class EmbedGenerator {
 			UTILS.debug("individual_description length: " + individual_description.length);
 			response_str.push(individual_description);
 		}
-		for (let i = 0; i < response_str.length; ++i) {
+		for (let i = 0; i < response_str.length;) {
 			let field_str = "";
 			for (; i < response_str.length; ++i) {
 				if (field_str.length + response_str[i].length < 1024) field_str += response_str[i] + "\n";
@@ -587,13 +718,16 @@ module.exports = class EmbedGenerator {
 	}
 	fairTeam(CONFIG, region, summoners, ranks, masteries, debug_mode = false) {
 		function formatDescriptionString(team, side) {
-			return debug_mode ? "**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **Δμ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side] - team.avg[1 - side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.sum[side]) + "` **Δ:** `" + UTILS.numberWithCommas(team.sum[side] - team.sum[1 - side]) + "` **%Δ:** `" + UTILS.round((100 * (team.sum[side] - team.sum[1 - side])) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
+			return debug_mode ? "**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Med:** `" + UTILS.numberWithCommas(team.med[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **Δμ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side] - team.avg[1 - side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.sum[side]) + "` **Δ:** `" + UTILS.numberWithCommas(team.sum[side] - team.sum[1 - side]) + "` **%Δ:** `" + UTILS.round((100 * (team.sum[side] - team.sum[1 - side])) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
 		}
 		function formatDescriptionStringLarge(team, side) {
-			return debug_mode ? "**Min:** `" + UTILS.gold(team.min[side]) + "` **Max:** `" + UTILS.gold(team.max[side]) + "`\n**μ:** `" + UTILS.gold(team.avg[side]) + "` **Δμ:** `" + UTILS.gold(team.avg[side] - team.avg[1 - side]) + "` **σ:** `" + UTILS.gold(team.stdev[side]) + "`\n**Σ:** `" + UTILS.gold(team.sum[side]) + "` **Δ:** `" + UTILS.gold(team.sum[side] - team.sum[1 - side]) + "` **%Δ:** `" + UTILS.round((100 * (team.sum[side] - team.sum[1 - side])) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
+			return debug_mode ? "**Min:** `" + UTILS.gold(team.min[side]) + "` **Med:** `" + UTILS.gold(team.med[side]) + "` **Max:** `" + UTILS.gold(team.max[side]) + "`\n**μ:** `" + UTILS.gold(team.avg[side]) + "` **Δμ:** `" + UTILS.gold(team.avg[side] - team.avg[1 - side]) + "` **σ:** `" + UTILS.gold(team.stdev[side]) + "`\n**Σ:** `" + UTILS.gold(team.sum[side]) + "` **Δ:** `" + UTILS.gold(team.sum[side] - team.sum[1 - side]) + "` **%Δ:** `" + UTILS.round((100 * (team.sum[side] - team.sum[1 - side])) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
 		}
 		function formatDescriptionStringRanks(team, side) {
-			return debug_mode ? "**Min:** `" + UTILS.iMMRtoEnglish(team.min[side]) + "` **Max:** `" + UTILS.iMMRtoEnglish(team.max[side]) + "`\n**μ:** `" + UTILS.iMMRtoEnglish(team.avg[side]) + "` **Δμ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side] - team.avg[1 - side], 0)) + "LP` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "LP`\n**Σ:** `" + UTILS.numberWithCommas(UTILS.round(team.sum[side], 0)) + "LP` **Δ:** `" + UTILS.numberWithCommas(UTILS.round(team.sum[side] - team.sum[1 - side], 0)) + "LP` **%Δ:** `" + UTILS.round((100 * (team.sum[side] - team.sum[1 - side])) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
+			return debug_mode ? "**Min:** `" + UTILS.iMMRtoEnglish(team.min[side]) + "` **Med:** `" + UTILS.iMMRtoEnglish(team.med[side]) + "` **Max:** `" + UTILS.iMMRtoEnglish(team.max[side]) + "`\n**μ:** `" + UTILS.iMMRtoEnglish(team.avg[side]) + "` **Δμ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side] - team.avg[1 - side], 0)) + "LP` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "LP`\n**Σ:** `" + UTILS.numberWithCommas(UTILS.round(team.sum[side], 0)) + "LP` **Δ:** `" + UTILS.numberWithCommas(UTILS.round(team.sum[side] - team.sum[1 - side], 0)) + "LP` **%Δ:** `" + UTILS.round((100 * (team.sum[side] - team.sum[1 - side])) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
+		}
+		function sideOfMap(diff, team_number) {
+			return team_number === 0 ? diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue : diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple;
 		}
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Fair Team Generator");
@@ -603,52 +737,54 @@ module.exports = class EmbedGenerator {
 		for (let b in TEAM_COMBINATIONS) team_by_level.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], summoners.map(s => s.summonerLevel)));
 		const team_by_level_lowest_diff = mathjs.min(team_by_level.map(t => t.abs));
 		const team_by_level_best = team_by_level.findIndex(t => t.abs === team_by_level_lowest_diff);//team arrangement index
-		let team_by_level_team_0_description = "**__Team " + (team_by_level[team_by_level_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
-		let team_by_level_team_1_description = "**__Team " + (team_by_level[team_by_level_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
+		let team_by_level_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_level_best].length; ++i) {
-			const individual_description = "lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
-			TEAM_COMBINATIONS[team_by_level_best][i] === "0" ? team_by_level_team_0_description += individual_description : team_by_level_team_1_description += individual_description;
+			const individual_description = "lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name;
+			team_by_level_description[TEAM_COMBINATIONS[team_by_level_best][i] === "0" ? 0 : 1].push([summoners[i].summonerLevel, individual_description]);
 		}
-		team_by_level_team_0_description += formatDescriptionString(team_by_level[team_by_level_best], 0);
-		team_by_level_team_1_description += formatDescriptionString(team_by_level[team_by_level_best], 1);
-		team_by_level_team_0_description = team_by_level_team_0_description.trim();
-		team_by_level_team_1_description = team_by_level_team_1_description.trim();
-		newEmbed.addField("By Experience", team_by_level_team_0_description, true);
-		newEmbed.addField("(Level) id: " + team_by_level_best, team_by_level_team_1_description, true);
+		for (let i = 0; i < team_by_level_description.length; ++i) {
+			team_by_level_description[i].sort((a, b) => b[0] - a[0]);
+			team_by_level_description[i] = "**__Team " + sideOfMap(team_by_level[team_by_level_best].diff, i) + "__**\n" + team_by_level_description[i].map(d => d[1]).join("\n") + "\n" + formatDescriptionString(team_by_level[team_by_level_best], i);
+			team_by_level_description[i] = team_by_level_description[i].trim();
+		}
+		newEmbed.addField("By Experience", team_by_level_description[0], true);
+		newEmbed.addField("(Level) id: " + team_by_level_best, team_by_level_description[1], true);
 		newEmbed.addBlankField(false);
 
 		let team_by_highest_mastery = [];//array of stats objects
 		for (let b in TEAM_COMBINATIONS) team_by_highest_mastery.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], masteries.map(m => (m[0].championPoints || 0))));
 		const team_by_highest_mastery_lowest_diff = mathjs.min(team_by_highest_mastery.map(t => t.abs));
 		const team_by_highest_mastery_best = team_by_highest_mastery.findIndex(t => t.abs === team_by_highest_mastery_lowest_diff);//team arrangement index
-		let team_by_highest_mastery_team_0_description = "**__Team " + (team_by_highest_mastery[team_by_highest_mastery_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
-		let team_by_highest_mastery_team_1_description = "**__Team " + (team_by_highest_mastery[team_by_highest_mastery_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
+		let team_by_highest_mastery_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_highest_mastery_best].length; ++i) {
-			const individual_description = CONFIG.STATIC.CHAMPIONS[masteries[i][0].championId].emoji + " `" + UTILS.gold(masteries[i][0].championPoints) + "` " + summoners[i].name + "\n";
-			TEAM_COMBINATIONS[team_by_highest_mastery_best][i] === "0" ? team_by_highest_mastery_team_0_description += individual_description : team_by_highest_mastery_team_1_description += individual_description;
+			const individual_description = CONFIG.STATIC.CHAMPIONS[masteries[i][0].championId].emoji + " `" + UTILS.gold(masteries[i][0].championPoints) + "` " + summoners[i].name;
+			team_by_highest_mastery_description[TEAM_COMBINATIONS[team_by_highest_mastery_best][i] === "0" ? 0 : 1].push([masteries[i][0].championPoints, individual_description]);
 		}
-		team_by_highest_mastery_team_0_description += formatDescriptionStringLarge(team_by_highest_mastery[team_by_highest_mastery_best], 0);
-		team_by_highest_mastery_team_1_description += formatDescriptionStringLarge(team_by_highest_mastery[team_by_highest_mastery_best], 1);
-		team_by_highest_mastery_team_0_description = team_by_highest_mastery_team_0_description.trim();
-		team_by_highest_mastery_team_1_description = team_by_highest_mastery_team_1_description.trim();
-		newEmbed.addField("By Experience", team_by_highest_mastery_team_0_description, true);
-		newEmbed.addField("(Highest Mastery Champion) id: " + team_by_highest_mastery_best, team_by_highest_mastery_team_1_description, true);
+		for (let i = 0; i < team_by_highest_mastery_description.length; ++i) {
+			team_by_highest_mastery_description[i].sort((a, b) => b[0] - a[0]);
+			team_by_highest_mastery_description[i] = "**__Team " + sideOfMap(team_by_highest_mastery[team_by_highest_mastery_best].diff, i) + "__**\n" + team_by_highest_mastery_description[i].map(d => d[1]).join("\n") + "\n" + formatDescriptionStringLarge(team_by_highest_mastery[team_by_highest_mastery_best], i);
+			team_by_highest_mastery_description[i] = team_by_highest_mastery_description[i].trim();
+		}
+		newEmbed.addField("By Experience", team_by_highest_mastery_description[0], true);
+		newEmbed.addField("(Highest Mastery Champion) id: " + team_by_highest_mastery_best, team_by_highest_mastery_description[1], true);
 		newEmbed.addBlankField(false);
 
 		let team_by_total_mastery = [];//array of stats objects
 		for (let b in TEAM_COMBINATIONS) team_by_total_mastery.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], masteries.map(m => m.reduce((total, increment) => total + increment.championPoints, 0))));
 		const team_by_total_mastery_lowest_diff = mathjs.min(team_by_total_mastery.map(t => t.abs));
 		const team_by_total_mastery_best = team_by_total_mastery.findIndex(t => t.abs === team_by_total_mastery_lowest_diff);//team arrangement index
-		let team_by_total_mastery_team_0_description = "**__Team " + (team_by_total_mastery[team_by_total_mastery_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
-		let team_by_total_mastery_team_1_description = "**__Team " + (team_by_total_mastery[team_by_total_mastery_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
+		let team_by_total_mastery_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_total_mastery_best].length; ++i) {
-			const individual_description = "`" + UTILS.gold(masteries[i].reduce((total, increment) => total + increment.championPoints, 0)) + "` " + summoners[i].name + "\n";
-			TEAM_COMBINATIONS[team_by_total_mastery_best][i] === "0" ? team_by_total_mastery_team_0_description += individual_description : team_by_total_mastery_team_1_description += individual_description;
+			const individual_description = "`" + UTILS.gold(masteries[i].reduce((total, increment) => total + increment.championPoints, 0)) + "` " + summoners[i].name;
+			team_by_total_mastery_description[TEAM_COMBINATIONS[team_by_total_mastery_best][i] === "0" ? 0 : 1].push([masteries[i].reduce((total, increment) => total + increment.championPoints, 0), individual_description]);
 		}
-		team_by_total_mastery_team_0_description += formatDescriptionStringLarge(team_by_total_mastery[team_by_total_mastery_best], 0);
-		team_by_total_mastery_team_1_description += formatDescriptionStringLarge(team_by_total_mastery[team_by_total_mastery_best], 1);
-		newEmbed.addField("By Experience", team_by_total_mastery_team_0_description, true);
-		newEmbed.addField("(Total Champion Mastery) id: " + team_by_total_mastery_best, team_by_total_mastery_team_1_description, true);
+		for (let i = 0; i < team_by_total_mastery_description.length; ++i) {
+			team_by_total_mastery_description[i].sort((a, b) => b[0] - a[0]);
+			team_by_total_mastery_description[i] = "**__Team " + sideOfMap(team_by_total_mastery[team_by_total_mastery_best].diff, i) + "__**\n" + team_by_total_mastery_description[i].map(d => d[1]).join("\n") + "\n" + formatDescriptionStringLarge(team_by_total_mastery[team_by_total_mastery_best], i);
+			team_by_total_mastery_description[i] = team_by_total_mastery_description[i].trim();
+		}
+		newEmbed.addField("By Experience", team_by_total_mastery_description[0], true);
+		newEmbed.addField("(Total Champion Mastery) id: " + team_by_total_mastery_best, team_by_total_mastery_description[1], true);
 		newEmbed.addBlankField(false);
 
 		let team_by_all_ranks = [];//array of stats objects
@@ -667,18 +803,18 @@ module.exports = class EmbedGenerator {
 		UTILS.debug("rank lowest diff is " + team_by_all_ranks_lowest_diff);
 		const team_by_all_ranks_best = team_by_all_ranks.findIndex(t => t.abs === team_by_all_ranks_lowest_diff);//team arrangement index
 		UTILS.debug("rank lowest diff index is " + team_by_all_ranks_best);
-		let team_by_all_ranks_team_0_description = "**__Team " + (team_by_all_ranks[team_by_all_ranks_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
-		let team_by_all_ranks_team_1_description = "**__Team " + (team_by_all_ranks[team_by_all_ranks_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
+		let team_by_all_ranks_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_all_ranks_best].length; ++i) {
-			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` " + summoners[i].name + "\n";
-			TEAM_COMBINATIONS[team_by_all_ranks_best][i] === "0" ? team_by_all_ranks_team_0_description += individual_description : team_by_all_ranks_team_1_description += individual_description;
+			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` " + summoners[i].name;
+			team_by_all_ranks_description[TEAM_COMBINATIONS[team_by_all_ranks_best][i] === "0" ? 0 : 1].push([UTILS.averageUserMMR(ranks[i]), individual_description]);
 		}
-		team_by_all_ranks_team_0_description += formatDescriptionStringRanks(team_by_all_ranks[team_by_all_ranks_best], 0);
-		team_by_all_ranks_team_1_description += formatDescriptionStringRanks(team_by_all_ranks[team_by_all_ranks_best], 1);
-		team_by_all_ranks_team_0_description = team_by_all_ranks_team_0_description.trim();
-		team_by_all_ranks_team_1_description = team_by_all_ranks_team_1_description.trim();
-		newEmbed.addField("By Skill", team_by_all_ranks_team_0_description, true);
-		newEmbed.addField("(All Ranks) id: " + team_by_all_ranks_best, team_by_all_ranks_team_1_description, true);
+		for (let i = 0; i < team_by_all_ranks_description.length; ++i) {
+			team_by_all_ranks_description[i].sort((a, b) => b[0] - a[0]);
+			team_by_all_ranks_description[i] = "**__Team " + sideOfMap(team_by_all_ranks[team_by_all_ranks_best].diff, i) + "__**\n" + team_by_all_ranks_description[i].map(d => d[1]).join("\n") + "\n" + formatDescriptionStringRanks(team_by_all_ranks[team_by_all_ranks_best], i);
+			team_by_all_ranks_description[i] = team_by_all_ranks_description[i].trim();
+		}
+		newEmbed.addField("By Skill", team_by_all_ranks_description[0], true);
+		newEmbed.addField("(All Ranks) id: " + team_by_all_ranks_best, team_by_all_ranks_description[1], true);
 		newEmbed.addBlankField(false);
 
 		let team_by_sr_ranks = [];//array of stats objects
@@ -697,22 +833,22 @@ module.exports = class EmbedGenerator {
 		UTILS.debug("rank lowest diff is " + team_by_sr_ranks_lowest_diff);
 		const team_by_sr_ranks_best = team_by_sr_ranks.findIndex(t => t.abs === team_by_sr_ranks_lowest_diff);//team arrangement index
 		UTILS.debug("rank lowest diff index is " + team_by_sr_ranks_best);
-		let team_by_sr_ranks_team_0_description = "**__Team " + (team_by_sr_ranks[team_by_sr_ranks_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
-		let team_by_sr_ranks_team_1_description = "**__Team " + (team_by_sr_ranks[team_by_sr_ranks_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
+		let team_by_sr_ranks_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_sr_ranks_best].length; ++i) {
-			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.summonersRiftMMR(ranks[i])) + "` " + summoners[i].name + "\n";
-			TEAM_COMBINATIONS[team_by_sr_ranks_best][i] === "0" ? team_by_sr_ranks_team_0_description += individual_description : team_by_sr_ranks_team_1_description += individual_description;
+			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.summonersRiftMMR(ranks[i])) + "` " + summoners[i].name;
+			team_by_sr_ranks_description[TEAM_COMBINATIONS[team_by_sr_ranks_best][i] === "0" ? 0 : 1].push([UTILS.summonersRiftMMR(ranks[i]), individual_description]);
 		}
-		team_by_sr_ranks_team_0_description += formatDescriptionStringRanks(team_by_sr_ranks[team_by_sr_ranks_best], 0);
-		team_by_sr_ranks_team_1_description += formatDescriptionStringRanks(team_by_sr_ranks[team_by_sr_ranks_best], 1);
-		team_by_sr_ranks_team_0_description = team_by_sr_ranks_team_0_description.trim();
-		team_by_sr_ranks_team_1_description = team_by_sr_ranks_team_1_description.trim();
-		newEmbed.addField("By Skill", team_by_sr_ranks_team_0_description, true);
-		newEmbed.addField("(Summoner's Rift Ranks) id: " + team_by_sr_ranks_best, team_by_sr_ranks_team_1_description, true);
+		for (let i = 0; i < team_by_sr_ranks_description.length; ++i) {
+			team_by_sr_ranks_description[i].sort((a, b) => b[0] - a[0]);
+			team_by_sr_ranks_description[i] = "**__Team " + sideOfMap(team_by_sr_ranks[team_by_sr_ranks_best].diff, i) + "__**\n" + team_by_sr_ranks_description[i].map(d => d[1]).join("\n") + "\n" + formatDescriptionStringRanks(team_by_sr_ranks[team_by_sr_ranks_best], i);
+			team_by_sr_ranks_description[i] = team_by_sr_ranks_description[i].trim();
+		}
+		newEmbed.addField("By Skill", team_by_sr_ranks_description[0], true);
+		newEmbed.addField("(Summoner's Rift Ranks) id: " + team_by_sr_ranks_best, team_by_sr_ranks_description[1], true);
 		newEmbed.addBlankField(false);
 
 		if (summoners.length <= 6) {
-			let team_by_sr_ranks = [];//array of stats objects
+			let team_by_tt_ranks = [];//array of stats objects
 			let tt_iMMR = [];
 			for (let i = 0; i < ranks.length; ++i) {
 				UTILS.debug("ranks[" + i + "] is " + JSON.stringify(ranks[i], null, "\t"));
@@ -723,23 +859,23 @@ module.exports = class EmbedGenerator {
 				else tt_iMMR.push(UTILS.twistedTreelineMMR(ranks[i]));
 			}
 			UTILS.debug(JSON.stringify(tt_iMMR, null, "\t"));
-			for (let b in TEAM_COMBINATIONS) team_by_sr_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], tt_iMMR));
-			const team_by_sr_ranks_lowest_diff = mathjs.min(team_by_sr_ranks.map(t => t.abs));
-			UTILS.debug("rank lowest diff is " + team_by_sr_ranks_lowest_diff);
-			const team_by_sr_ranks_best = team_by_sr_ranks.findIndex(t => t.abs === team_by_sr_ranks_lowest_diff);//team arrangement index
-			UTILS.debug("rank lowest diff index is " + team_by_sr_ranks_best);
-			let team_by_sr_ranks_team_0_description = "**__Team " + (team_by_sr_ranks[team_by_sr_ranks_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
-			let team_by_sr_ranks_team_1_description = "**__Team " + (team_by_sr_ranks[team_by_sr_ranks_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
-			for (let i = 0; i < TEAM_COMBINATIONS[team_by_sr_ranks_best].length; ++i) {
-				const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.twistedTreelineMMR(ranks[i])) + "` " + summoners[i].name + "\n";
-				TEAM_COMBINATIONS[team_by_sr_ranks_best][i] === "0" ? team_by_sr_ranks_team_0_description += individual_description : team_by_sr_ranks_team_1_description += individual_description;
+			for (let b in TEAM_COMBINATIONS) team_by_tt_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], tt_iMMR));
+			const team_by_tt_ranks_lowest_diff = mathjs.min(team_by_tt_ranks.map(t => t.abs));
+			UTILS.debug("rank lowest diff is " + team_by_tt_ranks_lowest_diff);
+			const team_by_tt_ranks_best = team_by_tt_ranks.findIndex(t => t.abs === team_by_tt_ranks_lowest_diff);//team arrangement index
+			UTILS.debug("rank lowest diff index is " + team_by_tt_ranks_best);
+			let team_by_tt_ranks_description = [[], []];
+			for (let i = 0; i < TEAM_COMBINATIONS[team_by_tt_ranks_best].length; ++i) {
+				const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.twistedTreelineMMR(ranks[i])) + "` " + summoners[i].name;
+				team_by_tt_ranks_description[TEAM_COMBINATIONS[team_by_tt_ranks_best][i] === "0" ? 0 : 1].push([UTILS.twistedTreelineMMR(ranks[i]), individual_description]);
 			}
-			team_by_sr_ranks_team_0_description += formatDescriptionStringRanks(team_by_sr_ranks[team_by_sr_ranks_best], 0);
-			team_by_sr_ranks_team_1_description += formatDescriptionStringRanks(team_by_sr_ranks[team_by_sr_ranks_best], 1);
-			team_by_sr_ranks_team_0_description = team_by_sr_ranks_team_0_description.trim();
-			team_by_sr_ranks_team_1_description = team_by_sr_ranks_team_1_description.trim();
-			newEmbed.addField("By Skill", team_by_sr_ranks_team_0_description, true);
-			newEmbed.addField("(Twisted Treeline Ranks) id: " + team_by_sr_ranks_best, team_by_sr_ranks_team_1_description, true);
+			for (let i = 0; i < team_by_tt_ranks_description.length; ++i) {
+				team_by_tt_ranks_description[i].sort((a, b) => b[0] - a[0]);
+				team_by_tt_ranks_description[i] = "**__Team " + sideOfMap(team_by_tt_ranks[team_by_tt_ranks_best].diff, i) + team_by_tt_ranks_description[i].map(d => d[1]).join("\n") + "\n" + formatDescriptionStringRanks(team_by_tt_ranks[team_by_tt_ranks_best], i);
+				team_by_tt_ranks_description[i] = team_by_tt_ranks_description[i].trim();
+			}
+			newEmbed.addField("By Skill", team_by_tt_ranks_description[0], true);
+			newEmbed.addField("(Twisted Treeline Ranks) id: " + team_by_tt_ranks_best, team_by_tt_ranks_description[1], true);
 			newEmbed.addBlankField(false);
 		}
 
@@ -756,19 +892,19 @@ module.exports = class EmbedGenerator {
 		}
 		UTILS.debug(JSON.stringify(random_iMMR, null, "\t"));
 		for (let b in TEAM_COMBINATIONS) team_by_random.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], random_iMMR));
-		const team_by_random_best = Math.trunc(Math.random() * TEAM_COMBINATIONS.length);//team arrangement index
-		let team_by_random_team_0_description = "**__Team " + (team_by_random[team_by_random_best].diff > 0 ? "Purple " + CONFIG.EMOJIS.purple : "Blue " + CONFIG.EMOJIS.blue) + "__**\n";
-		let team_by_random_team_1_description = "**__Team " + (team_by_random[team_by_random_best].diff > 0 ? "Blue " + CONFIG.EMOJIS.blue : "Purple " + CONFIG.EMOJIS.purple) + "__**\n";
+		const team_by_random_best = UTILS.randomInt(0, TEAM_COMBINATIONS.length);//team arrangement index
+		let team_by_random_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_random_best].length; ++i) {
-			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name + "\n";
-			TEAM_COMBINATIONS[team_by_random_best][i] === "0" ? team_by_random_team_0_description += individual_description : team_by_random_team_1_description += individual_description;
+			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.averageUserMMR(ranks[i])) + "` lv. `" + summoners[i].summonerLevel + "` " + summoners[i].name;
+			team_by_random_description[TEAM_COMBINATIONS[team_by_random_best][i] === "0" ? 0 : 1].push([UTILS.averageUserMMR(ranks[i]), individual_description]);
 		}
-		team_by_random_team_0_description += formatDescriptionStringRanks(team_by_random[team_by_random_best], 0);
-		team_by_random_team_1_description += formatDescriptionStringRanks(team_by_random[team_by_random_best], 1);
-		team_by_random_team_0_description = team_by_random_team_0_description.trim();
-		team_by_random_team_1_description = team_by_random_team_1_description.trim();
-		newEmbed.addField("Random", team_by_random_team_0_description, true);
-		newEmbed.addField("(Level/Rank information displayed) id: " + team_by_random_best, team_by_random_team_1_description, true);
+		for (let i = 0; i < team_by_random_description.length; ++i) {
+			team_by_random_description[i].sort((a, b) => b[0] - a[0]);
+			team_by_random_description[i] = "**__Team " + sideOfMap(team_by_random[team_by_random_best].diff, i) + "__**\n" + team_by_random_description[i].map(d => d[1]).join("\n") + "\n" + formatDescriptionStringRanks(team_by_random[team_by_random_best], i);
+			team_by_random_description[i] = team_by_random_description[i].trim();
+		}
+		newEmbed.addField("Random", team_by_random_description[0], true);
+		newEmbed.addField("(Level/Rank information displayed) id: " + team_by_random_best, team_by_random_description[1], true);
 		return newEmbed;
 	}
 	serverBan(CONFIG, server, reason, date, issuer_tag, issuer_avatarURL) {
@@ -787,7 +923,7 @@ module.exports = class EmbedGenerator {
 			newEmbed.setTimestamp(date_date);
 		}
 		newEmbed.addField("While this ban is effective", "SupportBot will ignore all messages sent from this server.", true);
-		newEmbed.addField("Help", "If you believe this is a mistake, please visit " + CONFIG.HELP_SERVER_INVITE_LINK, true);
+		newEmbed.addField("Help", "If you believe this is a mistake, please visit " + CONFIG.HELP_SERVER_INVITE_LINK + " and state your case to an admin.", true);
 		newEmbed.setAuthor(issuer_tag, issuer_avatarURL);
 		newEmbed.setDescription("The reason given was: " + reason);
 		return newEmbed;
@@ -856,33 +992,13 @@ module.exports = class EmbedGenerator {
 	disciplinaryHistory(CONFIG, id, user, docs) {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Disciplinary History");
-		let active_ban = -1;
-		const now = new Date().getTime();
-		for (let b in docs) {
-			if (docs[b].ban && docs[b].active) {
-				const ban_date = new Date(docs[b].date);
-				if (ban_date.getTime() == 0) {
-					active_ban = 0;
-					break;
-				}
-				else if (ban_date.getTime() > now) {
-					if (ban_date.getTime() > active_ban) active_ban = ban_date.getTime();
-				}
-			}
-		}
-		let recent_warning = false;
-		for (let b in docs) {
-			if (!docs[b].ban && docs[b].reason.substring(0, 9) == ":warning:") {
-				recent_warning = true;
-				break;
-			}
-		}
-		if (active_ban == 0) {
+		const status = UTILS.disciplinaryStatus(docs);
+		if (status.active_ban == 0) {
 			newEmbed.setColor([1, 1, 1]);
 			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active permanent ban.\nHere are the 10 most recent events:");
 		}
-		else if (active_ban == -1) {
-			if (recent_warning) {
+		else if (status.active_ban == -1) {
+			if (status.recent_warning) {
 				newEmbed.setColor([255, 255, 0]);
 				newEmbed.setDescription("This " + (user ? "user" : "server") + " has been warned recently.\nHere are the 10 most recent events:");
 			}
@@ -893,7 +1009,7 @@ module.exports = class EmbedGenerator {
 		}
 		else {
 			newEmbed.setColor([255, 0, 0]);
-			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active temporary ban. It expires in " + UTILS.until(new Date(active_ban)) + ".\nHere are the 10 most recent events:");
+			newEmbed.setDescription("This " + (user ? "user" : "server") + " has an active temporary ban. It expires in " + UTILS.until(new Date(status.active_ban)) + ".\nHere are the 10 most recent events:");
 		}
 		for (let i = 0; i < docs.length && i < 10; ++i) {
 			newEmbed.addField("By " + CONFIG.OWNER_DISCORD_IDS[docs[i].issuer_id].name + ", " + UTILS.ago(new Date(docs[i].id_timestamp)) + (docs[i].ban && docs[i].active ? (new Date(docs[i].date).getTime() == 0 ? ", Permanent Ban" : ", Ban Expires in " + UTILS.until(new Date(docs[i].date))) : ""), docs[i].reason);
@@ -928,8 +1044,8 @@ module.exports = class EmbedGenerator {
 			newEmbed.setColor([255, 0, 0]);
 			return newEmbed;
 		}
-		newEmbed.setAuthor(summoner.name, undefined, UTILS.opgg(region, summoner.name));
-		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
+		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(region, summoner.name));
+		newEmbed.setTitle("Individual Champion Mastery");
 		let cm_description = [];
 		let cm_total = 0;
 		let cms_total = 0;
@@ -942,9 +1058,103 @@ module.exports = class EmbedGenerator {
 		const SECTION_LENGTH = 15;
 		if (cm_description.length > 0) {
 			const sections = Math.trunc(cm_description.length / SECTION_LENGTH) + 1;
-			for (let i = 0; i < sections && i < 4; ++i) newEmbed.addField("Individual Champion Stats:", cm_description.slice(i * SECTION_LENGTH, (i + 1) * SECTION_LENGTH).join("\n"), true);
+			for (let i = 0; i < sections && i < 6; ++i) newEmbed.addField("#" + ((i * SECTION_LENGTH) + 1) + " - #" + (((i + 1) * SECTION_LENGTH) + 1), cm_description.slice(i * SECTION_LENGTH, (i + 1) * SECTION_LENGTH).join("\n"), true);
 		}
-		newEmbed.setFooter("Showing a maximum of 60 champions");
+		newEmbed.setFooter("Showing a maximum of 90 champions");
 		return newEmbed;
+	}
+	feedback(CONFIG, type, destination, msg, user_history, server_history, usertag) {
+		/*type = 0: general message from user (destination 1)
+		type = 1: complaint (destination 1->2)
+		type = 2: praise (destination 1->2)
+		type = 3: suggestion (destination 1->2)
+		type = 4: question (destination 1)
+		type = 5: general message to user (destination 0)
+		destination = 0: user PM
+		destination = 1: admin channel
+		destination = 2: public
+		(t, d)
+		(0, 1): user to admin channel
+		(1-3, 1): feedback awaiting public approval in admin channel
+		X(1-3, 2): feedback approved, to be published publicly. handled by function below, reviewFeedback()
+		X(1-3, 0): feedback approved, to be sent to original user. handled by function below, reviewFeedback()
+		(4, 1): question submitted to admin channel
+		(5, 0): management to user
+		(5, 1): management to user admin channel audit
+		*/
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setAuthor(msg.author.tag + (msg.PM ? " via PM" : " from server " + msg.guild.name + "::" + msg.guild.id), msg.author.displayAvatarURL);
+		newEmbed.setTimestamp();
+		newEmbed.setTitle("Message from a user");
+		newEmbed.setDescription(msg.cleanContent);
+		if (type === 0) {//Lsay
+			newEmbed.setColor("#ffffff");//white
+		}
+		else if (type === 1) {//Lcomplain
+			newEmbed.setColor("#ff0000");//red
+			newEmbed.setFooter(CONFIG.FEEDBACK.COMPLAINT_CID + ":" + msg.author.id + ":" + msg.author.username);
+		}
+		else if (type === 2) {//Lpraise
+			newEmbed.setColor("#00ff00");//green
+			newEmbed.setFooter(CONFIG.FEEDBACK.PRAISE_CID + ":" + msg.author.id + ":" + msg.author.username);
+		}
+		else if (type === 3) {//Lsuggest
+			newEmbed.setColor("#0000ff");//blue
+			newEmbed.setFooter(CONFIG.FEEDBACK.SUGGESTION_CID + ":" + msg.author.id + ":" + msg.author.username);
+		}
+		else if (type === 4) {//Lask/Lquestion
+			newEmbed.setColor("#ff00ff");//magenta (yellow reserved for warnings)
+		}
+		else if (type === 5) {
+			newEmbed.setAuthor(msg.author.username, msg.author.displayAvatarURL);
+			newEmbed.setTitle("Message from management to " + usertag);//reset title
+			if (destination === 0) {
+				newEmbed.setURL(CONFIG.HELP_SERVER_INVITE_LINK);
+				newEmbed.addField("This is a private conversation with management.", "You can reply to this message by sending `" + CONFIG.DISCORD_COMMAND_PREFIX + "say <your response goes here>`");
+				newEmbed.setDescription(msg.cleanContent + "\n\n" + CONFIG.OWNER_DISCORD_IDS[msg.author.id].flags);
+			}
+			else if (destination === 1) {}
+		}//Lmail
+		if (type < 5) {
+			let user_status = UTILS.disciplinaryStatusString(UTILS.disciplinaryStatus(user_history), true);
+			let server_status = UTILS.exists(server_history) ? "\n" + UTILS.disciplinaryStatusString(UTILS.disciplinaryStatus(server_history), false) : "";
+			newEmbed.addField("Background Checks", user_status + server_status);
+			if (destination === 1) {
+				newEmbed.addField("Responses", "Send message response: `" + CONFIG.DISCORD_COMMAND_PREFIX + "mail " + msg.author.id + " <text>`\nBan: `" + CONFIG.DISCORD_COMMAND_PREFIX + "banuser " + msg.author.id + " <duration> <reason>`\nWarn: `" + CONFIG.DISCORD_COMMAND_PREFIX + "warnuser " + msg.author.id + " <reason>`\nNote: `" + CONFIG.DISCORD_COMMAND_PREFIX + "noteuser " + msg.author.id + " <reason>`");
+			}
+		}
+		return newEmbed;
+	}
+	reviewFeedback(CONFIG, msg, approver, approved) {
+		if (!UTILS.exists(msg.embeds[0])) return 1;//no embed detected
+		if (!UTILS.exists(msg.embeds[0].footer) || !UTILS.exists(msg.embeds[0].footer.text)) return 2;//not approvable
+		const c_location = msg.embeds[0].footer.text.indexOf(":");
+		const c_location2 = UTILS.indexOfInstance(msg.embeds[0].footer.text, ":", 2);
+		if (c_location == -1 || c_location2 == -1) return 3;//not approvable
+		if (approved) {
+			let public_e = new Discord.RichEmbed(msg.embeds[0]);
+			let edit = new Discord.RichEmbed(msg.embeds[0]);
+			let user = new Discord.RichEmbed(msg.embeds[0]);
+			const cid = msg.embeds[0].footer.text.substring(0, c_location);
+			const uid = msg.embeds[0].footer.text.substring(c_location + 1, c_location2);
+			const username = msg.embeds[0].footer.text.substring(c_location2 + 1);
+			public_e.setFooter("Approved by " + approver.username, approver.displayAvatarURL);
+			public_e.fields = [];
+			public_e.setAuthor(username, public_e.author.icon_url);
+			edit.setFooter("Approved by " + approver.username, approver.displayAvatarURL);
+			edit.fields = [];
+			edit.addField("Responses", "Send message response: `" + CONFIG.DISCORD_COMMAND_PREFIX + "mail " + uid + "`\nNote: `" + CONFIG.DISCORD_COMMAND_PREFIX + "noteuser " + uid + " <reason>`");
+			user.setAuthor(username, msg.embeds[0].author.icon, msg.embeds[0].author.url);
+			user.setFooter("Approved by " + approver.username, approver.displayAvatarURL);
+			user.fields = [];
+			user.setTitle("Your feedback was reviewed by our staff and approved for public viewing on our server- click to join");
+			user.setURL("https://discord.gg/57Z8Npg");
+			public_e.setAuthor(username, user.author.icon_url);
+			return { to_user: user, to_user_uid: uid, edit, to_public: public_e, to_public_cid: cid };
+		}
+		else return {};
+	}
+	raw(embed_object) {
+		return new Discord.RichEmbed(embed_object);
 	}
 }

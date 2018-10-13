@@ -3,7 +3,7 @@ let ta = require("./timeago.js");
 let seq = require("./promise-sequential.js");
 String.prototype.replaceAll = function(search, replacement) {
 	let target = this;
-	return target.replace(new RegExp(search, 'g'), replacement);
+	return target.replace(new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replacement);
 }
 String.prototype.count = function(search) {
 	return (this.match(new RegExp(search, "g")) || []).length;
@@ -165,6 +165,8 @@ module.exports = class UTILS {
 		else return 0;
 	}
 	opgg(region, username) {
+		this.assert(this.exists(username));
+		if (region == "KR") region = "www";//account for kr region special www opgg link
 		return "http://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
 	}
 	shortRank(info) {
@@ -316,7 +318,7 @@ module.exports = class UTILS {
 		while (arr.indexOf(deletable) != -1) arr.splice(arr.indexOf(deletable), 1);
 	}
 	defaultChannelNames() {
-		return ["general", "bot", "bots", "bot-commands", "botcommands", "commands", "league", "lol", "games", "spam"];
+		return ["general", "bot", "bots", "bot-commands", "botcommands", "commands", "league", "lol", "supportbot", "support-bot", "games", "spam"];
 	}
 	durationParse(duration) {
 		let multiplier = duration.substring(duration.length - 1, duration.length).toUpperCase();
@@ -403,8 +405,9 @@ module.exports = class UTILS {
 		*/
 		let temp = {
 			raw: [[], []],//raw values
-			min: [[], []],//minimum values
-			max: [[], []],//maximum values
+			min: [0, 0],//minimum values
+			med: [0, 0],//median
+			max: [0, 0],//maximum values
 			avg: [0, 0],//team averages
 			stdev: [0, 0],//standard deviation
 			sum: [0, 0],//team_0 sum, team_1 sum
@@ -419,10 +422,120 @@ module.exports = class UTILS {
 			temp.min[t] = mathjs.min(temp.raw[t]);
 			temp.max[t] = mathjs.max(temp.raw[t]);
 			temp.avg[t] = mathjs.mean(temp.raw[t]);
+			temp.med[t] = mathjs.median(temp.raw[t]);
 			temp.stdev[t] = mathjs.std(temp.raw[t], "uncorrected");//σ: population standard deviation
 		}
 		temp.diff = temp.sum[0] - temp.sum[1];//team 0 - team 1
 		temp.abs = Math.abs(temp.sum[0] - temp.sum[1]);
 		return temp;
+	}
+	randomOf(choices) {
+		return choices[Math.trunc(Math.random() * choices.length)];
+	}
+	randomInt(a, b) {//[a, b)
+		return Math.trunc(Math.random() * (b - a)) + a;
+	}
+	disciplinaryStatus(docs) {
+		const now = new Date().getTime();
+		let active_ban = -1;//-1 = no ban, 0 = perma, other = temp ban
+		for (let b in docs) {
+			if (docs[b].ban && docs[b].active) {
+				const ban_date = new Date(docs[b].date);
+				if (ban_date.getTime() == 0) {
+					active_ban = 0;
+					break;
+				}
+				else if (ban_date.getTime() > now) {
+					if (ban_date.getTime() > active_ban) active_ban = ban_date.getTime();
+				}
+			}
+		}
+		let recent_ban = false;
+		for (let b in docs) {
+			if (docs[b].ban) {
+				const ban_date = new Date(docs[b].date);
+				if (now - (180 * 24 * 60 * 60 * 1000) < ban_date.getTime()) {//180 day
+					recent_ban = true;
+					break;
+				}
+			}
+		}
+		let recent_warning = false;
+		for (let b in docs) {
+			if (!docs[b].ban && docs[b].reason.substring(0, 9) == ":warning:") {
+				const warn_date = new Date(docs[b].date);
+				if (now - (180 * 24 * 60 * 60 * 1000) < warn_date.getTime()) {//180 day
+					recent_warning = true;
+					break;
+				}
+			}
+		}
+		let most_recent_note;
+		for (let i = 0; i < docs.length; ++i) {
+			if (!docs[i].ban && docs[i].reason.substring(0, 20) == ":information_source:") {
+				most_recent_note = docs[i].reason;
+				break;
+			}
+		}
+		return { active_ban, recent_ban, recent_warning, most_recent_note };
+	}
+	disciplinaryStatusString(status, user) {
+		this.assert(this.exists(user));
+		let answer = user ? "User: " : "Server: ";
+		if (status.active_ban == -1 && !status.recent_ban && !status.recent_warning) answer += ":white_check_mark: Good standing.";
+		else {
+			if (status.active_ban >= 0) {
+				if (status.active_ban == 0) answer += ":no_entry: Permabanned";
+				else answer += ":no_entry: Temporarily banned until " + this.until(new Date(status.active_ban));
+			}
+			else {
+				if (status.recent_ban && status.recent_warning) answer += ":warning: Recently banned\n:warning: Recently warned";
+				else if (status.recent_warning) answer += ":warning: Recently warned";
+				else if (status.recent_ban) answer += ":warning: Recently banned";
+			}
+		}
+		if (this.exists(status.most_recent_note)) answer += "\nMost recent note: " + status.most_recent_note;
+		return answer;
+	}
+	isInt(x) {
+		x = x + "";
+		let valid = false;
+		for (let i = 0; i < x.length; ++i) {
+			if (!isNaN(parseInt(x[i]))) valid = true;
+			else return false;
+		}
+		return valid;
+	}
+	embedRaw(richembed) {
+		return { author: this.exists(richembed.author) ? this.copy(richembed.author) : undefined,
+		color: richembed.color,
+		description: richembed.description,
+		fields: this.exists(richembed.fields) ? this.copy(richembed.fields) : undefined,
+		footer: this.exists(richembed.footer) ? this.copy(richembed.footer) : undefined,
+		image: this.exists(richembed.image) ? this.copy(richembed.image) : undefined,
+		thumbnail: this.exists(richembed.thumbnail) ? this.copy(richembed.thumbnail) : undefined,
+		timestamp: this.exists(richembed.timestamp) ? new Date(richembed.timestamp) : undefined,
+		title: richembed.title,
+		url: richembed.url };
+	}
+	expectNumber(str) {
+		let newStr = "";
+		for (let i = 0; i < str.length; ++i) {
+			if (!isNaN(parseInt(str[i]))) {
+				newStr += str[i];
+			}
+		}
+		newStr = parseInt(newStr);
+		if (isNaN(newStr)) return NaN;
+		else return newStr;
+	}
+	parseQuery(queryString) {//do not pass in full URL
+		var query = {};
+		var pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&');
+		for (var i = 0; i < pairs.length; i++) {
+			var pair = pairs[i].split('=');
+			query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+		}
+		return query;
 	}
 }

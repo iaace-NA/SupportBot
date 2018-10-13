@@ -2,21 +2,66 @@
 const fs = require("fs");
 const argv_options = new (require("getopts"))(process.argv.slice(2), {
 	alias: { c: ["config"] },
-	default: { c: "config.json" }});
+	default: { c: "config.json5" }});
 let CONFIG;
+const JSON5 = require("json5");
 try {
-	CONFIG = JSON.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.4.1";//b for non-release (in development)
+	CONFIG = JSON5.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
+	CONFIG.VERSION = "v1.5.0";//b for non-release (in development)
 }
 catch (e) {
 	console.log("something's wrong with config.json");
 	console.error(e);
 	process.exit(1);
 }
-
-let path = require('path');
-let crypto = require("crypto");
+function endpointToURL(region, endpoint) {
+	let options = UTILS.parseQuery(endpoint.substring(endpoint.indexOf("?")));
+	let maxage = parseInt(options.iapimaxage);
+	let request_id = options.iapirequest_id;
+	delete options.iapimaxage;
+	delete options.iapirequest_id;
+	let path = endpoint.substring(0, endpoint.indexOf("?"));
+	let newEndpoint = path;
+	let paramcount = 0;
+	for (let i in options) {
+		if (paramcount == 0) newEndpoint += "?" + i + "=" + encodeURIComponent(options[i]);
+		else newEndpoint += "&" + i + "=" + encodeURIComponent(options[i]);
+		++paramcount;
+	}
+	let query = endpoint.substring(endpoint.indexOf("?") + 1);//?date=0&iapi
+	let url = "https://" + region + ".api.riotgames.com" + path + "?api_key=";
+	for (let i in options) {
+		url += "&" + i + "=" + encodeURIComponent(options[i]);
+	}
+	//UTILS.debug("endpointToURL result from (" + region + ", " + endpoint + "): url: " + url + " maxage: " + maxage + " endpoint: " + newEndpoint + " request_id: " + request_id);
+	return { url, maxage, endpoint: newEndpoint, request_id };
+}
 let https = require('https');
+let riotRequest = new (require("riot-lol-api"))(CONFIG.RIOT_API_KEY, 12000, {
+	get: function(region, endpoint, callback) {
+		const oldFormat = endpointToURL(region, endpoint);
+		if (oldFormat.maxage != 0) {
+			checkCache(oldFormat.url, oldFormat.maxage, oldFormat.request_id).then(data => {
+				callback(null, data);
+				load_average[2].add();
+				if (UTILS.exists(irs[oldFormat.request_id])) ++irs[oldFormat.request_id][2];
+			}).catch(e => {
+				callback(null, null);
+			});
+		}
+		else {
+			load_average[1].add();
+			if (UTILS.exists(irs[oldFormat.request_id])) ++irs[oldFormat.request_id][1];
+			callback(null, null);
+		}
+	},
+	set: function(region, endpoint, cacheStrategy, data) {
+		const oldFormat = endpointToURL(region, endpoint);
+		if (cacheStrategy.cachetime != 0) addCache(oldFormat.url, JSON.stringify(data), cacheStrategy.cachetime);
+		else;
+	}
+});
+
 let LoadAverage = require("../loadaverage.js");
 const response_type = ["Total", "Uncachable", "Cache hit", "Cache hit expired", "Cache miss"];
 const load_average = [new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60)];
@@ -31,7 +76,7 @@ let routes = require("./routes.js");
 UTILS.assert(UTILS.exists(CONFIG.API_PORT));
 UTILS.output("Modules loaded.");
 let apicache = require("mongoose");
-apicache.connect("mongodb://localhost/apicache");//cache of summoner object name lookups
+apicache.connect("mongodb://localhost/apicache", { useNewUrlParser: true });//cache of summoner object name lookups
 apicache.connection.on("error", function (e) { throw e; });
 
 let api_doc = new apicache.Schema({
@@ -68,12 +113,13 @@ let disciplinary_model = apicache.model("disciplinary_model", disciplinary_doc);
 
 let server_preferences_doc = new apicache.Schema({
 	id: { type: String, required: true },//id of server
-	prefix: { type: String, required: true, default: CONFIG.DISCORD_COMMAND_PREFIX },//default bot prefix
+	prefix: { type: String, required: isString, default: CONFIG.DISCORD_COMMAND_PREFIX },//default bot prefix
 	enabled: { type: Boolean, required: true, default: true },//whether or not the bot is enabled on the server
 	slow: { type: Number, required: true, default: 0 },//self slow mode
 	//region: { type: String, required: true, default: "" },//default server region, LoL ("" = disabled)
 	auto_opgg: { type: Boolean, required: true, default: true },//automatically embed respond to op.gg links
-	force_prefix: { type: Boolean, required: true, default: false }
+	force_prefix: { type: Boolean, required: true, default: false },
+	release_notifications: { type: Boolean, required: true, default: true }
 	//music
 	/*
 	max_music_length: { type: Number, required: true, default: 360 },//in seconds
@@ -88,16 +134,6 @@ let server_preferences_doc = new apicache.Schema({
 	ccid: { type: String, required: true, default: "" },//cleverbot conversation ID
 	welcome_cid: { type: String, required: true, default: "" },//welcome channel ID ("" = disabled)
 	farewell_cid: { type: String, required: true, default: "" },//farewell channel ID ("" = disabled)
-	faq: { type: Boolean, required: true, default: true },//FAQ responses
-	what: { type: [String], required: true, default: ["what", "wat", "wut", "wot", "uwot", "u wot", "u wat", "wha", "what?", "wat?", "wut?", "wot?", "uwot?", "u wot?", "u wat?", "huh?", "hmm?", "wha?", "u wot m8", "u wot m8?", "say that me again", "say that me again.", "what did you just say", "what did you just say?", "what did u just say", "what did u just say?", "shh"] },
-	nsc: { type: Boolean, required: true, default: true },//"what" triggers
-	scoreMute: { type: [String], required: true, default: [] },//scoremuted channels
-	atrank: { type: Number, required: true, default: 0 },//autotrack rank threshold (0 = disabled)
-	attop: { type: Number, required: true, default: 0 },//autotrack top threshold (0 = disabled)
-	atpp: { type: Number, required: true, default: 0 },//autotrack pp threshold (0 = disabled)
-	atcid: { type: String, required: true, default: "" },//autotrack channel id
-	scorecardmode: { type: Number, required: true, default: CONFIG.CONSTANTS.SCM_REDUCED },//scorecard mode
-	replaycount: { type: Boolean, required: true, default: true }//show replay count (or not)
 	*/
 }, { minimize: false });
 server_preferences_doc.index({ id: "hashed" });
@@ -112,10 +148,11 @@ let database_profiler = new Profiler("Database Profiler");
 let server = https.createServer({ key: fs.readFileSync("../data/keys/server.key"),
 		cert: fs.readFileSync("../data/keys/server.crt"),
 		ca: fs.readFileSync("../data/keys/ca.crt")}, website).listen(CONFIG.API_PORT);
+server.setTimeout(120000);
 UTILS.output(CONFIG.VERSION + " IAPI " + process.env.NODE_ENV + " mode ready and listening on port " + CONFIG.API_PORT);
 let websocket = require("express-ws")(website, server);
 website.use(function (req, res, next) {
-	res.setTimeout(10000);
+	res.setTimeout(120000);
 	res.removeHeader("X-Powered-By");
 	return next();
 });
@@ -133,7 +170,7 @@ website.ws("/shard", (ws, req) => {
 	ws.on("message", data => {
 		data = JSON.parse(data);
 		UTILS.debug("ws message received: $" + data.id + " type: " + data.type);
-		wsRoutes(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans);
+		wsRoutes(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans, sendExpectReplyBroadcast);
 		if (UTILS.exists(data.request_id) && UTILS.exists(message_handlers[data.request_id])) {
 			let nMsg = UTILS.copy(data);
 			delete nMsg.request_id;
@@ -167,7 +204,7 @@ function sendExpectReply(message, destination, timeout = 5000) {
 function sendExpectReplyBroadcast(message, timeout = 5000) {
 	let shard_numbers = [];
 	for (let i = 0; i < CONFIG.SHARD_COUNT; ++i) shard_numbers.push(i);
-	return Promise.all(shard_numbers.map(n => sendExpectReply(message, n)));
+	return Promise.all(shard_numbers.map(n => sendExpectReply(message, n, timeout)));
 }
 
 setInterval(() => {
@@ -195,6 +232,7 @@ function getBans(user, callback) {
 		callback(bans);
 	});
 }
+/*
 serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, res, next) {
 	if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
 	++irs[req.params.request_id][0];
@@ -202,11 +240,31 @@ serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, r
 		console.error(e);
 		res.status(500);
 	});
+}, true);*/
+serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/:tag/", (req, res, next) => {
+	if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
+	++irs[req.params.request_id][0];
+	const cachetime = parseInt(req.params.cachetime);
+	riotRequest.request(req.params.region, req.params.tag, req.query.endpoint, { maxage: parseInt(req.params.maxage), cachetime }, (err, data) => {
+		if (err) {
+			if (!err.riotInternal || !UTILS.exists(err.response)) {//real error
+				res.status(500).end();
+				console.error(err);
+			}
+			else {
+				res.status(err.status).type('application/json').send(err.response.res.text).end();
+				const oldFormat = endpointToURL(req.params.region, req.query.endpoint);
+				if (cachetime != 0) addCache(oldFormat.url, err.response.res.text, cachetime);
+			}
+		}
+		else res.status(200).type('application/json').send(data).end();
+	});
 }, true);
 serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
 	for (let b in irs) if (new Date().getTime() - irs[b][5] > 1000 * 60 * 10) delete irs[b];//cleanup old requests
 	if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();//doesn't exist
 	let description = [];
+	irs[req.params.request_id][4] = irs[req.params.request_id][0] - irs[req.params.request_id][1] - irs[req.params.request_id][2] - irs[req.params.request_id][3];
 	for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[req.params.request_id][i] + "): " + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%");
 	description = description.join(", ");
 	UTILS.output("IAPI: request #" + req.params.request_id + " (" + (new Date().getTime() - irs[req.params.request_id][5]) + "ms): " + description);
@@ -274,63 +332,12 @@ function checkCache(url, maxage, request_id) {
 	});
 }
 function addCache(url, response, cachetime) {
+	//UTILS.debug("CACHE ADD: " + url + " is " + JSON.parse(response).status);
 	let new_document = new api_doc_model({ url: url, response: response, expireAt: new Date(new Date().getTime() + (cachetime * 1000)) });
 	new_document.save((e, doc) => {
 		if (e) console.error(e);
 	});
 }
-function get(region, url, cachetime, maxage, request_id) {
-	//cachetime in seconds, if cachetime is 0, do not cache
-	//maxage in seconds, if maxage is 0, force refresh
-	let that = this;
-	return new Promise((resolve, reject) => {
-		const url_with_key = url.replace("?api_key=", "?api_key=" + CONFIG.RIOT_API_KEY);
-		if (cachetime != 0) {//cache
-			checkCache(url, maxage, request_id).then((cached_result) => {
-				//UTILS.output("\tcache hit: " + url);
-				load_average[2].add();
-				if (UTILS.exists(irs[request_id])) ++irs[request_id][2];
-				resolve(JSON.parse(cached_result));
-			}).catch((e) => {
-				if (UTILS.exists(e)) console.error(e);
-				region_limiters[region].submit((no_use, cb) => {
-					cb();
-					request(url_with_key, (error, response, body) => {
-						if (UTILS.exists(error)) reject(error);
-						else {
-							try {
-								const answer = JSON.parse(body);
-								//UTILS.output("\tcache miss: " + url);
-								addCache(url, body, cachetime);
-								resolve(answer);
-							}
-							catch (e) {
-								reject(e);
-							}
-						}
-					});
-				}, null, () => {});
-			});
-		}
-		else {//don't cache
-			region_limiters[region].submit((no_use, cb) => {
-				cb();
-				request(url_with_key, (error, response, body) => {
-					if (UTILS.exists(error)) reject(error);
-					else {
-						try {
-							const answer = JSON.parse(body);
-							//UTILS.output("\tuncached: " + url);
-							load_average[1].add();
-							if (UTILS.exists(irs[request_id])) ++irs[request_id][1];
-							resolve(answer);
-						}
-						catch (e) {
-							reject(e);
-						}
-					}
-				});
-			}, null, () => {});
-		}
-	});
+function isString(s) {
+	return typeof(s) === "string";
 }

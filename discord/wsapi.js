@@ -5,6 +5,8 @@ const ws = require("ws");
 const fs = require("fs");
 const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt") };
 let embedgenerator = new (require("./embedgenerator.js"))();
+let Preferences = require("./preferences.js");
+let LOLAPI = require("./lolapi.js");
 module.exports = class WSAPI {
 	/*
 	Used for internal communication between shards and IAPI.
@@ -64,11 +66,18 @@ module.exports = class WSAPI {
 
 		30: IAPI wants to send server an unban message
 		31: unimplemented
+
+		32: IAPI wants to PM embed to user
+		33: shard wants to PM embed to user
+
+		34: IAPI wants to send an embed
+		35: shard wants to send an embed
 	*/
 	constructor(INIT_CONFIG, discord_client, INIT_STATUS) {
 		this.client = discord_client;
 		this.STATUS = INIT_STATUS;
 		this.CONFIG = INIT_CONFIG;
+		this.lolapi = new LOLAPI(this.CONFIG, 0);
 		if (!UTILS.exists(this.CONFIG)) throw new Error("config.json required.");
 		this.request = REQUEST;
 		this.address = "wss://" + this.CONFIG.API_ADDRESS;
@@ -85,7 +94,7 @@ module.exports = class WSAPI {
 			UTILS.output("ws closed: " + code + ", " + reason);
 		});
 		this.connection.on("message", data => {
-			UTILS.debug(data);
+			//UTILS.debug(data);
 			data = JSON.parse(data);
 			UTILS.debug("ws message received: type: " + data.type);
 			const that = this;
@@ -104,10 +113,12 @@ module.exports = class WSAPI {
 					this.STATUS.CHAMPION_EMOJIS = true;
 					break;
 				case 6://send message to channel
-					const candidate = this.client.channels.get(data.cid);
-					if (UTILS.exists(candidate)) {
-						candidate.send(data.content).catch(console.error);
-						UTILS.debug("message sent to " + data.cid);
+					if (true) {//scope limiter
+						const candidate = this.client.channels.get(data.cid);
+						if (UTILS.exists(candidate)) {
+							candidate.send(data.content).catch(console.error);
+							UTILS.debug("message sent to " + data.cid);
+						}
 					}
 					break;
 				case 8://send message to default channel in server
@@ -116,7 +127,11 @@ module.exports = class WSAPI {
 					const notification = embedgenerator.notify(this.CONFIG, data.content, data.username, data.displayAvatarURL);
 					this.client.guilds.forEach(g => {
 						let candidate = UTILS.preferredTextChannel(that.client, g.channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
-						if (UTILS.exists(candidate)) candidate.send("", { embed: notification }).catch(console.error);
+						if (UTILS.exists(candidate)) {
+							new Preferences(this.lolapi, g, preferences => {
+								if (!data.release || (data.release && preferences.get("release_notifications"))) candidate.send("", { embed: notification }).catch(console.error);
+							});
+						}
 					});
 					break;
 				case 14:
@@ -208,6 +223,30 @@ module.exports = class WSAPI {
 						});
 					}
 					break;
+				case 32:
+					this.client.users.get(data.uid).send(embedgenerator.raw(data.embed)).then(() => {
+						that.sendTextToChannel(that.CONFIG.FEEDBACK.EXTERNAL_CID, ":e_mail: User notified");
+					}).catch(e => {
+						console.error(e);
+						that.sendTextToChannel(that.CONFIG.FEEDBACK.EXTERNAL_CID, ":x::warning: User could not be notified");
+					});
+					break;
+				case 34:
+					if (true) {//scope limiter
+						const candidate = this.client.channels.get(data.cid);
+						if (UTILS.exists(candidate)) {
+							candidate.send(embedgenerator.raw(data.embed)).then(msg => {
+								if (data.approvable) {
+									setTimeout(() => {
+										embed.fields[embed.fields.length - 1].value += "\nApprove: `" + this.CONFIG.DISCORD_COMMAND_PREFIX + "approve " + msg.id + "`";
+										msg.edit({ embed }).catch(console.error);
+									}, 5000);
+								}
+							}).catch(console.error);
+							UTILS.debug("embed sent to " + data.cid);
+						}
+					}
+					break;
 				default:
 					UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
 			}
@@ -220,8 +259,20 @@ module.exports = class WSAPI {
 		if (UTILS.exists(this.client.channels.get(cid))) this.client.channels.get(cid).send(content).catch(console.error);
 		else this.send({ type: 7, content, cid });
 	}
-	lnotify(username, displayAvatarURL, content) {
-		this.send({ type: 13, content, username, displayAvatarURL });
+	sendEmbedToChannel(cid, embed, approvable = false) {
+		embed = UTILS.embedRaw(embed);
+		if (UTILS.exists(this.client.channels.get(cid))) this.client.channels.get(cid).send(embedgenerator.raw(embed)).then(msg => {
+			if (approvable) {
+				setTimeout(() => {
+					embed.fields[embed.fields.length - 1].value += "\nApprove: `" + this.CONFIG.DISCORD_COMMAND_PREFIX + "approve " + msg.id + "`";
+					msg.edit({ embed }).catch(console.error);
+				}, 5000);
+			}
+		}).catch(console.error);
+		else this.send({ type: 35, embed, cid, approvable });
+	}
+	lnotify(username, displayAvatarURL, content, release) {
+		this.send({ type: 13, content, username, displayAvatarURL, release });
 	}
 	getUserBans() {
 		this.send({ type: 15 });
@@ -239,6 +290,10 @@ module.exports = class WSAPI {
 			}, 10000);
 		}
 		else this.connection.send(JSON.stringify(raw_object));
+	}
+	embedPM(uid, embed) {
+		embed = UTILS.embedRaw(embed);
+		this.send({ type: 33, uid, embed });
 	}
 	connect() {
 		this.connection = new ws(this.address + ":" + this.port + "/shard?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&id=" + process.env.SHARD_ID, agentOptions);
