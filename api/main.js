@@ -88,10 +88,11 @@ api_doc.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 api_doc.index({ url: "hashed" });
 let api_doc_model = apicache.model("api_doc_model", api_doc);
 
-let shortcut_doc = new apicache.Schema({
-	uid: String,
-	shortcuts: { type: apicache.Schema.Types.Mixed, default: {} },
-	username: String
+let shortcut_doc = new apicache.Schema({//basically user preferences
+	uid: { type: String, required: true },
+	shortcuts: { type: apicache.Schema.Types.Mixed, default: {}, required: true },
+	username: { type: String, required: true},
+	verifiedAccounts: { type: apicache.Schema.Types.Mixed, default: {}, required: true }//["region:summonerid"] = expiry date ms
 }, { minimize: false });
 shortcut_doc.index({ uid: "hashed" });
 let shortcut_doc_model = apicache.model("shortcut_doc_model", shortcut_doc);
