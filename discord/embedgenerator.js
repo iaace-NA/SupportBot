@@ -584,7 +584,7 @@ module.exports = class EmbedGenerator {
 			jokeNumber = 1;
 		} else if (mmr < MMR_THRESHOLD[2]) {//silver
 			tier = RANK_ORDER[1];
-			jokeNumber >= 2;
+			jokeNumber = 2;
 		} else if (mmr < MMR_THRESHOLD[3]) {//gold
 			tier = RANK_ORDER[2];
 			jokeNumber = 3;
