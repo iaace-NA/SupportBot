@@ -332,7 +332,7 @@ function checkCache(url, maxage, request_id) {
 	});
 }
 function addCache(url, response, cachetime) {
-	UTILS.debug("CACHE ADD: " + url + " is " + JSON.parse(response).status);
+	//UTILS.debug("CACHE ADD: " + url + " is " + JSON.parse(response).status);
 	let new_document = new api_doc_model({ url: url, response: response, expireAt: new Date(new Date().getTime() + (cachetime * 1000)) });
 	new_document.save((e, doc) => {
 		if (e) console.error(e);
