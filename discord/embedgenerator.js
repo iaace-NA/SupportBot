@@ -151,7 +151,7 @@ const RANK_COLOR = [[153, 51, 0], [179, 179, 179], [255, 214, 51], [0, 255, 152]
 const IMMR_THRESHOLD = [100, 600, 1100, 1600, 2100, 2600, 2700];
 const MMR_THRESHOLD = [400, 1150, 1400, 1650, 1900, 2150, 2400];//starting MMRs for each tier
 const PREMADE_EMOJIS = ["", "\\💙", "\\💛", "\\💚"];
-const HORIZONTAL_SEPARATOR = "------------------------------"
+const HORIZONTAL_SEPARATOR = "------------------------------";
 module.exports = class EmbedGenerator {
 	constructor() { }
 	test() {
