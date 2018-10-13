@@ -1113,7 +1113,9 @@ module.exports = class EmbedGenerator {
 				newEmbed.addField("This is a private conversation with management.", "You can reply to this message by sending `" + CONFIG.DISCORD_COMMAND_PREFIX + "say <your response goes here>`");
 				newEmbed.setDescription(msg.cleanContent.substring(UTILS.indexOfInstance(msg.cleanContent, " ", 2) + 1) + "\n\n" + CONFIG.OWNER_DISCORD_IDS[msg.author.id].flags);
 			}
-			else if (destination === 1) {}
+			else if (destination === 1) {
+				newEmbed.setDescription(msg.cleanContent.substring(UTILS.indexOfInstance(msg.cleanContent, " ", 2) + 1));
+			}
 		}//Lmail
 		if (type < 5) {
 			let user_status = UTILS.disciplinaryStatusString(UTILS.disciplinaryStatus(user_history), true);
