@@ -1111,12 +1111,11 @@ module.exports = class EmbedGenerator {
 			if (destination === 0) {
 				newEmbed.setURL(CONFIG.HELP_SERVER_INVITE_LINK);
 				newEmbed.addField("This is a private conversation with management.", "You can reply to this message by sending `" + CONFIG.DISCORD_COMMAND_PREFIX + "say <your response goes here>`");
-				newEmbed.setDescription(msg.cleanContent + "\n\n" + CONFIG.OWNER_DISCORD_IDS[msg.author.id].flags);
+				newEmbed.setDescription(msg.cleanContent.substring(UTILS.indexOfInstance(msg.cleanContent, " ", 2) + 1) + "\n\n" + CONFIG.OWNER_DISCORD_IDS[msg.author.id].flags);
 			}
 			else if (destination === 1) {}
 		}//Lmail
 		if (type < 5) {
-			newEmbed.setDescription(msg.cleanContent.substring(UTILS.indexOfInstance(msg.cleanContent, " ", 2) + 1));
 			let user_status = UTILS.disciplinaryStatusString(UTILS.disciplinaryStatus(user_history), true);
 			let server_status = UTILS.exists(server_history) ? "\n" + UTILS.disciplinaryStatusString(UTILS.disciplinaryStatus(server_history), false) : "";
 			newEmbed.addField("Background Checks", user_status + server_status);
