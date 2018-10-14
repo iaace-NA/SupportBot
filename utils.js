@@ -453,7 +453,7 @@ module.exports = class UTILS {
 		let recent_ban = false;
 		for (let b of docs) {
 			if (b.ban) {
-				const ban_date = new Date(b).date);
+				const ban_date = new Date(b.date);
 				if (now - (180 * 24 * 60 * 60 * 1000) < ban_date.getTime()) {//180 day
 					recent_ban = true;
 					break;
