@@ -165,11 +165,11 @@ module.exports = class LOLAPI {
 		let that = this;
 		let requests = [];
 		if (this.CONFIG.API_SEQUENTIAL) {
-			for (let i in usernames) requests.push(function () { return that.getSummonerIDFromName(region, usernames[i], maxage); });
+			for (let i of usernames) requests.push(function () { return that.getSummonerIDFromName(region, i, maxage); });
 			return UTILS.sequential(requests);
 		}
 		else {
-			for (let i in usernames) requests.push(that.getSummonerIDFromName(region, usernames[i], maxage));
+			for (let i of usernames) requests.push(that.getSummonerIDFromName(region, i, maxage));
 			return Promise.all(requests);
 		}
 	}
@@ -181,11 +181,11 @@ module.exports = class LOLAPI {
 		let that = this;
 		let requests = [];
 		if (this.CONFIG.API_SEQUENTIAL) {
-			for (let i in ids) requests.push(function () { return that.getSummonerFromSummonerID(region, ids[i], maxage); });
+			for (let i of ids) requests.push(function () { return that.getSummonerFromSummonerID(region, i, maxage); });
 			return UTILS.sequential(requests);
 		}
 		else {
-			for (let i in ids) requests.push(that.getSummonerFromSummonerID(region, ids[i], maxage));
+			for (let i of ids) requests.push(that.getSummonerFromSummonerID(region, i, maxage));
 			return Promise.all(requests);
 		}
 	}
@@ -196,7 +196,7 @@ module.exports = class LOLAPI {
 	getMultipleRanks(region, summonerIDs, maxage) {
 		let that = this;
 		let requests = [];
-		for (let i in summonerIDs) requests.push(that.getRanks(region, summonerIDs[i], maxage));
+		for (let i of summonerIDs) requests.push(that.getRanks(region, i, maxage));
 		return Promise.all(requests);
 	}
 	getChampionMastery(region, summonerID, maxage) {
@@ -206,7 +206,7 @@ module.exports = class LOLAPI {
 	getMultipleChampionMastery(region, summonerIDs, maxage) {
 		let that = this;
 		let requests = [];
-		for (let i in summonerIDs) requests.push(that.getChampionMastery(region, summonerIDs[i], maxage));
+		for (let i of summonerIDs) requests.push(that.getChampionMastery(region, i, maxage));
 		return Promise.all(requests);
 	}
 	getRecentGames(region, accountID, maxage) {
@@ -216,11 +216,11 @@ module.exports = class LOLAPI {
 		let that = this;
 		let requests = [];
 		if (this.CONFIG.API_SEQUENTIAL) {
-			for (let i in accountIDs) requests.push(function () { return that.getRecentGames(region, accountIDs[i], maxage); });
+			for (let i of accountIDs) requests.push(function () { return that.getRecentGames(region, i, maxage); });
 			return UTILS.sequential(requests);
 		}
 		else {
-			for (let i in accountIDs) requests.push(that.getRecentGames(region, accountIDs[i], maxage));
+			for (let i of accountIDs) requests.push(that.getRecentGames(region, i, maxage));
 			return Promise.all(requests);
 		}
 	}
@@ -231,11 +231,11 @@ module.exports = class LOLAPI {
 		let that = this;
 		let requests = [];
 		if (this.CONFIG.API_SEQUENTIAL) {
-			for (let i in gameIDs) requests.push(function () { return that.getMatchInformation(region, gameIDs[i], maxage); });
+			for (let i of gameIDs) requests.push(function () { return that.getMatchInformation(region, i, maxage); });
 			return UTILS.sequential(requests);
 		}
 		else {
-			for (let i in gameIDs) requests.push(that.getMatchInformation(region, gameIDs[i], maxage));
+			for (let i of gameIDs) requests.push(that.getMatchInformation(region, i, maxage));
 			return Promise.all(requests);
 		}
 	}
@@ -272,8 +272,8 @@ module.exports = class LOLAPI {
 	}
 	clearCache() {
 		const filenames = fs.readdirSync("./data/static-api-cache/");
-		for (let b in filenames) {
-			fs.unlinkSync("./data/static-api-cache/" + filenames[b]);
+		for (let b of filenames) {
+			fs.unlinkSync("./data/static-api-cache/" + b);
 		}
 	}
 	createShortcut(uid, from, to) {

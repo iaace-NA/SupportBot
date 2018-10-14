@@ -58,7 +58,7 @@ module.exports = class LoadAverage {
 	total_count() {
 		this.cleanup();
 		let ans = this.total;
-		for (let i in this.recent) ans += this.recent[i];
+		for (let i of this.recent) ans += i;
 		return ans;
 	}
 	cleanup() {

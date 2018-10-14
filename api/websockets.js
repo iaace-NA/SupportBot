@@ -7,7 +7,7 @@ module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShar
 			break;
 		case 3:
 		case 5://received emojis
-			for (let b in data.emojis) champ_emojis[data.emojis[b].name] = data.emojis[b].code;
+			for (let b of data.emojis) champ_emojis[b.name] = b.code;
 			if (allShardsConnected()) {
 				let response = [];
 				for (let b in champ_emojis) response.push({ name: b, code: champ_emojis[b] });

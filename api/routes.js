@@ -5,7 +5,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 		findShortcut(req.params.uid, res, doc => {
 			if (UTILS.exists(doc)) {
 				let shortcut_count = 0;
-				for (let b in doc.shortcuts) ++shortcut_count;
+				for (let b of doc.shortcuts) ++shortcut_count;
 				if (shortcut_count >= 50) return res.json({ success: false });
 				doc.shortcuts[req.query.from] = req.query.to;
 				doc.markModified("shortcuts");
@@ -338,16 +338,16 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 	}, true);
 	serveWebRequest("/stats", function (req, res, next) {
 		let answer = {};
-		for (let i in load_average) {
+		for (let la of load_average) {
 			answer[i + ""] = {};
 			answer[i + ""].description = response_type[i];
-			answer[i + ""].min1 = load_average[i].min1();
-			answer[i + ""].min5 = load_average[i].min5();
-			answer[i + ""].min15 = load_average[i].min15();
-			answer[i + ""].min30 = load_average[i].min30();
-			answer[i + ""].min60 = load_average[i].min60();
-			answer[i + ""].total_rate = load_average[i].total_rate();
-			answer[i + ""].total_count = load_average[i].total_count();
+			answer[i + ""].min1 = la.min1();
+			answer[i + ""].min5 = la.min5();
+			answer[i + ""].min15 = la.min15();
+			answer[i + ""].min30 = la.min30();
+			answer[i + ""].min60 = la.min60();
+			answer[i + ""].total_rate = la.total_rate();
+			answer[i + ""].total_count = la.total_count();
 		}
 		res.json(answer);
 	}, true);
