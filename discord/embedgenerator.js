@@ -2,6 +2,7 @@
 const Discord = require("discord.js");
 const UTILS = new (require("../utils.js"))();
 const mathjs = require("mathjs");
+const crypto = require("crypto");
 const queues = {
 	"0": "Custom",
 	"70": "SR One for All",
@@ -1155,5 +1156,13 @@ module.exports = class EmbedGenerator {
 	}
 	raw(embed_object) {
 		return new Discord.RichEmbed(embed_object);
+	}
+	verify(CONFIG, summoner, uid) {
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setTitle("Verify ownership of LoL account");
+		let code = new Date().getTime() + "-" + summoner.region + "-" + summoner.id + "-" + uid;
+		code += "-" + crypto.createHmac("sha256", CONFIG.TPV_KEY).update(code).digest("hex");
+		newEmbed.setDescription("`" + code + "`");
+		return newEmbed;
 	}
 }

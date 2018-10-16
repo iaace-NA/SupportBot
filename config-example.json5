@@ -193,5 +193,6 @@
 		"SUGGESTION_CID": "channel id here",//approved public suggestion channel
 		"APPROVED_IMAGE_LINK": "https://cdn.discordapp.com/emojis/382263196477685771.png?v=1",//footer image for approved feedback (currently unused)
 		"DENIED_IMAGE_LINK": "https://cdn.discordapp.com/emojis/493118209566965764.png?v=1"//footer image for denied feedback (currently unused)
-	}
+	},
+	"TPV_KEY": "random string here"//third party verification code HMAC key
 }
