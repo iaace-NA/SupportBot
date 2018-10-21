@@ -143,7 +143,7 @@ let server_preferences_model = apicache.model("server_preferences_doc", server_p
 
 let region_limiters = {};
 let limiter = require("bottleneck");
-for (let b in CONFIG.REGIONS) region_limiters[b] = new limiter({ maxConcurrent: 1, minTime: CONFIG.API_PERIOD });
+for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({ maxConcurrent: 1, minTime: CONFIG.API_PERIOD });
 let irs = {};//individual request statistics
 let database_profiler = new Profiler("Database Profiler");
 let server = https.createServer({ key: fs.readFileSync("../data/keys/server.key"),
@@ -297,8 +297,8 @@ function serveWebRequest(branch, callback, validate = false) {
 		});
 	}
 	else {
-		for (let b of branch) {
-			website.get(b, function(req, res, next){
+		for (let b in branch) {
+			website.get(branch[b], function(req, res, next){
 				UTILS.debug("\trequest received: " + req.originalUrl);
 				if (validate && !UTILS.exists(req.query.k)) return res.status(401).end();//no key
 				if (validate && req.query.k !== CONFIG.API_KEY) return res.status(403).end();//wrong key

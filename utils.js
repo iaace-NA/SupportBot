@@ -271,10 +271,10 @@ module.exports = class UTILS {
 	summonersRiftMMR(rank) {
 		let individual_iMMR = 0;
 		let individual_games = 0;
-		for (let c of rank) {//queue
-			if (c.queueType !== "RANKED_FLEX_TT") {
-				individual_iMMR += this.iMMR(c) * (c.wins + c.losses);
-				individual_games += c.wins + c.losses;
+		for (let c in rank) {//queue
+			if (rank[c].queueType !== "RANKED_FLEX_TT") {
+				individual_iMMR += this.iMMR(rank[c]) * (rank[c].wins + rank[c].losses);
+				individual_games += rank[c].wins + rank[c].losses;
 			}
 		}
 		return individual_games == 0 ? 0 : individual_iMMR / individual_games;
@@ -282,10 +282,10 @@ module.exports = class UTILS {
 	twistedTreelineMMR(rank) {
 		let individual_iMMR = 0;
 		let individual_games = 0;
-		for (let c of rank) {//queue
-			if (c.queueType === "RANKED_FLEX_TT") {
-				individual_iMMR += this.iMMR(c) * (c.wins + c.losses);
-				individual_games += c.wins + c.losses;
+		for (let c in rank) {//queue
+			if (rank[c].queueType === "RANKED_FLEX_TT") {
+				individual_iMMR += this.iMMR(rank[c]) * (rank[c].wins + rank[c].losses);
+				individual_games += rank[c].wins + rank[c].losses;
 			}
 		}
 		return individual_games == 0 ? 0 : individual_iMMR / individual_games;
@@ -293,17 +293,17 @@ module.exports = class UTILS {
 	averageUserMMR(rank) {
 		let individual_iMMR = 0;
 		let individual_games = 0;
-		for (let c of rank) {//queue
-			individual_iMMR += this.iMMR(c) * (c.wins + c.losses);
-			individual_games += c.wins + c.losses;
+		for (let c in rank) {//queue
+			individual_iMMR += this.iMMR(rank[c]) * (rank[c].wins + rank[c].losses);
+			individual_games += rank[c].wins + rank[c].losses;
 		}
 		return individual_games == 0 ? 0 : individual_iMMR / individual_games;
 	}
 	averageMatchMMR(ranks) {
 		let total_iMMR = 0;
 		let total_users = 0;
-		for (let b of ranks) {//user
-			const individual_weighted_MMR = this.averageUserMMR(b);
+		for (let b in ranks) {//user
+			const individual_weighted_MMR = this.averageUserMMR(ranks[b]);
 			if (individual_weighted_MMR > 0) {
 				++total_users;
 				total_iMMR += individual_weighted_MMR;
@@ -438,9 +438,9 @@ module.exports = class UTILS {
 	disciplinaryStatus(docs) {
 		const now = new Date().getTime();
 		let active_ban = -1;//-1 = no ban, 0 = perma, other = temp ban
-		for (let b of docs) {
-			if (b.ban && b.active) {
-				const ban_date = new Date(b.date);
+		for (let b in docs) {
+			if (docs[b].ban && docs[b].active) {
+				const ban_date = new Date(docs[b].date);
 				if (ban_date.getTime() == 0) {
 					active_ban = 0;
 					break;
@@ -451,9 +451,9 @@ module.exports = class UTILS {
 			}
 		}
 		let recent_ban = false;
-		for (let b of docs) {
-			if (b.ban) {
-				const ban_date = new Date(b.date);
+		for (let b in docs) {
+			if (docs[b].ban) {
+				const ban_date = new Date(docs[b].date);
 				if (now - (180 * 24 * 60 * 60 * 1000) < ban_date.getTime()) {//180 day
 					recent_ban = true;
 					break;
@@ -461,9 +461,9 @@ module.exports = class UTILS {
 			}
 		}
 		let recent_warning = false;
-		for (let b of docs) {
-			if (!b.ban && b.reason.substring(0, 9) == ":warning:") {
-				const warn_date = new Date(b.date);
+		for (let b in docs) {
+			if (!docs[b].ban && docs[b].reason.substring(0, 9) == ":warning:") {
+				const warn_date = new Date(docs[b].date);
 				if (now - (180 * 24 * 60 * 60 * 1000) < warn_date.getTime()) {//180 day
 					recent_warning = true;
 					break;

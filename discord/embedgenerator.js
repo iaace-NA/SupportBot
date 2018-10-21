@@ -311,12 +311,12 @@ module.exports = class EmbedGenerator {
 			all_champions[match_meta[i].champion].A += KDA.A;
 			for (let b in all_KDA) all_KDA[b] += KDA[b];
 			for (let b in all_lanes_KDA[lane]) all_lanes_KDA[lane][b] += KDA[b];
-			for (let mp of matches[i].participants) {
-				if (!UTILS.exists(teams[mp.teamId])) teams[mp.teamId] = [];
-				teams[mp.teamId].push(mp);
+			for (let b in matches[i].participants) {
+				if (!UTILS.exists(teams[matches[i].participants[b].teamId])) teams[matches[i].participants[b].teamId] = [];
+				teams[matches[i].participants[b].teamId].push(matches[i].participants[b]);
 			}
-			for (let b of teams[teamParticipant.teamId]) {
-				const tmPI = UTILS.findParticipantIdentityFromPID(matches[i], b.participantId);
+			for (let b in teams[teamParticipant.teamId]) {
+				const tmPI = UTILS.findParticipantIdentityFromPID(matches[i], teams[teamParticipant.teamId][b].participantId);
 				if (tmPI.player.summonerId === summoner.id) continue;
 				if (!UTILS.exists(common_teammates[tmPI.player.summonerName])) common_teammates[tmPI.player.summonerName] = { w: 0, l: 0 };
 				if (win) common_teammates[tmPI.player.summonerName].w += 1;
@@ -354,7 +354,7 @@ module.exports = class EmbedGenerator {
 		}
 		all_champions_a.sort((a, b) => b.w + b.l - a.w - a.l);
 		all_KDA.KDA = (all_KDA.K + all_KDA.A) / all_KDA.D;
-		for (let b of all_lanes_KDA) b.KDA = (b.K + b.A) / b.D;
+		for (let b in all_lanes_KDA) all_lanes_KDA[b].KDA = (all_lanes_KDA[b].K + all_lanes_KDA[b].A) / all_lanes_KDA[b].D;
 		let lane_description = [];
 		for (let i = 0; i <= 5; ++i) if (all_lanes[i] > 0) lane_description.push([CONFIG.EMOJIS.lanes[i] + all_lanes[i] + "G (" + UTILS.round(100 * all_lanes_w[i] / (all_lanes_w[i] + all_lanes_l[i]), 0) + "%) = " + all_lanes_w[i] + "W + " + all_lanes_l[i] + "L\tKDA:`" + UTILS.KDAFormat(all_lanes_KDA[i].KDA) + "`", all_lanes[i]]);
 		lane_description.sort((a, b) => b[1] - a[1]);
@@ -401,20 +401,21 @@ module.exports = class EmbedGenerator {
 			pI.solo = "`" + UTILS.shortRank(solo) + "`";
 			pI.mastery = UTILS.getSingleChampionMastery(masteries[b], match.participants.find(p => p.participantId == pI.participantId).championId);
 		}
-		for (let b of match.participants) {
-			if (!UTILS.exists(teams[b.teamId])) teams[b.teamId] = [];
-			teams[b.teamId].push(b);
+		for (let b in match.participants) {
+			if (!UTILS.exists(teams[match.participants[b].teamId])) teams[match.participants[b].teamId] = [];
+			teams[match.participants[b].teamId].push(match.participants[b]);
 		}
 		let team_count = 0;
-		for (let team of teams) {
+		for (let b in teams) {
 			++team_count;
-			const tK = team.reduce((total, increment) => total + increment.stats.kills, 0);
-			const tD = team.reduce((total, increment) => total + increment.stats.deaths, 0);
-			const tA = team.reduce((total, increment) => total + increment.stats.assists, 0);
-			const tKP = UTILS.round(100 * (tK + tA) / (tK * team.length), 0);
-			newEmbed.addField((match.teams.find(t => team[0].teamId == t.teamId).win == "Win" ? CONFIG.EMOJIS["win"] : CONFIG.EMOJIS["loss"]) + "Team " + team_count + " Bans: " + match.teams.find(t => t.teamId == b).bans.map(b => b.championId == -1 ? ":x:" : CONFIG.STATIC.CHAMPIONS[b.championId].emoji).join(""), "__Σlv.__ `" + teams[b].reduce((total, increment) => total + increment.stats.champLevel, 0) + "`\t`" + tK + "/" + tD + "/" + tA + "`\t__KDR:__`" + UTILS.KDAFormat(tK / tD) + "`\t__KDA:__`" + UTILS.KDAFormat((tK + tA) / tD) + "` `" + tKP + "%`\t__Σcs:__`" + team.reduce((total, increment) => total + increment.stats.totalMinionsKilled + increment.stats.neutralMinionsKilled, 0) + "`\t__Σg:__`" + UTILS.gold(tteam.reduce((total, increment) => total + increment.stats.goldEarned, 0)) + "`");
-			team.sort((a, b) => UTILS.inferLane(a.timeline.role, a.timeline.lane, a.spell1Id, a.spell2Id) - UTILS.inferLane(b.timeline.role, b.timeline.lane, b.spell1Id, b.spell2Id));
-			for (let p of team) {
+			const tK = teams[b].reduce((total, increment) => total + increment.stats.kills, 0);
+			const tD = teams[b].reduce((total, increment) => total + increment.stats.deaths, 0);
+			const tA = teams[b].reduce((total, increment) => total + increment.stats.assists, 0);
+			const tKP = UTILS.round(100 * (tK + tA) / (tK * teams[b].length), 0);
+			newEmbed.addField((match.teams.find(t => teams[b][0].teamId == t.teamId).win == "Win" ? CONFIG.EMOJIS["win"] : CONFIG.EMOJIS["loss"]) + "Team " + team_count + " Bans: " + match.teams.find(t => t.teamId == b).bans.map(b => b.championId == -1 ? ":x:" : CONFIG.STATIC.CHAMPIONS[b.championId].emoji).join(""), "__Σlv.__ `" + teams[b].reduce((total, increment) => total + increment.stats.champLevel, 0) + "`\t`" + tK + "/" + tD + "/" + tA + "`\t__KDR:__`" + UTILS.KDAFormat(tK / tD) + "`\t__KDA:__`" + UTILS.KDAFormat((tK + tA) / tD) + "` `" + tKP + "%`\t__Σcs:__`" + teams[b].reduce((total, increment) => total + increment.stats.totalMinionsKilled + increment.stats.neutralMinionsKilled, 0) + "`\t__Σg:__`" + UTILS.gold(teams[b].reduce((total, increment) => total + increment.stats.goldEarned, 0)) + "`");
+			teams[b].sort((a, b) => UTILS.inferLane(a.timeline.role, a.timeline.lane, a.spell1Id, a.spell2Id) - UTILS.inferLane(b.timeline.role, b.timeline.lane, b.spell1Id, b.spell2Id));
+			for (let c in teams[b]) {
+				let p = teams[b][c];
 				let pI = match.participantIdentities.find(pI => pI.participantId == p.participantId);
 				let summoner_spells = "";
 				if (UTILS.exists(pI.player.summonerId)) {//not a bot
@@ -481,19 +482,19 @@ module.exports = class EmbedGenerator {
 			common_teammates[match.participants[b].summonerName] = {};
 		}
 		if (newlogic) {//new logic
-			for (let b of matches) {
+			for (let b in matches) {
 				let teams_private = {};
-				for (let c of b.participants) {
-					if (!UTILS.exists(teams_private[c.teamId])) teams_private[c.teamId] = [];
-					teams_private[c.teamId].push(c);
+				for (let c in matches[b].participants) {
+					if (!UTILS.exists(teams_private[matches[b].participants[c].teamId])) teams_private[matches[b].participants[c].teamId] = [];
+					teams_private[matches[b].participants[c].teamId].push(matches[b].participants[c]);
 				}
-				for (let c of teams_private) c = c.map(p => b.participantIdentities.find(pI => pI.participantId === p.participantId));
-				for (let c of teams_private) {//team of pIs
-					for (let d of c) {//individual pI
-						const dsn = d.player.summonerName;//d summoner name
+				for (let c in teams_private) teams_private[c] = teams_private[c].map(p => matches[b].participantIdentities.find(pI => pI.participantId === p.participantId));
+				for (let c in teams_private) {//team of pIs
+					for (let d in teams_private[c]) {//individual pI
+						const dsn = teams_private[c][d].player.summonerName;
 						if (!UTILS.exists(common_teammates[dsn])) common_teammates[dsn] = {};
-						for (let e of c) {
-							const esn = e.player.summonerName;//e summoner name
+						for (let e in teams_private[c]) {
+							const esn = teams_private[c][e].player.summonerName;
 							if (!UTILS.exists(common_teammates[dsn][esn])) common_teammates[dsn][esn] = 1;
 							else common_teammates[dsn][esn] += 1;
 						}
@@ -502,10 +503,12 @@ module.exports = class EmbedGenerator {
 			}
 		}
 		else {//old logic
-			for (let b of matches) {
-				for (let tC of b.participantIdentities) {
+			for (let b in matches) {
+				for (let c in matches[b].participantIdentities) {
+					const tC = matches[b].participantIdentities[c];
 					if (!UTILS.exists(common_teammates[tC.player.summonerName])) common_teammates[tC.player.summonerName] = {};
-					for (let tD of b.participantIdentities) {
+					for (let d in matches[b].participantIdentities) {
+						const tD = matches[b].participantIdentities[d];
 						if (tC.player.summonerId != tD.player.summonerId) { //same guy check
 							if (!UTILS.exists(common_teammates[tC.player.summonerName][tD.player.summonerName])) common_teammates[tC.player.summonerName][tD.player.summonerName] = 1;
 							else common_teammates[tC.player.summonerName][tD.player.summonerName] += 1;
@@ -517,37 +520,37 @@ module.exports = class EmbedGenerator {
 		if (trim) UTILS.debug(UTILS.trim(common_teammates) + " premade entries trimmed.");
 		let team_count = 1;
 		let player_count = 0;
-		for (let team of teams) {//team
+		for (let b in teams) {//team
 			let team_description_c1 = "";
 			let team_description_c2 = "";
 			let ban_description = [];
-			let networks = team.map(t => UTILS.getGroup(t.summonerName, common_teammates));//for everyone on the team, put the premade group in the network array
+			let networks = teams[b].map(t => UTILS.getGroup(t.summonerName, common_teammates));//for everyone on the team, put the premade group in the network array
 			let premade_str = networks.map(g => g.join(","));//array of comma delimited network strings
 			let premade_letter = {};//object of network strings
-			for (let c of premade_str) {
-				if (!UTILS.exists(premade_letter[c])) premade_letter[c] = 1;//if the network doesn't exist as a key in premade_letter, assign 1 to it
-				else ++premade_letter[c];//otherwise it exists, and add 1 to it
+			for (let c in premade_str) {
+				if (!UTILS.exists(premade_letter[premade_str[c]])) premade_letter[premade_str[c]] = 1;//if the network doesn't exist as a key in premade_letter, assign 1 to it
+				else ++premade_letter[premade_str[c]];//otherwise it exists, and add 1 to it
 			}
 			let premade_number = 1;
-			for (let c of premade_letter) {//for each unique network in premade_letter
-				if (c == 1) c = 0;//not a premade (group size 1)
+			for (let c in premade_letter) {//for each unique network in premade_letter
+				if (premade_letter[c] == 1) premade_letter[c] = 0;//not a premade (group size 1)
 				else {
-					c = premade_number;//assign a premade symbol index
+					premade_letter[c] = premade_number;//assign a premade symbol index
 					premade_number++;//increment the index
 				}
 			}
-			for (let c in team) {//player on team
-				if (UTILS.exists(CONFIG.SPELL_EMOJIS[team[c].spell1Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[team[c].spell1Id];
-				else team_description_c1 += "`" + CONFIG.STATIC.SUMMONERSPELLS[team[c].spell1Id].name + "`";
-				if (UTILS.exists(CONFIG.SPELL_EMOJIS[team[c].spell2Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[team[c].spell2Id];
-				else team_description_c1 += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[team[c].spell2Id].name + "`";
-				team_description_c1 += " `" + team[c].solo + " " + team[c].flex5 + " " + team[c].flex3 + "`\n";
-				team_description_c2 += "`M" + team[c].mastery + "`" + CONFIG.STATIC.CHAMPIONS[team[c].championId].emoji;
-				team_description_c2 += "`" + summoner_participants.find(p => p.id == team[c].summonerId).summonerLevel + "`";
+			for (let c in teams[b]) {//player on team
+				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id];
+				else team_description_c1 += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
+				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
+				else team_description_c1 += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
+				team_description_c1 += " `" + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3 + "`\n";
+				team_description_c2 += "`M" + teams[b][c].mastery + "`" + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
+				team_description_c2 += "`" + summoner_participants.find(p => p.id == teams[b][c].summonerId).summonerLevel + "`";
 				team_description_c2 += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
-				team_description_c2 += team[c].summonerId == summoner.id ? "**" : "";//bolding
-				team_description_c2 += "__[" + team[c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], team[c].summonerName) + ")__";
-				team_description_c2 += team[c].summonerId == summoner.id ? "**" + (verified ? "//" + VERIFIED_ICON : "") : "";//bolding
+				team_description_c2 += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
+				team_description_c2 += "__[" + teams[b][c].summonerName + (verified ? "\\" + VERIFIED_ICON : "") + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], teams[b][c].summonerName) + ")__";
+				team_description_c2 += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
 				if (UTILS.exists(match.bannedChampions[player_count])) {
 					ban_description.push(match.bannedChampions[player_count].championId == -1 ? ":x:" : CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].emoji);
 				}
@@ -625,24 +628,24 @@ module.exports = class EmbedGenerator {
 		newEmbed.setTitle(status_object.name);//region
 		newEmbed.setURL("http://status.leagueoflegends.com/#" + status_object.slug);
 		let status_color = [0, 255, 0];//green
-		for (let b of status_object.services) {
-			if (b.status !== "online") status_color = [255, 255, 0];
-			if (b.status === "offline") {
+		for (let b in status_object.services) {
+			if (status_object.services[b].status !== "online") status_color = [255, 255, 0];
+			if (status_object.services[b].status === "offline") {
 				status_color = [255, 0, 0];
 				break;
 			}
 		}
 		newEmbed.setColor(status_color);
-		for (let b of status_object.services) {
+		for (let b in status_object.services) {
 			let service_description = "";
-			if (b.incidents.length > 0) {
-				service_description += b.incidents.reduce((str, incident) => {
+			if (status_object.services[b].incidents.length > 0) {
+				service_description += status_object.services[b].incidents.reduce((str, incident) => {
 					if (incident.updates.length > 0) return str + incident.updates.map(update => "**" + update.severity + "**: " + update.content).join("\n") + "\n";
 					else return str;
 				}, "");
 			}
 			if (service_description === "") service_description = "*No incidents to report.*";
-			newEmbed.addField(b.name + ": " + b.status, service_description);
+			newEmbed.addField(status_object.services[b].name + ": " + status_object.services[b].status, service_description);
 		}
 		newEmbed.setTimestamp();
 		newEmbed.setThumbnail("https://cdn.discordapp.com/attachments/423261885262069771/433465885420945409/cby4p-fp0aj-0.png");
@@ -667,11 +670,11 @@ module.exports = class EmbedGenerator {
 				D: 0,
 				A: 0
 			};
-			for (let b of match_metas[i].matches) {//iterate through match meta for 1 summoner
-				const indv_match = matches.find(m => b.gameId == m.gameId);
+			for (let b in match_metas[i].matches) {//iterate through match meta for 1 summoner
+				const indv_match = matches.find(m => match_metas[i].matches[b].gameId == m.gameId);
 				results.push(UTILS.determineWin(summoners[i].id, indv_match));
 				const KDA = UTILS.KDA(summoners[i].id, indv_match);
-				for (let c in all_KDA) all_KDA[c] += KDA[c];
+				for (let b in all_KDA) all_KDA[b] += KDA[b];
 			}
 			let streak_count = 1;
 			const streak_result = results[0];
@@ -733,7 +736,7 @@ module.exports = class EmbedGenerator {
 		const TEAM_COMBINATIONS = UTILS.generateTeams(summoners);//array of binary team arrangements
 
 		let team_by_level = [];//array of stats objects
-		for (let b of TEAM_COMBINATIONS) team_by_level.push(UTILS.calculateTeamStatistics(mathjs, b, summoners.map(s => s.summonerLevel)));
+		for (let b in TEAM_COMBINATIONS) team_by_level.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], summoners.map(s => s.summonerLevel)));
 		const team_by_level_lowest_diff = mathjs.min(team_by_level.map(t => t.abs));
 		const team_by_level_best = team_by_level.findIndex(t => t.abs === team_by_level_lowest_diff);//team arrangement index
 		let team_by_level_description = [[], []];
@@ -751,7 +754,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.addBlankField(false);
 
 		let team_by_highest_mastery = [];//array of stats objects
-		for (let b of TEAM_COMBINATIONS) team_by_highest_mastery.push(UTILS.calculateTeamStatistics(mathjs, b, masteries.map(m => (m[0].championPoints || 0))));
+		for (let b in TEAM_COMBINATIONS) team_by_highest_mastery.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], masteries.map(m => (m[0].championPoints || 0))));
 		const team_by_highest_mastery_lowest_diff = mathjs.min(team_by_highest_mastery.map(t => t.abs));
 		const team_by_highest_mastery_best = team_by_highest_mastery.findIndex(t => t.abs === team_by_highest_mastery_lowest_diff);//team arrangement index
 		let team_by_highest_mastery_description = [[], []];
@@ -769,7 +772,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.addBlankField(false);
 
 		let team_by_total_mastery = [];//array of stats objects
-		for (let b of TEAM_COMBINATIONS) team_by_total_mastery.push(UTILS.calculateTeamStatistics(mathjs, b, masteries.map(m => m.reduce((total, increment) => total + increment.championPoints, 0))));
+		for (let b in TEAM_COMBINATIONS) team_by_total_mastery.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], masteries.map(m => m.reduce((total, increment) => total + increment.championPoints, 0))));
 		const team_by_total_mastery_lowest_diff = mathjs.min(team_by_total_mastery.map(t => t.abs));
 		const team_by_total_mastery_best = team_by_total_mastery.findIndex(t => t.abs === team_by_total_mastery_lowest_diff);//team arrangement index
 		let team_by_total_mastery_description = [[], []];
@@ -797,7 +800,7 @@ module.exports = class EmbedGenerator {
 			else iMMR.push(UTILS.averageUserMMR(ranks[i]));
 		}
 		UTILS.debug(JSON.stringify(iMMR, null, "\t"));
-		for (let b of TEAM_COMBINATIONS) team_by_all_ranks.push(UTILS.calculateTeamStatistics(mathjs, b, iMMR));
+		for (let b in TEAM_COMBINATIONS) team_by_all_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], iMMR));
 		const team_by_all_ranks_lowest_diff = mathjs.min(team_by_all_ranks.map(t => t.abs));
 		UTILS.debug("rank lowest diff is " + team_by_all_ranks_lowest_diff);
 		const team_by_all_ranks_best = team_by_all_ranks.findIndex(t => t.abs === team_by_all_ranks_lowest_diff);//team arrangement index
@@ -827,7 +830,7 @@ module.exports = class EmbedGenerator {
 			else sr_iMMR.push(UTILS.summonersRiftMMR(ranks[i]));
 		}
 		UTILS.debug(JSON.stringify(sr_iMMR, null, "\t"));
-		for (let b of TEAM_COMBINATIONS) team_by_sr_ranks.push(UTILS.calculateTeamStatistics(mathjs, b, sr_iMMR));
+		for (let b in TEAM_COMBINATIONS) team_by_sr_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], sr_iMMR));
 		const team_by_sr_ranks_lowest_diff = mathjs.min(team_by_sr_ranks.map(t => t.abs));
 		UTILS.debug("rank lowest diff is " + team_by_sr_ranks_lowest_diff);
 		const team_by_sr_ranks_best = team_by_sr_ranks.findIndex(t => t.abs === team_by_sr_ranks_lowest_diff);//team arrangement index
@@ -858,7 +861,7 @@ module.exports = class EmbedGenerator {
 				else tt_iMMR.push(UTILS.twistedTreelineMMR(ranks[i]));
 			}
 			UTILS.debug(JSON.stringify(tt_iMMR, null, "\t"));
-			for (let b of TEAM_COMBINATIONS) team_by_tt_ranks.push(UTILS.calculateTeamStatistics(mathjs, b, tt_iMMR));
+			for (let b in TEAM_COMBINATIONS) team_by_tt_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], tt_iMMR));
 			const team_by_tt_ranks_lowest_diff = mathjs.min(team_by_tt_ranks.map(t => t.abs));
 			UTILS.debug("rank lowest diff is " + team_by_tt_ranks_lowest_diff);
 			const team_by_tt_ranks_best = team_by_tt_ranks.findIndex(t => t.abs === team_by_tt_ranks_lowest_diff);//team arrangement index
@@ -890,7 +893,7 @@ module.exports = class EmbedGenerator {
 			else random_iMMR.push(UTILS.averageUserMMR(ranks[i]));
 		}
 		UTILS.debug(JSON.stringify(random_iMMR, null, "\t"));
-		for (let b of TEAM_COMBINATIONS) team_by_random.push(UTILS.calculateTeamStatistics(mathjs, b, random_iMMR));
+		for (let b in TEAM_COMBINATIONS) team_by_random.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], random_iMMR));
 		const team_by_random_best = UTILS.randomInt(0, TEAM_COMBINATIONS.length);//team arrangement index
 		let team_by_random_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_random_best].length; ++i) {

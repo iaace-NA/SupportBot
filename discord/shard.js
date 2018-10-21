@@ -47,7 +47,7 @@ client.on("ready", function () {
 	wsapi.sendEmojis(allEmojis());
 	wsapi.getUserBans();
 	wsapi.getServerBans();
-	for (let b of CONFIG.STATIC.CHAMPIONS) b.emoji = b.name;
+	for (let b in CONFIG.STATIC.CHAMPIONS) CONFIG.STATIC.CHAMPIONS[b].emoji = CONFIG.STATIC.CHAMPIONS[b].name;
 	UTILS.output("default champion emojis set");
 	initial_start = false;
 });
@@ -103,7 +103,7 @@ function loadAllStaticResources(callback = () => {}) {
 			CONFIG.STATIC.CHAMPIONS = results[0].data;
 			LOLAPI.getStaticSummonerSpellsNew("na1").then(result => {
 				CONFIG.STATIC.SUMMONERSPELLS = result.data;
-				for (let b of CONFIG.STATIC.CHAMPIONS) b.emoji = b.name;
+				for (let b in CONFIG.STATIC.CHAMPIONS) CONFIG.STATIC.CHAMPIONS[b].emoji = CONFIG.STATIC.CHAMPIONS[b].name;
 				UTILS.output("API STATIC RESOURCES LOADED");
 				wsapi.sendEmojis(allEmojis());
 				callback();
@@ -119,8 +119,8 @@ setInterval(() => {//long term maintenance loop
 }, 60000 * 15);
 function allEmojis() {
 	let all_emojis = [];//collects all emojis from emoji servers
-	for (let ces of CONFIG.CHAMP_EMOJI_SERVERS) {
-		const candidate = client.guilds.get(ces);
+	for (let i in CONFIG.CHAMP_EMOJI_SERVERS) {
+		const candidate = client.guilds.get(CONFIG.CHAMP_EMOJI_SERVERS[i]);
 		if (UTILS.exists(candidate)) all_emojis = all_emojis.concat(candidate.emojis.array());
 	}
 	return all_emojis.map(e => { return { name: e.name.toLowerCase(), code: e.toString() }; });
