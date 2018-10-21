@@ -307,7 +307,7 @@ module.exports = class LOLAPI {
 	checkVerifiedAccount(uid, region, summonerID) {
 		return new Promise((resolve, reject) => {
 			this.getIAPI("getverified/" + uid, {}).then(result => {
-				resolve(UTILS.exists(result[region + ":" + summonerID]));
+				resolve(UTILS.exists(result.verifiedAccounts[region + ":" + summonerID]));
 			}).catch(reject);
 		});
 	}
