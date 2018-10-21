@@ -299,7 +299,7 @@ module.exports = class LOLAPI {
 		return this.getIAPI("getshortcuts/" + uid, {});
 	}
 	getVerifiedAccounts(uid) {
-		return this.getIAPI("getverified/" + uid);
+		return this.getIAPI("getverified/" + uid, {});
 	}
 	setVerifiedAccount(uid, region, summonerID, expiry) {
 		return this.getIAPI("setverified/" + uid, { from: region + ":" + summonerID, to: expiry });
