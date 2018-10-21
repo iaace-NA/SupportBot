@@ -1165,7 +1165,7 @@ module.exports = class EmbedGenerator {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setTitle("Verify ownership of LoL account");
 		let code = new Date().getTime() + "-" + summoner.region + "-" + summoner.id + "-" + uid;
-		code += "-" + crypto.createHmac("sha256", CONFIG.TPV_KEY).update(code).digest("hex");
+		code += "-" + crypto.createHmac("sha1", CONFIG.TPV_KEY).update(code).digest("hex");
 		newEmbed.setDescription("Your code is: ```" + code + "```");
 		newEmbed.addField("If you have already followed the instructions below, there is a problem with the code you provided.", "Reread the instructions below and try again.");
 		newEmbed.addField("Instructions", "See the below image to save the code provided above to your account. Once you have done this, send the `" + CONFIG.DISCORD_COMMAND_PREFIX + "verify <region> <ign>` command again within the next 5 minutes after first **__waiting 30 seconds__**.");

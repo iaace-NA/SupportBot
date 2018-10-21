@@ -330,7 +330,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 						else if (tpc_region !== region) valid_code = false;//same region
 						else if (tpc_summonerID !== summoner.id) valid_code = false;//same summoner id
 						else if (tpc_discordID !== msg.author.id) valid_code = false;//same discord uid
-						else if (tpc_HMAC_output !== crypto.createHmac("sha256", CONFIG.TPV_KEY).update(tpc_HMAC_input).digest("hex")) valid_code = false;//same HMAC
+						else if (tpc_HMAC_output !== crypto.createHmac("sha1", CONFIG.TPV_KEY).update(tpc_HMAC_input).digest("hex")) valid_code = false;//same HMAC
 						if (valid_code) {
 							lolapi.setVerifiedAccount(msg.author.id, region, summoner.id, new Date().getTime() + (365 * 24 * 60 * 60000)).then(result2 => {
 								reply(":white_check_mark: You have linked your discord account to " + summoner.name + " for 1 year.");
