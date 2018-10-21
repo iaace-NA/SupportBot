@@ -98,7 +98,7 @@ function loadAllStaticResources(callback = () => {}) {
 		UTILS.output("DD STATIC RESOURCES LOADED");
 		CONFIG.STATIC = result;
 		let temp_regions = [];
-		for (let i of CONFIG.REGIONS) temp_regions.push(i);
+		for (let i in CONFIG.REGIONS) temp_regions.push(CONFIG.REGIONS[i]);
 		Promise.all(temp_regions.map(tr => LOLAPI.getStaticChampionsNew(tr))).then(results => {
 			CONFIG.STATIC.CHAMPIONS = results[0].data;
 			LOLAPI.getStaticSummonerSpellsNew("na1").then(result => {
