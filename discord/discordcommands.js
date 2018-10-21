@@ -313,7 +313,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 				}
 				else {//not verified yet
 					lolapi.getThirdPartyCode(region, summoner.id, CONFIG.API_MAXAGE.VERIFY.THIRD_PARTY_CODE).then(tpc => {
-						let valid_code = true;
+						let valid_code = 0;
 						const tpc_timestamp_ms = parseInt(tpc.substring(0, tpc.indexOf("-")));
 						const tpc_region = tpc.substring(tpc.indexOf("-") + 1, UTILS.indexOfInstance(tpc, "-", 2));
 						const tpc_summonerID = tpc.substring(UTILS.indexOfInstance(tpc, "-", 2) + 1, UTILS.indexOfInstance(tpc, "-", 3));
@@ -326,12 +326,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 						UTILS.debug("tpc_discordID: " + tpc_discordID);
 						UTILS.debug("tpc_HMAC_input: " + tpc_HMAC_input);
 						UTILS.debug("tpc_HMAC_output: " + tpc_HMAC_output);
-						if (tpc_timestamp_ms < new Date().getTime() - (5 * 60 * 1000)) valid_code = false;//not expired
-						else if (tpc_region !== region) valid_code = false;//same region
-						else if (tpc_summonerID !== summoner.id) valid_code = false;//same summoner id
-						else if (tpc_discordID !== msg.author.id) valid_code = false;//same discord uid
+						if (tpc_timestamp_ms < new Date().getTime() - (5 * 60 * 1000)) valid_code = 1;//not expired
+						else if (tpc_region !== region) valid_code = 2;//same region
+						else if (tpc_summonerID !== summoner.id) valid_code = 3;//same summoner id
+						else if (tpc_discordID !== msg.author.id) valid_code = 4;//same discord uid
 						else if (tpc_HMAC_output !== crypto.createHmac("sha1", CONFIG.TPV_KEY).update(tpc_HMAC_input).digest("hex")) valid_code = false;//same HMAC
-						if (valid_code) {
+						if (valid_code > 0) {
+							UTILS.debug("valid_code: " + valid_code);
 							lolapi.setVerifiedAccount(msg.author.id, region, summoner.id, new Date().getTime() + (365 * 24 * 60 * 60000)).then(result2 => {
 								reply(":white_check_mark: You have linked your discord account to " + summoner.name + " for 1 year.");
 							}).catch(console.error);
