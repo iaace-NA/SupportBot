@@ -104,7 +104,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 		findShortcut(req.params.uid, res, doc => {
 			if (UTILS.exists(doc)) {
 				let shortcut_count = 0;
-				for (let b of doc.verifiedAccounts) ++shortcut_count;
+				for (let b in doc.verifiedAccounts) ++shortcut_count;
 				if (shortcut_count >= 50) return res.json({ success: false });
 				doc.verifiedAccounts[req.query.from] = parseInt(req.query.to);
 				doc.markModified("verifiedAccounts");
