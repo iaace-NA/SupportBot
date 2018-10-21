@@ -491,23 +491,21 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 					lolapi.getMultipleRecentGames(region, pSA.map(pS => pS.accountId), CONFIG.API_MAXAGE.LG.RECENT_GAMES).then(mhA => {//matchhistory array
 						let mIDA = [];//match id array;
 						for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
-						lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.LG.MULTIPLE_MATCH).then(matches => {
-							lolapi.getMultipleRanks(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS).then(ranks => {
-								lolapi.getMultipleChampionMastery(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_MASTERIES).then(masteries => {
-									//nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA) }).catch();
-									lolapi.checkVerifiedAccount(msg.author.id, region, result.id).then(verified => {
-										request_profiler.begin("generating embed");
-										const newEmbed = embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, verified);
-										request_profiler.end("generating embed");
-										UTILS.debug("\n" + ctable.getTable(request_profiler.endAllCtable()));
-										replyEmbed(newEmbed, () => {
-											//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false, true));
-										});
-										//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false));//untrimmed output
-									}).catch(console.error);
-								}).catch(console.error);
-							}).catch(console.error);
-						});
+						Promise.all([lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.LG.MULTIPLE_MATCH), lolapi.getMultipleRanks(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS), lolapi.getMultipleChampionMastery(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_MASTERIES), lolapi.checkVerifiedAccount(msg.author.id, region, result.id)]).then(parallel => {
+							let matches = parallel[0];
+							let ranks = parallel[1];
+							let masteries = parallel[2];
+							let verified = parallel[3];
+							//nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA) }).catch();
+							request_profiler.begin("generating embed");
+							const newEmbed = embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, verified);
+							request_profiler.end("generating embed");
+							UTILS.debug("\n" + ctable.getTable(request_profiler.endAllCtable()));
+							replyEmbed(newEmbed, () => {
+								//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false, true));
+							});
+								//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false));//untrimmed output
+						}).catch(console.error);
 					}).catch(console.error);
 				}).catch(console.error);
 			}).catch(console.error);
@@ -547,10 +545,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	commandGuessUsername(forcePrefix(["championmastery ", "mastery "]), false, (region, username, parameter) => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.CM.SUMMONER_ID).then(result => {
-			lolapi.getChampionMastery(region, result.id, CONFIG.API_MAXAGE.CM.CHAMPION_MASTERY).then(cm => {
-				lolapi.checkVerifiedAccount(msg.author.id, region, result.id).then(verified => {
-					replyEmbed(embedgenerator.mastery(CONFIG, result, cm, CONFIG.REGIONS_REVERSE[region], verified));
-				}).catch(console.error);
+			Promise.all([lolapi.getChampionMastery(region, result.id, CONFIG.API_MAXAGE.CM.CHAMPION_MASTERY), lolapi.checkVerifiedAccount(msg.author.id, region, result.id)]).then(parallel => {
+				let cm = parallel[0];
+				let verified = parallel[1];
+				replyEmbed(embedgenerator.mastery(CONFIG, result, cm, CONFIG.REGIONS_REVERSE[region], verified));
 			}).catch(console.error);
 		}).catch(console.error);
 	});
