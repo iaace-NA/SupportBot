@@ -321,11 +321,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 						const tpc_HMAC_input = tpc.substring(0, UTILS.indexOfInstance(tpc, "-", 4));
 						const tpc_HMAC_output = tpc.substring(UTILS.indexOfInstance(tpc, "-", 4) + 1);
 						UTILS.debug("tpc_timestamp_ms: " + tpc_timestamp_ms);
-						UTILS.debug("tpc_region: " + tpc_timestamp_ms);
-						UTILS.debug("tpc_summonerID: " + tpc_timestamp_ms);
-						UTILS.debug("tpc_discordID: " + tpc_timestamp_ms);
-						UTILS.debug("tpc_HMAC_input: " + tpc_timestamp_ms);
-						UTILS.debug("tpc_HMAC_output: " + tpc_timestamp_ms);
+						UTILS.debug("tpc_region: " + tpc_region);
+						UTILS.debug("tpc_summonerID: " + tpc_summonerID);
+						UTILS.debug("tpc_discordID: " + tpc_discordID);
+						UTILS.debug("tpc_HMAC_input: " + tpc_HMAC_input);
+						UTILS.debug("tpc_HMAC_output: " + tpc_HMAC_output);
 						if (tpc_timestamp_ms < new Date().getTime() - (5 * 60 * 1000)) valid_code = false;//not expired
 						else if (tpc_region !== region) valid_code = false;//same region
 						else if (tpc_summonerID !== summoner.id) valid_code = false;//same summoner id
