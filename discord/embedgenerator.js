@@ -240,11 +240,11 @@ module.exports = class EmbedGenerator {
 		if (highest_rank > -1) newEmbed.setColor(RANK_COLOR[highest_rank]);
 		if (will) {
 			const challenger_rank = UTILS.randomInt(5, 200);
-			const challenger_LP = UTILS.randomInt(100, 1000);
 			const fake_games = UTILS.randomInt(200, 700);
 			const fake_wins = UTILS.randomInt(fake_games / 2, fake_games);
 			const fake_losses = fake_games - fake_wins;
 			const fake_wr = UTILS.round(100 * fake_wins / (fake_wins + fake_losses), 2);
+			const challenger_LP = UTILS.map(fake_wr, .5, 1, 500, 1000);
 			newEmbed.addField("<:Challenger:437262128282599424>True Rank: Challenger ~#" + challenger_rank + " " + challenger_LP + "LP", fake_games + "G (" + fake_wr + "%) = " + fake_wins + "W + " + fake_losses + "L", true);
 			newEmbed.setColor(RANK_COLOR[RANK_COLOR.length - 1]);
 		}
