@@ -86,6 +86,55 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			else res.send("{}");
 		});
 	}, true);
+	serveWebRequest("/getverified/:uid", function(req, res, next) {
+		findShortcut(req.params.uid, res, doc => {
+			if (UTILS.exists(doc)) {
+				const now = new Date().getTime();
+				for (let b in doc.verifiedAccounts) if (doc.verifiedAccounts[b] < now) delete doc.verifiedAccounts[b];
+				doc.markModified("verifiedAccounts");
+				res.json({ verifiedAccounts: doc.toObject().verifiedAccounts });
+				doc.save(e => {
+					if (e) console.error(e);
+				});
+			}
+			else res.send("{}");
+		});
+	}, true);
+	serveWebRequest("/setverified/:uid", function(req, res, next) {
+		findShortcut(req.params.uid, res, doc => {
+			if (UTILS.exists(doc)) {
+				let shortcut_count = 0;
+				for (let b of doc.verifiedAccounts) ++shortcut_count;
+				if (shortcut_count >= 50) return res.json({ success: false });
+				doc.verifiedAccounts[req.query.from] = parseInt(req.query.to);
+				doc.markModified("verifiedAccounts");
+				doc.save(e => {
+					if (e) {
+						console.error(e);
+						return res.status(500).end();
+					}
+					else res.json({ success: true });
+				});
+			}
+			else {
+				let new_shortcuts = {
+					uid: req.params.uid,
+					shortcuts: {},
+					verifiedAccounts: {},
+					username: ""
+				}
+				new_shortcuts.verifiedAccounts[req.query.from] = parseInt(req.query.to);
+				let new_document = new shortcut_doc_model(new_shortcuts);
+				new_document.save((e, doc) => {
+					if (e) {
+						console.error(e);
+						return res.status(500).end();
+					}
+					else res.json({ success: true });
+				});
+			}
+		});
+	}, true);
 	serveWebRequest("/setlink/:uid", (req, res, next) => {
 		findShortcut(req.params.uid, res, doc => {
 			if (UTILS.exists(doc)) {

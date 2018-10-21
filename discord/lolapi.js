@@ -14,7 +14,8 @@ const tags = {
 	account: "accountid",//summoners by account id
 	cm: "championmastery",//summoner champion mastery
 	spectator: "spectator",
-	status: "status"
+	status: "status",
+	tpv: "tpv"
 };
 module.exports = class LOLAPI {
 	constructor(INIT_CONFIG, request_id) {
@@ -36,7 +37,7 @@ module.exports = class LOLAPI {
 			}).catch(reject);
 		});
 	}
-	get(region, path, tag, options, cachetime, maxage) {
+	get(region, path, tag, options, cachetime, maxage, parseJSON = true) {
 		let that = this;
 		return new Promise((resolve, reject) => {
 			UTILS.assert(UTILS.exists(region));
@@ -54,10 +55,13 @@ module.exports = class LOLAPI {
 				}
 				else {
 					try {
-						const answer = JSON.parse(body);
-						if (UTILS.exists(answer.status)) UTILS.output(iurl + " : " + body);
-						UTILS.assert(typeof(answer) === "object");
-						resolve(answer);
+						if (parseJSON) {
+							const answer = JSON.parse(body);
+							if (UTILS.exists(answer.status)) UTILS.output(iurl + " : " + body);
+							UTILS.assert(typeof(answer) === "object");
+							resolve(answer);
+						}
+						else resolve(body);
 					}
 					catch (e) {
 						reject(e);
@@ -242,6 +246,9 @@ module.exports = class LOLAPI {
 	getLiveMatch(region, summonerID, maxage) {
 		return this.get(region, "spectator/v3/active-games/by-summoner/" + summonerID, tags.spectator, {}, this.CONFIG.API_CACHETIME.GET_LIVE_MATCH, maxage);
 	}
+	getThirdPartyCode(region, summonerID, maxage) {
+		return this.get(region, "platform/v3/third-party-code/by-summoner/" + summonerID, tags.tpv, {}, this.CONFIG.API_CACHETIME.THIRD_PARTY_CODE, maxage, false);
+	}
 	getMMR(region, summonerID, maxage) {
 		return this.get(region, "league/v3/mmr-af/by-summoner/" + summonerID, "afmmr", {}, this.CONFIG.API_CACHETIME.GET_MMR, maxage);
 	}
@@ -290,6 +297,19 @@ module.exports = class LOLAPI {
 	}
 	getShortcuts(uid) {
 		return this.getIAPI("getshortcuts/" + uid, {});
+	}
+	getVerifiedAccounts(uid) {
+		return this.getIAPI("getverified/" + uid);
+	}
+	setVerifiedAccount(uid, region, summonerID, expiry) {
+		return this.getIAPI("setverified/" + uid, { from: region + ":" + summonerID, to: expiry });
+	}
+	checkVerifiedAccount(uid, region, summonerID) {
+		return new Promise((resolve, reject) => {
+			this.getIAPI("getverified/" + uid).then(result => {
+				resolve(UTILS.exists(result[region + ":" + summonerID]));
+			}).catch(reject);
+		});
 	}
 	terminate() {
 		this.getIAPI("terminate_request/" + this.request_id, {}, false).catch();

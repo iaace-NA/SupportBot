@@ -153,6 +153,7 @@ const IMMR_THRESHOLD = [100, 600, 1100, 1600, 2100, 2600, 2700];
 const MMR_THRESHOLD = [400, 1150, 1400, 1650, 1900, 2150, 2400];//starting MMRs for each tier
 const PREMADE_EMOJIS = ["", "\\💙", "\\💛", "\\💚"];
 const HORIZONTAL_SEPARATOR = "------------------------------";
+const VERIFIED_ICON = "✅";
 module.exports = class EmbedGenerator {
 	constructor() { }
 	test() {
@@ -200,7 +201,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;
 	}
-	detailedSummoner(CONFIG, summoner, ranks, championmastery, region, match, challengers) {//region username command
+	detailedSummoner(CONFIG, summoner, ranks, championmastery, region, match, challengers, verified) {//region username command
 		let newEmbed = new Discord.RichEmbed();
 		if (!UTILS.exists(summoner.id)) {
 			newEmbed.setAuthor(summoner.guess);
@@ -209,7 +210,7 @@ module.exports = class EmbedGenerator {
 			newEmbed.setColor([255, 0, 0]);
 			return newEmbed;
 		}
-		newEmbed.setAuthor(summoner.name, undefined, UTILS.opgg(region, summoner.name));
+		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), undefined, UTILS.opgg(region, summoner.name));
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(match.status)) newEmbed.setDescription("Level " + summoner.summonerLevel);
 		else {
@@ -260,9 +261,9 @@ module.exports = class EmbedGenerator {
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;
 	}
-	match(CONFIG, summoner, match_meta, matches) {//should show 5 most recent games
+	match(CONFIG, summoner, match_meta, matches, verified) {//should show 5 most recent games
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
+		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 		let common_teammates = {};
 		/*{
 			"name": {
@@ -374,9 +375,9 @@ module.exports = class EmbedGenerator {
 		newEmbed.addField("Top 10 Recently Played With", rpws.slice(0, 10).join("\n"));
 		return newEmbed;
 	}
-	detailedMatch(CONFIG, summoner, match_meta, match, ranks, masteries, summoner_participants) {//should show detailed information about 1 game
+	detailedMatch(CONFIG, summoner, match_meta, match, ranks, masteries, summoner_participants, verified) {//should show detailed information about 1 game
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
+		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 		if (UTILS.exists(match.status)) {
 			newEmbed.setAuthor(summoner.guess);
 			newEmbed.setTitle("This summoner has no recent matches.");
@@ -425,7 +426,7 @@ module.exports = class EmbedGenerator {
 				else summoner_spells = ":x::x:";//bot
 				const username = pI.player.summonerName;
 				const lane = CONFIG.EMOJIS.lanes[UTILS.inferLane(p.timeline.role, p.timeline.lane, p.spell1Id, p.spell2Id)];
-				newEmbed.addField(CONFIG.STATIC.CHAMPIONS[p.championId].emoji + lane + summoner_spells + " " + pI.solo + " ¦ " + pI.flex5 + " ¦ " + pI.flex3 + " ¦ `M" + pI.mastery + "` lv. `" + (UTILS.exists(pI.player.summonerId) ? summoner_participants.find(p => p.id == pI.player.summonerId).summonerLevel : 0) + "` __" + (pI.player.summonerId == summoner.id ? "**" + username + "**" : username) + "__", "[opgg](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ") " + "__lv.__ `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\t__KDR:__`" + UTILS.KDAFormat(p.stats.kills / p.stats.deaths) + "`\t__KDA:__`" + UTILS.KDAFormat((p.stats.kills + p.stats.assists) / p.stats.deaths) + "` `" + UTILS.KPFormat((100 * (p.stats.assists + p.stats.kills)) / tK) + "%`\t__cs:__`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "`\t__g:__`" + UTILS.gold(p.stats.goldEarned) + "`");
+				newEmbed.addField(CONFIG.STATIC.CHAMPIONS[p.championId].emoji + lane + summoner_spells + " " + pI.solo + " ¦ " + pI.flex5 + " ¦ " + pI.flex3 + " ¦ `M" + pI.mastery + "` lv. `" + (UTILS.exists(pI.player.summonerId) ? summoner_participants.find(p => p.id == pI.player.summonerId).summonerLevel : 0) + "` __" + (pI.player.summonerId == summoner.id ? "**" + username + "**" + (verified ? "\\" + VERIFIED_ICON : "") : username) + "__", "[opgg](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ") " + "__lv.__ `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\t__KDR:__`" + UTILS.KDAFormat(p.stats.kills / p.stats.deaths) + "`\t__KDA:__`" + UTILS.KDAFormat((p.stats.kills + p.stats.assists) / p.stats.deaths) + "` `" + UTILS.KPFormat((100 * (p.stats.assists + p.stats.kills)) / tK) + "%`\t__cs:__`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "`\t__g:__`" + UTILS.gold(p.stats.goldEarned) + "`");
 			}
 		}
 		// champion
@@ -445,9 +446,9 @@ module.exports = class EmbedGenerator {
 		// KP
 		return newEmbed;
 	}
-	liveMatchPremade(CONFIG, summoner, match, matches, ranks, masteries, summoner_participants, trim = true, newlogic = true) {//show current match information
+	liveMatchPremade(CONFIG, summoner, match, matches, ranks, masteries, summoner_participants, verified, trim = true, newlogic = true) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
+		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 		if (UTILS.exists(match.status)) {
 			newEmbed.setAuthor(summoner.guess);
 			newEmbed.setTitle("This summoner is currently not in a match.");
@@ -546,7 +547,7 @@ module.exports = class EmbedGenerator {
 				team_description_c2 += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
 				team_description_c2 += team[c].summonerId == summoner.id ? "**" : "";//bolding
 				team_description_c2 += "__[" + team[c].summonerName + "](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], team[c].summonerName) + ")__";
-				team_description_c2 += team[c].summonerId == summoner.id ? "**" : "";//bolding
+				team_description_c2 += team[c].summonerId == summoner.id ? "**" + (verified ? "//" + VERIFIED_ICON : "") : "";//bolding
 				if (UTILS.exists(match.bannedChampions[player_count])) {
 					ban_description.push(match.bannedChampions[player_count].championId == -1 ? ":x:" : CONFIG.STATIC.CHAMPIONS[match.bannedChampions[player_count].championId].emoji);
 				}
@@ -561,7 +562,7 @@ module.exports = class EmbedGenerator {
 		}
 		return newEmbed;
 	}
-	mmr(CONFIG, summoner) {
+	mmr(CONFIG, summoner, verified) {
 		let newEmbed = new Discord.RichEmbed();
 		if (!UTILS.exists(summoner.id)) {
 			newEmbed.setTitle("This summoner does not exist.");
@@ -600,7 +601,7 @@ module.exports = class EmbedGenerator {
 			jokeNumber = 7;
 		}
 		const analysis = UTILS.randomOf(MMR_JOKES[jokeNumber]);
-		newEmbed.setAuthor(summoner.name, null, UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
+		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), null, UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
 		newEmbed.setDescription("Level " + summoner.summonerLevel);
 		newEmbed.addField("MMR Data", "Tier: " + UTILS.english(tier) + "\nMMR: `" + mmr + "`\n" + analysis);
@@ -1033,7 +1034,7 @@ module.exports = class EmbedGenerator {
 		}
 		return newEmbed;
 	}
-	mastery(CONFIG, summoner, championmastery, region) {
+	mastery(CONFIG, summoner, championmastery, region, verified) {
 		let newEmbed = new Discord.RichEmbed();
 		if (!UTILS.exists(summoner.id)) {
 			newEmbed.setAuthor(summoner.guess);
@@ -1042,7 +1043,7 @@ module.exports = class EmbedGenerator {
 			newEmbed.setColor([255, 0, 0]);
 			return newEmbed;
 		}
-		newEmbed.setAuthor(summoner.name, "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(region, summoner.name));
+		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(region, summoner.name));
 		newEmbed.setTitle("Individual Champion Mastery");
 		let cm_description = [];
 		let cm_total = 0;
@@ -1162,7 +1163,11 @@ module.exports = class EmbedGenerator {
 		newEmbed.setTitle("Verify ownership of LoL account");
 		let code = new Date().getTime() + "-" + summoner.region + "-" + summoner.id + "-" + uid;
 		code += "-" + crypto.createHmac("sha256", CONFIG.TPV_KEY).update(code).digest("hex");
-		newEmbed.setDescription("`" + code + "`");
+		newEmbed.setDescription("Your code is: `" + code + "`");
+		newEmbed.addField("If you have already followed the instructions below, there is a problem with the code you provided.", "Reread the instructions below and try again.");
+		newEmbed.addField("Instructions", "See the below image to save the code provided above to your account. Once you have done this, send the `" + CONFIG.DISCORD_COMMAND_PREFIX + "verify <region> <ign>` command again within the next 5 minutes after first **__waiting 30 seconds__**.");
+		newEmbed.setImage("https://supportbot.tk/f/tpv.png");//tpv tutorial image
+		newEmbed.setFooter("This code does not need to be kept secret.");
 		return newEmbed;
 	}
 }
