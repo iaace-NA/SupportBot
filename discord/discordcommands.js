@@ -556,9 +556,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	commandGuessUsername(forcePrefix(["mmr "]), false, (region, username, parameter) => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.MMR_JOKE.SUMMONER_ID).then(result => {
-			result.region = region;
-			result.guess = username;
-			replyEmbed(embedgenerator.mmr(CONFIG, result));
+			lolapi.checkVerifiedAccount(msg.author.id, region, result.id).then(verified => {
+				result.region = region;
+				result.guess = username;
+				replyEmbed(embedgenerator.mmr(CONFIG, result, verified));
+			}).catch(console.error);
 		}).catch(console.error);
 	});
 
