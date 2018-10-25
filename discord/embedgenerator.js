@@ -185,13 +185,25 @@ function getMatchTags(summonerID, match) {
 			--i;
 		}
 	}
-	const criteria = [{ statName: "totalCS", designation: "Most CS" }, { statName: "totalDamageDealtToChampions" , designation: "Most Champion Damage" }, { statName: "totalDamageDealt", designation: "Most Damage" }, { statName: "visionScore", designation: "Most Vision" }, { statName: "assists", designation: "Selfless" }, { statName: "inverseKDA", designation: "Heavy" }, { statName: "damageDealtToObjectives", designation: "Objective Focused" }, { statName: "damageTaken", designation: "Most Damage Taken" }, { statName: "KP", designation: "Highest KP" }, { statName: "timeCCingOthers", designation: "Most CC" }, { statName: "largestKillingSpree", designation: "Scary" }, { statName: "inverseDeaths", designation: "Slippery" }, { statName: "goldEarned", designation: "Most Gold" }];//simple, single stat criteria only
-	for (let b in criteria) {
-		UTILS.assert(UTILS.exists(sortable_all.participants[0].stats[criteria[b].statName]));
-		sortable_all.participants.sort((a, b) => b.stats[criteria[b].statName] - a.stats[criteria[b].statName]);
-		sortable_team.participants.sort((a, b) => b.stats[criteria[b].statName] - a.stats[criteria[b].statName]);
-		if (sortable_all.participants[0].participantId === pID) answer.push(criteria[b].designation);
-		else if (sortable_team.participants[0].participantId === pID) answer.push("*" + criteria[b].designation);
+	const criteria = [{ statName: "totalCS", designation: "Most CS" },
+	{ statName: "totalDamageDealtToChampions" , designation: "Most Champion Damage" },
+	{ statName: "totalDamageDealt", designation: "Most Damage" },
+	{ statName: "visionScore", designation: "Most Vision" },
+	{ statName: "assists", designation: "Selfless" },
+	{ statName: "inverseKDA", designation: "Heavy" },
+	{ statName: "damageDealtToObjectives", designation: "Objective Focused" },
+	{ statName: "damageTaken", designation: "Most Damage Taken" },
+	{ statName: "KP", designation: "Highest KP" },
+	{ statName: "timeCCingOthers", designation: "Most CC" },
+	{ statName: "largestKillingSpree", designation: "Scary" },
+	{ statName: "inverseDeaths", designation: "Slippery" },
+	{ statName: "goldEarned", designation: "Most Gold" }];//simple, single stat criteria only
+	for (let c in criteria) {
+		UTILS.assert(UTILS.exists(sortable_all.participants[0].stats[criteria[c].statName]));
+		sortable_all.participants.sort((a, b) => b.stats[criteria[c].statName] - a.stats[criteria[c].statName]);
+		sortable_team.participants.sort((a, b) => b.stats[criteria[c].statName] - a.stats[criteria[c].statName]);
+		if (sortable_all.participants[0].participantId === pID) answer.push(criteria[c].designation);
+		else if (sortable_team.participants[0].participantId === pID) answer.push("*" + criteria[c].designation);
 	}
 	const win = UTILS.determineWin(summonerID, match);
 	const ally_K = sortable_team.participants.reduce((total, increment) => total + increment.stats.kills, 0);
