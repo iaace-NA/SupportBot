@@ -79,13 +79,17 @@ module.exports = class UTILS {
 		return this.teamParticipant(summonerID, match).stats;
 	}
 	KDA(summonerID, match) {
-		const stats = this.stats(summonerID, match);
+		return this.KDAFromStats(this.stats(summonerID, match));
+	}
+	KDAFromStats(stats) {
 		return {
 			K: stats.kills,
 			D: stats.deaths,
 			A: stats.assists,
 			KDA: (stats.kills + stats.assists) / stats.deaths,
-			KD: stats.kills / stats.deaths
+			KD: stats.kills / stats.deaths,
+			KDANoPerfect: (stats.kills + stats.assists) / (stats.deaths === 0 ? 1 : stats.deaths),
+			inverseKDA: stats.deaths / ((stats.kills + stats.assists === 0) ? 1 : (stats.kills + stats.assists))
 		};
 	}
 	determineWin(summonerID, match) {

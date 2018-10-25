@@ -154,6 +154,49 @@ const MMR_THRESHOLD = [400, 1150, 1400, 1650, 1900, 2150, 2400];//starting MMRs 
 const PREMADE_EMOJIS = ["", "\\💙", "\\💛", "\\💚"];
 const HORIZONTAL_SEPARATOR = "------------------------------";
 const VERIFIED_ICON = "✅";
+function getMatchTags(summonerID, match) {
+	let answer = [];
+	if (match.gameDuration < 300) return answer;
+	const stats = UTILS.stats(summonerID, match);
+	if (stats.largestMultiKill === 3) answer.push("TRIPLE");
+	else if (stats.largestMultiKill === 4) answer.push("QUADRA");
+	else if (stats.largestMultiKill >= 5) answer.push("PENTA");
+	if (pI.mastery === 0) answer.push("First Time");
+	else if (pI.mastery === 1) answer.push("\"First Time\"");
+	let sortable_all = UTILS.copy(match);//match with both teams
+	const teamID = UTILS.teamParticipant(summonerID, match).teamId;
+	const pID = UTILS.teamParticipant(summonerID, match).participantId;
+	for (let b in sortable_all.participants) {
+		const KDA = UTILS.KDAFromStats(sortable_all.participants[b].stats);
+		sortable_all.participants[b].stats.KDA = KDA.KDA;
+		sortable_all.participants[b].stats.KDANoPerfect = KDA.KDANoPerfect;
+		sortable_all.participants[b].stats.inverseKDA = KDA.inverseKDA;
+		sortable_all.participants[b].stats.totalCS = sortable_all.participants[b].stats.totalMinionsKilled + sortable_all.participants[b].stats.neutralMinionsKilled;
+		sortable_all.participants[b].stats.damageTaken = sortable_all.participants[b].stats.totalDamageTaken + sortable_all.participants[b].stats.damageSelfMitigated;
+		sortable_all.participants[b].stats.KP = KDA.K + KDA.A;
+		sortable_all.participants[b].stats.inverseDeaths = -KDA.D;
+	}
+	let sortable_team = UTILS.copy(match);//match with ally team only
+	for (let i = 0; i < sortable_team.participants.length; ++i) {
+		if (sortable_team.participants[i].teamId !== teamID) {
+			sortable_team.participants.splice(i, 1);//removes non-allies
+			--i;
+		}
+	}
+	const criteria = [{ statName: "totalCS", designation: "Most CS" }, { statName: "totalDamageDealtToChampions" , designation: "Most Champion Damage" }, { statName: "totalDamageDealt", designation: "Most Damage" }, { statName: "visionScore", designation: "Most Vision" }, { statName: "assists", designation: "Selfless" }, { statName: "inverseKDA", designation: "Heavy" }, { statName: "damageDealtToObjectives", designation: "Objective Focused" }, { statName: "damageTaken", designation: "Most Damage Taken" }, { statName: "KP", designation: "Highest KP" }, { statName: "timeCCingOthers", designation: "Most CC" }, { statName: "largestKillingSpree", designation: "Scary" }, { statName: "inverseDeaths", designation: "Slippery" }, { statName: "goldEarned", designation: "Most Gold" }];//simple, single stat criteria only
+	for (let b in criteria) {
+		UTILS.assert(UTILS.exists(sortable_all.participants[0].stats[criteria[b].statName]));
+		sortable_all.participants.sort((a, b) => b.stats[criteria[b].statName] - a.stats[criteria[b].statName]);
+		sortable_team.participants.sort((a, b) => b.stats[criteria[b].statName] - a.stats[criteria[b].statName]);
+		if (sortable_all.participants[0].participantId === pID) answer.push(criteria[b].designation);
+		else if (sortable_team.participants[0].participantId === pID) answer.push("*" + criteria[b].designation);
+	}
+	const win = UTILS.determineWin(summonerID, match);
+	const ally_K = sortable_team.participants.reduce((total, increment) => total + increment.stats.kills, 0);
+	const enemy_K = sortable_all.participants.reduce((total, increment) => total + increment.stats.kills, 0) - ally_K;
+	if (win && (ally_K + enemy_K >= 5) && (ally_K >= (enemy_K * 3))) answer.push("Easy");
+	return answer;
+}
 module.exports = class EmbedGenerator {
 	constructor() { }
 	test() {
@@ -331,7 +374,7 @@ module.exports = class EmbedGenerator {
 				else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id];
 				else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell2Id].name + "`";
-				individual_match_description.push([(win ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].emoji + CONFIG.EMOJIS.lanes[lane] + " " + summoner_spells + " `" + UTILS.standardTimestamp(matches[i].gameDuration) + "` " + queues[matches[i].queueId + ""] + " " + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))), "__lv.__ `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\t__KDR:__`" + UTILS.KDAFormat(KDA.KD) + "`\t__KDA:__`" + UTILS.KDAFormat(KDA.KDA) + "` `" + UTILS.KPFormat((100 * (KDA.A + KDA.K)) / tK) + "%`\t__cs:__`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "`\t__g:__`" + UTILS.gold(stats.goldEarned) + "`"]);
+				individual_match_description.push([(win ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].emoji + CONFIG.EMOJIS.lanes[lane] + " " + summoner_spells + " `" + UTILS.standardTimestamp(matches[i].gameDuration) + "` " + queues[matches[i].queueId + ""] + " " + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))), "__lv.__ `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\t__KDR:__`" + UTILS.KDAFormat(KDA.KD) + "`\t__KDA:__`" + UTILS.KDAFormat(KDA.KDA) + "` `" + UTILS.KPFormat((100 * (KDA.A + KDA.K)) / tK) + "%`\t__cs:__`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "`\t__g:__`" + UTILS.gold(stats.goldEarned) + "`\n" + getMatchTags(summoner.id, matches[i]).map(s => "`" + s + "`").join("\t")]);
 			}
 			// champion
 			// match result
@@ -388,6 +431,7 @@ module.exports = class EmbedGenerator {
 		for (let i = 0; i < IMMR_THRESHOLD.length; ++i) if (avg_iMMR >= IMMR_THRESHOLD[i]) newEmbed.setColor(RANK_COLOR[i]);
 		UTILS.output("average iMMR is " + UTILS.round(avg_iMMR) + " or " + UTILS.iMMRtoEnglish(avg_iMMR));
 		newEmbed.setTitle(queues[match.queueId] + " `" + UTILS.standardTimestamp(match.gameDuration) + "`");
+		newEmbed.setDescription(getMatchTags(summoner.id, match).map(s => "`" + s + "`").join("\t"));
 		newEmbed.setTimestamp(new Date(match_meta.timestamp + (match.gameDuration * 1000)));
 		newEmbed.setFooter("Match played " + UTILS.ago(new Date(match_meta.timestamp + (match.gameDuration * 1000))) + " at: ");
 		let teams = {};
