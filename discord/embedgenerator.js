@@ -179,7 +179,7 @@ function getMatchTags(summonerID, match) {
 		sortable_all.participants[b].stats.KP = KDA.K + KDA.A;
 		sortable_all.participants[b].stats.inverseDeaths = -KDA.D;
 	}
-	let sortable_team = UTILS.copy(match);//match with ally team only
+	let sortable_team = UTILS.copy(sortable_all);//match with ally team only
 	for (let i = 0; i < sortable_team.participants.length; ++i) {
 		if (sortable_team.participants[i].teamId !== teamID) {
 			sortable_team.participants.splice(i, 1);//removes non-allies
