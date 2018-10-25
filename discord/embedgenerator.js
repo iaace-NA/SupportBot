@@ -213,7 +213,7 @@ function getMatchTags(summonerID, match) {
 			else if (sortable_team.participants[0].participantId === pID) answer.push("*" + criteria[c].designation);
 		}
 		else {
-			if (sortable_team.participants[0].participantId === pID) answer.push(criteria[c].designation);
+			if (sortable_team.participants[0].participantId === pID) non_direct.push(criteria[c].designation);
 		}
 	}
 	if ((non_direct.indexOf("KDA") !== -1 && non_direct.indexOf("KD") !== -1) || (answer.indexOf("*Most Champion Damage") !== -1 || answer.indexOf("Most Champion Damage") !== -1)) answer.push("Carry");
