@@ -161,11 +161,13 @@ function getMatchTags(summonerID, match) {
 	if (stats.largestMultiKill === 3) answer.push("TRIPLE");
 	else if (stats.largestMultiKill === 4) answer.push("QUADRA");
 	else if (stats.largestMultiKill >= 5) answer.push("PENTA");
-	if (pI.mastery === 0) answer.push("First Time");
-	else if (pI.mastery === 1) answer.push("\"First Time\"");
+	const pID = UTILS.teamParticipant(summonerID, match).participantId;
+	const m_level = UTILS.findParticipantIdentityFromPID(match, pID);
+	if (m_level === 0) answer.push("First Time");
+	else if (m_level === 1) answer.push("\"First Time\"");
 	let sortable_all = UTILS.copy(match);//match with both teams
 	const teamID = UTILS.teamParticipant(summonerID, match).teamId;
-	const pID = UTILS.teamParticipant(summonerID, match).participantId;
+
 	for (let b in sortable_all.participants) {
 		const KDA = UTILS.KDAFromStats(sortable_all.participants[b].stats);
 		sortable_all.participants[b].stats.KDA = KDA.KDA;
