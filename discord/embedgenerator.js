@@ -204,6 +204,7 @@ function getMatchTags(summonerID, match) {
 		sortable_all.participants.sort((a, b) => b.stats[criteria[c].statName] - a.stats[criteria[c].statName]);
 		sortable_team.participants.sort((a, b) => b.stats[criteria[c].statName] - a.stats[criteria[c].statName]);
 		UTILS.debug(criteria[c].statName + ": " + sortable_all.participants.map(p => p.participantId + ":" + p.stats[criteria[c].statName]).join(", "));
+		UTILS.debug("team " + criteria[c].statName + ": " + sortable_team.participants.map(p => p.participantId + ":" + p.stats[criteria[c].statName]).join(", "));
 		if (sortable_all.participants[0].participantId === pID) answer.push(criteria[c].designation);
 		else if (sortable_team.participants[0].participantId === pID) answer.push("*" + criteria[c].designation);
 	}
