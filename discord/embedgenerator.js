@@ -172,7 +172,7 @@ function getMatchTags(summonerID, match) {
 		const KDA = UTILS.KDAFromStats(sortable_all.participants[b].stats);
 		sortable_all.participants[b].stats.KDA = KDA.KDA;
 		sortable_all.participants[b].stats.KDANoPerfect = KDA.KDANoPerfect;
-
+		sortable_all.participants[b].stats.KDNoPerfect = KDA.KDNoPerfect;
 		sortable_all.participants[b].stats.inverseKDA = KDA.inverseKDA;
 		sortable_all.participants[b].stats.totalCS = sortable_all.participants[b].stats.totalMinionsKilled + sortable_all.participants[b].stats.neutralMinionsKilled;
 		sortable_all.participants[b].stats.damageTaken = sortable_all.participants[b].stats.totalDamageTaken + sortable_all.participants[b].stats.damageSelfMitigated;
