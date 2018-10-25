@@ -89,6 +89,7 @@ module.exports = class UTILS {
 			KDA: (stats.kills + stats.assists) / stats.deaths,
 			KD: stats.kills / stats.deaths,
 			KDANoPerfect: (stats.kills + stats.assists) / (stats.deaths === 0 ? 1 : stats.deaths),
+			KDNoPerfect: stats.kills / (stats.deaths === 0 ? 1 : stats.deaths),
 			inverseKDA: stats.deaths / ((stats.kills + stats.assists === 0) ? 1 : (stats.kills + stats.assists))
 		};
 	}

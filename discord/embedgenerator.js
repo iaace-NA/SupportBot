@@ -172,6 +172,7 @@ function getMatchTags(summonerID, match) {
 		const KDA = UTILS.KDAFromStats(sortable_all.participants[b].stats);
 		sortable_all.participants[b].stats.KDA = KDA.KDA;
 		sortable_all.participants[b].stats.KDANoPerfect = KDA.KDANoPerfect;
+
 		sortable_all.participants[b].stats.inverseKDA = KDA.inverseKDA;
 		sortable_all.participants[b].stats.totalCS = sortable_all.participants[b].stats.totalMinionsKilled + sortable_all.participants[b].stats.neutralMinionsKilled;
 		sortable_all.participants[b].stats.damageTaken = sortable_all.participants[b].stats.totalDamageTaken + sortable_all.participants[b].stats.damageSelfMitigated;
@@ -185,28 +186,37 @@ function getMatchTags(summonerID, match) {
 			--i;
 		}
 	}
-	const criteria = [{ statName: "totalCS", designation: "Most CS" },
-	{ statName: "totalDamageDealtToChampions" , designation: "Most Champion Damage" },
-	{ statName: "totalDamageDealt", designation: "Most Damage" },
-	{ statName: "visionScore", designation: "Most Vision" },
-	{ statName: "assists", designation: "Selfless" },
-	{ statName: "inverseKDA", designation: "Heavy" },
-	{ statName: "damageDealtToObjectives", designation: "Objective Focused" },
-	{ statName: "damageTaken", designation: "Most Damage Taken" },
-	{ statName: "KP", designation: "Highest KP" },
-	{ statName: "timeCCingOthers", designation: "Most CC" },
-	{ statName: "largestKillingSpree", designation: "Scary" },
-	{ statName: "inverseDeaths", designation: "Slippery" },
-	{ statName: "goldEarned", designation: "Most Gold" }];//simple, single stat criteria only
+	const criteria = [{ statName: "totalCS", designation: "Most CS", direct: true },
+	{ statName: "totalDamageDealtToChampions" , designation: "Most Champion Damage", direct: true },
+	{ statName: "totalDamageDealt", designation: "Most Damage", direct: true },
+	{ statName: "visionScore", designation: "Most Vision", direct: true },
+	{ statName: "assists", designation: "Selfless", direct: true },
+	{ statName: "inverseKDA", designation: "Heavy", direct: true },
+	{ statName: "damageDealtToObjectives", designation: "Objective Focused", direct: true },
+	{ statName: "damageTaken", designation: "Most Damage Taken", direct: true },
+	{ statName: "KP", designation: "Highest KP", direct: true },
+	{ statName: "timeCCingOthers", designation: "Most CC", direct: true },
+	{ statName: "largestKillingSpree", designation: "Scary", direct: true },
+	{ statName: "inverseDeaths", designation: "Slippery", direct: true },
+	{ statName: "goldEarned", designation: "Most Gold", direct: true },
+	{ statName: "KDANoPerfect", designation: "KDA", direct: false },
+	{ statName: "KDNoPerfect", designation: "KD", direct: false }];//simple, single stat criteria only
+	let non_direct = [];
 	for (let c in criteria) {
 		UTILS.assert(UTILS.exists(sortable_all.participants[0].stats[criteria[c].statName]));
 		sortable_all.participants.sort((a, b) => b.stats[criteria[c].statName] - a.stats[criteria[c].statName]);
 		sortable_team.participants.sort((a, b) => b.stats[criteria[c].statName] - a.stats[criteria[c].statName]);
 		UTILS.debug(criteria[c].statName + ": " + sortable_all.participants.map(p => p.participantId + ":" + p.stats[criteria[c].statName]).join(", "));
 		UTILS.debug("team " + criteria[c].statName + ": " + sortable_team.participants.map(p => p.participantId + ":" + p.stats[criteria[c].statName]).join(", "));
-		if (sortable_all.participants[0].participantId === pID) answer.push(criteria[c].designation);
-		else if (sortable_team.participants[0].participantId === pID) answer.push("*" + criteria[c].designation);
+		if (direct) {
+			if (sortable_all.participants[0].participantId === pID) answer.push(criteria[c].designation);
+			else if (sortable_team.participants[0].participantId === pID) answer.push("*" + criteria[c].designation);
+		}
+		else {
+			if (sortable_team.participants[0].participantId === pID) answer.push(criteria[c].designation);
+		}
 	}
+	if ((non_direct.indexOf("KDA") !== -1 && non_direct.indexOf("KD") !== -1) || (answer.indexOf("*Most Champion Damage") !== -1 || answer.indexOf("Most Champion Damage") !== -1)) answer.push("Carry");
 	const win = UTILS.determineWin(summonerID, match);
 	const ally_K = sortable_team.participants.reduce((total, increment) => total + increment.stats.kills, 0);
 	const enemy_K = sortable_all.participants.reduce((total, increment) => total + increment.stats.kills, 0) - ally_K;
