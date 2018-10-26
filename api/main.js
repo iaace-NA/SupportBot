@@ -141,9 +141,6 @@ server_preferences_doc.index({ id: "hashed" });
 server_preferences_doc.index({ id: 1 });
 let server_preferences_model = apicache.model("server_preferences_doc", server_preferences_doc);
 
-let region_limiters = {};
-let limiter = require("bottleneck");
-for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({ maxConcurrent: 1, minTime: CONFIG.API_PERIOD });
 let irs = {};//individual request statistics
 let database_profiler = new Profiler("Database Profiler");
 let server = https.createServer({ key: fs.readFileSync("../data/keys/server.key"),
