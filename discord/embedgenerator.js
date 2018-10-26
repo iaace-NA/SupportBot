@@ -1058,7 +1058,7 @@ module.exports = class EmbedGenerator {
 		const SECTION_LENGTH = 15;
 		if (cm_description.length > 0) {
 			const sections = Math.trunc(cm_description.length / SECTION_LENGTH) + 1;
-			for (let i = 0; i < sections && i < 6; ++i) newEmbed.addField("#" + ((i * SECTION_LENGTH) + 1) + " - #" + (((i + 1) * SECTION_LENGTH) + 1), cm_description.slice(i * SECTION_LENGTH, (i + 1) * SECTION_LENGTH).join("\n"), true);
+			for (let i = 0; i < sections && i < 6; ++i) newEmbed.addField("#" + ((i * SECTION_LENGTH) + 1) + " - #" + ((i + 1) * SECTION_LENGTH), cm_description.slice(i * SECTION_LENGTH, (i + 1) * SECTION_LENGTH).join("\n"), true);
 		}
 		newEmbed.setFooter("Showing a maximum of 90 champions");
 		return newEmbed;
