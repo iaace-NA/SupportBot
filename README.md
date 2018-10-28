@@ -13,12 +13,13 @@ League of Legends Statistics for Discord
 - Processes
   - 3 shards implemented as separate processes (blocking)
     - (Future, not implemented) +1 process per shard for realtime music playback/streaming (non-blocking)
-  - 1 parent process to control all 3 shards (blocking)
+  - 1 parent process to startup all 3 shards (blocking)
   - 1 internal (stateful) API process to cache external API requests and to handle database operations (blocking)
     - HTTPS for database operations
     - wss for bidirectional discord shard related communications
     - api key authentication
   - (Future, not implemented) 1 child process of the internal API to handle polling and tracking (blocking)
+  - (Future, not implemented) 1 website process, accessing the internal API via HTTPS requests
 - Configurable API caching timeouts per endpoint, per command
 - Feedback commands
 - Configurable user and server rate limiting
