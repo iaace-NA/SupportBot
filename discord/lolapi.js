@@ -213,8 +213,14 @@ module.exports = class LOLAPI {
 		for (let i in summonerIDs) requests.push(that.getChampionMastery(region, summonerIDs[i], maxage));
 		return Promise.all(requests);
 	}
-	getRecentGames(region, accountID, maxage) {
-		return this.get(region, "match/v3/matchlists/by-account/" + accountID, tags.matchhistory, { endIndex: 20 }, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage);
+	getRecentGames(region, accountID, maxage, limit = 20) {
+		return new Promise((resolve, reject) => {
+			this.get(region, "match/v3/matchlists/by-account/" + accountID, tags.matchhistory, { endIndex: 100 }, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage).then(matchlist => {
+				matchlist.matches = matchlist.matches.slice(0, limit);
+				matchlist.endIndex = matchlist.matches.length;
+				resolve(matchlist);
+			}).catch(reject);
+		});
 	}
 	getMultipleRecentGames(region, accountIDs, maxage) {
 		let that = this;
