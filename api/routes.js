@@ -1,6 +1,6 @@
 "use strict";
 const UTILS = new (require("../utils.js"))();
-module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard, server_preferences_model) {
+module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard, server_preferences_model, dc_load_average) {
 	serveWebRequest("/createshortcut/:uid", function(req, res, next) {
 		findShortcut(req.params.uid, res, doc => {
 			if (UTILS.exists(doc)) {
@@ -398,6 +398,17 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			answer[i + ""].total_rate = load_average[i].total_rate();
 			answer[i + ""].total_count = load_average[i].total_count();
 		}
+		answer.discord = {
+			description: "Discord commands",
+			min1: dc_load_average.min1(),
+			min5: dc_load_average.min5(),
+			min15: dc_load_average.min15(),
+			min30: dc_load_average.min30(),
+			min60: dc_load_average.min60(),
+			total_rate: dc_load_average.total_rate(),
+			total_count: dc_load_average.total_count()
+		};
+		answer.uptime = process.uptime();
 		res.json(answer);
 	}, true);
 	serveWebRequest("/", function (req, res, next) {

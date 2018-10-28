@@ -65,6 +65,7 @@ let riotRequest = new (require("riot-lol-api"))(CONFIG.RIOT_API_KEY, 12000, {
 let LoadAverage = require("../loadaverage.js");
 const response_type = ["Total", "Uncachable", "Cache hit", "Cache hit expired", "Cache miss"];
 const load_average = [new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60)];
+const dc_load_average = new LoadAverage(60);//discord command load average
 const express = require("express");
 const website = express();
 
@@ -259,6 +260,7 @@ serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/:tag/", (req, res, 
 	});
 }, true);
 serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
+	dc_load_average.add();
 	for (let b in irs) if (new Date().getTime() - irs[b][5] > 1000 * 60 * 10) delete irs[b];//cleanup old requests
 	if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();//doesn't exist
 	let description = [];
@@ -282,7 +284,7 @@ serveWebRequest("/eval/:script", function (req, res, next) {
 	}
 	res.json(result).end();
 }, true);
-routes(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard, server_preferences_model);
+routes(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard, server_preferences_model, dc_load_average);
 function serveWebRequest(branch, callback, validate = false) {
 	if (typeof(branch) == "string") {
 		website.get(branch, function (req, res, next) {
