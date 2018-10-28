@@ -577,4 +577,50 @@ module.exports = class UTILS {
 		}
 		return query;
 	}
+	generateGraph(mathjs, raw, height = 5, width = 35) {
+		let answer = "";
+		let min = raw[0][0];//start time
+		let max = raw[raw.length - 1][0];//end time
+		const y_vals = raw.map(point => point[1]);
+		const y_min = mathjs.min(y_vals);
+		const y_max = mathjs.max(y_vals);
+		const raw_normalized = raw.map(point => {
+			point[1] = this.map(point[1], y_min, y_max, 0, 1);
+			return point;
+		});
+		for (let r = 0; r < height; ++r) {
+			answer += "\n";
+			for (let i = 0; i < width; ++i) {
+				const targetTime = this.map(i, 0, width, min, max);
+				let closestTimeLeft = min;
+				let closestHealthLeft = raw_normalized[0][1];
+				let closestTimeRight = max;
+				let closestHealthRight = raw_normalized[raw_normalized.length - 1][1];
+				for (let j = 1; j < raw_normalized.length; ++j) {
+					if (raw_normalized[j][0] >= targetTime) {
+						closestTimeLeft = raw_normalized[j - 1][0];
+						closestHealthLeft = raw_normalized[j - 1][1];
+						closestTimeRight = raw_normalized[j][0];
+						closestHealthRight = raw_normalized[j][1];
+						break;
+					}
+				}
+				let slope = (closestHealthRight - closestHealthLeft) / (closestTimeRight - closestTimeLeft);
+				let healthValue = (slope * (targetTime - closestTimeRight)) + closestHealthRight;
+				//output("(" + r + "," + i + ") is " + healthValue);
+				if (healthValue >= 0.95 - (r * 0.2)) {
+					answer += "█";
+				}
+				else if (healthValue < 0.95 - (r * 0.2) && healthValue >= 1 - ((r + 1) * 0.2)) {
+					answer += "▄";
+				}
+				else {
+					answer += " ";
+				}
+			}
+			if (r === 0) answer += y_max;
+			else if (r === height - 1) answer += y_min;
+		}
+		return "```" + answer + "```";
+	}
 }
