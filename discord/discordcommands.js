@@ -48,8 +48,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	command([preferences.get("prefix") + "banuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lbanuser <uid> <duration> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
-		const reason = parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1);
-		let duration = parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2));
+		const reason = parameter.substring(parameter.indexOfInstance(" ", 2) + 1);
+		let duration = parameter.substring(parameter.indexOfInstance(" ", 1) + 1, parameter.indexOfInstance(" ", 2));
 		duration = duration == "0" ? duration = 0 : UTILS.durationParse(duration);
 		if (isNaN(duration)) return reply(":x: The duration is invalid.");
 		const end_date = duration == 0 ? 0 : new Date().getTime() + duration;
@@ -65,8 +65,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	command([preferences.get("prefix") + "banserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lbanserver <sid> <duration> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
-		const reason = parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1);
-		let duration = parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2));
+		const reason = parameter.substring(parameter.indexOfInstance(" ", 2) + 1);
+		let duration = parameter.substring(parameter.indexOfInstance(" ", 1) + 1, parameter.indexOfInstance(" ", 2));
 		duration = duration == "0" ? duration = 0 : UTILS.durationParse(duration);
 		if (isNaN(duration)) return reply(":x: The duration is invalid.");
 		const end_date = duration == 0 ? 0 : new Date().getTime() + duration;
@@ -315,11 +315,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 					lolapi.getThirdPartyCode(region, summoner.id, CONFIG.API_MAXAGE.VERIFY.THIRD_PARTY_CODE).then(tpc => {
 						let valid_code = 0;
 						const tpc_timestamp_ms = parseInt(tpc.substring(0, tpc.indexOf("-")));
-						const tpc_region = tpc.substring(tpc.indexOf("-") + 1, UTILS.indexOfInstance(tpc, "-", 2));
-						const tpc_summonerID = tpc.substring(UTILS.indexOfInstance(tpc, "-", 2) + 1, UTILS.indexOfInstance(tpc, "-", 3));
-						const tpc_discordID = tpc.substring(UTILS.indexOfInstance(tpc, "-", 3) + 1, UTILS.indexOfInstance(tpc, "-", 4));
-						const tpc_HMAC_input = tpc.substring(0, UTILS.indexOfInstance(tpc, "-", 4));
-						const tpc_HMAC_output = tpc.substring(UTILS.indexOfInstance(tpc, "-", 4) + 1);
+						const tpc_region = tpc.substring(tpc.indexOf("-") + 1, tpc.indexOfInstance("-", 2));
+						const tpc_summonerID = tpc.substring(tpc.indexOfInstance("-", 2) + 1, tpc.indexOfInstance("-", 3));
+						const tpc_discordID = tpc.substring(tpc.indexOfInstance("-", 3) + 1, tpc.indexOfInstance("-", 4));
+						const tpc_HMAC_input = tpc.substring(0, tpc.indexOfInstance("-", 4));
+						const tpc_HMAC_output = tpc.substring(tpc.indexOfInstance("-", 4) + 1);
 						UTILS.debug("tpc_timestamp_ms: " + tpc_timestamp_ms);
 						UTILS.debug("tpc_region: " + tpc_region);
 						UTILS.debug("tpc_summonerID: " + tpc_summonerID);
@@ -755,9 +755,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			const number = parseInt(parameter.substring(0, parameter.indexOf(" ")));
 			if (isNaN(number)) return false;
 			try {//username explicitly provided
-				const region = assertRegion(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
+				const region = assertRegion(parameter.substring(parameter.indexOfInstance(" ", 1) + 1, parameter.indexOfInstance(" ", 2)), false);//see if there is a region
 				if (!processRateLimit()) return false;
-				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) {//longest query should be less than 35 characters
+				if (parameter.substring(parameter.indexOfInstance(" ", 2) + 1).length < 35) {//longest query should be less than 35 characters
 					if (msg.mentions.users.size == 1) {
 						lolapi.getLink(msg.mentions.users.first().id).then(result => {
 							let username = msg.mentions.users.first().username;//suppose the link doesn't exist in the database
@@ -765,14 +765,14 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 							callback(region, username, number, 4);
 						}).catch(console.error);
 					}
-					else if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1)[0] == "$") {
-						lolapi.getShortcut(msg.author.id, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)).then(result => {
-							callback(region, result[parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)], number, 1);
+					else if (parameter.substring(parameter.indexOfInstance(" ", 2) + 1)[0] == "$") {
+						lolapi.getShortcut(msg.author.id, parameter.substring(parameter.indexOfInstance(" ", 2) + 1).toLowerCase().substring(1)).then(result => {
+							callback(region, result[parameter.substring(parameter.indexOfInstance(" ", 2) + 1).toLowerCase().substring(1)], number, 1);
 						}).catch(e => {
 							if (e) reply(":x: An error has occurred. The shortcut may not exist.");
 						});
 					}
-					else if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1) == "^") {
+					else if (parameter.substring(parameter.indexOfInstance(" ", 2) + 1) == "^") {
 						msg.channel.fetchMessages({ before: msg.id, limit: 30 }).then(msgs => {
 							msgs = msgs.array();
 							let username;
@@ -790,7 +790,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 							else callback(region, username, number, 5);
 						}).catch(console.error);
 					}
-					else callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number, 0);
+					else callback(region, parameter.substring(parameter.indexOfInstance(" ", 2) + 1), number, 0);
 					return true;
 				}
 			}

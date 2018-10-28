@@ -1183,10 +1183,10 @@ module.exports = class EmbedGenerator {
 			if (destination === 0) {
 				newEmbed.setURL(CONFIG.HELP_SERVER_INVITE_LINK);
 				newEmbed.addField("This is a private conversation with management.", "You can reply to this message by sending `" + CONFIG.DISCORD_COMMAND_PREFIX + "say <your response goes here>`");
-				newEmbed.setDescription(msg.cleanContent.substring(UTILS.indexOfInstance(msg.cleanContent, " ", 2) + 1) + "\n\n" + CONFIG.OWNER_DISCORD_IDS[msg.author.id].flags);
+				newEmbed.setDescription(msg.cleanContent.substring(msg.cleanContent.indexOfInstance(" ", 2) + 1) + "\n\n" + CONFIG.OWNER_DISCORD_IDS[msg.author.id].flags);
 			}
 			else if (destination === 1) {
-				newEmbed.setDescription(msg.cleanContent.substring(UTILS.indexOfInstance(msg.cleanContent, " ", 2) + 1));
+				newEmbed.setDescription(msg.cleanContent.substring(msg.cleanContent.indexOfInstance(" ", 2) + 1));
 			}
 		}//Lmail
 		if (type < 5) {
@@ -1203,7 +1203,7 @@ module.exports = class EmbedGenerator {
 		if (!UTILS.exists(msg.embeds[0])) return 1;//no embed detected
 		if (!UTILS.exists(msg.embeds[0].footer) || !UTILS.exists(msg.embeds[0].footer.text)) return 2;//not approvable
 		const c_location = msg.embeds[0].footer.text.indexOf(":");
-		const c_location2 = UTILS.indexOfInstance(msg.embeds[0].footer.text, ":", 2);
+		const c_location2 = msg.embeds[0].footer.text.indexOfInstance(":", 2);
 		if (c_location == -1 || c_location2 == -1) return 3;//not approvable
 		if (approved) {
 			let public_e = new Discord.RichEmbed(msg.embeds[0]);

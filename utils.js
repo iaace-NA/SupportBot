@@ -8,6 +8,16 @@ String.prototype.replaceAll = function(search, replacement) {
 String.prototype.count = function(search) {
 	return (this.match(new RegExp(search, "g")) || []).length;
 }
+String.prototype.indexOfInstance = function(searchString, index) {
+	let answer = -1;
+	for (let i = 0, count = 0; i < this.length - searchString.length; ++i) {
+		if (this.substring(i, i + searchString.length) == searchString) {
+			++count;
+			if (count == index) answer = i;
+		}
+	}
+	return answer;
+}
 Number.prototype.pad = function(size) {
 	let s = String(this);
 	while (s.length < (size || 2)) {s = "0" + s;}
@@ -118,16 +128,6 @@ module.exports = class UTILS {
 	}
 	level(summonerID, match) {
 		return this.stats(summonerID, match).championLevel;
-	}
-	indexOfInstance(string, searchString, index) {
-		let answer = -1;
-		for (let i = 0, count = 0; i < string.length - searchString.length; ++i) {
-			if (string.substring(i, i + searchString.length) == searchString) {
-				++count;
-				if (count == index) answer = i;
-			}
-		}
-		return answer;
 	}
 	preferredTextChannel(client, collection, type, names, permissions) {
 		for (let i = 0; i < names.length; ++i) {
