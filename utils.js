@@ -273,6 +273,40 @@ module.exports = class UTILS {
 		}
 		return answer;
 	}
+	decodeEnglishToIMMR(text) {
+		const answer = internal_calc();
+		return (isNaN(answer) || !this.exists(answer)) ? null : answer;
+		function internal_calc() {
+			text.replaceAll(" ", "");//remove spaces
+			text = text.toLowerCase();//all lowercase
+			const TIERS = ["b", "s", "g", "p", "d", "m", "c"];
+			const T_IMMR = [300, 800, 1300, 1800, 2300, 2600, 2800];
+			const tier_index = TIERS.indexOf(text[0]);
+			if (tier_index === -1) return null;//tier not detected
+			if (text.length === 1) return T_IMMR[TIERS.indexOf(text[0])];//tier only
+			else {//tier, div, [LP]
+				const div = parseInt(text[1]);
+				if (text.length === 2) {//tier, div
+					if (tier_index < 5) {//below master
+						if (div > 5 || div < 1) return null;
+						else return T_IMMR[tier_index] + ((3 - div) * 100);
+					}
+					else return null;
+				}
+				else if (tier_index >= 5) {//tier, LP master/challenger
+					let LP = parseInt(text.substring(1));//must be >= 0
+					if (LP < 0) return null;
+					else if (tier_index == 5) return T_IMMR[tier_index] + (LP / 5);
+					else return T_IMMR[tier_index] - 200 + (LP / 5);
+				}
+				else {//tier, div, LP
+					let LP = parseInt(text.substring(2));
+					if (LP > 100 || LP < 0) return null;//must be between 0 and 100
+					return T_IMMR[tier_index] + ((3 - div) * 100) + LP;
+				}
+			}
+		}
+	}
 	summonersRiftMMR(rank) {
 		let individual_iMMR = 0;
 		let individual_games = 0;
