@@ -1243,4 +1243,13 @@ module.exports = class EmbedGenerator {
 		newEmbed.setFooter("This code does not need to be kept secret.");
 		return newEmbed;
 	}
+	debug(CONFIG, client, iapi_stats, ) {
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setTitle("Diagnostic Information");
+		newEmbed.addField("System", "iAPI request rate: " + iapi_stats["0"].total_count + "req/min\nNode.js " + process.versions.node + "\nNODE_ENV: " + process.env.NODE_ENV + "\nSoftware Version: " + CONFIG.VERSION);
+		newEmbed.addField("Uptime Information", "Time since last disconnect: " + (client.uptime / 3600000.0) + "\nTime since last restart: " + (process.uptime() / 3600.0) + "\nIAPI time since last restart: " + (iapi_stats.uptime / 3600.0));
+		newEmbed.setColor(255);
+
+		return newEmbed;
+	}
 }

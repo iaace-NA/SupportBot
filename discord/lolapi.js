@@ -70,7 +70,7 @@ module.exports = class LOLAPI {
 			});
 		});
 	}
-	getIAPI(path, options, response_expected = true) {//get internal API
+	getIAPI(path, options, response_expected = true, json_expected = true) {//get internal API
 		let that = this;
 		options.k = this.CONFIG.API_KEY;
 		return new Promise((resolve, reject) => {
@@ -95,9 +95,14 @@ module.exports = class LOLAPI {
 				else {
 					try {
 						//UTILS.debug(body, true);
-						const answer = JSON.parse(body);
-						UTILS.output("IAPI req: " + url);
-						resolve(answer);
+						if (json_expected) {
+							const answer = JSON.parse(body);
+							UTILS.output("IAPI req: " + url);
+							resolve(answer);
+						}
+						else {
+							resolve(body);
+						}
 					}
 					catch (e) {
 						reject(e);
