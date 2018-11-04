@@ -287,7 +287,7 @@ module.exports = class EmbedGenerator {
 			if (match.gameStartTime != 0) newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Playing:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => { return p.summonerId == summoner.id; }).championId].emoji + "** on " + game_type + " for `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
 			else newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Game Loading:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => p.summonerId == summoner.id).championId].emoji + "** on " + game_type);
 		}
-		const will = (region === "na" && summoner.id == 50714503) ? true : false;
+		const will = (region === "NA" && summoner.id == 50714503) ? true : false;
 		let highest_rank = -1;
 		for (let i = 0; i < ranks.length; ++i) {
 			let description = (ranks[i].wins + ranks[i].losses) + "G (" + UTILS.round(100 * ranks[i].wins / (ranks[i].wins + ranks[i].losses), 2) + "%) = " + ranks[i].wins + "W + " + ranks[i].losses + "L";
@@ -311,11 +311,11 @@ module.exports = class EmbedGenerator {
 		if (highest_rank > -1) newEmbed.setColor(RANK_COLOR[highest_rank]);
 		if (will) {
 			const challenger_rank = UTILS.randomInt(5, 200);
-			const challenger_LP = UTILS.randomInt(100, 1000);
 			const fake_games = UTILS.randomInt(200, 700);
 			const fake_wins = UTILS.randomInt(fake_games / 2, fake_games);
 			const fake_losses = fake_games - fake_wins;
 			const fake_wr = UTILS.round(100 * fake_wins / (fake_wins + fake_losses), 2);
+			const challenger_LP = UTILS.map(fake_wr, .5, 1, 500, 1000);
 			newEmbed.addField("<:Challenger:437262128282599424>True Rank: Challenger ~#" + challenger_rank + " " + challenger_LP + "LP", fake_games + "G (" + fake_wr + "%) = " + fake_wins + "W + " + fake_losses + "L", true);
 			newEmbed.setColor(RANK_COLOR[RANK_COLOR.length - 1]);
 		}
@@ -943,7 +943,7 @@ module.exports = class EmbedGenerator {
 			}
 			for (let i = 0; i < team_by_tt_ranks_description.length; ++i) {
 				team_by_tt_ranks_description[i].sort((a, b) => b[0] - a[0]);
-				team_by_tt_ranks_description[i] = "**__Team " + sideOfMap(team_by_tt_ranks[team_by_tt_ranks_best].diff, i) + team_by_tt_ranks_description[i].map(d => d[1]).join("\n") + "\n" + formatDescriptionStringRanks(team_by_tt_ranks[team_by_tt_ranks_best], i);
+				team_by_tt_ranks_description[i] = "**__Team " + sideOfMap(team_by_tt_ranks[team_by_tt_ranks_best].diff, i) + "__**\n" + team_by_tt_ranks_description[i].map(d => d[1]).join("\n") + "\n" + formatDescriptionStringRanks(team_by_tt_ranks[team_by_tt_ranks_best], i);
 				team_by_tt_ranks_description[i] = team_by_tt_ranks_description[i].trim();
 			}
 			newEmbed.addField("By Skill", team_by_tt_ranks_description[0], true);
@@ -1130,7 +1130,7 @@ module.exports = class EmbedGenerator {
 		const SECTION_LENGTH = 15;
 		if (cm_description.length > 0) {
 			const sections = Math.trunc(cm_description.length / SECTION_LENGTH) + 1;
-			for (let i = 0; i < sections && i < 6; ++i) newEmbed.addField("#" + ((i * SECTION_LENGTH) + 1) + " - #" + (((i + 1) * SECTION_LENGTH) + 1), cm_description.slice(i * SECTION_LENGTH, (i + 1) * SECTION_LENGTH).join("\n"), true);
+			for (let i = 0; i < sections && i < 6; ++i) newEmbed.addField("#" + ((i * SECTION_LENGTH) + 1) + " - #" + ((i + 1) * SECTION_LENGTH), cm_description.slice(i * SECTION_LENGTH, (i + 1) * SECTION_LENGTH).join("\n"), true);
 		}
 		newEmbed.setFooter("Showing a maximum of 90 champions");
 		return newEmbed;

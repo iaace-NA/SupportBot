@@ -472,6 +472,8 @@ module.exports = class UTILS {
 		return choices[Math.trunc(Math.random() * choices.length)];
 	}
 	randomInt(a, b) {//[a, b)
+		a = Math.ceil(a);
+		b = Math.floor(b);
 		return Math.trunc(Math.random() * (b - a)) + a;
 	}
 	disciplinaryStatus(docs) {
