@@ -51,14 +51,14 @@ module.exports = class UTILS {
 	round(num, decimal = 0) {
 		return Math.round(num * Math.pow(10, decimal)) / Math.pow(10, decimal);
 	}
-	assert(condition) {
+	assert(condition, message) {
 		if (typeof (condition) != "boolean") {
 			console.trace();
 			throw new Error("asserting non boolean value: " + typeof (condition));
 		}
 		if (!condition) {
 			console.trace();
-			throw new Error("assertion false");
+			throw new Error("assertion false" + (this.exists(message) ? ": " + message : ""));
 		}
 		return true;
 	}
@@ -170,7 +170,8 @@ module.exports = class UTILS {
 		else return 0;
 	}
 	opgg(region, username) {
-		this.assert(this.exists(username));
+		this.assert(this.exists(username), "opgg link generator: username doesn't exist");
+		this.assert(this.region(region), "opgg link generator: region doesn't exist");
 		if (region == "KR") region = "www";//account for kr region special www opgg link
 		return "http://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
 	}
@@ -521,7 +522,7 @@ module.exports = class UTILS {
 		return { active_ban, recent_ban, recent_warning, most_recent_note };
 	}
 	disciplinaryStatusString(status, user) {
-		this.assert(this.exists(user));
+		this.assert(this.exists(user), "UTILS.dSS(status, user): user doesn't exist");
 		let answer = user ? "User: " : "Server: ";
 		if (status.active_ban == -1 && !status.recent_ban && !status.recent_warning) answer += ":white_check_mark: Good standing.";
 		else {

@@ -40,10 +40,10 @@ module.exports = class LOLAPI {
 	get(region, path, tag, options, cachetime, maxage, parseJSON = true) {
 		let that = this;
 		return new Promise((resolve, reject) => {
-			UTILS.assert(UTILS.exists(region));
-			UTILS.assert(UTILS.exists(cachetime));
-			UTILS.assert(UTILS.exists(maxage));
-			UTILS.assert(UTILS.exists(tag));
+			UTILS.assert(UTILS.exists(region), "API get: region not specified");
+			UTILS.assert(UTILS.exists(cachetime), "API get: cachetime not specified");
+			UTILS.assert(UTILS.exists(maxage), "API get: maxage not specified");
+			UTILS.assert(UTILS.exists(tag), "API get: tag not specified");
 			let endpoint = "/lol/" + path + "?iapimaxage=" + maxage + "&iapirequest_id=" + this.request_id;
 			for (let i in options) {
 				endpoint += "&" + i + "=" + encodeURIComponent(options[i]);

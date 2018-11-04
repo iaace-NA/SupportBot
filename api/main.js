@@ -74,7 +74,7 @@ let Profiler = require("../timeprofiler.js");
 let request = require("request");
 let wsRoutes = require("./websockets.js");
 let routes = require("./routes.js");
-UTILS.assert(UTILS.exists(CONFIG.API_PORT));
+UTILS.assert(UTILS.exists(CONFIG.API_PORT), "API port does not exist in config.");
 UTILS.output("Modules loaded.");
 let apicache = require("mongoose");
 apicache.connect("mongodb://localhost/apicache", { useNewUrlParser: true });//cache of summoner object name lookups

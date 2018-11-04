@@ -309,7 +309,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			if (UTILS.exists(summoner.status)) return reply(":x: The username appears to be invalid.");
 			lolapi.getVerifiedAccounts(msg.author.id).then(result => {
 				if (UTILS.exists(result.verifiedAccounts[region + ":" + summoner.id])) {
-					reply(":white_check_mark: You have already linked your discord account to " + summoner.name + ".");//verified
+					reply(":white_check_mark: You have already linked your discord account to " + summoner.name + ". This will expire in " + UTILS.until(new Date(result.verifiedAccounts[region + ":" + summoner.id])) + ".");//verified
 				}
 				else {//not verified yet
 					lolapi.getThirdPartyCode(region, summoner.id, CONFIG.API_MAXAGE.VERIFY.THIRD_PARTY_CODE).then(tpc => {
