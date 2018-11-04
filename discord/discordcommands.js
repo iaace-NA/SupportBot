@@ -326,18 +326,20 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 						UTILS.debug("tpc_discordID: " + tpc_discordID);
 						UTILS.debug("tpc_HMAC_input: " + tpc_HMAC_input);
 						UTILS.debug("tpc_HMAC_output: " + tpc_HMAC_output);
-						if (tpc_timestamp_ms < new Date().getTime() - (5 * 60 * 1000)) valid_code = 1;//not expired
-						else if (tpc_region !== region) valid_code = 2;//same region
-						else if (tpc_summonerID !== summoner.id) valid_code = 3;//same summoner id
-						else if (tpc_discordID !== msg.author.id) valid_code = 4;//same discord uid
-						else if (tpc_HMAC_output !== crypto.createHmac("sha1", CONFIG.TPV_KEY).update(tpc_HMAC_input).digest("hex")) valid_code = false;//same HMAC
-						if (valid_code > 0) {
-							UTILS.debug("valid_code: " + valid_code);
+						if (tpc_timestamp_ms < new Date().getTime() - (5 * 60 * 1000)) valid_code += 1;//not expired
+						else if (tpc_region !== region) valid_code += 2;//same region
+						else if (tpc_summonerID !== summoner.id) valid_code += 4;//same summoner id
+						else if (tpc_discordID !== msg.author.id) valid_code += 8;//same discord uid
+						else if (tpc_HMAC_output !== crypto.createHmac("sha1", CONFIG.TPV_KEY).update(tpc_HMAC_input).digest("hex")) valid_code += 16;//same HMAC
+						if (valid_code === 0) {
 							lolapi.setVerifiedAccount(msg.author.id, region, summoner.id, new Date().getTime() + (365 * 24 * 60 * 60000)).then(result2 => {
 								reply(":white_check_mark: You have linked your discord account to " + summoner.name + " for 1 year.");
 							}).catch(console.error);
 						}
-						else replyEmbed(embedgenerator.verify(CONFIG, summoner, msg.author.id));
+						else {
+							UTILS.debug("valid_code: " + valid_code.toString(2));
+							replyEmbed(embedgenerator.verify(CONFIG, summoner, msg.author.id));
+						}
 					}).catch();
 				}
 			}).catch(console.error);
