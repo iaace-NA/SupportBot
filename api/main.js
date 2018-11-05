@@ -7,7 +7,7 @@ let CONFIG;
 const JSON5 = require("json5");
 try {
 	CONFIG = JSON5.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.5.1";//b for non-release (in development)
+	CONFIG.VERSION = "v1.5.2";//b for non-release (in development)
 }
 catch (e) {
 	console.log("something's wrong with config.json");
@@ -76,7 +76,7 @@ let routes = require("./routes.js");
 UTILS.assert(UTILS.exists(CONFIG.API_PORT));
 UTILS.output("Modules loaded.");
 let apicache = require("mongoose");
-apicache.connect("mongodb://localhost/apicache", { useNewUrlParser: true });//cache of summoner object name lookups
+apicache.connect(CONFIG.MONGODB_ADDRESS, { useNewUrlParser: true });//cache of summoner object name lookups
 apicache.connection.on("error", function (e) { throw e; });
 
 let api_doc = new apicache.Schema({
