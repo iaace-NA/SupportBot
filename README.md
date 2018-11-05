@@ -1,4 +1,4 @@
-# SupportBot v1.5.1
+# SupportBot v1.5.2
 League of Legends Statistics for Discord
 (c) 2018; source available, all rights reserved
 
