@@ -171,7 +171,7 @@ module.exports = class UTILS {
 	}
 	opgg(region, username) {
 		this.assert(this.exists(username), "opgg link generator: username doesn't exist");
-		this.assert(this.region(region), "opgg link generator: region doesn't exist");
+		this.assert(this.exists(region), "opgg link generator: region doesn't exist");
 		if (region == "KR") region = "www";//account for kr region special www opgg link
 		return "http://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
 	}
