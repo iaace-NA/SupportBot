@@ -424,7 +424,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			});
 		})).then(usernames => {
 			lolapi.getMultipleSummonerIDFromName(region, usernames, CONFIG.API_MAXAGE.MULTI.MULTIPLE_SUMMONER_ID).then(summoners => {
-				UTILS.removeAllOccurances(summoners, undefined);
+				UTILS.removeAllOccurances(summoners, e => !UTILS.exists(e.id));
 				const ids = summoners.map(s => s.id);
 				lolapi.getMultipleRanks(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_RANKS).then(ranks => {
 					lolapi.getMultipleChampionMastery(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_MASTERIES).then(masteries => {
@@ -469,7 +469,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			});
 		})).then(usernames => {
 			lolapi.getMultipleSummonerIDFromName(region, usernames, CONFIG.API_MAXAGE.FTG.MULTIPLE_SUMMONER_ID).then(summoners => {
-				UTILS.removeAllOccurances(summoners, undefined);
+				UTILS.removeAllOccurances(summoners, e => !UTILS.exists(e.id));
 				const ids = summoners.map(s => s.id);
 				lolapi.getMultipleRanks(region, ids, CONFIG.API_MAXAGE.FTG.MULTIPLE_RANKS).then(ranks => {
 					lolapi.getMultipleChampionMastery(region, ids, CONFIG.API_MAXAGE.FTG.MULTIPLE_MASTERIES).then(masteries => {

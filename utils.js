@@ -355,7 +355,23 @@ module.exports = class UTILS {
 		return JSON.parse(JSON.stringify(obj));
 	}
 	removeAllOccurances(arr, deletable) {
-		while (arr.indexOf(deletable) != -1) arr.splice(arr.indexOf(deletable), 1);
+		let deleted = 0;
+		if (typeof(deletable) === "function") {
+			for (let i = 0; i < arr.length; ++i) {
+				if (deletable(arr[i])) {
+					arr.splice(i, 1);
+					--i;
+					++deleted;
+				}
+			}
+		}
+		else {
+			while (arr.indexOf(deletable) != -1) {
+				arr.splice(arr.indexOf(deletable), 1);
+				++deleted;
+			}
+		}
+		return deleted;
 	}
 	defaultChannelNames() {
 		return ["general", "bot", "bots", "bot-commands", "botcommands", "commands", "league", "lol", "supportbot", "support-bot", "games", "spam"];
