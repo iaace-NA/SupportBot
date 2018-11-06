@@ -180,12 +180,7 @@ function getMatchTags(summonerID, match) {
 		sortable_all.participants[b].stats.inverseDeaths = -KDA.D;
 	}
 	let sortable_team = UTILS.copy(sortable_all);//match with ally team only
-	for (let i = 0; i < sortable_team.participants.length; ++i) {
-		if (sortable_team.participants[i].teamId !== teamID) {
-			sortable_team.participants.splice(i, 1);//removes non-allies
-			--i;
-		}
-	}
+	UTILS.removeAllOccurances(sortable_team.participants, p => p.teamId !== teamID);
 	const criteria = [{ statName: "totalCS", designation: "Most CS", direct: true },
 	{ statName: "totalDamageDealtToChampions" , designation: "Most Champion Damage", direct: true },
 	{ statName: "totalDamageDealt", designation: "Most Damage", direct: true },
