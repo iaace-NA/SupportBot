@@ -167,7 +167,9 @@ module.exports = class LOLAPI {
 				return resolve({ status: "username didn't pass regex filter" });
 			}
 			username = username.toLowerCase();
-			this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), tags.summoner, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage).then(resolve).catch(reject);
+			this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), tags.summoner, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage).then(answer => {
+				resolve(answer.name === ("rtbf" + answer.id) ? { status: "GDPR right to be forgotten" } : answer);
+			}).catch(reject);
 		});
 	}
 	getMultipleSummonerIDFromName(region, usernames, maxage) {
@@ -183,8 +185,12 @@ module.exports = class LOLAPI {
 		}
 	}
 	getSummonerFromSummonerID(region, id, maxage) {
-		if (id === null) return new Promise((resolve, reject) => { resolve({}); });
-		return this.get(region, "summoner/v3/summoners/" + id, tags.summoner, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_FROM_SUMMONER_ID, maxage);
+		if (id === null) return new Promise((resolve, reject) => resolve({}));
+		return new Promise((resolve, reject) => {
+			this.get(region, "summoner/v3/summoners/" + id, tags.summoner, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_FROM_SUMMONER_ID, maxage).then(answer => {
+				resolve(answer.name === ("rtbf" + answer.id) ? { status: "GDPR right to be forgotten" } : answer);
+			}).catch(reject);
+		});
 	}
 	getMultipleSummonerFromSummonerID(region, ids, maxage) {
 		let that = this;
