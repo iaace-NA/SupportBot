@@ -272,12 +272,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	command([preferences.get("prefix") + "setshortcut ", preferences.get("prefix") + "ss ", preferences.get("prefix") + "createshortcut ", preferences.get("prefix") + "addshortcut "], true, false, (original, index, parameter) => {
 		if (parameter[0] !== "$") return reply(":x: The shortcut must begin with an `$`. Please try again.");
-		if (parameter.indexOf(" ") === -1) return reply(":x: The shortcut word and the username must be separated by a space. Please try again.");
-		if (parameter.length > 60) return reply(":x: The shortcut name or the username is too long.");
+		else if (parameter.indexOf(" ") === -1) return reply(":x: The shortcut word and the username must be separated by a space. Please try again.");
+		else if (parameter.length > 60) return reply(":x: The shortcut name or the username is too long.");
 		const from = parameter.substring(1, parameter.indexOf(" ")).toLowerCase();
 		if (from.length === 0) return reply(":x: The shortcut name was not specified. Please try again.");
 		const to = parameter.substring(parameter.indexOf(" ") + 1);
 		if (to.length === 0) return reply(":x: The username was not specified. Please try again.");
+		else if (parameter.substring(1).indexOf("$") !== -1) return reply("The shortcut cannot contain more than 1 `$` character.");
 		lolapi.createShortcut(msg.author.id, from, to).then(result => {
 			if (result.success) reply(":white_check_mark: `$" + from + "` will now point to `" + to + "`.");
 			else reply(":x: You can only have up to 50 shortcuts. Please remove some and try again.");
