@@ -12,8 +12,8 @@ echo Finished installing mongodb 3.6
 sudo service mongod start
 echo MongoDB started
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-sudo apt install -y nodejs
-echo NodeJS installed
+sudo apt install -y nodejs npm
+echo NodeJS & npm installed
 sudo apt install -y htop
 echo htop installed
 cd ~
