@@ -29,3 +29,4 @@ npm install
 echo Finished installing discord deps
 cd ../
 echo "Setup script complete. The following needs to be completed by the user:\nAdd config file\nAdd TLS files\nRestart system\nRun startup script in start folder"
+
