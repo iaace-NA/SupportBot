@@ -40,10 +40,10 @@ module.exports = class LOLAPI {
 	get(region, path, tag, options, cachetime, maxage, parseJSON = true) {
 		let that = this;
 		return new Promise((resolve, reject) => {
-			UTILS.assert(UTILS.exists(region));
-			UTILS.assert(UTILS.exists(cachetime));
-			UTILS.assert(UTILS.exists(maxage));
-			UTILS.assert(UTILS.exists(tag));
+			UTILS.assert(UTILS.exists(region), "API get: region not specified");
+			UTILS.assert(UTILS.exists(cachetime), "API get: cachetime not specified");
+			UTILS.assert(UTILS.exists(maxage), "API get: maxage not specified");
+			UTILS.assert(UTILS.exists(tag), "API get: tag not specified");
 			let endpoint = "/lol/" + path + "?iapimaxage=" + maxage + "&iapirequest_id=" + this.request_id;
 			for (let i in options) {
 				endpoint += "&" + i + "=" + encodeURIComponent(options[i]);
@@ -70,7 +70,7 @@ module.exports = class LOLAPI {
 			});
 		});
 	}
-	getIAPI(path, options, response_expected = true) {//get internal API
+	getIAPI(path, options, response_expected = true, json_expected = true) {//get internal API
 		let that = this;
 		options.k = this.CONFIG.API_KEY;
 		return new Promise((resolve, reject) => {
@@ -95,9 +95,14 @@ module.exports = class LOLAPI {
 				else {
 					try {
 						//UTILS.debug(body, true);
-						const answer = JSON.parse(body);
-						UTILS.output("IAPI req: " + url);
-						resolve(answer);
+						if (json_expected) {
+							const answer = JSON.parse(body);
+							UTILS.output("IAPI req: " + url);
+							resolve(answer);
+						}
+						else {
+							resolve(body);
+						}
 					}
 					catch (e) {
 						reject(e);
@@ -162,7 +167,9 @@ module.exports = class LOLAPI {
 				return resolve({ status: "username didn't pass regex filter" });
 			}
 			username = username.toLowerCase();
-			this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), tags.summoner, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage).then(resolve).catch(reject);
+			this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), tags.summoner, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage).then(answer => {
+				resolve(answer.name === ("rtbf" + answer.id) ? { status: "GDPR right to be forgotten" } : answer);
+			}).catch(reject);
 		});
 	}
 	getMultipleSummonerIDFromName(region, usernames, maxage) {
@@ -178,8 +185,12 @@ module.exports = class LOLAPI {
 		}
 	}
 	getSummonerFromSummonerID(region, id, maxage) {
-		if (id === null) return new Promise((resolve, reject) => { resolve({}); });
-		return this.get(region, "summoner/v3/summoners/" + id, tags.summoner, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_FROM_SUMMONER_ID, maxage);
+		if (id === null) return new Promise((resolve, reject) => resolve({}));
+		return new Promise((resolve, reject) => {
+			this.get(region, "summoner/v3/summoners/" + id, tags.summoner, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_FROM_SUMMONER_ID, maxage).then(answer => {
+				resolve(answer.name === ("rtbf" + answer.id) ? { status: "GDPR right to be forgotten" } : answer);
+			}).catch(reject);
+		});
 	}
 	getMultipleSummonerFromSummonerID(region, ids, maxage) {
 		let that = this;
@@ -364,6 +375,9 @@ module.exports = class LOLAPI {
 	}
 	getPreferences(sid) {
 		return this.getIAPI("getpreferences", { id: sid });
+	}
+	checkPreferences(sid) {
+		return this.getIAPI("existspreferences", { id: sid });
 	}
 	setPreferences(sid, prop, val, type) {
 		return this.getIAPI("setpreferences", { id: sid, prop, val, type });

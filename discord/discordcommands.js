@@ -272,12 +272,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	command([preferences.get("prefix") + "setshortcut ", preferences.get("prefix") + "ss ", preferences.get("prefix") + "createshortcut ", preferences.get("prefix") + "addshortcut "], true, false, (original, index, parameter) => {
 		if (parameter[0] !== "$") return reply(":x: The shortcut must begin with an `$`. Please try again.");
-		if (parameter.indexOf(" ") === -1) return reply(":x: The shortcut word and the username must be separated by a space. Please try again.");
-		if (parameter.length > 60) return reply(":x: The shortcut name or the username is too long.");
+		else if (parameter.indexOf(" ") === -1) return reply(":x: The shortcut word and the username must be separated by a space. Please try again.");
+		else if (parameter.length > 60) return reply(":x: The shortcut name or the username is too long.");
 		const from = parameter.substring(1, parameter.indexOf(" ")).toLowerCase();
 		if (from.length === 0) return reply(":x: The shortcut name was not specified. Please try again.");
 		const to = parameter.substring(parameter.indexOf(" ") + 1);
 		if (to.length === 0) return reply(":x: The username was not specified. Please try again.");
+		else if (parameter.substring(1).indexOf("$") !== -1) return reply(":x: The shortcut cannot contain more than 1 `$` character.");
 		lolapi.createShortcut(msg.author.id, from, to).then(result => {
 			if (result.success) reply(":white_check_mark: `$" + from + "` will now point to `" + to + "`.");
 			else reply(":x: You can only have up to 50 shortcuts. Please remove some and try again.");
@@ -309,7 +310,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			if (UTILS.exists(summoner.status)) return reply(":x: The username appears to be invalid.");
 			lolapi.getVerifiedAccounts(msg.author.id).then(result => {
 				if (UTILS.exists(result.verifiedAccounts[region + ":" + summoner.id])) {
-					reply(":white_check_mark: You have already linked your discord account to " + summoner.name + ".");//verified
+					reply(":white_check_mark: You have already linked your discord account to " + summoner.name + ". This will expire in " + UTILS.until(new Date(result.verifiedAccounts[region + ":" + summoner.id])) + ".");//verified
 				}
 				else {//not verified yet
 					lolapi.getThirdPartyCode(region, summoner.id, CONFIG.API_MAXAGE.VERIFY.THIRD_PARTY_CODE).then(tpc => {
@@ -326,18 +327,20 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 						UTILS.debug("tpc_discordID: " + tpc_discordID);
 						UTILS.debug("tpc_HMAC_input: " + tpc_HMAC_input);
 						UTILS.debug("tpc_HMAC_output: " + tpc_HMAC_output);
-						if (tpc_timestamp_ms < new Date().getTime() - (5 * 60 * 1000)) valid_code = 1;//not expired
-						else if (tpc_region !== region) valid_code = 2;//same region
-						else if (tpc_summonerID !== summoner.id) valid_code = 3;//same summoner id
-						else if (tpc_discordID !== msg.author.id) valid_code = 4;//same discord uid
-						else if (tpc_HMAC_output !== crypto.createHmac("sha1", CONFIG.TPV_KEY).update(tpc_HMAC_input).digest("hex")) valid_code = false;//same HMAC
-						if (valid_code > 0) {
-							UTILS.debug("valid_code: " + valid_code);
+						if (tpc_timestamp_ms < new Date().getTime() - (5 * 60 * 1000)) valid_code += 1;//not expired
+						else if (tpc_region !== region) valid_code += 2;//same region
+						else if (tpc_summonerID !== summoner.id) valid_code += 4;//same summoner id
+						else if (tpc_discordID !== msg.author.id) valid_code += 8;//same discord uid
+						else if (tpc_HMAC_output !== crypto.createHmac("sha1", CONFIG.TPV_KEY).update(tpc_HMAC_input).digest("hex")) valid_code += 16;//same HMAC
+						if (valid_code === 0) {
 							lolapi.setVerifiedAccount(msg.author.id, region, summoner.id, new Date().getTime() + (365 * 24 * 60 * 60000)).then(result2 => {
 								reply(":white_check_mark: You have linked your discord account to " + summoner.name + " for 1 year.");
 							}).catch(console.error);
 						}
-						else replyEmbed(embedgenerator.verify(CONFIG, summoner, msg.author.id));
+						else {
+							UTILS.debug("valid_code: " + valid_code.toString(2));
+							replyEmbed(embedgenerator.verify(CONFIG, summoner, msg.author.id));
+						}
 					}).catch();
 				}
 			}).catch(console.error);
@@ -421,6 +424,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			});
 		})).then(usernames => {
 			lolapi.getMultipleSummonerIDFromName(region, usernames, CONFIG.API_MAXAGE.MULTI.MULTIPLE_SUMMONER_ID).then(summoners => {
+				UTILS.removeAllOccurances(summoners, e => !UTILS.exists(e.id));
 				const ids = summoners.map(s => s.id);
 				lolapi.getMultipleRanks(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_RANKS).then(ranks => {
 					lolapi.getMultipleChampionMastery(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_MASTERIES).then(masteries => {
@@ -465,6 +469,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			});
 		})).then(usernames => {
 			lolapi.getMultipleSummonerIDFromName(region, usernames, CONFIG.API_MAXAGE.FTG.MULTIPLE_SUMMONER_ID).then(summoners => {
+				UTILS.removeAllOccurances(summoners, e => !UTILS.exists(e.id));
 				const ids = summoners.map(s => s.id);
 				lolapi.getMultipleRanks(region, ids, CONFIG.API_MAXAGE.FTG.MULTIPLE_RANKS).then(ranks => {
 					lolapi.getMultipleChampionMastery(region, ids, CONFIG.API_MAXAGE.FTG.MULTIPLE_MASTERIES).then(masteries => {

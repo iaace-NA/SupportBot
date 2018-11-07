@@ -180,12 +180,7 @@ function getMatchTags(summonerID, match) {
 		sortable_all.participants[b].stats.inverseDeaths = -KDA.D;
 	}
 	let sortable_team = UTILS.copy(sortable_all);//match with ally team only
-	for (let i = 0; i < sortable_team.participants.length; ++i) {
-		if (sortable_team.participants[i].teamId !== teamID) {
-			sortable_team.participants.splice(i, 1);//removes non-allies
-			--i;
-		}
-	}
+	UTILS.removeAllOccurances(sortable_team.participants, p => p.teamId !== teamID);
 	const criteria = [{ statName: "totalCS", designation: "Most CS", direct: true },
 	{ statName: "totalDamageDealtToChampions" , designation: "Most Champion Damage", direct: true },
 	{ statName: "totalDamageDealt", designation: "Most Damage", direct: true },
@@ -206,8 +201,8 @@ function getMatchTags(summonerID, match) {
 		UTILS.assert(UTILS.exists(sortable_all.participants[0].stats[criteria[c].statName]));
 		sortable_all.participants.sort((a, b) => b.stats[criteria[c].statName] - a.stats[criteria[c].statName]);
 		sortable_team.participants.sort((a, b) => b.stats[criteria[c].statName] - a.stats[criteria[c].statName]);
-		UTILS.debug(criteria[c].statName + ": " + sortable_all.participants.map(p => p.participantId + ":" + p.stats[criteria[c].statName]).join(", "));
-		UTILS.debug("team " + criteria[c].statName + ": " + sortable_team.participants.map(p => p.participantId + ":" + p.stats[criteria[c].statName]).join(", "));
+		//UTILS.debug(criteria[c].statName + ": " + sortable_all.participants.map(p => p.participantId + ":" + p.stats[criteria[c].statName]).join(", "));
+		//UTILS.debug("team " + criteria[c].statName + ": " + sortable_team.participants.map(p => p.participantId + ":" + p.stats[criteria[c].statName]).join(", "));
 		if (criteria[c].direct) {
 			if (sortable_all.participants[0].participantId === pID) answer.push(criteria[c].designation);
 			else if (sortable_team.participants[0].participantId === pID) answer.push("*" + criteria[c].designation);
@@ -287,7 +282,7 @@ module.exports = class EmbedGenerator {
 			if (match.gameStartTime != 0) newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Playing:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => { return p.summonerId == summoner.id; }).championId].emoji + "** on " + game_type + " for `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
 			else newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Game Loading:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => p.summonerId == summoner.id).championId].emoji + "** on " + game_type);
 		}
-		const will = (region === "na" && summoner.id == 50714503) ? true : false;
+		const will = (region === "NA" && summoner.id == 50714503) ? true : false;
 		let highest_rank = -1;
 		for (let i = 0; i < ranks.length; ++i) {
 			let description = (ranks[i].wins + ranks[i].losses) + "G (" + UTILS.round(100 * ranks[i].wins / (ranks[i].wins + ranks[i].losses), 2) + "%) = " + ranks[i].wins + "W + " + ranks[i].losses + "L";
@@ -311,11 +306,11 @@ module.exports = class EmbedGenerator {
 		if (highest_rank > -1) newEmbed.setColor(RANK_COLOR[highest_rank]);
 		if (will) {
 			const challenger_rank = UTILS.randomInt(5, 200);
-			const challenger_LP = UTILS.randomInt(100, 1000);
 			const fake_games = UTILS.randomInt(200, 700);
 			const fake_wins = UTILS.randomInt(fake_games / 2, fake_games);
 			const fake_losses = fake_games - fake_wins;
 			const fake_wr = UTILS.round(100 * fake_wins / (fake_wins + fake_losses), 2);
+			const challenger_LP = UTILS.map(fake_wr, .5, 1, 500, 1000);
 			newEmbed.addField("<:Challenger:437262128282599424>True Rank: Challenger ~#" + challenger_rank + " " + challenger_LP + "LP", fake_games + "G (" + fake_wr + "%) = " + fake_wins + "W + " + fake_losses + "L", true);
 			newEmbed.setColor(RANK_COLOR[RANK_COLOR.length - 1]);
 		}
@@ -753,9 +748,9 @@ module.exports = class EmbedGenerator {
 				else break;
 			}
 			individual_description += streak_count.pad(2) + (streak_result ? "Ws " : "Ls ");//streak information
-			const total_wins = results.reduce((total, increment) => total + (increment ? 1 : 0), 0) + "";
-			const total_losses = results.reduce((total, increment) => total + (increment ? 0 : 1), 0) + "";
-			individual_description += total_wins.pad(2) + "W/" + total_losses.pad(2) + "L ";//20 game W/L record
+			const total_wins = results.reduce((total, increment) => total + (increment ? 1 : 0), 0).pad(2);
+			const total_losses = results.reduce((total, increment) => total + (increment ? 0 : 1), 0).pad(2);
+			individual_description += total_wins + "W/" + total_losses + "L ";//20 game W/L record
 			individual_description += "@ " + UTILS.KDAFormat((all_KDA.K + all_KDA.A) / all_KDA.D) + "` ";
 			for (let j = 0; j < 3; ++j) {//top 3 champion masteries
 				individual_description += j < masteries[i].length ? CONFIG.STATIC.CHAMPIONS[masteries[i][j].championId].emoji : ":x:";
@@ -943,7 +938,7 @@ module.exports = class EmbedGenerator {
 			}
 			for (let i = 0; i < team_by_tt_ranks_description.length; ++i) {
 				team_by_tt_ranks_description[i].sort((a, b) => b[0] - a[0]);
-				team_by_tt_ranks_description[i] = "**__Team " + sideOfMap(team_by_tt_ranks[team_by_tt_ranks_best].diff, i) + team_by_tt_ranks_description[i].map(d => d[1]).join("\n") + "\n" + formatDescriptionStringRanks(team_by_tt_ranks[team_by_tt_ranks_best], i);
+				team_by_tt_ranks_description[i] = "**__Team " + sideOfMap(team_by_tt_ranks[team_by_tt_ranks_best].diff, i) + "__**\n" + team_by_tt_ranks_description[i].map(d => d[1]).join("\n") + "\n" + formatDescriptionStringRanks(team_by_tt_ranks[team_by_tt_ranks_best], i);
 				team_by_tt_ranks_description[i] = team_by_tt_ranks_description[i].trim();
 			}
 			newEmbed.addField("By Skill", team_by_tt_ranks_description[0], true);
@@ -1130,7 +1125,7 @@ module.exports = class EmbedGenerator {
 		const SECTION_LENGTH = 15;
 		if (cm_description.length > 0) {
 			const sections = Math.trunc(cm_description.length / SECTION_LENGTH) + 1;
-			for (let i = 0; i < sections && i < 6; ++i) newEmbed.addField("#" + ((i * SECTION_LENGTH) + 1) + " - #" + (((i + 1) * SECTION_LENGTH) + 1), cm_description.slice(i * SECTION_LENGTH, (i + 1) * SECTION_LENGTH).join("\n"), true);
+			for (let i = 0; i < sections && i < 6; ++i) newEmbed.addField("#" + ((i * SECTION_LENGTH) + 1) + " - #" + ((i + 1) * SECTION_LENGTH), cm_description.slice(i * SECTION_LENGTH, (i + 1) * SECTION_LENGTH).join("\n"), true);
 		}
 		newEmbed.setFooter("Showing a maximum of 90 champions");
 		return newEmbed;
@@ -1241,6 +1236,15 @@ module.exports = class EmbedGenerator {
 		newEmbed.addField("Instructions", "See the below image to save the code provided above to your account. Once you have done this, send the `" + CONFIG.DISCORD_COMMAND_PREFIX + "verify <region> <ign>` command again within the next 5 minutes after first **__waiting 30 seconds__**.");
 		newEmbed.setImage("https://supportbot.tk/f/tpv.png");//tpv tutorial image
 		newEmbed.setFooter("This code does not need to be kept secret.");
+		return newEmbed;
+	}
+	debug(CONFIG, client, iapi_stats, ) {
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setTitle("Diagnostic Information");
+		newEmbed.addField("System", "iAPI request rate: " + iapi_stats["0"].total_count + "req/min\nNode.js " + process.versions.node + "\nNODE_ENV: " + process.env.NODE_ENV + "\nSoftware Version: " + CONFIG.VERSION);
+		newEmbed.addField("Uptime Information", "Time since last disconnect: " + (client.uptime / 3600000.0) + "\nTime since last restart: " + (process.uptime() / 3600.0) + "\nIAPI time since last restart: " + (iapi_stats.uptime / 3600.0));
+		newEmbed.setColor(255);
+
 		return newEmbed;
 	}
 }

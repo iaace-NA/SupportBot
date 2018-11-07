@@ -108,19 +108,20 @@
 	"API_PERIOD": 250,//period (in ms) between requests to riot API servers. this is managed by the iapi. this setting has no effect anymore
 	"API_KEY": "insert random string here",//for internal api use only
 	"API_SEQUENTIAL": true,//whether or not multiple LoL api requests should be sequential or bursted
+	"MONGODB_ADDRESS": "mongodb://localhost/apicache",//mongodb database address
 	"API_CACHETIME": {//how long (in seconds) the api document should remain in cache. set to 0 to never cache
-		"GET_SUMMONER_ID_FROM_NAME": 86400,
-		"GET_SUMMONER_FROM_SUMMONER_ID": 86400,
-		"GET_RANKS": 14400,
-		"GET_CHAMPION_MASTERY": 86400,
-		"GET_RECENT_GAMES": 1800,
-		"GET_MATCH_INFORMATION": 2592000,
-		"GET_LIVE_MATCH": 90,
-		"GET_MMR": 120,
-		"GET_STATUS": 60,
-		"STATIC_CHAMPIONS": 10800,
-		"STATIC_SPELLS": 10800,
-		"GET_CHALLENGERS": 14400,
+		"GET_SUMMONER_ID_FROM_NAME": 86400,//1D
+		"GET_SUMMONER_FROM_SUMMONER_ID": 86400,//1D
+		"GET_RANKS": 14400,//4H
+		"GET_CHAMPION_MASTERY": 86400,//1D
+		"GET_RECENT_GAMES": 1800,//30m
+		"GET_MATCH_INFORMATION": 15552000,//180D
+		"GET_LIVE_MATCH": 90,//1.5m
+		"GET_MMR": 120,//2m
+		"GET_STATUS": 60,//1m
+		"STATIC_CHAMPIONS": 10800,//3H
+		"STATIC_SPELLS": 10800,//3H
+		"GET_CHALLENGERS": 14400,//4H
 		"THIRD_PARTY_CODE": 30
 	},
 	"API_MAXAGE": {//maximum acceptable age (in seconds) of api data for a command. set to 0 to never use cached responses
@@ -136,21 +137,21 @@
 		"MH": {
 			"SUMMONER_ID": 3600,
 			"RECENT_GAMES": 120,
-			"MULTIPLE_MATCH": 2592000
+			"MULTIPLE_MATCH": 15552000
 		},
 		"LG": {
 			"SUMMONER_ID": 3600,
 			"LIVE_MATCH": 60,
 			"OTHER_SUMMONER_ID": 86400,
 			"RECENT_GAMES": 1800,
-			"MULTIPLE_MATCH": 2592000,
+			"MULTIPLE_MATCH": 15552000,
 			"MULTIPLE_RANKS": 14400,
 			"MULTIPLE_MASTERIES": 86400
 		},
 		"DMH": {
 			"SUMMONER_ID": 3600,
 			"RECENT_GAMES": 120,
-			"MATCH_INFORMATION": 2592000,
+			"MATCH_INFORMATION": 15552000,
 			"MULTIPLE_RANKS": 86400,
 			"MULTIPLE_MASTERIES": 86400,
 			"OTHER_SUMMONER_ID": 86400
@@ -160,7 +161,7 @@
 			"MULTIPLE_RANKS": 14400,
 			"MULTIPLE_MASTERIES": 86400,
 			"MULTIPLE_RECENT_GAMES": 1800,
-			"MULTIPLE_MATCH": 2592000
+			"MULTIPLE_MATCH": 15552000
 		},
 		"FTG": {
 			"MULTIPLE_SUMMONER_ID": 86400,

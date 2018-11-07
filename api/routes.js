@@ -346,6 +346,11 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			});
 		});
 	}, true);
+	serveWebRequest("/existspreferences", (req, res, next) => {
+		findPreferences(req.query.id, res, doc => {
+			res.json({ new: !UTILS.exists(doc) });
+		});
+	}, true);
 	serveWebRequest("/getpreferences", (req, res, next) => {
 		findPreferences(req.query.id, res, doc => {
 			if (!UTILS.exists(doc)) {//create new doc
