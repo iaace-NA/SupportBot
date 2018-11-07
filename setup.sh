@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo "vm.swappiness = 20" >> /etc/sysctl.conf
+echo "vm.swappiness = 20" | sudo tee -a /etc/sysctl.conf
 echo Finshed setting vm.swappiness to 20
 sudo apt update
 sudo apt dist-upgrade -y
