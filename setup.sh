@@ -1,4 +1,5 @@
 #!/bin/bash
+#usage: ./setup.sh folder_name
 echo "vm.swappiness = 20" | sudo tee -a /etc/sysctl.conf
 echo "================Finshed setting vm.swappiness to 20================"
 sudo apt update
@@ -20,8 +21,8 @@ echo "================htop installed================"
 sudo apt install -y git
 echo "================git installed================"
 cd ~
-git clone https://github.com/iaace-NA/Supportbot sb
-cd sb
+git clone https://github.com/iaace-NA/Supportbot $1
+cd $1
 echo "================Finshed cloning repository================"
 sudo npm install pm2 -g
 echo "================Finished installing pm2 via npm global================"
