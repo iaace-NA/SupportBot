@@ -291,14 +291,16 @@ module.exports = class LOLAPI {
 		const that = this;
 		return new Promise((resolve, reject) => {
 			that.getSummonerIDFromNameOld(region, username, this.CONFIG.API_MAXAGE.SUMMONER_CARD.SUMMONER_ID).then(result => {
-				result.region = region;
-				result.guess = username;
-				if (!UTILS.exists(result.id)) reject();
-				that.getRanks(region, result.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RANKS).then(result2 => {
-					Promise.all(result2.map(r => that.getChallengerRanks(region, r.queueType, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHALLENGERS))).then(result5 => {
-						that.getChampionMastery(region, result.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHAMPION_MASTERY).then(result3 => {
-							that.getLiveMatch(region, result.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.LIVE_MATCH).then(result4 => {
-								resolve([result, result2, result3, result4, result5]);
+				that.getSummonerIDFromNameOld(region, username, this.CONFIG.API_MAXAGE.SUMMONER_CARD.SUMMONER_ID).then(result6 => {
+					result.region = region;
+					result.guess = username;
+					if (!UTILS.exists(result.id)) reject();
+					that.getRanks(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RANKS).then(result2 => {
+						Promise.all(result2.map(r => that.getChallengerRanks(region, r.queueType, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHALLENGERS))).then(result5 => {
+							that.getChampionMastery(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHAMPION_MASTERY).then(result3 => {
+								that.getLiveMatch(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.LIVE_MATCH).then(result4 => {
+									resolve([result, result2, result3, result4, result5]);
+								}).catch(reject);
 							}).catch(reject);
 						}).catch(reject);
 					}).catch(reject);
