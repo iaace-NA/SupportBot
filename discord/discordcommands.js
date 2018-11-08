@@ -345,7 +345,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			if (parameter.substring(parameter.indexOf(".") + 1, parameter.indexOf(".") + 6) == "op.gg") {
 				let username = decodeURIComponent(msg.content.substring(msg.content.indexOf("userName=") + "userName=".length)).replaceAll("+", " ");//reformat spaces
 				lolapi.getSummonerCard(region, username).then(result => {
-					lolapi.checkVerifiedAccount(msg.author.id, result[6].puuid).then(verified => {
+					lolapi.checkVerifiedAccount(msg.author.id, result[5].puuid).then(verified => {
 						replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], r_copy, result[3], result[4], verified));
 					}).catch(console.error);
 				}).catch(console.error);
@@ -360,7 +360,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	commandGuessUsername(forcePrefix([""]), false, (region, username, parameter, guess_method) => {
 		lolapi.getSummonerCard(region, username).then(result => {
-			lolapi.checkVerifiedAccount(msg.author.id, result[6].puuid).then(verified => {
+			lolapi.checkVerifiedAccount(msg.author.id, result[5].puuid).then(verified => {
 				replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], CONFIG.REGIONS_REVERSE[region], result[3], result[4], verified));
 			}).catch(console.error);
 		}).catch(e => {
