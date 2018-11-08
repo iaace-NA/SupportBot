@@ -792,7 +792,7 @@ module.exports = class EmbedGenerator {
 			return debug_mode ? "**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Med:** `" + UTILS.numberWithCommas(team.med[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **Δμ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side] - team.avg[1 - side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.sum[side]) + "` **Δ:** `" + UTILS.numberWithCommas(team.sum[side] - team.sum[1 - side]) + "` **%Δ:** `" + UTILS.round((100 * (team.sum[side] - team.sum[1 - side])) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
 		}
 		function formatDescriptionStringLarge(team, side) {
-			return debug_mode ? "**Min:** `" + UTILS.gold(team.min[side]) + "` **Med:** `" + UTILS.gold(team.med[side]) + "` **Max:** `" + UTILS.gold(team.max[side]) + "`\n**μ:** `" + UTILS.gold(team.avg[side]) + "` **Δμ:** `" + UTILS.gold(team.avg[side] - team.avg[1 - side]) + "` **σ:** `" + UTILS.gold(team.stdev[side]) + "`\n**Σ:** `" + UTILS.gold(team.sum[side]) + "` **Δ:** `" + UTILS.gold(team.sum[side] - team.sum[1 - side]) + "` **%Δ:** `" + UTILS.round((100 * (team.sum[side] - team.sum[1 - side])) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
+			return debug_mode ? "**Min:** `" + UTILS.masteryPoints(team.min[side]) + "` **Med:** `" + UTILS.masteryPoints(team.med[side]) + "` **Max:** `" + UTILS.masteryPoints(team.max[side]) + "`\n**μ:** `" + UTILS.masteryPoints(team.avg[side]) + "` **Δμ:** `" + UTILS.masteryPoints(team.avg[side] - team.avg[1 - side]) + "` **σ:** `" + UTILS.masteryPoints(team.stdev[side]) + "`\n**Σ:** `" + UTILS.masteryPoints(team.sum[side]) + "` **Δ:** `" + UTILS.masteryPoints(team.sum[side] - team.sum[1 - side]) + "` **%Δ:** `" + UTILS.round((100 * (team.sum[side] - team.sum[1 - side])) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
 		}
 		function formatDescriptionStringRanks(team, side) {
 			return debug_mode ? "**Min:** `" + UTILS.iMMRtoEnglish(team.min[side]) + "` **Med:** `" + UTILS.iMMRtoEnglish(team.med[side]) + "` **Max:** `" + UTILS.iMMRtoEnglish(team.max[side]) + "`\n**μ:** `" + UTILS.iMMRtoEnglish(team.avg[side]) + "` **Δμ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side] - team.avg[1 - side], 0)) + "LP` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "LP`\n**Σ:** `" + UTILS.numberWithCommas(UTILS.round(team.sum[side], 0)) + "LP` **Δ:** `" + UTILS.numberWithCommas(UTILS.round(team.sum[side] - team.sum[1 - side], 0)) + "LP` **%Δ:** `" + UTILS.round((100 * (team.sum[side] - team.sum[1 - side])) / (team.sum[0] + team.sum[1]), 1) + "`" : "";
@@ -828,7 +828,7 @@ module.exports = class EmbedGenerator {
 		const team_by_highest_mastery_best = team_by_highest_mastery.findIndex(t => t.abs === team_by_highest_mastery_lowest_diff);//team arrangement index
 		let team_by_highest_mastery_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_highest_mastery_best].length; ++i) {
-			const individual_description = CONFIG.STATIC.CHAMPIONS[masteries[i][0].championId].emoji + " `" + UTILS.gold(masteries[i][0].championPoints) + "` " + summoners[i].name;
+			const individual_description = CONFIG.STATIC.CHAMPIONS[masteries[i][0].championId].emoji + " `" + UTILS.masteryPoints(masteries[i][0].championPoints) + "` " + summoners[i].name;
 			team_by_highest_mastery_description[TEAM_COMBINATIONS[team_by_highest_mastery_best][i] === "0" ? 0 : 1].push([masteries[i][0].championPoints, individual_description]);
 		}
 		for (let i = 0; i < team_by_highest_mastery_description.length; ++i) {
@@ -846,7 +846,7 @@ module.exports = class EmbedGenerator {
 		const team_by_total_mastery_best = team_by_total_mastery.findIndex(t => t.abs === team_by_total_mastery_lowest_diff);//team arrangement index
 		let team_by_total_mastery_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_total_mastery_best].length; ++i) {
-			const individual_description = "`" + UTILS.gold(masteries[i].reduce((total, increment) => total + increment.championPoints, 0)) + "` " + summoners[i].name;
+			const individual_description = "`" + UTILS.masteryPoints(masteries[i].reduce((total, increment) => total + increment.championPoints, 0)) + "` " + summoners[i].name;
 			team_by_total_mastery_description[TEAM_COMBINATIONS[team_by_total_mastery_best][i] === "0" ? 0 : 1].push([masteries[i].reduce((total, increment) => total + increment.championPoints, 0), individual_description]);
 		}
 		for (let i = 0; i < team_by_total_mastery_description.length; ++i) {
@@ -1121,11 +1121,11 @@ module.exports = class EmbedGenerator {
 		let cm_total = 0;
 		let cms_total = 0;
 		for (let i = 0; i < championmastery.length; ++i) {
-			cm_description.push("#`" + (i + 1).pad(2) + "`. `M" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + " `" + UTILS.gold(championmastery[i].championPoints) + "`pts");
+			cm_description.push("#`" + (i + 1).pad(2) + "`. `M" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + " `" + UTILS.masteryPoints(championmastery[i].championPoints) + "`pts");
 			cm_total += championmastery[i].championLevel;
 			cms_total += championmastery[i].championPoints;
 		}
-		newEmbed.setDescription("Total Mastery Level: " + cm_total + "\nTotal Mastery Score: " + UTILS.gold(cms_total));
+		newEmbed.setDescription("Total Mastery Level: " + cm_total + "\nTotal Mastery Score: " + UTILS.masteryPoints(cms_total));
 		const SECTION_LENGTH = 15;
 		if (cm_description.length > 0) {
 			const sections = Math.trunc(cm_description.length / SECTION_LENGTH) + 1;

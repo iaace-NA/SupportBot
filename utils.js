@@ -126,6 +126,10 @@ module.exports = class UTILS {
 		number /= 1000;
 		return number.toFixed(1) + "k";
 	}
+	masteryPoints(number) {
+		number /= 1000;
+		return Math.round(number) + "k";
+	}
 	level(summonerID, match) {
 		return this.stats(summonerID, match).championLevel;
 	}
