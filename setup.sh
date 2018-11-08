@@ -33,7 +33,7 @@ cd ../discord
 npm install
 echo "================Finished installing discord deps================"
 cd ../
-sudo apt autoremove
+sudo apt autoremove -y
 echo "================Finished Apt Autoremove================"
 sudo timedatectl set-timezone UTC
 echo "================Finished Setting Timezone to UTC================"
