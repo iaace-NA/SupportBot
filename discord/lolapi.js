@@ -172,6 +172,18 @@ module.exports = class LOLAPI {
 			}).catch(reject);
 		});
 	}
+	getSummonerIDFromNameNew(region, username, maxage) {
+		return new Promise((resolve, reject) => {
+			if(!(new XRegExp("^[0-9\\p{L} _\\.]+$").test(username))) {
+				UTILS.debug("username " + username + " didn't pass regex filter");
+				return resolve({ status: "username didn't pass regex filter" });
+			}
+			username = username.toLowerCase();
+			this.get(region, "summoner/v4/summoners/by-name/" + encodeURIComponent(username), tags.summoner, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage).then(answer => {
+				resolve(answer.name === ("rtbf" + answer.id) ? { status: "GDPR right to be forgotten" } : answer);
+			}).catch(reject);
+		});
+	}
 	getMultipleSummonerIDFromName(region, usernames, maxage) {
 		let that = this;
 		let requests = [];

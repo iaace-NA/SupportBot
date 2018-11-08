@@ -261,7 +261,7 @@ module.exports = class EmbedGenerator {
 		}
 		newEmbed.setAuthor(apiobj.name);
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + apiobj.profileIconId + ".png");
-		newEmbed.setDescription("Level " + apiobj.summonerLevel + "\nSummoner ID: " + apiobj.id + "\nAccount ID: " + apiobj.accountId);
+		newEmbed.setDescription("Level " + apiobj.summonerLevel + "\npuuid: `" + apiobj.puuid + "`\nSummoner ID: `" + apiobj.id + "`\nAccount ID: `" + apiobj.accountId + "`");
 		newEmbed.setTimestamp(new Date(apiobj.revisionDate));
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;

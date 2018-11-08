@@ -211,7 +211,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 		replyEmbed(embedgenerator.test());
 	});
 	command([preferences.get("prefix") + "sd ", preferences.get("prefix") + "summonerdebug "], true, false, (original, index, parameter) => {
-		lolapi.getSummonerIDFromName(assertRegion(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.SD).then(result => {
+		lolapi.getSummonerIDFromNameNew(assertRegion(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.SD).then(result => {
 			result.guess = parameter.substring(parameter.indexOf(" ") + 1);
 			replyEmbed(embedgenerator.summoner(CONFIG, result));
 		}).catch(console.error);
@@ -375,7 +375,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
 			lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.MH.RECENT_GAMES).then(matchhistory => {
 				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`." + suggestLink(guess_method));
-				lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m =>  m.gameId), CONFIG.API_MAXAGE.MH.MULTIPLE_MATCH).then(matches => {
+				lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => m.gameId), CONFIG.API_MAXAGE.MH.MULTIPLE_MATCH).then(matches => {
 					lolapi.checkVerifiedAccount(msg.author.id, region, result.id).then(verified => {
 						request_profiler.begin("generating embed");
 						const answer = embedgenerator.match(CONFIG, result, matchhistory.matches, matches, verified);
