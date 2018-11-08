@@ -1,12 +1,13 @@
 #!/bin/bash
 #usage: ./setup.sh folder_name
 echo "vm.swappiness = 20" | sudo tee -a /etc/sysctl.conf
+echo "sysctl vm.swappiness=20" | sudo sh -
 echo "================Finshed setting vm.swappiness to 20================"
 sudo apt update
 sudo apt dist-upgrade -y
 sudo apt install build-essential -y
 echo "================Finished dist-upgrading================"
-sudo apt install apt-transport-https
+sudo apt install apt-transport-https -y
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5
 echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.6 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.6.list
 sudo apt update
