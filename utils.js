@@ -136,7 +136,7 @@ module.exports = class UTILS {
 			});
 			if (this.exists(candidate)) return candidate;
 		}
-		return collection.find(ch => { if (ch.type === type && ch.permissionsFor(client.user).has(permissions)) return true; });
+		return collection.find(ch => ch.type === type && ch.permissionsFor(client.user).has(permissions));
 	}
 	trim(network) {
 		let count = 0;

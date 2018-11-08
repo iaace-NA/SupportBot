@@ -22,7 +22,7 @@ module.exports = class Profiler {
 			if (b > 0) answer += "last: " + this.ms(this.diff(this.events[b].time, this.events[b - 1].time)) + "ms ago ";
 			if (this.events[b].type === 0) answer += this.events[b].name + " marked ";
 			else if (this.events[b].type === 1) answer += this.events[b].name + " started ";
-			else if (this.events[b].type === 2) answer += "duration: " + this.ms(this.diff(this.events[b].time, this.events.find(e => { return e.name == this.events[b].name; }).time)) + "ms " + this.events[b].name + " completed";
+			else if (this.events[b].type === 2) answer += "duration: " + this.ms(this.diff(this.events[b].time, this.events.find(e => e.name == this.events[b].name).time)) + "ms " + this.events[b].name + " completed";
 			answer += "\n";
 		}
 		this.events = [];
