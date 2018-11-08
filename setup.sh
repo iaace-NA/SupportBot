@@ -4,6 +4,7 @@ echo "vm.swappiness = 20" | sudo tee -a /etc/sysctl.conf
 echo "================Finshed setting vm.swappiness to 20================"
 sudo apt update
 sudo apt dist-upgrade -y
+sudo apt install build-essential -y
 echo "================Finished dist-upgrading================"
 sudo apt install apt-transport-https
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5
