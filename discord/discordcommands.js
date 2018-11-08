@@ -316,7 +316,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 					lolapi.getThirdPartyCode(region, summoner.id, CONFIG.API_MAXAGE.VERIFY.THIRD_PARTY_CODE).then(tpc => {
 						let valid_code = 0;
 						const tpc_timestamp_ms = parseInt(tpc.substring(0, tpc.indexOf("-")));
-						const tpc_HMAC_input = tpc_timestamp_ms + "-" + region + "-" + summoner.id + "-" + msg.author.id;
+						const tpc_HMAC_input = tpc_timestamp_ms + "-" + region + "-" + msg.author.id + "-" + summoner.id;
 						const tpc_HMAC_output = tpc.substring(tpc.indexOf("-") + 1);
 						UTILS.debug("tpc_timestamp_ms: " + tpc_timestamp_ms);
 						UTILS.debug("tpc_HMAC_input: " + tpc_HMAC_input);
