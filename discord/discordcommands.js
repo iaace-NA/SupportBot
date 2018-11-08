@@ -329,7 +329,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 							}).catch(console.error);
 						}
 						else {
-							UTILS.debug("valid_code: " + valid_code.toString(2));
+							UTILS.debug("valid_code: " + valid_code);
 							replyEmbed(embedgenerator.verify(CONFIG, summoner, msg.author.id));
 						}
 					}).catch();
