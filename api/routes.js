@@ -90,7 +90,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 		findShortcut(req.params.uid, res, doc => {
 			if (UTILS.exists(doc)) {
 				const now = new Date().getTime();
-				for (let b in doc.verifiedAccounts) if (doc.verifiedAccounts[b] < now) delete doc.verifiedAccounts[b];
+				for (let b in doc.verifiedAccounts) if (doc.verifiedAccounts[b].getTime() < now) delete doc.verifiedAccounts[b];
 				doc.markModified("verifiedAccounts");
 				res.json({ verifiedAccounts: doc.toObject().verifiedAccounts });
 				doc.save(e => {
@@ -106,7 +106,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 				let shortcut_count = 0;
 				for (let b in doc.verifiedAccounts) ++shortcut_count;
 				if (shortcut_count >= 50) return res.json({ success: false });
-				doc.verifiedAccounts[req.query.from] = parseInt(req.query.to);
+				doc.verifiedAccounts[req.query.from] = new Date(parseInt(req.query.to));
 				doc.markModified("verifiedAccounts");
 				doc.save(e => {
 					if (e) {
@@ -123,7 +123,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 					verifiedAccounts: {},
 					username: ""
 				}
-				new_shortcuts.verifiedAccounts[req.query.from] = parseInt(req.query.to);
+				new_shortcuts.verifiedAccounts[req.query.from] = new Date(parseInt(req.query.to));
 				let new_document = new shortcut_doc_model(new_shortcuts);
 				new_document.save((e, doc) => {
 					if (e) {
