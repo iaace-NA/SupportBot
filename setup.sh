@@ -37,4 +37,8 @@ sudo apt autoremove -y
 echo "================Finished Apt Autoremove================"
 sudo timedatectl set-timezone UTC
 echo "================Finished Setting Timezone to UTC================"
-echo "Setup script complete. The following needs to be completed by the user:\nAdd config file\nAdd TLS files\nRestart system\nRun startup script in start folder"
+echo "Setup script complete. The following needs to be completed by the user:"
+echo "- Add config file"
+echo "- Add TLS files"
+echo "- Restart system"
+echo "- Run startup script in start folder"
