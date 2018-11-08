@@ -157,6 +157,7 @@ const VERIFIED_ICON = "✅";
 const TAB = " ";
 function getMatchTags(summonerID, match) {
 	let answer = [];
+	if (!UTILS.exists(summonerID)) return answer;//bot
 	if (match.gameDuration < 300) return answer;
 	const stats = UTILS.stats(summonerID, match);
 	if (stats.largestMultiKill === 3) answer.push("TRIPLE");
