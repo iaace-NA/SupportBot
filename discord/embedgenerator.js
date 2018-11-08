@@ -165,8 +165,8 @@ function getMatchTags(summonerID, match) {
 	else if (stats.largestMultiKill >= 5) answer.push("PENTA");
 	const pID = UTILS.teamParticipant(summonerID, match).participantId;
 	const m_level = UTILS.findParticipantIdentityFromPID(match, pID);
-	if (m_level === 0) answer.push("First Time");
-	else if (m_level === 1) answer.push("\"First Time\"");
+	if (m_level === 0) answer.push("First_Time");
+	else if (m_level === 1) answer.push("\"First_Time\"");
 	let sortable_all = UTILS.copy(match);//match with both teams
 	const teamID = UTILS.teamParticipant(summonerID, match).teamId;
 	for (let b in sortable_all.participants) {
@@ -182,19 +182,19 @@ function getMatchTags(summonerID, match) {
 	}
 	let sortable_team = UTILS.copy(sortable_all);//match with ally team only
 	UTILS.removeAllOccurances(sortable_team.participants, p => p.teamId !== teamID);
-	const criteria = [{ statName: "totalCS", designation: "Most CS", direct: true },
-	{ statName: "totalDamageDealtToChampions" , designation: "Most Champion Damage", direct: true },
-	{ statName: "totalDamageDealt", designation: "Most Damage", direct: true },
-	{ statName: "visionScore", designation: "Most Vision", direct: true },
+	const criteria = [{ statName: "totalCS", designation: "Most_CS", direct: true },
+	{ statName: "totalDamageDealtToChampions" , designation: "Most_Champion_Damage", direct: true },
+	{ statName: "totalDamageDealt", designation: "Most_Damage", direct: true },
+	{ statName: "visionScore", designation: "Most_Vision", direct: true },
 	{ statName: "assists", designation: "Selfless", direct: true },
 	{ statName: "inverseKDA", designation: "Heavy", direct: true },
-	{ statName: "damageDealtToObjectives", designation: "Objective Focused", direct: true },
-	{ statName: "damageTaken", designation: "Most Damage Taken", direct: true },
-	{ statName: "KP", designation: "Highest KP", direct: true },
-	{ statName: "timeCCingOthers", designation: "Most CC", direct: true },
+	{ statName: "damageDealtToObjectives", designation: "Objective_Focused", direct: true },
+	{ statName: "damageTaken", designation: "Most_Damage_Taken", direct: true },
+	{ statName: "KP", designation: "Highest_KP", direct: true },
+	{ statName: "timeCCingOthers", designation: "Most_CC", direct: true },
 	{ statName: "largestKillingSpree", designation: "Scary", direct: true },
 	{ statName: "inverseDeaths", designation: "Slippery", direct: true },
-	{ statName: "goldEarned", designation: "Most Gold", direct: true },
+	{ statName: "goldEarned", designation: "Most_Gold", direct: true },
 	{ statName: "KDANoPerfect", designation: "KDA", direct: false },
 	{ statName: "KDNoPerfect", designation: "KD", direct: false }];//simple, single stat criteria only
 	let non_direct = [];
@@ -212,7 +212,7 @@ function getMatchTags(summonerID, match) {
 			if (sortable_team.participants[0].participantId === pID) non_direct.push(criteria[c].designation);
 		}
 	}
-	if ((non_direct.indexOf("KDA") !== -1 && non_direct.indexOf("KD") !== -1) || (answer.indexOf("*Most Champion Damage") !== -1 || answer.indexOf("Most Champion Damage") !== -1)) answer.push("Carry");
+	if ((non_direct.indexOf("KDA") !== -1 && non_direct.indexOf("KD") !== -1) || (answer.indexOf("*Most_Champion_Damage") !== -1 || answer.indexOf("Most_Champion_Damage") !== -1)) answer.push("Carry");
 	const win = UTILS.determineWin(summonerID, match);
 	const ally_K = sortable_team.participants.reduce((total, increment) => total + increment.stats.kills, 0);
 	const enemy_K = sortable_all.participants.reduce((total, increment) => total + increment.stats.kills, 0) - ally_K;
