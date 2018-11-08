@@ -291,7 +291,7 @@ module.exports = class LOLAPI {
 		const that = this;
 		return new Promise((resolve, reject) => {
 			that.getSummonerIDFromNameOld(region, username, this.CONFIG.API_MAXAGE.SUMMONER_CARD.SUMMONER_ID).then(result => {
-				that.getSummonerIDFromNameOld(region, username, this.CONFIG.API_MAXAGE.SUMMONER_CARD.SUMMONER_ID).then(result6 => {
+				that.getSummonerIDFromName(region, username, this.CONFIG.API_MAXAGE.SUMMONER_CARD.SUMMONER_ID).then(result6 => {
 					result.region = region;
 					result.guess = username;
 					if (!UTILS.exists(result.id)) reject();
