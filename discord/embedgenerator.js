@@ -217,6 +217,8 @@ function getMatchTags(summonerID, match) {
 	const ally_K = sortable_team.participants.reduce((total, increment) => total + increment.stats.kills, 0);
 	const enemy_K = sortable_all.participants.reduce((total, increment) => total + increment.stats.kills, 0) - ally_K;
 	if (win && (ally_K + enemy_K >= 5) && (ally_K >= (enemy_K * 3)) && match.gameDuration < (30 * 60)) answer.push("Easy");
+	if ((ally_K + enemy_K) >= (match.gameDuration / 30)) answer.push("Messy");
+	if (match.teams[0].inhibitorKills > 0 && match.teams[1].inhibitorKills > 0) answer.push("Close");
 	return answer;
 }
 module.exports = class EmbedGenerator {
