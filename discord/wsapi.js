@@ -124,7 +124,7 @@ module.exports = class WSAPI {
 				case 8://send message to default channel in server
 				case 10://send message to user
 				case 12:
-					const notification = embedgenerator.notify(this.CONFIG, data.content, data.username, data.displayAvatarURL);
+					const notification = embedgenerator.notify(this.CONFIG, data.content, data.username, data.displayAvatarURL, data.release);
 					this.client.guilds.forEach(g => {
 						let candidate = UTILS.preferredTextChannel(that.client, g.channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
 						if (UTILS.exists(candidate)) {

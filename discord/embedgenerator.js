@@ -678,13 +678,14 @@ module.exports = class EmbedGenerator {
 		newEmbed.setFooter("This information does not reflect this summoner's actual MMR.");
 		return newEmbed;
 	}
-	notify(CONFIG, content, username, displayAvatarURL) {
+	notify(CONFIG, content, username, displayAvatarURL, release) {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setColor([255, 255, 0]);
 		newEmbed.setTitle("Important message from SupportBot staff");
 		newEmbed.setURL(CONFIG.HELP_SERVER_INVITE_LINK);
 		newEmbed.setAuthor(username, displayAvatarURL);
 		newEmbed.setDescription(content);
+		if (release) newEmbed.addField("To disable this kind of release notif,", "Use the command `Lsetting release-notifications off`");
 		newEmbed.setTimestamp();
 		newEmbed.setFooter("Message sent ");
 		return newEmbed;
