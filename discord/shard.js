@@ -77,7 +77,7 @@ client.on("guildCreate", function (guild) {
 		}
 		else {
 			UTILS.output("Server Rejoined: " + guild.id + " :: " + guild.name + " :: " + guild.region + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
-			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":white_check_mark:`$" + process.env.SHARD_ID + "`Server Rejoined: `" + guild.id + "` :: " + guild.region + " :: " + guild.name + " :: :busts_in_silhouette:" + guild.memberCount + " :: " + guild.owner.user.tag);
+			sendToChannel(CONFIG.LOG_CHANNEL_ID, ":white_check_mark::repeat:`$" + process.env.SHARD_ID + "`Server Rejoined: `" + guild.id + "` :: " + guild.region + " :: " + guild.name + " :: :busts_in_silhouette:" + guild.memberCount + " :: " + guild.owner.user.tag);
 		}
 	}).catch(console.error);
 
