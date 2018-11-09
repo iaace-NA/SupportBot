@@ -453,7 +453,7 @@ module.exports = class EmbedGenerator {
 		}
 		const avg_iMMR = UTILS.averageMatchMMR(ranks);
 		for (let i = 0; i < IMMR_THRESHOLD.length; ++i) if (avg_iMMR >= IMMR_THRESHOLD[i]) newEmbed.setColor(RANK_COLOR[i]);
-		UTILS.output("average iMMR is " + UTILS.round(avg_iMMR) + " or " + UTILS.iMMRtoEnglish(avg_iMMR));
+		UTILS.output("average iMMR is " + Math.round(avg_iMMR) + " or " + UTILS.iMMRtoEnglish(avg_iMMR));
 		newEmbed.setTitle(queues[match.queueId] + " `" + UTILS.standardTimestamp(match.gameDuration) + "`");
 		newEmbed.setTimestamp(new Date(match_meta.timestamp + (match.gameDuration * 1000)));
 		newEmbed.setFooter("Match played " + UTILS.ago(new Date(match_meta.timestamp + (match.gameDuration * 1000))) + " at: ");
