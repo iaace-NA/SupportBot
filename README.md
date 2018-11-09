@@ -51,6 +51,7 @@ League of Legends Statistics for Discord
 - api: internal api files
 - data: TLS certs and other local data
 - discord: discord bot files
+- install: bash installation files for 1 time use only, Ubuntu OS
 - releasenotes: release notes for supportbot
 - start: startup configs for pm2
 - tests: manual test cases
