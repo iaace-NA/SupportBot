@@ -602,9 +602,17 @@ module.exports = class UTILS {
 	}
 	aggregateClientEvals(client, arr) {//numerical only
 		let par = [];
+		let that = this;
 		for (let b of arr) {
 			par.push(new Promise((resolve, reject) => {
-				client.shard.broadcastEval(b).then(r => resolve(r.reduce((prev, val) => prev + val, 0))).catch(reject);
+				client.shard.broadcastEval(b[0]).then(r => {
+					if (that.exists(b[1])) {
+						resolve(b[1](r));
+					}
+					else {
+						resolve(r);
+					}
+				}).catch(reject);
 			}));
 		}
 		return Promise.all(par);

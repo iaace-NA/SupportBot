@@ -180,7 +180,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	command([preferences.get("prefix") + "stats"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 		lolapi.stats().then(iapi_stats => {
-			UTILS.aggregateClientEvals(client, ["this.guilds.size.reduce((prev, val) => prev + val, 0)", "this.users.size.reduce((prev, val) => prev + val, 0)", "this.guilds.map(g => g.memberCount).reduce((prev, val) => prev + val, 0)"]).then(c_eval => {
+			UTILS.aggregateClientEvals(client, [["this.guilds.size", r => r.reduce((prev, val) => prev + val, 0)], ["this.users.size", r => r.reduce((prev, val) => prev + val, 0)], ["this.guilds.map(g => g.memberCount).reduce((prev, val) => prev + val, 0)"]]).then(c_eval => {
 				reply(embedgenerator.debug(CONFIG, client, iapi_stats, c_eval));
 			});
 		}).catch(console.error);
