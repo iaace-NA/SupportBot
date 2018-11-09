@@ -1245,11 +1245,20 @@ module.exports = class EmbedGenerator {
 	}
 	debug(CONFIG, client, iapi_stats, c_eval) {
 		let newEmbed = new Discord.RichEmbed();
+		let serverbans = 0, userbans = 0;
+		newEmbed.setTimestamp();
+		const now = new Date().getTime();
+		for (let b in CONFIG.BANS.USERS) {
+			if (CONFIG.BANS.USERS[b] == 0 || CONFIG.BANS.USERS[b] > now) ++userbans;
+		}
+		for (let b in CONFIG.BANS.SERVERS) {
+			if (CONFIG.BANS.SERVERS[b] == 0 || CONFIG.BANS.SERVERS[b] > now) ++serverbans;
+		}
 		newEmbed.setAuthor("Shard $" + process.env.SHARD_ID);
 		newEmbed.setTitle("Diagnostic Information");
 		newEmbed.addField("System", "iAPI request rate: " + UTILS.round(iapi_stats["0"].total_rate, 1) + " req/min\niAPI total requests: " + iapi_stats["0"].total_count + "\nNode.js " + process.versions.node + "\nNODE_ENV: " + process.env.NODE_ENV + "\nSoftware Version: " + CONFIG.VERSION + "\nShards configured: " + CONFIG.SHARD_COUNT);
 		newEmbed.addField("Uptime Information", "Time since last disconnect: " + UTILS.round(client.uptime / 3600000.0, 2) + " hours\nTime since last restart: " + UTILS.round(process.uptime() / 3600.0, 2) + " hours\nIAPI time since last restart: " + UTILS.round(iapi_stats.uptime / 3600.0, 2) + " hours");
-		newEmbed.addField("Discord Load", "Guilds: " + c_eval[0] + "\nUsers: " + c_eval[1] + "\nMembers: " + c_eval[2]);
+		newEmbed.addField("Discord Load", "Guilds: " + c_eval[0] + "\nUsers: " + c_eval[1] + "\nMembers: " + c_eval[2] + "\nBanned Servers: " + serverbans + "\nBanned Users: " + userbans);
 		newEmbed.setColor(255);
 		return newEmbed;
 	}
