@@ -600,6 +600,15 @@ module.exports = class UTILS {
 		}
 		return query;
 	}
+	aggregateClientValues(client, arr) {//numerical only
+		let par = [];
+		for (let b of arr) {
+			par.push(new Promise((resolve, reject) => {
+				client.shard.broadcastEval(b).then(r => resolve(r.reduce((prev, val) => prev + val, 0))).catch(reject);
+			}));
+		}
+		return Promise.all(par).then(resolve).catch(reject);
+	}
 	generateGraph(mathjs, raw, height = 5, width = 35) {
 		let answer = "";
 		let min = raw[0][0];//start time

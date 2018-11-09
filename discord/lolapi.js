@@ -399,4 +399,7 @@ module.exports = class LOLAPI {
 	resetPreferences(sid) {
 		return this.getIAPI("resetpreferences", { id: sid });
 	}
+	stats() {
+		return this.getIAPI("stats", {});
+	}
 }

@@ -179,7 +179,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 		reply(msg.mentions.users.first().tag + " has " + (isOwner(msg.mentions.users.first().id, false) ? "owner" : "normal") + " permissions.");
 	});
 	command([preferences.get("prefix") + "stats"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
-		reply("This is shard " + process.env.SHARD_ID);
+		lolapi.stats().then(iapi_stats => {
+			UTILS.aggregateClientEvals(client, ["this.guilds.size.reduce((prev, val) => prev + val, 0)", "this.users.size.reduce((prev, val) => prev + val, 0)", "this.guilds.map(g => g.memberCount).reduce((prev, val) => prev + val, 0)"]).then(c_eval => {
+				reply(embedgenerator.debug(CONFIG, client, iapi_stats, c_eval));
+			});
+		}).catch(console.error);
 	});
 	command([preferences.get("prefix") + "ping"], false, false, () => {
 		reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));

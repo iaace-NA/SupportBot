@@ -1243,13 +1243,14 @@ module.exports = class EmbedGenerator {
 		newEmbed.setFooter("This code does not need to be kept secret.");
 		return newEmbed;
 	}
-	debug(CONFIG, client, iapi_stats, ) {
+	debug(CONFIG, client, iapi_stats, c_eval) {
 		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setAuthor("$" + process.env.SHARD_ID);
 		newEmbed.setTitle("Diagnostic Information");
-		newEmbed.addField("System", "iAPI request rate: " + iapi_stats["0"].total_count + "req/min\nNode.js " + process.versions.node + "\nNODE_ENV: " + process.env.NODE_ENV + "\nSoftware Version: " + CONFIG.VERSION);
+		newEmbed.addField("System", "iAPI request rate: " + iapi_stats["0"].total_rate + "req/min\niAPI total requests: " + iapi_stats["0"].total_count + "\nNode.js " + process.versions.node + "\nNODE_ENV: " + process.env.NODE_ENV + "\nSoftware Version: " + CONFIG.VERSION + "\nShards configured: " + CONFIG.SHARD_COUNT);
 		newEmbed.addField("Uptime Information", "Time since last disconnect: " + (client.uptime / 3600000.0) + "\nTime since last restart: " + (process.uptime() / 3600.0) + "\nIAPI time since last restart: " + (iapi_stats.uptime / 3600.0));
+		newEmbed.addField("Discord Load", "Guilds: " + c_eval[0] + "\nUsers: " + c_eval[1] + "\nMembers: " + c_eval[2]);
 		newEmbed.setColor(255);
-
 		return newEmbed;
 	}
 }
