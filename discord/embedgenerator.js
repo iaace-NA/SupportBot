@@ -1236,11 +1236,11 @@ module.exports = class EmbedGenerator {
 		const now = new Date().getTime();
 		let code = now + "-" + uid + "-" + summoner.puuid;
 		code = now + "-" + crypto.createHmac("sha256", CONFIG.TPV_KEY).update(code).digest("hex");
-		newEmbed.setDescription("Your code is: ```" + code + "```");
+		newEmbed.setDescription("Verifying your LoL account gives you a \\" + VERIFIED_ICON + " which is displayed next to your name to prove you own an account. It is displayed when you run a LoL statistics command on an account you own. The ownership period expires after 1 year. 1 discord account can own multiple LoL accounts and 1 LoL account can be owned by multiple discord accounts.\nYour code is: ```" + code + "```");
 		newEmbed.addField("If you have already followed the instructions below, there is a problem with the code you provided.", "Reread the instructions below and try again.");
-		newEmbed.addField("Instructions", "See the below image to save the code provided above to your account. Once you have done this, send the `" + CONFIG.DISCORD_COMMAND_PREFIX + "verify <region> <ign>` command again within the next 5 minutes after first **__waiting 30 seconds__**.");
+		newEmbed.addField("Instructions", "See the below image to save the code provided above to your account. Once you have done this, resend the `" + CONFIG.DISCORD_COMMAND_PREFIX + "verify <region> <ign>` command again within the next 5 minutes **__after first waiting 30 seconds__**.");
 		newEmbed.setImage("https://supportbot.tk/f/tpv.png");//tpv tutorial image
-		newEmbed.setFooter("This code does not need to be kept secret.");
+		newEmbed.setFooter("This code does not need to be kept secret. It expires in 5 minutes, and will only work on this discord and LoL account.");
 		return newEmbed;
 	}
 	debug(CONFIG, client, iapi_stats, c_eval) {
