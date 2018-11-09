@@ -1245,10 +1245,10 @@ module.exports = class EmbedGenerator {
 	}
 	debug(CONFIG, client, iapi_stats, c_eval) {
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor("$" + process.env.SHARD_ID);
+		newEmbed.setAuthor("Shard $" + process.env.SHARD_ID);
 		newEmbed.setTitle("Diagnostic Information");
-		newEmbed.addField("System", "iAPI request rate: " + iapi_stats["0"].total_rate + "req/min\niAPI total requests: " + iapi_stats["0"].total_count + "\nNode.js " + process.versions.node + "\nNODE_ENV: " + process.env.NODE_ENV + "\nSoftware Version: " + CONFIG.VERSION + "\nShards configured: " + CONFIG.SHARD_COUNT);
-		newEmbed.addField("Uptime Information", "Time since last disconnect: " + (client.uptime / 3600000.0) + "\nTime since last restart: " + (process.uptime() / 3600.0) + "\nIAPI time since last restart: " + (iapi_stats.uptime / 3600.0));
+		newEmbed.addField("System", "iAPI request rate: " + UTILS.round(iapi_stats["0"].total_rate, 1) + " req/min\niAPI total requests: " + iapi_stats["0"].total_count + "\nNode.js " + process.versions.node + "\nNODE_ENV: " + process.env.NODE_ENV + "\nSoftware Version: " + CONFIG.VERSION + "\nShards configured: " + CONFIG.SHARD_COUNT);
+		newEmbed.addField("Uptime Information", "Time since last disconnect: " + UTILS.round(client.uptime / 3600000.0, 2) + " hours\nTime since last restart: " + UTILS.round(process.uptime() / 3600.0, 2) + " hours\nIAPI time since last restart: " + UTILS.round(iapi_stats.uptime / 3600.0, 2) + " hours");
 		newEmbed.addField("Discord Load", "Guilds: " + c_eval[0] + "\nUsers: " + c_eval[1] + "\nMembers: " + c_eval[2]);
 		newEmbed.setColor(255);
 		return newEmbed;

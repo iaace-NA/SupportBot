@@ -606,12 +606,7 @@ module.exports = class UTILS {
 		for (let b of arr) {
 			par.push(new Promise((resolve, reject) => {
 				client.shard.broadcastEval(b[0]).then(r => {
-					if (that.exists(b[1])) {
-						resolve(b[1](r));
-					}
-					else {
-						resolve(r);
-					}
+					resolve(that.exists(b[1]) ? b[1](r) : r);
 				}).catch(reject);
 			}));
 		}
