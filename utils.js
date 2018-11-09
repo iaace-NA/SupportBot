@@ -600,7 +600,7 @@ module.exports = class UTILS {
 		}
 		return query;
 	}
-	aggregateClientValues(client, arr) {//numerical only
+	aggregateClientEvals(client, arr) {//numerical only
 		let par = [];
 		for (let b of arr) {
 			par.push(new Promise((resolve, reject) => {
