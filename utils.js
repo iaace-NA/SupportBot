@@ -607,7 +607,7 @@ module.exports = class UTILS {
 				client.shard.broadcastEval(b).then(r => resolve(r.reduce((prev, val) => prev + val, 0))).catch(reject);
 			}));
 		}
-		return Promise.all(par).then(resolve).catch(reject);
+		return Promise.all(par);
 	}
 	generateGraph(mathjs, raw, height = 5, width = 35) {
 		let answer = "";
