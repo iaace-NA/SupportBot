@@ -23,6 +23,9 @@ Number.prototype.pad = function(size) {
 	while (s.length < (size || 2)) {s = "0" + s;}
 	return s;
 }
+Number.prototype.round = function(decimal = 0) {
+	return Math.round(this * Math.pow(10, decimal)) / Math.pow(10, decimal);
+}
 module.exports = class UTILS {
 	output(t) {//general utility function
 		if (this.exists(t)) {
