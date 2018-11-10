@@ -26,6 +26,8 @@ module.exports = class LOLAPI {
 		this.request = REQUEST;
 		this.address = "https://" + this.CONFIG.API_ADDRESS;
 		this.port = this.CONFIG.API_PORT;
+		this.created = new Date().getTime();
+		this.calls = 0;
 	}
 	ping() {
 		return new Promise((resolve, reject) => {
@@ -49,6 +51,7 @@ module.exports = class LOLAPI {
 				endpoint += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
 			const iurl = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/" + tag + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&endpoint=" + encodeURIComponent(endpoint);
+			++that.calls;
 			this.request({ url: iurl, agentOptions }, (error, response, body) => {
 				if (UTILS.exists(error)) {
 					reject(error);
@@ -81,6 +84,7 @@ module.exports = class LOLAPI {
 				else url += "&" + i + "=" + encodeURIComponent(options[i]);
 				++paramcount;
 			}
+			++that.calls;
 			this.request({ url , agentOptions }, (error, response, body) => {
 				if (!response_expected) {
 					resolve();
@@ -342,8 +346,32 @@ module.exports = class LOLAPI {
 			}).catch(reject);
 		});
 	}
-	terminate() {
-		this.getIAPI("terminate_request/" + this.request_id, {}, false).catch();
+	terminate(msg, plevel, response, embed) {
+		const now = new Date().getTime();
+		let opts = {
+			mid: msg.id,
+			uid: msg.author.id,
+			tag: msg.author.tag,
+			cid: msg.channel.id,
+			calls: this.calls,
+			creation_time: msg.createdTimestamp,
+			reply_time: now,
+			ttr: now - this.created,
+			permission: plevel,
+			shard: process.env.SHARD_ID
+		};
+		if (!msg.PM) {
+			opts.sid = msg.guild.id,
+			opts.guild_name = msg.guild.name,
+			opts.channel_name = msg.channel.name
+		}
+		if (UTILS.exists(msg.content)) {
+			opts.content = msg.content;
+			opts.clean_content = msg.cleanContent;
+		}
+		if (UTILS.exists(response)) opts.response = response;
+		if (UTILS.exists(embed)) opts.embed = JSON.stringify(embed);
+		this.getIAPI("terminate_request/" + this.request_id, opts, false).catch(console.error);
 	}
 	IAPIEval(script) {
 		return this.getIAPI("eval/" + encodeURIComponent(script), {});

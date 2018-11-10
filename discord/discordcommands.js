@@ -842,7 +842,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	}
 	function reply(reply_text, callback, errorCallback) {
 		printMessage("reply (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
-		lolapi.terminate();
+		lolapi.terminate(msg, ACCESS_LEVEL, reply_text);
 		msg.channel.send(reply_text, { split: true }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
@@ -853,7 +853,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 
 	function replyToAuthor(reply_text, callback, errorCallback) {
 		printMessage("reply to author (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
-		lolapi.terminate();
+		lolapi.terminate(msg, ACCESS_LEVEL, reply_text);
 		msg.author.send(reply_text, { split: true }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
@@ -864,12 +864,12 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 
 	function replyEmbed(reply_embed, callback, errorCallback) {
 		if (!msg.PM && !msg.channel.permissionsFor(client.user).has(["EMBED_LINKS"])) {//doesn't have permission to embed links in server
-			lolapi.terminate();
+			lolapi.terminate(msg, ACCESS_LEVEL, ":x: I cannot respond to your request without the \"embed links\" permission.");
 			reply(":x: I cannot respond to your request without the \"embed links\" permission.");
 		}
 		else {//has permission to embed links, or is a DM/PM
 			printMessage("reply embedded (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
-			lolapi.terminate();
+			lolapi.terminate(msg, ACCESS_LEVEL, undefined, reply_embed);
 			msg.channel.send("", { embed: reply_embed }).then((nMsg) => {
 				if (UTILS.exists(callback)) callback(nMsg);
 			}).catch((e) => {
@@ -881,7 +881,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 
 	function replyEmbedToAuthor(reply_embed, callback, errorCallback) {
 		printMessage("reply embedded to author (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
-		lolapi.terminate();
+		lolapi.terminate(msg, ACCESS_LEVEL, undefined, reply_embed);
 		msg.author.send("", { embed: reply_embed }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
