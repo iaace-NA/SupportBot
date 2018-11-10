@@ -253,6 +253,7 @@ serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/:tag/", (req, res, 
 			else {
 				res.status(err.status).type('application/json').send(err.response.res.text).end();
 				const oldFormat = endpointToURL(req.params.region, req.query.endpoint);
+				UTILS.debug(oldFormat.url);
 				if (cachetime != 0) addCache(oldFormat.url, err.response.res.text, cachetime);
 			}
 		}
