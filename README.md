@@ -61,19 +61,18 @@ League of Legends Statistics for Discord
 - mongodb 3.x
 ## npm Dependencies
 - pm2 (global)
-- getopts 2.2.1
-- bottleneck 2.12.0
+- getopts 2.2.3
 - discord.js 11.4.2
-- mongoose 5.3.2
+- mongoose 5.3.11
 - request 2.88.0
-- mathjs 5.2.0
+- mathjs 5.2.3
 - console.table 0.10.0
 - json5 2.1.0
 - iaace-NA/riot-lol-api 4.2.16
-- express 4.6.3
+- express 4.16.4
 - express-ws 4.0.0
 - uws 9.148.0
-- ws 5.2.2
+- ws 6.1.0
 - xregexp 4.2.0
 ## Minimum System Requirements
 - RAM: 1 GB
