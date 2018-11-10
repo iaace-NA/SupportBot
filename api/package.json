@@ -11,10 +11,10 @@
   "dependencies": {
     "express": "^4.16.4",
     "express-ws": "^4.0.0",
-    "getopts": "^2.2.1",
+    "getopts": "^2.2.3",
     "json5": "^2.1.0",
-    "mathjs": "^5.2.0",
-    "mongoose": "^5.3.2",
+    "mathjs": "^5.2.3",
+    "mongoose": "^5.3.11",
     "request": "^2.88.0",
     "riot-lol-api": "github:iaace-NA/riot-lol-api"
   }
