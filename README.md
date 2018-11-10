@@ -1,4 +1,4 @@
-# SupportBot v1.5.2
+# SupportBot v1.6.0
 League of Legends Statistics for Discord
 (c) 2018; source available, all rights reserved
 
@@ -13,12 +13,13 @@ League of Legends Statistics for Discord
 - Processes
   - 3 shards implemented as separate processes (blocking)
     - (Future, not implemented) +1 process per shard for realtime music playback/streaming (non-blocking)
-  - 1 parent process to control all 3 shards (blocking)
+  - 1 parent process to startup all 3 shards (blocking)
   - 1 internal (stateful) API process to cache external API requests and to handle database operations (blocking)
     - HTTPS for database operations
     - wss for bidirectional discord shard related communications
     - api key authentication
   - (Future, not implemented) 1 child process of the internal API to handle polling and tracking (blocking)
+  - (Future, not implemented) 1 website process, accessing the internal API via HTTPS requests
 - Configurable API caching timeouts per endpoint, per command
 - Feedback commands
 - Configurable user and server rate limiting
@@ -50,6 +51,7 @@ League of Legends Statistics for Discord
 - api: internal api files
 - data: TLS certs and other local data
 - discord: discord bot files
+- install: bash installation files for 1 time use only, Ubuntu OS
 - releasenotes: release notes for supportbot
 - start: startup configs for pm2
 - tests: manual test cases
@@ -59,19 +61,18 @@ League of Legends Statistics for Discord
 - mongodb 3.x
 ## npm Dependencies
 - pm2 (global)
-- getopts 2.2.1
-- bottleneck 2.12.0
+- getopts 2.2.3
 - discord.js 11.4.2
-- mongoose 5.3.2
+- mongoose 5.3.11
 - request 2.88.0
-- mathjs 5.2.0
+- mathjs 5.2.3
 - console.table 0.10.0
 - json5 2.1.0
 - iaace-NA/riot-lol-api 4.2.16
-- express 4.6.3
+- express 4.16.4
 - express-ws 4.0.0
 - uws 9.148.0
-- ws 5.2.2
+- ws 6.1.0
 - xregexp 4.2.0
 ## Minimum System Requirements
 - RAM: 1 GB

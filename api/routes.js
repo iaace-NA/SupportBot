@@ -1,6 +1,6 @@
 "use strict";
 const UTILS = new (require("../utils.js"))();
-module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard, server_preferences_model) {
+module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard, server_preferences_model, dc_load_average) {
 	serveWebRequest("/createshortcut/:uid", function(req, res, next) {
 		findShortcut(req.params.uid, res, doc => {
 			if (UTILS.exists(doc)) {
@@ -84,6 +84,55 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 		findShortcut(req.params.uid, res, doc => {
 			if (UTILS.exists(doc)) res.json({ shortcuts: doc.toObject().shortcuts });
 			else res.send("{}");
+		});
+	}, true);
+	serveWebRequest("/getverified/:uid", function(req, res, next) {
+		findShortcut(req.params.uid, res, doc => {
+			if (UTILS.exists(doc)) {
+				const now = new Date().getTime();
+				for (let b in doc.verifiedAccounts) if (doc.verifiedAccounts[b].getTime() < now) delete doc.verifiedAccounts[b];
+				doc.markModified("verifiedAccounts");
+				res.json({ verifiedAccounts: doc.toObject().verifiedAccounts });
+				doc.save(e => {
+					if (e) console.error(e);
+				});
+			}
+			else res.send("{}");
+		});
+	}, true);
+	serveWebRequest("/setverified/:uid", function(req, res, next) {
+		findShortcut(req.params.uid, res, doc => {
+			if (UTILS.exists(doc)) {
+				let shortcut_count = 0;
+				for (let b in doc.verifiedAccounts) ++shortcut_count;
+				if (shortcut_count >= 50) return res.json({ success: false });
+				doc.verifiedAccounts[req.query.from] = new Date(parseInt(req.query.to));
+				doc.markModified("verifiedAccounts");
+				doc.save(e => {
+					if (e) {
+						console.error(e);
+						return res.status(500).end();
+					}
+					else res.json({ success: true });
+				});
+			}
+			else {
+				let new_shortcuts = {
+					uid: req.params.uid,
+					shortcuts: {},
+					verifiedAccounts: {},
+					username: ""
+				}
+				new_shortcuts.verifiedAccounts[req.query.from] = new Date(parseInt(req.query.to));
+				let new_document = new shortcut_doc_model(new_shortcuts);
+				new_document.save((e, doc) => {
+					if (e) {
+						console.error(e);
+						return res.status(500).end();
+					}
+					else res.json({ success: true });
+				});
+			}
 		});
 	}, true);
 	serveWebRequest("/setlink/:uid", (req, res, next) => {
@@ -297,6 +346,11 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			});
 		});
 	}, true);
+	serveWebRequest("/existspreferences", (req, res, next) => {
+		findPreferences(req.query.id, res, doc => {
+			res.json({ new: !UTILS.exists(doc) });
+		});
+	}, true);
 	serveWebRequest("/getpreferences", (req, res, next) => {
 		findPreferences(req.query.id, res, doc => {
 			if (!UTILS.exists(doc)) {//create new doc
@@ -349,6 +403,17 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			answer[i + ""].total_rate = load_average[i].total_rate();
 			answer[i + ""].total_count = load_average[i].total_count();
 		}
+		answer.discord = {
+			description: "Discord commands",
+			min1: dc_load_average.min1(),
+			min5: dc_load_average.min5(),
+			min15: dc_load_average.min15(),
+			min30: dc_load_average.min30(),
+			min60: dc_load_average.min60(),
+			total_rate: dc_load_average.total_rate(),
+			total_count: dc_load_average.total_count()
+		};
+		answer.uptime = process.uptime();
 		res.json(answer);
 	}, true);
 	serveWebRequest("/", function (req, res, next) {

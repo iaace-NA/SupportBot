@@ -48,6 +48,8 @@ module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShar
 		case 35:
 			shardBroadcast({ type: 34, embed: data.embed, cid: data.cid, approvable: data.approvable }, [data.id]);
 			break;
+		case 37:
+			sendToShard({ type: 36 }, data.id);
 		default:
 			UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
 	}

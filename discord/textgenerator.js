@@ -6,7 +6,10 @@ module.exports = class TextGenerator {
 		nMsg.edit(nMsg.content + " " + (nMsg.createdTimestamp - msg.createdTimestamp) + "ms");
 	}
 	internal_ping(times) {
-		return "Time to internal api: " + (times.received - times.started) + " ms. Time to return: " + (times.ended - times.received) + " ms.";
+		return "Time to internal api: ~" + Math.round((times.ended - times.started) / 2) + " ms. Round Trip Time: " + (times.ended - times.started) + " ms.";
+	}
+	ws_ping(times) {
+		return "Time to internal api via websocket: ~" + Math.round((times.ended - times.started) / 2) + " ms. Round Trip Time: " + (times.ended - times.started) + " ms.";
 	}
 	shortcuts(CONFIG, obj) {
 		const post_desc = "To add a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "setshortcut $<shortcut name> <username>`\nTo remove a shortcut: `" + CONFIG.DISCORD_COMMAND_PREFIX + "removeshortcut $<shortcut name>`\nTo remove all shortcuts: `" + CONFIG.DISCORD_COMMAND_PREFIX + "removeallshortcuts`";

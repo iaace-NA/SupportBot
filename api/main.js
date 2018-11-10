@@ -7,7 +7,7 @@ let CONFIG;
 const JSON5 = require("json5");
 try {
 	CONFIG = JSON5.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.5.2";//b for non-release (in development)
+	CONFIG.VERSION = "v1.6.0";//b for non-release (in development)
 }
 catch (e) {
 	console.log("something's wrong with config.json");
@@ -65,6 +65,7 @@ let riotRequest = new (require("riot-lol-api"))(CONFIG.RIOT_API_KEY, 12000, {
 let LoadAverage = require("../loadaverage.js");
 const response_type = ["Total", "Uncachable", "Cache hit", "Cache hit expired", "Cache miss"];
 const load_average = [new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60)];
+const dc_load_average = new LoadAverage(60);//discord command load average
 const express = require("express");
 const website = express();
 
@@ -73,7 +74,7 @@ let Profiler = require("../timeprofiler.js");
 let request = require("request");
 let wsRoutes = require("./websockets.js");
 let routes = require("./routes.js");
-UTILS.assert(UTILS.exists(CONFIG.API_PORT));
+UTILS.assert(UTILS.exists(CONFIG.API_PORT), "API port does not exist in config.");
 UTILS.output("Modules loaded.");
 let apicache = require("mongoose");
 apicache.connect(CONFIG.MONGODB_ADDRESS, { useNewUrlParser: true });//cache of summoner object name lookups
@@ -88,10 +89,11 @@ api_doc.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 api_doc.index({ url: "hashed" });
 let api_doc_model = apicache.model("api_doc_model", api_doc);
 
-let shortcut_doc = new apicache.Schema({
-	uid: String,
-	shortcuts: { type: apicache.Schema.Types.Mixed, default: {} },
-	username: String
+let shortcut_doc = new apicache.Schema({//basically user preferences
+	uid: { type: String, required: true },
+	shortcuts: { type: apicache.Schema.Types.Mixed, default: {}, required: true },
+	username: { type: String, required: true},
+	verifiedAccounts: { type: apicache.Schema.Types.Mixed, default: {}, required: true }//["region:summonerid"] = expiry date ms
 }, { minimize: false });
 shortcut_doc.index({ uid: "hashed" });
 let shortcut_doc_model = apicache.model("shortcut_doc_model", shortcut_doc);
@@ -110,6 +112,45 @@ disciplinary_doc.index({ issuer_id: "hashed" });//direct issuer lookups
 //disciplinary_doc.index({ target_id: 1 });//ranged username lookups
 disciplinary_doc.index({ active: 1, date: 1, user: 1, ban: 1 });//actives for broadcast to shards
 let disciplinary_model = apicache.model("disciplinary_model", disciplinary_doc);
+let msg_audit_doc = new apicache.Schema({
+	mid: { type: String, required: true },//message id
+	uid: { type: String, required: true },//user id
+	tag: { type: String, required: true },//username#discriminator
+	cid: { type: String, required: true },//channel id
+	sid: { type: String },//server id not required
+	content: { type: String },
+	clean_content: { type: String },
+	guild_name: { type: String },//server name, not required
+	channel_name: { type: String },//channel name, not required
+	calls: { type: Number, required: true },//number of API calls
+	chr: { type: Number },//0-1 floating point number for cache hit ratio
+	creation_time: { type: Date, required: true },//when the command was sent
+	reply_time: { type: Date, required: true },//when the reply was sent
+	ttr: { type: Number, required: true },//time to respond (ms)
+	permission: { type: Number, required: true },//permission level number
+	response: { type: String },//string reply
+	embed: { type: apicache.Schema.Types.Mixed },//embed object reply
+	shard: { type: Number, required: true },
+	expireAt: { type: Date, required: true }
+});
+msg_audit_doc.index({ mid: 1 });
+msg_audit_doc.index({ uid: "hashed" });
+msg_audit_doc.index({ tag: "hashed" });
+msg_audit_doc.index({ cid: "hashed" });
+msg_audit_doc.index({ sid: "hashed" });
+msg_audit_doc.index({ content: "hashed" });
+msg_audit_doc.index({ clean_content: "hashed" });
+msg_audit_doc.index({ guild_name: "hashed" });
+msg_audit_doc.index({ channel_name: "hashed" });
+msg_audit_doc.index({ calls: -1 });
+msg_audit_doc.index({ chr: -1 });
+msg_audit_doc.index({ creation_time: -1 });
+msg_audit_doc.index({ reply_time: -1 });
+msg_audit_doc.index({ ttr: -1 });
+msg_audit_doc.index({ permission: "hashed" });
+msg_audit_doc.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
+let msg_audit_model = apicache.model("msg_audit_model", msg_audit_doc);
+
 
 let server_preferences_doc = new apicache.Schema({
 	id: { type: String, required: true },//id of server
@@ -140,9 +181,6 @@ server_preferences_doc.index({ id: "hashed" });
 server_preferences_doc.index({ id: 1 });
 let server_preferences_model = apicache.model("server_preferences_doc", server_preferences_doc);
 
-let region_limiters = {};
-let limiter = require("bottleneck");
-for (let b in CONFIG.REGIONS) region_limiters[CONFIG.REGIONS[b]] = new limiter({ maxConcurrent: 1, minTime: CONFIG.API_PERIOD });
 let irs = {};//individual request statistics
 let database_profiler = new Profiler("Database Profiler");
 let server = https.createServer({ key: fs.readFileSync("../data/keys/server.key"),
@@ -261,17 +299,44 @@ serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/:tag/", (req, res, 
 	});
 }, true);
 serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
+	res.status(200).end()
+	dc_load_average.add();
 	for (let b in irs) if (new Date().getTime() - irs[b][5] > 1000 * 60 * 10) delete irs[b];//cleanup old requests
-	if (!UTILS.exists(irs[req.params.request_id])) return res.status(200).end();//doesn't exist
-	let description = [];
-	irs[req.params.request_id][4] = irs[req.params.request_id][0] - irs[req.params.request_id][1] - irs[req.params.request_id][2] - irs[req.params.request_id][3];
-	for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[req.params.request_id][i] + "): " + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%");
-	description = description.join(", ");
-	UTILS.output("IAPI: request #" + req.params.request_id + " (" + (new Date().getTime() - irs[req.params.request_id][5]) + "ms): " + description);
-	console.log("");
-	delete irs[req.params.request_id];
-	res.status(200).end();
-	UTILS.debug(database_profiler.endAll(), false);
+	let newaudit = {
+		mid: req.query.mid,
+		uid: req.query.uid,
+		tag: req.query.tag,
+		cid: req.query.cid,
+		calls: req.query.calls,
+		creation_time: new Date(parseInt(req.query.creation_time)),
+		reply_time: new Date(parseInt(req.query.reply_time)),
+		ttr: parseInt(req.query.ttr),
+		permission: parseInt(req.query.permission),
+		shard: parseInt(req.query.shard),
+		expireAt: new Date(new Date().getTime() + (CONFIG.AUDIT_TTL * 1000))
+	};
+	if (UTILS.exists(req.query.sid)) newaudit.sid = req.query.sid;
+	if (UTILS.exists(req.query.guild_name)) newaudit.guild_name = req.query.guild_name;
+	if (UTILS.exists(req.query.channel_name)) newaudit.channel_name = req.query.channel_name;
+	if (UTILS.exists(req.query.content)) newaudit.content = req.query.content;
+	if (UTILS.exists(req.query.clean_content)) newaudit.clean_content = req.query.clean_content;
+	if (UTILS.exists(req.query.response)) newaudit.response = req.query.response;
+	if (UTILS.exists(req.query.embed)) newaudit.embed = JSON.parse(req.query.embed);
+	if (UTILS.exists(irs[req.params.request_id])) {//request handler exists
+		let description = [];
+		irs[req.params.request_id][4] = irs[req.params.request_id][0] - irs[req.params.request_id][1] - irs[req.params.request_id][2] - irs[req.params.request_id][3];
+		for (let i = 0; i < 5; ++i) description.push(response_type[i] + " (" + irs[req.params.request_id][i] + "): " + UTILS.round(100 * irs[req.params.request_id][i] / irs[req.params.request_id][0], 0) + "%");
+		description = description.join(", ");
+		UTILS.output("IAPI: request #" + req.params.request_id + " (" + (new Date().getTime() - irs[req.params.request_id][5]) + "ms): " + description);
+		console.log("");
+		newaudit.chr = irs[req.params.request_id][2] / irs[req.params.request_id][0];
+		delete irs[req.params.request_id];
+		UTILS.debug(database_profiler.endAll(), false);
+	}
+	let new_document = new msg_audit_model(newaudit);
+	new_document.save((e, doc) => {
+		if (e) console.error(e);
+	})
 }, true);
 
 serveWebRequest("/eval/:script", function (req, res, next) {
@@ -284,7 +349,7 @@ serveWebRequest("/eval/:script", function (req, res, next) {
 	}
 	res.json(result).end();
 }, true);
-routes(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard, server_preferences_model);
+routes(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard, server_preferences_model, dc_load_average);
 function serveWebRequest(branch, callback, validate = false) {
 	if (typeof(branch) == "string") {
 		website.get(branch, function (req, res, next) {

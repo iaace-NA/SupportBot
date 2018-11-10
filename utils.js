@@ -8,10 +8,23 @@ String.prototype.replaceAll = function(search, replacement) {
 String.prototype.count = function(search) {
 	return (this.match(new RegExp(search, "g")) || []).length;
 }
+String.prototype.indexOfInstance = function(searchString, index) {
+	let answer = -1;
+	for (let i = 0, count = 0; i < this.length - searchString.length; ++i) {
+		if (this.substring(i, i + searchString.length) == searchString) {
+			++count;
+			if (count == index) answer = i;
+		}
+	}
+	return answer;
+}
 Number.prototype.pad = function(size) {
 	let s = String(this);
 	while (s.length < (size || 2)) {s = "0" + s;}
 	return s;
+}
+Number.prototype.round = function(decimal = 0) {
+	return Math.round(this * Math.pow(10, decimal)) / Math.pow(10, decimal);
 }
 module.exports = class UTILS {
 	output(t) {//general utility function
@@ -41,14 +54,14 @@ module.exports = class UTILS {
 	round(num, decimal = 0) {
 		return Math.round(num * Math.pow(10, decimal)) / Math.pow(10, decimal);
 	}
-	assert(condition) {
+	assert(condition, message) {
 		if (typeof (condition) != "boolean") {
 			console.trace();
 			throw new Error("asserting non boolean value: " + typeof (condition));
 		}
 		if (!condition) {
 			console.trace();
-			throw new Error("assertion false");
+			throw new Error("assertion false" + (this.exists(message) ? ": " + message : ""));
 		}
 		return true;
 	}
@@ -79,13 +92,18 @@ module.exports = class UTILS {
 		return this.teamParticipant(summonerID, match).stats;
 	}
 	KDA(summonerID, match) {
-		const stats = this.stats(summonerID, match);
+		return this.KDAFromStats(this.stats(summonerID, match));
+	}
+	KDAFromStats(stats) {
 		return {
 			K: stats.kills,
 			D: stats.deaths,
 			A: stats.assists,
 			KDA: (stats.kills + stats.assists) / stats.deaths,
-			KD: stats.kills / stats.deaths
+			KD: stats.kills / stats.deaths,
+			KDANoPerfect: (stats.kills + stats.assists) / (stats.deaths === 0 ? 1 : stats.deaths),
+			KDNoPerfect: stats.kills / (stats.deaths === 0 ? 1 : stats.deaths),
+			inverseKDA: stats.deaths / ((stats.kills + stats.assists === 0) ? 1 : (stats.kills + stats.assists))
 		};
 	}
 	determineWin(summonerID, match) {
@@ -111,18 +129,12 @@ module.exports = class UTILS {
 		number /= 1000;
 		return number.toFixed(1) + "k";
 	}
+	masteryPoints(number) {
+		number /= 1000;
+		return Math.round(number) + "k";
+	}
 	level(summonerID, match) {
 		return this.stats(summonerID, match).championLevel;
-	}
-	indexOfInstance(string, searchString, index) {
-		let answer = -1;
-		for (let i = 0, count = 0; i < string.length - searchString.length; ++i) {
-			if (string.substring(i, i + searchString.length) == searchString) {
-				++count;
-				if (count == index) answer = i;
-			}
-		}
-		return answer;
 	}
 	preferredTextChannel(client, collection, type, names, permissions) {
 		for (let i = 0; i < names.length; ++i) {
@@ -131,7 +143,7 @@ module.exports = class UTILS {
 			});
 			if (this.exists(candidate)) return candidate;
 		}
-		return collection.find(ch => { if (ch.type === type && ch.permissionsFor(client.user).has(permissions)) return true; });
+		return collection.find(ch => ch.type === type && ch.permissionsFor(client.user).has(permissions));
 	}
 	trim(network) {
 		let count = 0;
@@ -165,7 +177,8 @@ module.exports = class UTILS {
 		else return 0;
 	}
 	opgg(region, username) {
-		this.assert(this.exists(username));
+		this.assert(this.exists(username), "opgg link generator: username doesn't exist");
+		this.assert(this.exists(region), "opgg link generator: region doesn't exist");
 		if (region == "KR") region = "www";//account for kr region special www opgg link
 		return "http://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
 	}
@@ -215,11 +228,11 @@ module.exports = class UTILS {
 	}
 	KDAFormat(num) {
 		if (isNaN(num) || num == Infinity) return "Perfect";
-		else return this.round(num, 2).toFixed(2);
+		else return num.toFixed(2);
 	}
 	KPFormat(num) {
 		if (isNaN(num)) return 0;
-		else return this.round(num, 0);
+		else return Math.round(num);
 	}
 	iMMR(rank) {//internal MMR Representation
 		/*
@@ -268,6 +281,40 @@ module.exports = class UTILS {
 		}
 		return answer;
 	}
+	decodeEnglishToIMMR(text) {
+		const answer = internal_calc();
+		return (isNaN(answer) || !this.exists(answer)) ? null : answer;
+		function internal_calc() {
+			text.replaceAll(" ", "");//remove spaces
+			text = text.toLowerCase();//all lowercase
+			const TIERS = ["b", "s", "g", "p", "d", "m", "c"];
+			const T_IMMR = [300, 800, 1300, 1800, 2300, 2600, 2800];
+			const tier_index = TIERS.indexOf(text[0]);
+			if (tier_index === -1) return null;//tier not detected
+			if (text.length === 1) return T_IMMR[TIERS.indexOf(text[0])];//tier only
+			else {//tier, div, [LP]
+				const div = parseInt(text[1]);
+				if (text.length === 2) {//tier, div
+					if (tier_index < 5) {//below master
+						if (div > 5 || div < 1) return null;
+						else return T_IMMR[tier_index] + ((3 - div) * 100);
+					}
+					else return null;
+				}
+				else if (tier_index >= 5) {//tier, LP master/challenger
+					let LP = parseInt(text.substring(1));//must be >= 0
+					if (LP < 0) return null;
+					else if (tier_index == 5) return T_IMMR[tier_index] + (LP / 5);
+					else return T_IMMR[tier_index] - 200 + (LP / 5);
+				}
+				else {//tier, div, LP
+					let LP = parseInt(text.substring(2));
+					if (LP > 100 || LP < 0) return null;//must be between 0 and 100
+					return T_IMMR[tier_index] + ((3 - div) * 100) + LP;
+				}
+			}
+		}
+	}
 	summonersRiftMMR(rank) {
 		let individual_iMMR = 0;
 		let individual_games = 0;
@@ -315,7 +362,23 @@ module.exports = class UTILS {
 		return JSON.parse(JSON.stringify(obj));
 	}
 	removeAllOccurances(arr, deletable) {
-		while (arr.indexOf(deletable) != -1) arr.splice(arr.indexOf(deletable), 1);
+		let deleted = 0;
+		if (typeof(deletable) === "function") {
+			for (let i = 0; i < arr.length; ++i) {
+				if (deletable(arr[i])) {
+					arr.splice(i, 1);
+					--i;
+					++deleted;
+				}
+			}
+		}
+		else {
+			while (arr.indexOf(deletable) != -1) {
+				arr.splice(arr.indexOf(deletable), 1);
+				++deleted;
+			}
+		}
+		return deleted;
 	}
 	defaultChannelNames() {
 		return ["general", "bot", "bots", "bot-commands", "botcommands", "commands", "league", "lol", "supportbot", "support-bot", "games", "spam"];
@@ -482,7 +545,7 @@ module.exports = class UTILS {
 		return { active_ban, recent_ban, recent_warning, most_recent_note };
 	}
 	disciplinaryStatusString(status, user) {
-		this.assert(this.exists(user));
+		this.assert(this.exists(user), "UTILS.dSS(status, user): user doesn't exist");
 		let answer = user ? "User: " : "Server: ";
 		if (status.active_ban == -1 && !status.recent_ban && !status.recent_warning) answer += ":white_check_mark: Good standing.";
 		else {
@@ -539,5 +602,63 @@ module.exports = class UTILS {
 			query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
 		}
 		return query;
+	}
+	aggregateClientEvals(client, arr) {//numerical only
+		let par = [];
+		let that = this;
+		for (let b of arr) {
+			par.push(new Promise((resolve, reject) => {
+				client.shard.broadcastEval(b[0]).then(r => {
+					resolve(that.exists(b[1]) ? b[1](r) : r);
+				}).catch(reject);
+			}));
+		}
+		return Promise.all(par);
+	}
+	generateGraph(mathjs, raw, height = 5, width = 35) {
+		let answer = "";
+		let min = raw[0][0];//start time
+		let max = raw[raw.length - 1][0];//end time
+		const y_vals = raw.map(point => point[1]);
+		const y_min = mathjs.min(y_vals);
+		const y_max = mathjs.max(y_vals);
+		const raw_normalized = raw.map(point => {
+			point[1] = this.map(point[1], y_min, y_max, 0, 1);
+			return point;
+		});
+		for (let r = 0; r < height; ++r) {
+			answer += "\n";
+			for (let i = 0; i < width; ++i) {
+				const targetTime = this.map(i, 0, width, min, max);
+				let closestTimeLeft = min;
+				let closestHealthLeft = raw_normalized[0][1];
+				let closestTimeRight = max;
+				let closestHealthRight = raw_normalized[raw_normalized.length - 1][1];
+				for (let j = 1; j < raw_normalized.length; ++j) {
+					if (raw_normalized[j][0] >= targetTime) {
+						closestTimeLeft = raw_normalized[j - 1][0];
+						closestHealthLeft = raw_normalized[j - 1][1];
+						closestTimeRight = raw_normalized[j][0];
+						closestHealthRight = raw_normalized[j][1];
+						break;
+					}
+				}
+				let slope = (closestHealthRight - closestHealthLeft) / (closestTimeRight - closestTimeLeft);
+				let healthValue = (slope * (targetTime - closestTimeRight)) + closestHealthRight;
+				//output("(" + r + "," + i + ") is " + healthValue);
+				if (healthValue >= 0.95 - (r * 0.2)) {
+					answer += "█";
+				}
+				else if (healthValue < 0.95 - (r * 0.2) && healthValue >= 1 - ((r + 1) * 0.2)) {
+					answer += "▄";
+				}
+				else {
+					answer += " ";
+				}
+			}
+			if (r === 0) answer += y_max;
+			else if (r === height - 1) answer += y_min;
+		}
+		return "```" + answer + "```";
 	}
 }

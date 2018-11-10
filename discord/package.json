@@ -11,12 +11,12 @@
   "dependencies": {
     "console.table": "^0.10.0",
     "discord.js": "^11.4.2",
-    "getopts": "^2.0.6",
+    "getopts": "^2.2.3",
     "json5": "^2.1.0",
-    "mathjs": "^5.1.0",
+    "mathjs": "^5.2.3",
     "request": "^2.88.0",
     "uws": "^9.14.0",
-    "ws": "^5.2.2",
+    "ws": "^6.1.0",
     "xregexp": "^4.2.0",
     "zlib-sync": "^0.1.4"
   }

@@ -6,6 +6,7 @@ const UTILS = new (require("../utils.js"))();
 let LOLAPI = require("./lolapi.js");
 let Profiler = require("../timeprofiler.js");
 let ctable = require("console.table");
+const crypto = require("crypto");
 module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedToChannel, preferences, ACCESS_LEVEL, server_RL, user_RL) {
 	if (msg.author.bot || msg.author.id === client.user.id) return;//ignore all messages from [BOT] users and own messages
 	if (!msg.PM && !msg.channel.permissionsFor(client.user).has(["VIEW_CHANNEL", "SEND_MESSAGES"])) return;//dont read messages that can't be responded to
@@ -47,8 +48,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	command([preferences.get("prefix") + "banuser "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lbanuser <uid> <duration> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
-		const reason = parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1);
-		let duration = parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2));
+		const reason = parameter.substring(parameter.indexOfInstance(" ", 2) + 1);
+		let duration = parameter.substring(parameter.indexOfInstance(" ", 1) + 1, parameter.indexOfInstance(" ", 2));
 		duration = duration == "0" ? duration = 0 : UTILS.durationParse(duration);
 		if (isNaN(duration)) return reply(":x: The duration is invalid.");
 		const end_date = duration == 0 ? 0 : new Date().getTime() + duration;
@@ -64,8 +65,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	command([preferences.get("prefix") + "banserver "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		//Lbanserver <sid> <duration> <reason>
 		const id = parameter.substring(0, parameter.indexOf(" "));
-		const reason = parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1);
-		let duration = parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2));
+		const reason = parameter.substring(parameter.indexOfInstance(" ", 2) + 1);
+		let duration = parameter.substring(parameter.indexOfInstance(" ", 1) + 1, parameter.indexOfInstance(" ", 2));
 		duration = duration == "0" ? duration = 0 : UTILS.durationParse(duration);
 		if (isNaN(duration)) return reply(":x: The duration is invalid.");
 		const end_date = duration == 0 ? 0 : new Date().getTime() + duration;
@@ -178,13 +179,22 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 		reply(msg.mentions.users.first().tag + " has " + (isOwner(msg.mentions.users.first().id, false) ? "owner" : "normal") + " permissions.");
 	});
 	command([preferences.get("prefix") + "stats"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
-		reply("This is shard " + process.env.SHARD_ID);
+		lolapi.stats().then(iapi_stats => {
+			UTILS.aggregateClientEvals(client, [["this.guilds.size", r => r.reduce((prev, val) => prev + val, 0) + " (" + r.join(", ") + ")"],
+				["this.users.size", r => r.reduce((prev, val) => prev + val, 0) + " (" + r.join(", ") + ")"],
+				["this.guilds.map(g => g.memberCount).reduce((prev, val) => prev + val, 0)", r => r.reduce((prev, val) => prev + val, 0) + " (" + r.join(", ") + ")"]]).then(c_eval => {
+				replyEmbed(embedgenerator.debug(CONFIG, client, iapi_stats, c_eval));
+			});
+		}).catch(console.error);
 	});
 	command([preferences.get("prefix") + "ping"], false, false, () => {
 		reply("command to response time: ", nMsg => textgenerator.ping_callback(msg, nMsg));
 	});
 	command(["iping"], false, false, () => {
 		lolapi.ping().then(times => reply(textgenerator.internal_ping(times))).catch(console.error);
+	});
+	command(["wping"], false, false, () => {
+		wsapi.ping(times => reply(textgenerator.ws_ping(times)));
 	});
 	command([preferences.get("prefix") + "ping "], true, false, function (original, index, parameter) {
 		reply("you said: " + parameter);
@@ -271,12 +281,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	command([preferences.get("prefix") + "setshortcut ", preferences.get("prefix") + "ss ", preferences.get("prefix") + "createshortcut ", preferences.get("prefix") + "addshortcut "], true, false, (original, index, parameter) => {
 		if (parameter[0] !== "$") return reply(":x: The shortcut must begin with an `$`. Please try again.");
-		if (parameter.indexOf(" ") === -1) return reply(":x: The shortcut word and the username must be separated by a space. Please try again.");
-		if (parameter.length > 60) return reply(":x: The shortcut name or the username is too long.");
+		else if (parameter.indexOf(" ") === -1) return reply(":x: The shortcut word and the username must be separated by a space. Please try again.");
+		else if (parameter.length > 60) return reply(":x: The shortcut name or the username is too long.");
 		const from = parameter.substring(1, parameter.indexOf(" ")).toLowerCase();
 		if (from.length === 0) return reply(":x: The shortcut name was not specified. Please try again.");
 		const to = parameter.substring(parameter.indexOf(" ") + 1);
 		if (to.length === 0) return reply(":x: The username was not specified. Please try again.");
+		else if (parameter.substring(1).indexOf("$") !== -1) return reply(":x: The shortcut cannot contain more than 1 `$` character.");
 		lolapi.createShortcut(msg.author.id, from, to).then(result => {
 			if (result.success) reply(":white_check_mark: `$" + from + "` will now point to `" + to + "`.");
 			else reply(":x: You can only have up to 50 shortcuts. Please remove some and try again.");
@@ -300,6 +311,42 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			reply(":white_check_mark: All shortcuts were removed.")
 		}).catch(console.error);
 	});
+	/*
+	command([preferences.get("prefix") + "verify "], true, false, (original, index, parameter) => {
+		let region = assertRegion(parameter.substring(0, parameter.indexOf(" ")));
+		lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.VERIFY.SUMMONER_ID).then(summoner => {
+			summoner.region = region;
+			summoner.guess = parameter.substring(parameter.indexOf(" ") + 1);
+			if (UTILS.exists(summoner.status)) return reply(":x: The username appears to be invalid.");
+			lolapi.getVerifiedAccounts(msg.author.id).then(result => {
+				if (UTILS.exists(result.verifiedAccounts[summoner.puuid])) {
+					reply(":white_check_mark: You have already linked your discord account to " + summoner.name + ". This will expire in " + UTILS.until(new Date(result.verifiedAccounts[summoner.puuid])) + ".");//verified
+				}
+				else {//not verified yet
+					lolapi.getThirdPartyCode(region, summoner.id, CONFIG.API_MAXAGE.VERIFY.THIRD_PARTY_CODE).then(tpc => {
+						let valid_code = 0;
+						const tpc_timestamp_ms = parseInt(tpc.substring(0, tpc.indexOf("-")));
+						const tpc_HMAC_input = tpc_timestamp_ms + "-" + msg.author.id + "-" + summoner.puuid;
+						const tpc_HMAC_output = tpc.substring(tpc.indexOf("-") + 1);
+						UTILS.debug("tpc_timestamp_ms: " + tpc_timestamp_ms);
+						UTILS.debug("tpc_HMAC_input: " + tpc_HMAC_input);
+						UTILS.debug("tpc_HMAC_output: " + tpc_HMAC_output);
+						if (tpc_timestamp_ms < new Date().getTime() - (5 * 60 * 1000)) valid_code += 1;//not expired
+						else if (tpc_HMAC_output !== crypto.createHmac("sha256", CONFIG.TPV_KEY).update(tpc_HMAC_input).digest("hex")) valid_code += 2;//same HMAC
+						if (valid_code === 0) {
+							lolapi.setVerifiedAccount(msg.author.id, summoner.puuid, new Date().getTime() + (365 * 24 * 60 * 60000)).then(result2 => {
+								reply(":white_check_mark: You have linked your discord account to " + summoner.name + " for 1 year.");
+							}).catch(console.error);
+						}
+						else {
+							UTILS.debug("valid_code: " + valid_code);
+							replyEmbed(embedgenerator.verify(CONFIG, summoner, msg.author.id));
+						}
+					}).catch();
+				}
+			}).catch(console.error);
+		}).catch(console.error);
+	});*/
 	if (preferences.get("auto_opgg")) {
 		command(["http://"], true, false, (original, index, parameter) => {
 			let r_copy = parameter.substring(0, parameter.indexOf("."));
@@ -308,7 +355,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			if (parameter.substring(parameter.indexOf(".") + 1, parameter.indexOf(".") + 6) == "op.gg") {
 				let username = decodeURIComponent(msg.content.substring(msg.content.indexOf("userName=") + "userName=".length)).replaceAll("+", " ");//reformat spaces
 				lolapi.getSummonerCard(region, username).then(result => {
-					replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], r_copy, result[3]));
+					lolapi.checkVerifiedAccount(msg.author.id, result[5].puuid).then(verified => {
+						replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], r_copy, result[3], result[4], verified));
+					}).catch(console.error);
 				}).catch(console.error);
 			}
 		});
@@ -321,7 +370,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	commandGuessUsername(forcePrefix([""]), false, (region, username, parameter, guess_method) => {
 		lolapi.getSummonerCard(region, username).then(result => {
-			replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], CONFIG.REGIONS_REVERSE[region], result[3], result[4]));
+			lolapi.checkVerifiedAccount(msg.author.id, result[5].puuid).then(verified => {
+				replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], CONFIG.REGIONS_REVERSE[region], result[3], result[4], verified));
+			}).catch(console.error);
 		}).catch(e => {
 			if (UTILS.exists(e)) console.error(e);
 			reply(":x: No results for `" + username + "`." + suggestLink(guess_method));
@@ -334,17 +385,19 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
 			lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.MH.RECENT_GAMES).then(matchhistory => {
 				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`." + suggestLink(guess_method));
-				lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m =>  m.gameId), CONFIG.API_MAXAGE.MH.MULTIPLE_MATCH).then(matches => {
-					request_profiler.begin("generating embed");
-					const answer = embedgenerator.match(CONFIG, result, matchhistory.matches, matches);
-					request_profiler.end("generating embed");
-					UTILS.debug(request_profiler.endAll());
-					replyEmbed(answer);
+				lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => m.gameId), CONFIG.API_MAXAGE.MH.MULTIPLE_MATCH).then(matches => {
+					lolapi.checkVerifiedAccount(msg.author.id, result.puuid).then(verified => {
+						request_profiler.begin("generating embed");
+						const answer = embedgenerator.match(CONFIG, result, matchhistory.matches, matches, verified);
+						request_profiler.end("generating embed");
+						UTILS.debug(request_profiler.endAll());
+						replyEmbed(answer);
+					}).catch(console.error);
 				}).catch(console.error);
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	command(forcePrefix(["compare ", "multi ", "m ", "c "]), true, false, (original, index, parameter) => {
+	command(forcePrefix(["multi ", "m "]), true, false, (original, index, parameter) => {
 		request_profiler.mark("multi command recognized");
 		request_profiler.begin("parsing usernames");
 		let region = assertRegion(parameter.substring(0, parameter.indexOf(" ")), index < 2);
@@ -372,6 +425,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			});
 		})).then(usernames => {
 			lolapi.getMultipleSummonerIDFromName(region, usernames, CONFIG.API_MAXAGE.MULTI.MULTIPLE_SUMMONER_ID).then(summoners => {
+				UTILS.removeAllOccurances(summoners, e => !UTILS.exists(e.id));
 				const ids = summoners.map(s => s.id);
 				lolapi.getMultipleRanks(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_RANKS).then(ranks => {
 					lolapi.getMultipleChampionMastery(region, ids, CONFIG.API_MAXAGE.MULTI.MULTIPLE_MASTERIES).then(masteries => {
@@ -416,6 +470,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			});
 		})).then(usernames => {
 			lolapi.getMultipleSummonerIDFromName(region, usernames, CONFIG.API_MAXAGE.FTG.MULTIPLE_SUMMONER_ID).then(summoners => {
+				UTILS.removeAllOccurances(summoners, e => !UTILS.exists(e.id));
 				const ids = summoners.map(s => s.id);
 				lolapi.getMultipleRanks(region, ids, CONFIG.API_MAXAGE.FTG.MULTIPLE_RANKS).then(ranks => {
 					lolapi.getMultipleChampionMastery(region, ids, CONFIG.API_MAXAGE.FTG.MULTIPLE_MASTERIES).then(masteries => {
@@ -442,21 +497,21 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 					lolapi.getMultipleRecentGames(region, pSA.map(pS => pS.accountId), CONFIG.API_MAXAGE.LG.RECENT_GAMES).then(mhA => {//matchhistory array
 						let mIDA = [];//match id array;
 						for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
-						lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.LG.MULTIPLE_MATCH).then(matches => {
-							lolapi.getMultipleRanks(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS).then(ranks => {
-								lolapi.getMultipleChampionMastery(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_MASTERIES).then(masteries => {
-									//nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA) }).catch();
-									request_profiler.begin("generating embed");
-									const newEmbed = embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA);
-									request_profiler.end("generating embed");
-									UTILS.debug("\n" + ctable.getTable(request_profiler.endAllCtable()));
-									replyEmbed(newEmbed, () => {
-										//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false, true));
-									});
-									//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false));//untrimmed output
-								}).catch(console.error);
-							}).catch();
-						});
+						Promise.all([lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.LG.MULTIPLE_MATCH), lolapi.getMultipleRanks(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS), lolapi.getMultipleChampionMastery(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_MASTERIES), lolapi.checkVerifiedAccount(msg.author.id, result.puuid)]).then(parallel => {
+							let matches = parallel[0];
+							let ranks = parallel[1];
+							let masteries = parallel[2];
+							let verified = parallel[3];
+							//nMsg.edit("", { embed: embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA) }).catch();
+							request_profiler.begin("generating embed");
+							const newEmbed = embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, verified);
+							request_profiler.end("generating embed");
+							UTILS.debug("\n" + ctable.getTable(request_profiler.endAllCtable()));
+							replyEmbed(newEmbed, () => {
+								//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false, true));
+							});
+								//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false));//untrimmed output
+						}).catch(console.error);
 					}).catch(console.error);
 				}).catch(console.error);
 			}).catch(console.error);
@@ -469,9 +524,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			result.region = region;
 			result.guess = username;
 			if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
-			lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.DMH.RECENT_GAMES).then(matchhistory => {
+			lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.DMH.RECENT_GAMES, 100).then(matchhistory => {
 				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
-				if (number < 1 || number > 20 || !UTILS.exists(matchhistory.matches[number - 1])) return reply(":x: This number is out of range.");
+				if (number < 1 || number > 100 || !UTILS.exists(matchhistory.matches[number - 1])) return reply(":x: This number is out of range.");
 				lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId, CONFIG.API_MAXAGE.DMH.MATCH_INFORMATION).then(match => {
 					const pIDA = match.participantIdentities.map(pI => {
 						if (UTILS.exists(pI.player.summonerId)) return pI.player.summonerId;
@@ -480,11 +535,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 					lolapi.getMultipleRanks(region, pIDA, CONFIG.API_MAXAGE.DMH.MULTIPLE_RANKS).then(ranks => {
 						lolapi.getMultipleChampionMastery(region, pIDA, CONFIG.API_MAXAGE.DMH.MULTIPLE_MASTERIES).then(masteries => {
 							lolapi.getMultipleSummonerFromSummonerID(region, pIDA, CONFIG.API_MAXAGE.DMH.OTHER_SUMMONER_ID).then(pSA => {
-								request_profiler.begin("generating embed");
-								const answer = embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match, ranks, masteries, pSA);
-								request_profiler.end("generating embed");
-								UTILS.debug(request_profiler.endAll());
-								replyEmbed(answer);
+								lolapi.checkVerifiedAccount(msg.author.id, result.puuid).then(verified => {
+									request_profiler.begin("generating embed");
+									const answer = embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match, ranks, masteries, pSA, verified);
+									request_profiler.end("generating embed");
+									UTILS.debug(request_profiler.endAll());
+									replyEmbed(answer);
+								}).catch(console.error);
 							});
 						});
 					}).catch();
@@ -494,16 +551,20 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	commandGuessUsername(forcePrefix(["championmastery ", "mastery "]), false, (region, username, parameter) => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.CM.SUMMONER_ID).then(result => {
-			lolapi.getChampionMastery(region, result.id, CONFIG.API_MAXAGE.CM.CHAMPION_MASTERY).then(cm => {
-				replyEmbed(embedgenerator.mastery(CONFIG, result, cm, CONFIG.REGIONS_REVERSE[region]));
+			Promise.all([lolapi.getChampionMastery(region, result.id, CONFIG.API_MAXAGE.CM.CHAMPION_MASTERY), lolapi.checkVerifiedAccount(msg.author.id, result.puuid)]).then(parallel => {
+				let cm = parallel[0];
+				let verified = parallel[1];
+				replyEmbed(embedgenerator.mastery(CONFIG, result, cm, CONFIG.REGIONS_REVERSE[region], verified));
 			}).catch(console.error);
 		}).catch(console.error);
 	});
 	commandGuessUsername(forcePrefix(["mmr "]), false, (region, username, parameter) => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.MMR_JOKE.SUMMONER_ID).then(result => {
-			result.region = region;
-			result.guess = username;
-			replyEmbed(embedgenerator.mmr(CONFIG, result));
+			lolapi.checkVerifiedAccount(msg.author.id, result.puuid).then(verified => {
+				result.region = region;
+				result.guess = username;
+				replyEmbed(embedgenerator.mmr(CONFIG, result, verified));
+			}).catch(console.error);
 		}).catch(console.error);
 	});
 
@@ -700,9 +761,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			const number = parseInt(parameter.substring(0, parameter.indexOf(" ")));
 			if (isNaN(number)) return false;
 			try {//username explicitly provided
-				const region = assertRegion(parameter.substring(UTILS.indexOfInstance(parameter, " ", 1) + 1, UTILS.indexOfInstance(parameter, " ", 2)), false);//see if there is a region
+				const region = assertRegion(parameter.substring(parameter.indexOfInstance(" ", 1) + 1, parameter.indexOfInstance(" ", 2)), false);//see if there is a region
 				if (!processRateLimit()) return false;
-				if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).length < 35) {//longest query should be less than 35 characters
+				if (parameter.substring(parameter.indexOfInstance(" ", 2) + 1).length < 35) {//longest query should be less than 35 characters
 					if (msg.mentions.users.size == 1) {
 						lolapi.getLink(msg.mentions.users.first().id).then(result => {
 							let username = msg.mentions.users.first().username;//suppose the link doesn't exist in the database
@@ -710,14 +771,14 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 							callback(region, username, number, 4);
 						}).catch(console.error);
 					}
-					else if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1)[0] == "$") {
-						lolapi.getShortcut(msg.author.id, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)).then(result => {
-							callback(region, result[parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1).toLowerCase().substring(1)], number, 1);
+					else if (parameter.substring(parameter.indexOfInstance(" ", 2) + 1)[0] == "$") {
+						lolapi.getShortcut(msg.author.id, parameter.substring(parameter.indexOfInstance(" ", 2) + 1).toLowerCase().substring(1)).then(result => {
+							callback(region, result[parameter.substring(parameter.indexOfInstance(" ", 2) + 1).toLowerCase().substring(1)], number, 1);
 						}).catch(e => {
 							if (e) reply(":x: An error has occurred. The shortcut may not exist.");
 						});
 					}
-					else if (parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1) == "^") {
+					else if (parameter.substring(parameter.indexOfInstance(" ", 2) + 1) == "^") {
 						msg.channel.fetchMessages({ before: msg.id, limit: 30 }).then(msgs => {
 							msgs = msgs.array();
 							let username;
@@ -735,7 +796,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 							else callback(region, username, number, 5);
 						}).catch(console.error);
 					}
-					else callback(region, parameter.substring(UTILS.indexOfInstance(parameter, " ", 2) + 1), number, 0);
+					else callback(region, parameter.substring(parameter.indexOfInstance(" ", 2) + 1), number, 0);
 					return true;
 				}
 			}
@@ -785,7 +846,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	}
 	function reply(reply_text, callback, errorCallback) {
 		printMessage("reply (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
-		lolapi.terminate();
+		lolapi.terminate(msg, ACCESS_LEVEL, reply_text);
 		msg.channel.send(reply_text, { split: true }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
@@ -796,7 +857,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 
 	function replyToAuthor(reply_text, callback, errorCallback) {
 		printMessage("reply to author (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
-		lolapi.terminate();
+		lolapi.terminate(msg, ACCESS_LEVEL, reply_text);
 		msg.author.send(reply_text, { split: true }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {
@@ -807,12 +868,12 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 
 	function replyEmbed(reply_embed, callback, errorCallback) {
 		if (!msg.PM && !msg.channel.permissionsFor(client.user).has(["EMBED_LINKS"])) {//doesn't have permission to embed links in server
-			lolapi.terminate();
+			lolapi.terminate(msg, ACCESS_LEVEL, ":x: I cannot respond to your request without the \"embed links\" permission.");
 			reply(":x: I cannot respond to your request without the \"embed links\" permission.");
 		}
 		else {//has permission to embed links, or is a DM/PM
 			printMessage("reply embedded (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
-			lolapi.terminate();
+			lolapi.terminate(msg, ACCESS_LEVEL, undefined, reply_embed);
 			msg.channel.send("", { embed: reply_embed }).then((nMsg) => {
 				if (UTILS.exists(callback)) callback(nMsg);
 			}).catch((e) => {
@@ -824,7 +885,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 
 	function replyEmbedToAuthor(reply_embed, callback, errorCallback) {
 		printMessage("reply embedded to author (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
-		lolapi.terminate();
+		lolapi.terminate(msg, ACCESS_LEVEL, undefined, reply_embed);
 		msg.author.send("", { embed: reply_embed }).then((nMsg) => {
 			if (UTILS.exists(callback)) callback(nMsg);
 		}).catch((e) => {

@@ -72,6 +72,9 @@ module.exports = class WSAPI {
 
 		34: IAPI wants to send an embed
 		35: shard wants to send an embed
+
+		36: IAPI response to shard ping
+		37: shard wants to ping IAPI
 	*/
 	constructor(INIT_CONFIG, discord_client, INIT_STATUS) {
 		this.client = discord_client;
@@ -124,7 +127,7 @@ module.exports = class WSAPI {
 				case 8://send message to default channel in server
 				case 10://send message to user
 				case 12:
-					const notification = embedgenerator.notify(this.CONFIG, data.content, data.username, data.displayAvatarURL);
+					const notification = embedgenerator.notify(this.CONFIG, data.content, data.username, data.displayAvatarURL, data.release);
 					this.client.guilds.forEach(g => {
 						let candidate = UTILS.preferredTextChannel(that.client, g.channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
 						if (UTILS.exists(candidate)) {
@@ -247,6 +250,10 @@ module.exports = class WSAPI {
 						}
 					}
 					break;
+				case 36:
+					this.end_time = new Date().getTime();
+					this.pingcb({ started: this.start_time, ended: this.end_time });
+					break;
 				default:
 					UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
 			}
@@ -300,5 +307,10 @@ module.exports = class WSAPI {
 	}
 	connected() {
 		return this.connection.readyState == 1;
+	}
+	ping(cb) {
+		this.pingcb = cb;
+		this.start_time = new Date().getTime();
+		this.send({ type: 37 });
 	}
 }
