@@ -123,7 +123,7 @@ let msg_audit_doc = new apicache.Schema({
 	guild_name: { type: String },//server name, not required
 	channel_name: { type: String },//channel name, not required
 	calls: { type: Number, required: true },//number of API calls
-	chr: { typeNumber: Number },//0-1 floating point number for cache hit ratio
+	chr: { type: Number },//0-1 floating point number for cache hit ratio
 	creation_time: { type: Date, required: true },//when the command was sent
 	reply_time: { type: Date, required: true },//when the reply was sent
 	ttr: { type: Number, required: true },//time to respond (ms)
