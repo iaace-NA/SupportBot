@@ -72,6 +72,9 @@ module.exports = class WSAPI {
 
 		34: IAPI wants to send an embed
 		35: shard wants to send an embed
+
+		36: IAPI response to shard ping
+		37: shard wants to ping IAPI
 	*/
 	constructor(INIT_CONFIG, discord_client, INIT_STATUS) {
 		this.client = discord_client;
@@ -247,6 +250,10 @@ module.exports = class WSAPI {
 						}
 					}
 					break;
+				case 36:
+					this.end_time = new Date().getTime();
+					this.pingcb({ started: this.start_time, ended: this.end_time });
+					break;
 				default:
 					UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
 			}
@@ -300,5 +307,10 @@ module.exports = class WSAPI {
 	}
 	connected() {
 		return this.connection.readyState == 1;
+	}
+	ping(cb) {
+		this.pingcb = cb;
+		this.start_time = new Date().getTime();
+		this.send({ type: 37 });
 	}
 }

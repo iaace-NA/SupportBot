@@ -193,6 +193,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	command(["iping"], false, false, () => {
 		lolapi.ping().then(times => reply(textgenerator.internal_ping(times))).catch(console.error);
 	});
+	command(["wping"], false, false, () => {
+		wsapi.ping(times => reply(textgenerator.ws_ping(times)));
+	});
 	command([preferences.get("prefix") + "ping "], true, false, function (original, index, parameter) {
 		reply("you said: " + parameter);
 	});
