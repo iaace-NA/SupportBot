@@ -313,7 +313,7 @@ serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
 		ttr: parseInt(req.query.ttr),
 		permission: parseInt(req.query.permission),
 		shard: parseInt(req.query.shard),
-		expireAt: new Date(new Date().getTime() + (365 * 24 * 60 * 60 * 1000))
+		expireAt: new Date(new Date().getTime() + (CONFIG.AUDIT_TTL * 1000))
 	};
 	if (UTILS.exists(req.query.sid)) newaudit.sid = req.query.sid;
 	if (UTILS.exists(req.query.guild_name)) newaudit.guild_name = req.query.guild_name;
