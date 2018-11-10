@@ -311,6 +311,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			reply(":white_check_mark: All shortcuts were removed.")
 		}).catch(console.error);
 	});
+	/*
 	command([preferences.get("prefix") + "verify "], true, false, (original, index, parameter) => {
 		let region = assertRegion(parameter.substring(0, parameter.indexOf(" ")));
 		lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.VERIFY.SUMMONER_ID).then(summoner => {
@@ -345,7 +346,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 				}
 			}).catch(console.error);
 		}).catch(console.error);
-	});
+	});*/
 	if (preferences.get("auto_opgg")) {
 		command(["http://"], true, false, (original, index, parameter) => {
 			let r_copy = parameter.substring(0, parameter.indexOf("."));
