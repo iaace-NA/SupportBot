@@ -393,7 +393,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	command(forcePrefix(["compare ", "multi ", "m ", "c "]), true, false, (original, index, parameter) => {
+	command(forcePrefix(["multi ", "m "]), true, false, (original, index, parameter) => {
 		request_profiler.mark("multi command recognized");
 		request_profiler.begin("parsing usernames");
 		let region = assertRegion(parameter.substring(0, parameter.indexOf(" ")), index < 2);
