@@ -184,13 +184,25 @@
 	"SHARD_COUNT": 3,//amount of discord shards to spawn. recommended minimum 3, 1500 guilds per shard
 	"RATE_LIMIT": {
 		"CHANNEL_ID": "channel id here",//reports rate limit incidents in this channel
-		"LARGE_SERVER_THRESHOLD": 200,//the point where a server is large and the rate limit is increased
 		"USER_MESSAGES": 4,
 		"USER_TIME_S": 60,
-		"SERVER_MESSAGES": 6,
-		"SERVER_TIME_S": 60,
-		"LARGE_SERVER_MESSAGES": 8,
-		"LARGE_SERVER_TIME_S": 60
+		"SERVERS": [{
+			MESSAGES: 4,
+			TIME_S: 60,
+			MEMBER_COUNT: 0//minimum members required to qualify
+		}, {
+			MESSAGES: 6,
+			TIME_S: 60,
+			MEMBER_COUNT: 5
+		}, {
+			MESSAGES: 8,
+			TIME_S: 60,
+			MEMBER_COUNT: 200
+		}, {
+			MESSAGES: 10,
+			TIME_S: 60,
+			MEMBER_COUNT: 1000
+		}]
 	},
 	"FEEDBACK": {
 		"EXTERNAL_CID": "channel id here",//where external feedback comes to get approved
