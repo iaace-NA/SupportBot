@@ -61,7 +61,7 @@ client.on("message", function (msg) {
 		const SERVER_RL = msg.PM ? null : getServerRateLimiter(msg.guild.id);
 		if (!msg.PM) {
 			for (let i = CONFIG.RATE_LIMIT.SERVERS.length - 1; i >= 0; --i) {
-				if (msg.guild.memberCount >= CONFIG.RATE_LIMIT.SERVERS[i].MEMBERCOUNT) {
+				if (msg.guild.memberCount >= CONFIG.RATE_LIMIT.SERVERS[i].MEMBER_COUNT) {
 					SERVER_RL.setMode(CONFIG.RATE_LIMIT.SERVERS[i].MESSAGES, CONFIG.RATE_LIMIT.SERVERS[i].TIME_S);
 					break;
 				}
