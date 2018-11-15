@@ -55,6 +55,7 @@ League of Legends Statistics for Discord
 - releasenotes: release notes for supportbot
 - start: startup configs for pm2
 - tests: manual test cases
+- utils: utility classes and functions
 
 
 ## Dependencies

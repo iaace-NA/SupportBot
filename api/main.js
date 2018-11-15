@@ -62,7 +62,7 @@ let riotRequest = new (require("riot-lol-api"))(CONFIG.RIOT_API_KEY, 12000, {
 	}
 });
 
-let LoadAverage = require("../loadaverage.js");
+let LoadAverage = require("../utils/loadaverage.js");
 const response_type = ["Total", "Uncachable", "Cache hit", "Cache hit expired", "Cache miss"];
 const load_average = [new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60)];
 const dc_load_average = new LoadAverage(60);//discord command load average

@@ -1,5 +1,5 @@
 "use strict";
-const UTILS = new (require("../utils.js"))();
+const UTILS = new (require("../utils/utils.js"))();
 const fs = require("fs");
 const REQUEST = require("request");
 const XRegExp = require("xregexp");

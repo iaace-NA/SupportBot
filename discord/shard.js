@@ -8,10 +8,10 @@ const argv_options = new (require("getopts"))(process.argv.slice(2), {
 const Discord = require("discord.js");
 let discordcommands = require("./discordcommands.js");
 
-const UTILS = new (require("../utils.js"))();
+const UTILS = new (require("../utils/utils.js"))();
 
 const client = new Discord.Client({ disabledEvents: ["TYPING_START"] });
-let RateLimiter = require("../ratelimiter.js");
+let RateLimiter = require("../utils/ratelimiter.js");
 
 let CONFIG;
 const JSON5 = require("json5");

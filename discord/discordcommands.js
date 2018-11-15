@@ -2,9 +2,9 @@
 let embedgenerator = new (require("./embedgenerator.js"))();
 let textgenerator = new (require("./textgenerator.js"))();
 let child_process = require("child_process");
-const UTILS = new (require("../utils.js"))();
+const UTILS = new (require("../utils/utils.js"))();
 let LOLAPI = require("./lolapi.js");
-let Profiler = require("../timeprofiler.js");
+let Profiler = require("../utils/timeprofiler.js");
 let ctable = require("console.table");
 const crypto = require("crypto");
 module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedToChannel, preferences, ACCESS_LEVEL, server_RL, user_RL) {

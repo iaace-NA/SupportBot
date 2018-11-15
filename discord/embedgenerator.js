@@ -1,6 +1,6 @@
 "use strict";
 const Discord = require("discord.js");
-const UTILS = new (require("../utils.js"))();
+const UTILS = new (require("../utils/utils.js"))();
 const mathjs = require("mathjs");
 const crypto = require("crypto");
 const queues = {
