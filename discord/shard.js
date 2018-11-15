@@ -26,7 +26,7 @@ catch (e) {
 	process.exit(1);
 }
 const mode = process.env.NODE_ENV === "production" ? "PRODUCTION:warning:" : process.env.NODE_ENV;
-const LOLAPI = new (require("./lolapi.js"))(CONFIG, 0);
+const LOLAPI = new (require("./lolapi.js"))(CONFIG, process.env.SHARD_ID);
 let STATUS = {
 	CHAMPION_EMOJIS: false
 };
