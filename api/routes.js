@@ -1,5 +1,5 @@
 "use strict";
-const UTILS = new (require("../utils.js"))();
+const UTILS = new (require("../utils/utils.js"))();
 module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard, server_preferences_model, dc_load_average) {
 	serveWebRequest("/createshortcut/:uid", function(req, res, next) {
 		findShortcut(req.params.uid, res, doc => {

@@ -69,7 +69,7 @@ const dc_load_average = new LoadAverage(60);//discord command load average
 const express = require("express");
 const website = express();
 
-const UTILS = new (require("../utils.js"))();
+const UTILS = new (require("../utils/utils.js"))();
 let Profiler = require("../timeprofiler.js");
 let request = require("request");
 let wsRoutes = require("./websockets.js");
