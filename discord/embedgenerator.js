@@ -19,12 +19,12 @@ const queues = {
 	"317": "CS Definitely Not Dominion",
 	"325": "SR All Random",
 	"400": "SR Draft",
-	"420": "SR Ranked Solo",
+	"420": "SR Ranked Solo",//ranked
 	"430": "SR Blind",
-	"440": "SR Ranked Flex",
+	"440": "SR Ranked Flex",//ranked
 	"450": "HA ARAM",
 	"460": "TT Blind",
-	"470": "TT Ranked Flex",
+	"470": "TT Ranked Flex",//ranked
 	"600": "SR Blood Hunt",
 	"610": "CR Dark Star: Singularity",
 	"700": "SR Clash",
