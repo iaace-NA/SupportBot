@@ -18,7 +18,7 @@ const tags = {
 	tpv: "tpv"
 };
 module.exports = class LOLAPI {
-	constructor(INIT_CONFIG, request_id) {
+	constructor(INIT_CONFIG, request_id, internal = false, customGet) {
 		this.CONFIG = INIT_CONFIG;
 		this.request_id = request_id;
 		if (!UTILS.exists(this.CONFIG)) throw new Error("config.json required to access riot api.");
@@ -28,6 +28,10 @@ module.exports = class LOLAPI {
 		this.port = this.CONFIG.API_PORT;
 		this.created = new Date().getTime();
 		this.calls = 0;
+		this.internal = internal;
+		if (this.internal) {
+			this.customGet = customGet;
+		}
 	}
 	ping() {
 		return new Promise((resolve, reject) => {
@@ -52,28 +56,42 @@ module.exports = class LOLAPI {
 			}
 			const iurl = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/" + tag + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&endpoint=" + encodeURIComponent(endpoint);
 			++that.calls;
-			this.request({ url: iurl, agentOptions }, (error, response, body) => {
-				if (UTILS.exists(error)) {
-					reject(error);
-				}
-				else {
-					try {
-						if (parseJSON) {
-							const answer = JSON.parse(body);
-							if (UTILS.exists(answer.status)) UTILS.output(iurl + " : " + body);
-							UTILS.assert(typeof(answer) === "object");
-							resolve(answer);
+			if (!this.internal) {
+				this.request({ url: iurl, agentOptions }, (error, response, body) => {
+					if (UTILS.exists(error)) {
+						reject(error);
+					}
+					else {
+						try {
+							if (parseJSON) {
+								const answer = JSON.parse(body);
+								if (UTILS.exists(answer.status)) UTILS.output(iurl + " : " + body);
+								UTILS.assert(typeof(answer) === "object");
+								resolve(answer);
+							}
+							else resolve(body);
 						}
-						else resolve(body);
+						catch (e) {
+							reject(e);
+						}
 					}
-					catch (e) {
-						reject(e);
+				});
+			}
+			else {
+				this.customGet(region, tag, endpoint, maxage, cachetime).then(body => {
+					if (parseJSON) {
+						const answer = JSON.parse(body);
+						if (UTILS.exists(answer.status)) UTILS.output(iurl + " : " + body);
+						UTILS.assert(typeof(answer) === "object");
+						resolve(answer);
 					}
-				}
-			});
+					else resolve(body);
+				}).catch(reject);
+			}
 		});
 	}
 	getIAPI(path, options, response_expected = true, json_expected = true) {//get internal API
+		if (this.internal) throw new Error("Can't call LOLAPI.getIAPI() in internal mode");
 		let that = this;
 		options.k = this.CONFIG.API_KEY;
 		return new Promise((resolve, reject) => {
