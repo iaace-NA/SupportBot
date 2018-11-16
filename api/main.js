@@ -25,9 +25,16 @@ function endpointToURL(region, endpoint) {
 	let newEndpoint = path;
 	let paramcount = 0;
 	for (let i in options) {
-		if (paramcount == 0) newEndpoint += "?" + i + "=" + encodeURIComponent(options[i]);
-		else newEndpoint += "&" + i + "=" + encodeURIComponent(options[i]);
-		++paramcount;
+		if (typeof(options[i]) === "object") {
+			for (let j in options[i]) {
+				newEndpoint += (paramcount == 0 ? "?" : "&") + i + "=" + encodeURIComponent(options[i][j]);
+				++paramcount;
+			}
+		}
+		else {
+			newEndpoint += (paramcount == 0 ? "?" : "&") + i + "=" + encodeURIComponent(options[i]);
+			++paramcount;
+		}
 	}
 	let query = endpoint.substring(endpoint.indexOf("?") + 1);//?date=0&iapi
 	let url = "https://" + region + ".api.riotgames.com" + path + "?api_key=";

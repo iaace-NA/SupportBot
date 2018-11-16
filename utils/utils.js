@@ -604,7 +604,13 @@ module.exports = class UTILS {
 		var pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&');
 		for (var i = 0; i < pairs.length; i++) {
 			var pair = pairs[i].split('=');
-			query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+			if (this.exists(query[decodeURIComponent(pair[0])])) {//already exists, so must be a set
+				if (typeof(query[decodeURIComponent(pair[0])]) !== "object") {//is not an array yet
+					query[decodeURIComponent(pair[0])] = [query[decodeURIComponent(pair[0])]];//make array
+				}
+				query[decodeURIComponent(pair[0])].push(pair[1]);//put at end of array
+			}
+			else query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
 		}
 		return query;
 	}

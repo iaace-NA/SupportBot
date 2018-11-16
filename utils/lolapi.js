@@ -52,7 +52,8 @@ module.exports = class LOLAPI {
 			UTILS.assert(UTILS.exists(tag), "API get: tag not specified");
 			let endpoint = "/lol/" + path + "?iapimaxage=" + maxage + "&iapirequest_id=" + this.request_id;
 			for (let i in options) {
-				endpoint += "&" + i + "=" + encodeURIComponent(options[i]);
+				if (typeof(options[i]) === "object") endpoint += options[i].map(e => "&" + i + "=" + encodeURIComponent(e)).join("");//array type
+				else endpoint += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
 			const iurl = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/" + tag + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&endpoint=" + encodeURIComponent(endpoint);
 			++that.calls;
@@ -258,9 +259,12 @@ module.exports = class LOLAPI {
 		for (let i in summonerIDs) requests.push(that.getChampionMastery(region, summonerIDs[i], maxage));
 		return Promise.all(requests);
 	}
-	getRecentGames(region, accountID, maxage, limit = 20) {
+	getRecentGames(region, accountID, maxage, limit = 20, ranked = false) {
+		const ranked_queues = [420, 440, 470];
 		return new Promise((resolve, reject) => {
-			this.get(region, "match/v4/matchlists/by-account/" + accountID, tags.matchhistory, { endIndex: 100 }, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage).then(matchlist => {
+			let opts = { endIndex: 100 };
+			if (ranked) opts.queue = ranked_queues;
+			this.get(region, "match/v4/matchlists/by-account/" + accountID, tags.matchhistory, opts, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage).then(matchlist => {
 				matchlist.matches = matchlist.matches.slice(0, limit);
 				matchlist.endIndex = matchlist.matches.length;
 				resolve(matchlist);
