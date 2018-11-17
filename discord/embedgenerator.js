@@ -74,7 +74,8 @@ const MMR_JOKES = [
 	"Don't worry, we've always ignored all \"Intentionally Feeding\" reports on your account.",
 	"There is no I in team, but there is one in Iron.",
 	"You should try charity instead.",
-	"We see you've improved a lot!"],
+	"We see you've improved a lot!",
+	"We made Iron just for you!"],
 	["You want another account now, don't you?",//bronze
 	"League of Legends is a team game.",
 	"Don't waste a Summoner Spell on Smite. You can't use Smite on champions.",
