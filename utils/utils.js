@@ -672,4 +672,13 @@ module.exports = class UTILS {
 		}
 		return "```" + answer + "```";
 	}
+	strictParseInt(str) {
+		let ans = ""
+		for (let i = 0; i < str.length; ++i) {
+			const temp = parseInt(str[i]);
+			if (!isNaN(temp)) ans += temp;
+			else return NaN;
+		}
+		return parseInt(ans);
+	}
 }
