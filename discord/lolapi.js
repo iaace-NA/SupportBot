@@ -336,13 +336,13 @@ module.exports = class LOLAPI {
 	getVerifiedAccounts(uid) {
 		return this.getIAPI("getverified/" + uid, {});
 	}
-	setVerifiedAccount(uid, puuid, expiry) {
-		return this.getIAPI("setverified/" + uid, { from: puuid, to: expiry });
+	setVerifiedAccount(uid, puuid, region, expiry) {
+		return this.getIAPI("setverified/" + uid, { from: region + ":" + puuid, to: expiry });
 	}
-	checkVerifiedAccount(uid, puuid) {
+	checkVerifiedAccount(uid, puuid, region) {
 		return new Promise((resolve, reject) => {
 			this.getIAPI("getverified/" + uid, {}).then(result => {
-				resolve(UTILS.exists(result.verifiedAccounts[puuid]));
+				resolve(UTILS.exists(result.verifiedAccounts[region + ":" + puuid]));
 			}).catch(reject);
 		});
 	}
