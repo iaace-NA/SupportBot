@@ -213,5 +213,6 @@
 		"DENIED_IMAGE_LINK": "https://cdn.discordapp.com/emojis/493118209566965764.png?v=1"//footer image for denied feedback (currently unused)
 	},
 	"TPV_KEY": "random string here",//third party verification code HMAC key
-	"AUDIT_TTL": 31536000//time in seconds to keep logs of command use (default: 1 year)
+	"AUDIT_TTL": 31536000,//time in seconds to keep logs of command use (default: 1 year)
+	"PATCH_LOCK": "latest"//locks the patch. set to "latest" for latest
 }
