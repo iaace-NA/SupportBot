@@ -200,26 +200,37 @@ module.exports = class UTILS {
 				answer += "↑" + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
 			}
 			else {//BO3
-				answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank] + "↑ " + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
+				answer += { "I": "1", "II": "2", "III": "3", "IV": "4" }[info.rank] + "↑ " + info.miniSeries.progress.substring(0, info.miniSeries.progress.length - 1).replaceAll("N", "-");
 			}
 		}
 		else {//no series
 			let LP = info.leaguePoints;
-			if (info.tier[0] == "C" || info.tier[0] == "M") {//challenger or master (unlimited LP)
+			if (info.tier == "MASTER") {//master/grandmaster (unlimited LP)
+				answer = "MA";
+				if (LP < 0) answer += " -";
+				else if (LP < 100) answer += " +";
+				else answer += "+";
+			}
+			else if (info.tier == "GRANDMASTER") {
+				answer = "GM";
+				if (LP < 0) answer += " -";
+				else if (LP < 100) answer += " +";
+				else answer += "+";
+			}
+			else if (info.tier[0] == "C") {//challenger
 				if (LP < 0) answer += "  -";
 				else if (LP < 100) answer += "  +";
 				else if (LP < 1000) answer += " +";
 				else answer += "+";
 			}
 			else {
-				answer += { "I": "1", "II": "2", "III": "3", "IV": "4", "V": "5" }[info.rank];
+				answer += { "I": "1", "II": "2", "III": "3", "IV": "4" }[info.rank];
 				if (LP < 0) answer += " -";
 				else if (LP < 100) answer += " +";
 				else answer += "+";
 			}
-			LP = Math.abs(LP);
-			if (LP >= 10) answer += LP;
-			else answer += "0" + LP;
+			LP = Math.abs(LP).pad(2);
+			answer += LP;
 		}
 		return answer;
 	}
@@ -236,21 +247,22 @@ module.exports = class UTILS {
 	}
 	iMMR(rank) {//internal MMR Representation
 		/*
-		Bronze 5, 0LP: 100
-		Bronze 4, 0LP: 200
-		Bronze 3, 0LP: 300
-		Bronze 2, 0LP: 400
-		Bronze 1, 0LP: 500
-		Silver 5, 0LP: 600
-		Gold 5, 0LP: 1100
-		Platinum 5, 0LP: 1600
-		Diamond 5, 0LP: 2100
-		Master, 0LP: 2600
-		Challenger, 1000LP: 2800
+		Iron 4, 0LP: 100
+		Iron 3, 0LP: 200
+		Iron 2, 0LP: 300
+		Iron 1, 0LP: 400
+		Bronze 4, 0LP: 500
+		Silver 4, 0LP: 900
+		Gold 4, 0LP: 1300
+		Platinum 4, 0LP: 1700
+		Diamond 4, 0LP: 2100
+		Master, 0LP: 2500
+		Grandmaster, 500LP: 2600
+		Challenger, 1000LP: 2700
 		*/
-		let answer = { BRONZE: 100, SILVER: 600, GOLD: 1100, PLATINUM: 1600, DIAMOND: 2100, MASTER: 2600, CHALLENGER: 2600 }[rank.tier];
-		if (answer != 2600) {
-			answer += { V: 0, IV: 100, III: 200, II: 300, I: 400 }[rank.rank];
+		let answer = { IRON: 100, BRONZE: 500, SILVER: 900, GOLD: 1300, PLATINUM: 1700, DIAMOND: 2100, MASTER: 2500, GRANDMASTER: 2500, CHALLENGER: 2500 }[rank.tier];
+		if (answer != 2500) {
+			answer += { IV: 0, III: 100, II: 200, I: 300 }[rank.rank];
 			answer += rank.leaguePoints;
 		}
 		else answer += rank.leaguePoints / 5;//magic number constant: 500 LP = 1 iMMR div
@@ -260,24 +272,32 @@ module.exports = class UTILS {
 		//6-char representation
 		if (mmr < 100) return "******";
 		let answer = "";
-		if (mmr < 600) answer += "B";
-		else if (mmr < 1100) answer += "S";
-		else if (mmr < 1600) answer += "G";
+		if (mmr < 500) answer += "I";
+		else if (mmr < 900) answer += "B";
+		else if (mmr < 1300) answer += "S";
+		else if (mmr < 1700) answer += "G";
 		else if (mmr < 2100) answer += "P";
-		else if (mmr < 2600) answer += "D";
-		else if (mmr < 2700) answer += "M";//arbitrary M/C threshold @ 500LP
-		else answer += "C";
+		else if (mmr < 2500) answer += "D";
+		else if (mmr < 2600) answer += "MA";
+		else if (mmr < 2700) answer += "GM";//arbitrary MA/GM threshold @ 500LP
+		else answer += "C";//arbitrary MG/C threshold @ 1000LP
 		let LP;
-		if (mmr < 2600) {
-			answer += ["5", "4", "3", "2", "1"][Math.floor(((mmr - 100) % 500) / 100)];
+		if (mmr < 2500) {//4 div tiers
+			answer += ["4", "3", "2", "1"][Math.floor(((mmr - 100) % 400) / 100)];
 			LP = " +" + this.round(mmr % 100).pad(2);
 			answer += LP;
 		}
 		else {
-			LP = this.round((mmr - 2600) * 5);
-			if (LP < 100) answer += "  +" + LP.pad(2);
-			else if (LP < 1000) answer += " +" + LP;
-			else answer += "+" + LP;
+			LP = this.round((mmr - 2500) * 5);
+			if (mmr < 2700) {//MA/GM
+				if (LP < 100) answer += " +" + LP.pad(2);
+				else if (LP < 1000) answer += "+" + LP;
+				else answer += "+" + LP;
+			}
+			else {//challenger
+				if (LP < 1000) answer += " +" + LP;
+				else answer += "+" + LP;
+			}
 		}
 		return answer;
 	}
