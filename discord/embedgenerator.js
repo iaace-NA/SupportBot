@@ -298,8 +298,10 @@ module.exports = class EmbedGenerator {
 				"RANKED_FLEX_TT": "Flex 3v3"
 			}[ranks[i].queueType] + ": ";
 			title += UTILS.english(ranks[i].tier) + " ";
-			if (ranks[i].tier != "CHALLENGER") title += ranks[i].rank + " ";
-			else {
+			if (ranks[i].tier != "CHALLENGER" && ranks[i].tier != "MASTER" && ranks[i].tier != "GRANDMASTER") title += ranks[i].rank + " ";
+			else if (ranks[i].tier == "MASTER") { }
+			else if (ranks[i].tier == "GRANDMASTER") { }
+			else {//
 				challengers[i].entries.sort((a, b) => b.leaguePoints - a.leaguePoints);//sort by LP
 				const candidate = challengers[i].entries.findIndex(cr => summoner.id == cr.playerOrTeamId);//find placing
 				if (candidate != -1) title += "#" + (candidate + 1) + " ";//add placing if index found
