@@ -186,6 +186,7 @@ module.exports = class UTILS {
 		//****** unranked
 		//XXXXXX unranked
 		//██████ unranked
+		//I4P+00 Provisional rank
 		//G↑W--- Gold promotion, 1 win
 		//G2 +00 Gold 2, 0 LP
 		//G2 +56 Gold 2, 56LP
@@ -225,9 +226,11 @@ module.exports = class UTILS {
 			}
 			else {
 				answer += { "I": "1", "II": "2", "III": "3", "IV": "4" }[info.rank];
-				if (LP < 0) answer += " -";
-				else if (LP < 100) answer += " +";
-				else answer += "+";
+				if (info.wins + info.losses >= 10) answer += " ";
+				else answer += "P";//placements, less than 10 games
+				if (LP < 0) answer += " -";//negative
+				else if (LP < 100) answer += " +";//less than 100
+				else answer += "+";//=100
 			}
 			LP = Math.abs(LP).pad(2);
 			answer += LP;
