@@ -17,7 +17,7 @@ let CONFIG;
 const JSON5 = require("json5");
 try {
 	CONFIG = JSON5.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.6.0";//b for non-release (in development)
+	CONFIG.VERSION = "v1.6.1";//b for non-release (in development)
 	CONFIG.BANS = {};
 }
 catch (e) {
@@ -115,9 +115,10 @@ function loadAllStaticResources(callback = () => {}) {
 		CONFIG.STATIC = result;
 		let temp_regions = [];
 		for (let i in CONFIG.REGIONS) temp_regions.push(CONFIG.REGIONS[i]);
-		Promise.all(temp_regions.map(tr => LOLAPI.getStaticChampionsNew(tr))).then(results => {
+		let v = CONFIG.PATCH_LOCK === "latest" ? undefined : CONFIG.PATCH_LOCK;
+		Promise.all(temp_regions.map(tr => LOLAPI.getStaticChampions(tr, v))).then(results => {
 			CONFIG.STATIC.CHAMPIONS = results[0].data;
-			LOLAPI.getStaticSummonerSpellsNew("na1").then(result => {
+			LOLAPI.getStaticSummonerSpells("na1", v).then(result => {
 				CONFIG.STATIC.SUMMONERSPELLS = result.data;
 				for (let b in CONFIG.STATIC.CHAMPIONS) CONFIG.STATIC.CHAMPIONS[b].emoji = CONFIG.STATIC.CHAMPIONS[b].name;
 				UTILS.output("API STATIC RESOURCES LOADED");

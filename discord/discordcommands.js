@@ -311,7 +311,6 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			reply(":white_check_mark: All shortcuts were removed.")
 		}).catch(console.error);
 	});
-	/*
 	command([preferences.get("prefix") + "verify "], true, false, (original, index, parameter) => {
 		let region = assertRegion(parameter.substring(0, parameter.indexOf(" ")));
 		lolapi.getSummonerIDFromName(region, parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.VERIFY.SUMMONER_ID).then(summoner => {
@@ -334,7 +333,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 						if (tpc_timestamp_ms < new Date().getTime() - (5 * 60 * 1000)) valid_code += 1;//not expired
 						else if (tpc_HMAC_output !== crypto.createHmac("sha256", CONFIG.TPV_KEY).update(tpc_HMAC_input).digest("hex")) valid_code += 2;//same HMAC
 						if (valid_code === 0) {
-							lolapi.setVerifiedAccount(msg.author.id, summoner.puuid, new Date().getTime() + (365 * 24 * 60 * 60000)).then(result2 => {
+							lolapi.setVerifiedAccount(msg.author.id, summoner.puuid, region, new Date().getTime() + (365 * 24 * 60 * 60000)).then(result2 => {
 								reply(":white_check_mark: You have linked your discord account to " + summoner.name + " for 1 year.");
 							}).catch(console.error);
 						}
@@ -346,7 +345,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 				}
 			}).catch(console.error);
 		}).catch(console.error);
-	});*/
+	});
 	if (preferences.get("auto_opgg")) {
 		command(["http://"], true, false, (original, index, parameter) => {
 			let r_copy = parameter.substring(0, parameter.indexOf("."));
@@ -355,7 +354,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			if (parameter.substring(parameter.indexOf(".") + 1, parameter.indexOf(".") + 6) == "op.gg") {
 				let username = decodeURIComponent(msg.content.substring(msg.content.indexOf("userName=") + "userName=".length)).replaceAll("+", " ");//reformat spaces
 				lolapi.getSummonerCard(region, username).then(result => {
-					lolapi.checkVerifiedAccount(msg.author.id, result[5].puuid).then(verified => {
+					lolapi.checkVerifiedAccount(msg.author.id, result[5].puuid, region).then(verified => {
 						replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], r_copy, result[3], result[4], verified));
 					}).catch(console.error);
 				}).catch(console.error);
@@ -370,7 +369,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	commandGuessUsername(forcePrefix([""]), false, (region, username, parameter, guess_method) => {
 		lolapi.getSummonerCard(region, username).then(result => {
-			lolapi.checkVerifiedAccount(msg.author.id, result[5].puuid).then(verified => {
+			lolapi.checkVerifiedAccount(msg.author.id, result[5].puuid, region).then(verified => {
 				replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[0], result[1], result[2], CONFIG.REGIONS_REVERSE[region], result[3], result[4], verified));
 			}).catch(console.error);
 		}).catch(e => {
@@ -386,7 +385,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.MH.RECENT_GAMES).then(matchhistory => {
 				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`." + suggestLink(guess_method));
 				lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => m.gameId), CONFIG.API_MAXAGE.MH.MULTIPLE_MATCH).then(matches => {
-					lolapi.checkVerifiedAccount(msg.author.id, result.puuid).then(verified => {
+					lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region).then(verified => {
 						request_profiler.begin("generating embed");
 						const answer = embedgenerator.match(CONFIG, result, matchhistory.matches, matches, verified);
 						request_profiler.end("generating embed");
@@ -497,7 +496,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 					lolapi.getMultipleRecentGames(region, pSA.map(pS => pS.accountId), CONFIG.API_MAXAGE.LG.RECENT_GAMES).then(mhA => {//matchhistory array
 						let mIDA = [];//match id array;
 						for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
-						Promise.all([lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.LG.MULTIPLE_MATCH), lolapi.getMultipleRanks(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS), lolapi.getMultipleChampionMastery(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_MASTERIES), lolapi.checkVerifiedAccount(msg.author.id, result.puuid)]).then(parallel => {
+						Promise.all([lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.LG.MULTIPLE_MATCH), lolapi.getMultipleRanks(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS), lolapi.getMultipleChampionMastery(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_MASTERIES), lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region)]).then(parallel => {
 							let matches = parallel[0];
 							let ranks = parallel[1];
 							let masteries = parallel[2];
@@ -535,7 +534,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 					lolapi.getMultipleRanks(region, pIDA, CONFIG.API_MAXAGE.DMH.MULTIPLE_RANKS).then(ranks => {
 						lolapi.getMultipleChampionMastery(region, pIDA, CONFIG.API_MAXAGE.DMH.MULTIPLE_MASTERIES).then(masteries => {
 							lolapi.getMultipleSummonerFromSummonerID(region, pIDA, CONFIG.API_MAXAGE.DMH.OTHER_SUMMONER_ID).then(pSA => {
-								lolapi.checkVerifiedAccount(msg.author.id, result.puuid).then(verified => {
+								lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region).then(verified => {
 									request_profiler.begin("generating embed");
 									const answer = embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match, ranks, masteries, pSA, verified);
 									request_profiler.end("generating embed");
@@ -551,7 +550,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	commandGuessUsername(forcePrefix(["championmastery ", "mastery "]), false, (region, username, parameter) => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.CM.SUMMONER_ID).then(result => {
-			Promise.all([lolapi.getChampionMastery(region, result.id, CONFIG.API_MAXAGE.CM.CHAMPION_MASTERY), lolapi.checkVerifiedAccount(msg.author.id, result.puuid)]).then(parallel => {
+			Promise.all([lolapi.getChampionMastery(region, result.id, CONFIG.API_MAXAGE.CM.CHAMPION_MASTERY), lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region)]).then(parallel => {
 				let cm = parallel[0];
 				let verified = parallel[1];
 				replyEmbed(embedgenerator.mastery(CONFIG, result, cm, CONFIG.REGIONS_REVERSE[region], verified));
@@ -560,7 +559,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	commandGuessUsername(forcePrefix(["mmr "]), false, (region, username, parameter) => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.MMR_JOKE.SUMMONER_ID).then(result => {
-			lolapi.checkVerifiedAccount(msg.author.id, result.puuid).then(verified => {
+			lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region).then(verified => {
 				result.region = region;
 				result.guess = username;
 				replyEmbed(embedgenerator.mmr(CONFIG, result, verified));

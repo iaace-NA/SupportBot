@@ -19,12 +19,12 @@ const queues = {
 	"317": "CS Definitely Not Dominion",
 	"325": "SR All Random",
 	"400": "SR Draft",
-	"420": "SR Ranked Solo",
+	"420": "SR Ranked Solo",//ranked
 	"430": "SR Blind",
-	"440": "SR Ranked Flex",
+	"440": "SR Ranked Flex",//ranked
 	"450": "HA ARAM",
 	"460": "TT Blind",
-	"470": "TT Ranked Flex",
+	"470": "TT Ranked Flex",//ranked
 	"600": "SR Blood Hunt",
 	"610": "CR Dark Star: Singularity",
 	"700": "SR Clash",
@@ -74,7 +74,9 @@ const MMR_JOKES = [
 	"Don't worry, we've always ignored all \"Intentionally Feeding\" reports on your account.",
 	"There is no I in team, but there is one in Iron.",
 	"You should try charity instead.",
-	"We see you've improved a lot!"],
+	"We see you've improved a lot!",
+	"We made Iron just for you!",
+	"Welcome to your new home!"],
 	["You want another account now, don't you?",//bronze
 	"League of Legends is a team game.",
 	"Don't waste a Summoner Spell on Smite. You can't use Smite on champions.",
@@ -127,7 +129,7 @@ const MMR_JOKES = [
 	"Ah, so you're the guy smurfing in normals.",
 	"I heard diamonds were hard...what happened to you?",
 	"At least you're not plat.",
-	"Don't get that excited. Diamond 5 is garbage.",
+	"Don't get that excited. Diamond 4 is garbage.",
 	"You're closer to bronze than you are to Diamond 3.",
 	"Does it even matter if no one thinks you deserve it?",
 	"You worked really hard for it- that is, to get enough money to pay for this boost."],
@@ -147,9 +149,9 @@ const MMR_JOKES = [
 	"Tell us when you join a pro team. We'll send you a Poro plushie to celebrate.",
 	"Party like a former pro League rock star!"]
 ];
-const RANK_ORDER = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "CHALLENGER"];
-const RANK_COLOR = [[153, 51, 0], [179, 179, 179], [255, 214, 51], [0, 255, 152], [179, 240, 255], [255, 153, 255], [255, 0, 0]];
-const IMMR_THRESHOLD = [100, 600, 1100, 1600, 2100, 2600, 2700];
+const RANK_ORDER = ["IRON", "BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "GRANDMASTER", "CHALLENGER"];
+const RANK_COLOR = [[69, 69, 69], [153, 51, 0], [179, 179, 179], [255, 214, 51], [0, 255, 152], [179, 240, 255], [203, 0, 255], [224, 0, 62], [0, 136, 216]];
+const IMMR_THRESHOLD = [100, 500, 900, 1300, 1700, 2100, 2500, 2600, 2700];
 const MMR_THRESHOLD = [400, 1150, 1400, 1650, 1900, 2150, 2400];//starting MMRs for each tier
 const PREMADE_EMOJIS = ["", "\\💙", "\\💛", "\\💚"];
 const HORIZONTAL_SEPARATOR = "------------------------------";
@@ -296,8 +298,10 @@ module.exports = class EmbedGenerator {
 				"RANKED_FLEX_TT": "Flex 3v3"
 			}[ranks[i].queueType] + ": ";
 			title += UTILS.english(ranks[i].tier) + " ";
-			if (ranks[i].tier != "CHALLENGER") title += ranks[i].rank + " ";
-			else {
+			if (ranks[i].tier != "CHALLENGER" && ranks[i].tier != "MASTER" && ranks[i].tier != "GRANDMASTER") title += ranks[i].rank + " ";
+			else if (ranks[i].tier == "MASTER") { }
+			else if (ranks[i].tier == "GRANDMASTER") { }
+			else {//
 				challengers[i].entries.sort((a, b) => b.leaguePoints - a.leaguePoints);//sort by LP
 				const candidate = challengers[i].entries.findIndex(cr => summoner.id == cr.playerOrTeamId);//find placing
 				if (candidate != -1) title += "#" + (candidate + 1) + " ";//add placing if index found
@@ -314,7 +318,7 @@ module.exports = class EmbedGenerator {
 			const fake_losses = fake_games - fake_wins;
 			const fake_wr = UTILS.round(100 * fake_wins / (fake_wins + fake_losses), 2);
 			const challenger_LP = UTILS.round(UTILS.map(fake_wr, 50, 100, 500, 1000));
-			newEmbed.addField("<:Challenger:437262128282599424> Challenger ~#" + challenger_rank + " " + challenger_LP + "LP", fake_games + "G (" + fake_wr + "%) = " + fake_wins + "W + " + fake_losses + "L", true);
+			newEmbed.addField(CONFIG.EMOJIS.ranks[CONFIG.EMOJIS.ranks.length - 1] + " Challenger ~#" + challenger_rank + " " + challenger_LP + "LP", fake_games + "G (" + fake_wr + "%) = " + fake_wins + "W + " + fake_losses + "L", true);
 			newEmbed.setColor(RANK_COLOR[RANK_COLOR.length - 1]);
 		}
 		let cm_description = [];
@@ -650,25 +654,25 @@ module.exports = class EmbedGenerator {
 			tier = UTILS.randomOf(["WOOD", "CLOTH", "IRON", "PLASTIC", "PAPER", "COPPER", "CARDBOARD", "LEAD", "DIRT", "GARBAGE"]);
 			jokeNumber = 0;
 		} else if (mmr < MMR_THRESHOLD[1]) {//bronze
-			tier = RANK_ORDER[0];
+			tier = RANK_ORDER[1];
 			jokeNumber = 1;
 		} else if (mmr < MMR_THRESHOLD[2]) {//silver
-			tier = RANK_ORDER[1];
+			tier = RANK_ORDER[2];
 			jokeNumber = 2;
 		} else if (mmr < MMR_THRESHOLD[3]) {//gold
-			tier = RANK_ORDER[2];
+			tier = RANK_ORDER[3];
 			jokeNumber = 3;
 		} else if (mmr < MMR_THRESHOLD[4]) {//plat
-			tier = RANK_ORDER[3];
+			tier = RANK_ORDER[4];
 			jokeNumber = 4;
 		} else if (mmr < MMR_THRESHOLD[5]) {//dia
-			tier = RANK_ORDER[4];
+			tier = RANK_ORDER[5];
 			jokeNumber = 5;
 		} else if (mmr < MMR_THRESHOLD[6]) {//master
-			tier = RANK_ORDER[5];
+			tier = RANK_ORDER[6];
 			jokeNumber = 6;
 		} else {//challenger
-			tier = RANK_ORDER[6];
+			tier = RANK_ORDER[8];
 			jokeNumber = 7;
 		}
 		const analysis = UTILS.randomOf(MMR_JOKES[jokeNumber]);
