@@ -1,8 +1,5 @@
 #!/bin/bash
 #usage: ./setup.sh folder_name
-echo "vm.swappiness = 20" | sudo tee -a /etc/sysctl.conf
-echo "sysctl vm.swappiness=20" | sudo sh -
-echo "================Finshed setting vm.swappiness to 20================"
 sudo apt update
 sudo apt dist-upgrade -y
 sudo apt install build-essential -y
