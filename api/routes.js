@@ -97,7 +97,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 					if (e) console.error(e);
 				});
 			}
-			else res.send("{}");
+			else res.send({ verifiedAccounts: {} });
 		});
 	}, true);
 	serveWebRequest("/setverified/:uid", function(req, res, next) {
