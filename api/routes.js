@@ -97,7 +97,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 					if (e) console.error(e);
 				});
 			}
-			else res.send("{}");
+			else res.send({ verifiedAccounts: {} });
 		});
 	}, true);
 	serveWebRequest("/setverified/:uid", function(req, res, next) {
@@ -348,7 +348,9 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 	}, true);
 	serveWebRequest("/existspreferences", (req, res, next) => {
 		findPreferences(req.query.id, res, doc => {
-			res.json({ new: !UTILS.exists(doc) });
+			let answer = false;
+			if (!UTILS.exists(doc) || apicache.Types.ObjectId(doc._id).getTimestamp().getTime() > new Date().getTime() - 10000) answer = true;
+			res.json({ new: answer });
 		});
 	}, true);
 	serveWebRequest("/getpreferences", (req, res, next) => {
