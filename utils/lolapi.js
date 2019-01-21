@@ -155,11 +155,12 @@ module.exports = class LOLAPI {
 			});
 		});
 	}
-	getStaticChampionsNew(region, locale = "en_US") {
+	getStaticChampions(region, version, locale = "en_US") {
 		UTILS.debug("STATIC CHAMPIONS: " + region);
 		return new Promise((resolve, reject) => {
 			this.getStatic("realms/" + this.CONFIG.REGIONS_REVERSE[region].toLowerCase() + ".json").then(realm => {
-				this.getStatic("cdn/" + realm.v + "/data/" + locale + "/champion.json").then(cd => {//champion data
+				let v = UTILS.exists(version) ? version : realm.v;
+				this.getStatic("cdn/" + v + "/data/" + locale + "/champion.json").then(cd => {//champion data
 					for (let b in cd.data) {
 						cd.data[cd.data[b].key] = cd.data[b];//add key as duplicate of data
 						delete cd.data[b];//delete original
@@ -169,11 +170,12 @@ module.exports = class LOLAPI {
 			}).catch(reject);
 		});
 	}
-	getStaticSummonerSpellsNew(region, locale = "en_US") {
+	getStaticSummonerSpells(region, version, locale = "en_US") {
 		UTILS.output("STATIC SPELLS: " + region);
 		return new Promise((resolve, reject) => {
 			this.getStatic("realms/" + this.CONFIG.REGIONS_REVERSE[region].toLowerCase() + ".json").then(realm => {
-				this.getStatic("cdn/" + realm.v + "/data/" + locale + "/summoner.json").then(sd => {//spell data
+				let v = UTILS.exists(version) ? version : realm.v;
+				this.getStatic("cdn/" + v + "/data/" + locale + "/summoner.json").then(sd => {//spell data
 					for (let b in sd.data) {
 						sd.data[sd.data[b].key] = sd.data[b];//add key as duplicate of data
 						delete sd.data[b];//delete original
@@ -358,13 +360,13 @@ module.exports = class LOLAPI {
 	getVerifiedAccounts(uid) {
 		return this.getIAPI("getverified/" + uid, {});
 	}
-	setVerifiedAccount(uid, puuid, expiry) {
-		return this.getIAPI("setverified/" + uid, { from: puuid, to: expiry });
+	setVerifiedAccount(uid, puuid, region, expiry) {
+		return this.getIAPI("setverified/" + uid, { from: region + ":" + puuid, to: expiry });
 	}
-	checkVerifiedAccount(uid, puuid) {
+	checkVerifiedAccount(uid, puuid, region) {
 		return new Promise((resolve, reject) => {
 			this.getIAPI("getverified/" + uid, {}).then(result => {
-				resolve(UTILS.exists(result.verifiedAccounts[puuid]));
+				resolve(UTILS.exists(result.verifiedAccounts[region + ":" + puuid]));
 			}).catch(reject);
 		});
 	}
