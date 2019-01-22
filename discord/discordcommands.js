@@ -388,7 +388,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 					lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region).then(verified => {
 						lolapi.getChampionMastery(region, result.id, CONFIG.API_MAXAGE.MH.CHAMPION_MASTERY).then(mastery => {
 							request_profiler.begin("generating embed");
-							const answer = embedgenerator.match(CONFIG, result, matchhistory.matches, matches, verified);
+							const answer = embedgenerator.match(CONFIG, result, matchhistory.matches, matches, mastery, verified);
 							request_profiler.end("generating embed");
 							UTILS.debug(request_profiler.endAll());
 							replyEmbed(answer);
