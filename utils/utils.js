@@ -273,6 +273,7 @@ module.exports = class UTILS {
 	}
 	iMMRtoEnglish(mmr) {
 		//6-char representation
+		mmr = parseInt(mmr);
 		if (mmr < 100) return "******";
 		let answer = "";
 		if (mmr < 500) answer += "I";
@@ -287,7 +288,7 @@ module.exports = class UTILS {
 		let LP;
 		if (mmr < 2500) {//4 div tiers
 			answer += ["4", "3", "2", "1"][Math.floor(((mmr - 100) % 400) / 100)];
-			LP = " +" + this.round(mmr % 100).pad(2);
+			LP = " +" + (mmr % 100).round.pad(2);
 			answer += LP;
 		}
 		else {
