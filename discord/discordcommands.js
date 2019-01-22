@@ -386,11 +386,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`." + suggestLink(guess_method));
 				lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => m.gameId), CONFIG.API_MAXAGE.MH.MULTIPLE_MATCH).then(matches => {
 					lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region).then(verified => {
-						request_profiler.begin("generating embed");
-						const answer = embedgenerator.match(CONFIG, result, matchhistory.matches, matches, verified);
-						request_profiler.end("generating embed");
-						UTILS.debug(request_profiler.endAll());
-						replyEmbed(answer);
+						lolapi.getChampionMastery(region, result.id, CONFIG.API_MAXAGE.MH.CHAMPION_MASTERY).then(mastery => {
+							request_profiler.begin("generating embed");
+							const answer = embedgenerator.match(CONFIG, result, matchhistory.matches, matches, verified);
+							request_profiler.end("generating embed");
+							UTILS.debug(request_profiler.endAll());
+							replyEmbed(answer);
+						}).catch(console.error);
 					}).catch(console.error);
 				}).catch(console.error);
 			}).catch(console.error);

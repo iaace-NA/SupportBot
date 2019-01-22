@@ -338,7 +338,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;
 	}
-	match(CONFIG, summoner, match_meta, matches, verified) {//should show 5 most recent games
+	match(CONFIG, summoner, match_meta, matches, mastery, verified) {//should show 5 most recent games
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 		let common_teammates = {};
@@ -372,6 +372,7 @@ module.exports = class EmbedGenerator {
 		for (let i = 0; i < match_meta.length && i < 20; ++i) {
 			const KDA = UTILS.KDA(summoner.id, matches[i]);
 			const stats = UTILS.stats(summoner.id, matches[i]);
+			stats.mastery = UTILS.getSingleChampionMastery(mastery, match_meta[i].champion);
 			const teamParticipant = UTILS.teamParticipant(summoner.id, matches[i]);
 			let teams = {};
 			let lane = UTILS.inferLane(match_meta[i].role, match_meta[i].lane, teamParticipant.spell1Id, teamParticipant.spell2Id);
