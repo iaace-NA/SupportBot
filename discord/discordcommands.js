@@ -172,11 +172,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 		});
 	});
 	command([preferences.get("prefix") + "permissionstest", preferences.get("prefix") + "pt"], false, false, () => {
-		reply("You have " + (isOwner(undefined, false) ? "owner" : "normal") + " permissions.");
+		reply("You have " + ["normal", "bot commander", "moderator", "server admin", "server owner", "bot owner"][ACCESS_LEVEL] + " permissions.");
 	});
 	command([preferences.get("prefix") + "permissionstest ", preferences.get("prefix") + "pt "], true, false, () => {
 		if (msg.mentions.users.size != 1) return reply(":x: A user must be mentioned.");
-		reply(msg.mentions.users.first().tag + " has " + (isOwner(msg.mentions.users.first().id, false) ? "owner" : "normal") + " permissions.");
+		reply(msg.mentions.users.first().tag + " has " + ["normal", "bot commander", "moderator", "server admin", "server owner", "bot owner"][UTILS.accessLevel(CONFIG, msg, msg.mentions.users.first().id)] + " permissions.");
 	});
 	command([preferences.get("prefix") + "stats"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 		lolapi.stats().then(iapi_stats => {
@@ -830,7 +830,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			}
 			return false;
 		}
-		else {
+		else {//retrieve access level for a different user
 			const other_ACCESS_LEVEL = UTILS.accessLevel(CONFIG, msg);
 			return other_ACCESS_LEVEL >= PLEVEL;//never notifies
 		}

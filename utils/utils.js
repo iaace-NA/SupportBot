@@ -461,9 +461,9 @@ module.exports = class UTILS {
 	conditionalFormat(text, surrounds, condition = true) {
 		return condition ? surrounds + text + surrounds : text;
 	}
-	accessLevel(CONFIG, msg, uid) {
+	accessLevel(CONFIG, msg, uid) {//uid optional
 		if (!this.exists(uid)) uid = msg.author.id;
-		if (this.exists(CONFIG.OWNER_DISCORD_IDS[uid]) && CONFIG.OWNER_DISCORD_IDS[uid].active) return CONFIG.CONSTANTS.BOTOWNERS;
+		if (this.exists(CONFIG.OWNER_DISCORD_IDS[uid]) && CONFIG.OWNER_DISCORD_IDS[uid].active) return CONFIG.CONSTANTS.BOTOWNERS;//if it's an owner id
 		const MEMBER = uid === msg.author.id ? msg.member : msg.guild.members.get(uid);
 		if (!this.exists(MEMBER)) return CONFIG.CONSTANTS.NORMALMEMBERS;//PM
 		else if (MEMBER.id === msg.guild.ownerID) return CONFIG.CONSTANTS.SERVEROWNERS;
