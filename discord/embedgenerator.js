@@ -160,7 +160,7 @@ const VERIFIED_ICON = "✅";
 const TAB = " ";
 const ITEMS = JSON.parse(fs.readFileSync("../data/items.json", "utf-8"));
 function getItemTags(item_ids) {//accepts array, returns array
-	UTILS.removeAllOccurances(item_ids, "0");//remove empty item slots
+	UTILS.removeAllOccurances(item_ids, 0);//remove empty item slots
 	return item_ids.map(id => UTILS.exists(ITEMS[id + ""]) ? ITEMS[id + ""] : id);
 }
 function getMatchTags(summonerID, match) {//returns array

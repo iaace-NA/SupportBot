@@ -402,7 +402,7 @@ module.exports = class UTILS {
 				++deleted;
 			}
 		}
-		return deleted;
+		return deleted;//number of deleted items
 	}
 	defaultChannelNames() {
 		return ["general", "bot", "bots", "bot-commands", "botcommands", "commands", "league", "lol", "supportbot", "support-bot", "games", "spam"];
