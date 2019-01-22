@@ -288,7 +288,7 @@ module.exports = class UTILS {
 		let LP;
 		if (mmr < 2500) {//4 div tiers
 			answer += ["4", "3", "2", "1"][Math.floor(((mmr - 100) % 400) / 100)];
-			LP = " +" + (mmr % 100).round.pad(2);
+			LP = " +" + (mmr % 100).round(0).pad(2);
 			answer += LP;
 		}
 		else {
