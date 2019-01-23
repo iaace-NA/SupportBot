@@ -172,6 +172,7 @@ function getMatchTags(summonerID, match) {//returns array
 	else if (stats.largestMultiKill === 4) answer.push("QUADRA");
 	else if (stats.largestMultiKill >= 5) answer.push("PENTA");
 	const pID = UTILS.teamParticipant(summonerID, match).participantId;
+	UTILS.assert(UTILS.exists(UTILS.findParticipantIdentityFromPID(match, pID).mastery), ".mastery undefined");
 	const m_level = UTILS.findParticipantIdentityFromPID(match, pID).mastery;
 	if (m_level === 0) answer.push("First_Time");
 	else if (m_level === 1) answer.push("\"First_Time\"");
