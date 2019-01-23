@@ -372,7 +372,7 @@ function serveWebRequest(branch, callback, validate = false) {
 	}
 }
 function rawAPIRequest(region, tag, endpoint, maxage, cachetime) {
-	return new Promise((resolve, request) => {
+	return new Promise((resolve, reject) => {
 		riotRequest.request(region, tag, endpoint, { maxage, cachetime }, (err, data) => {
 			if (err) {
 				if (!err.riotInternal || !UTILS.exists(err.response)) {//real error
