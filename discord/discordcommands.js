@@ -623,7 +623,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 					approvable.edit({ embed: candidate.edit });//change internal feedback message
 					sendEmbedToChannel(candidate.to_public_cid, candidate.to_public);//publish to public feedback channel
 				}
-			}).catch(console.error);
+			}).catch(e => reply(":x: Could not find the message. Check permissions and message id."));
 		});
 	}
 	else {//PM/DM only
