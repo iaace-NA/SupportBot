@@ -625,6 +625,24 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 				}
 			}).catch(e => reply(":x: Could not find the message. Check permissions and message id."));
 		});
+		command([preferences.get("prefix") + "deny "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+			const mid = parameter;
+			if (!UTILS.isInt(mid)) return reply(":x: Message ID not recognizable.");
+			msg.channel.fetchMessage(mid).then(approvable => {
+				if (approvable.author.id != client.user.id) return reply(":x: Cannot approve messages not sent from this account.");
+				const candidate = embedgenerator.reviewFeedback(CONFIG, approvable, msg.author, false);
+				if (typeof(candidate) == "number") {
+					UTILS.debug(CONFIG.DISCORD_COMMAND_PREFIX + "deny error type " + candidate);
+					if (candidate == 1) return reply(":x: No embed found.");
+					else return reply(":x: This type of message is not approvable.");
+				}
+				else {//success
+					//do not notify user of success
+					approvable.edit({ embed: candidate.edit });//change internal feedback message
+					//do not publish to public feedback channel
+				}
+			}).catch(e => reply(":x: Could not find the message. Check permissions and message id."));
+		});
 	}
 	else {//PM/DM only
 		command([preferences.get("prefix") + "say "], true, false, (original, index, parameter) => {

@@ -1236,7 +1236,17 @@ module.exports = class EmbedGenerator {
 			public_e.setAuthor(username, user.author.icon_url);
 			return { to_user: user, to_user_uid: uid, edit, to_public: public_e, to_public_cid: cid };
 		}
-		else return {};
+		else {
+			let edit = new Discord.RichEmbed(msg.embeds[0]);
+			const cid = msg.embeds[0].footer.text.substring(0, c_location);
+			const uid = msg.embeds[0].footer.text.substring(c_location + 1, c_location2);
+			const username = msg.embeds[0].footer.text.substring(c_location2 + 1);
+			edit.setFooter("Denied by " + approver.username, approver.displayAvatarURL);
+			edit.fields = [];
+			edit.addField("Responses", "Send message response: `" + CONFIG.DISCORD_COMMAND_PREFIX + "mail <text>" + uid + "`\nNote: `" + CONFIG.DISCORD_COMMAND_PREFIX + "noteuser " + uid + " <reason>`");
+			edit.setColor("#010101");
+			return { edit };
+		}
 	}
 	raw(embed_object) {
 		return new Discord.RichEmbed(embed_object);
