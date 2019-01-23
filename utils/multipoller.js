@@ -113,7 +113,7 @@ module.exports = class MultiPoller {
 		this.last_job_time = new Date().getTime();
 		try {
 			let uqo = this.update_queue[0];//update queue object
-			if (this.update_queue.length <= 1) this.checkUpdatesDue();
+			if (this.update_queue.length <= 1) this.checkUpdatesDue();//update list of things needed to be updated soon
 			if (this.update_interval_mode !== -3 && UTILS.exists(uqo) && this.checkUpdate(uqo.id, uqo.options)) {
 				this.update_queue.shift();
 				this.forceUpdateNow(uqo.id, uqo.options).then(data => this.justUpdated(uqo.id, data, null)).catch(e => this.justUpdated(uqo.id, null, e));
