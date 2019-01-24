@@ -346,6 +346,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			}).catch(console.error);
 		}).catch(console.error);
 	});
+	command([preferences.get("prefix") + "about", preferences.get("prefix") + "credits", preferences.get("prefix") + "acknowledgements"], false, false, (original, index) => reply(CONFIG.ACKNOWLEDGEMENTS));
 	if (preferences.get("auto_opgg")) {
 		command(["http://"], true, false, (original, index, parameter) => {
 			let r_copy = parameter.substring(0, parameter.indexOf("."));
