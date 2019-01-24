@@ -159,8 +159,22 @@ const HORIZONTAL_SEPARATOR = "------------------------------";
 const VERIFIED_ICON = "✅";
 const TAB = " ";
 const ITEMS = JSON.parse(fs.readFileSync("../data/items.json", "utf-8"));
+const BLUE_SMITE_ITEMS = [1416, 1401, 1402, 1400];
+const BLUE_SMITE = 3706;
+const RED_SMITE_ITEMS = [1419, 1413, 1414, 1412];
+const RED_SMITE = 3715;
 function getItemTags(item_ids) {//accepts array, returns array
 	UTILS.removeAllOccurances(item_ids, 0);//remove empty item slots
+	for (let i = 0; i < item_ids.length; ++i) {
+		if (BLUE_SMITE_ITEMS.indexOf(item_ids[i]) !== -1) {//blue smite item found
+			item_ids.splice(i, 0, BLUE_SMITE);
+			++i;
+		}
+		else if (RED_SMITE_ITEMS.indexOf(item_ids[i]) !== -1) {//red smite item found
+			item_ids.splice(i, 0, RED_SMITE);
+			++i;
+		}
+	}
 	return item_ids.map(id => UTILS.exists(ITEMS[id + ""]) ? ITEMS[id + ""] : id);
 }
 function getMatchTags(summonerID, match, mastery) {//returns array
