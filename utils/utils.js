@@ -226,7 +226,7 @@ module.exports = class UTILS {
 			}
 			else {
 				answer += { "I": "1", "II": "2", "III": "3", "IV": "4" }[info.rank];
-				if (info.wins + info.losses >= 10) answer += " ";
+				if (info.wins + info.losses >= 8) answer += " ";
 				else answer += "P";//placements, less than 10 games
 				if (LP < 0) answer += "-";//negative
 				else if (LP < 100) answer += "+";//less than 100
