@@ -60,6 +60,7 @@ League of Legends Statistics for Discord
 
 ## Dependencies
 - mongodb 3.x
+- gnuplot
 ## npm Dependencies
 - pm2 (global)
 - getopts 2.2.3

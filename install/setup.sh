@@ -21,6 +21,8 @@ sudo apt install -y npm
 echo "================NodeJS & npm installed================"
 sudo apt install -y htop
 echo "================htop installed================"
+sudo apt install -y gnuplot
+echo "================gnuplot installed================"
 sudo apt install -y git
 echo "================git installed================"
 cd ~
