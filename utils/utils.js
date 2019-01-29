@@ -719,7 +719,7 @@ module.exports = class UTILS {
 						let answer = stdout.split("\n");
 						answer.splice(0, 1);//remove first line
 						answer.splice(answer.length - 1, 1);//remove last line
-						resolve(answer);
+						resolve(answer.join("\n"));
 					}
 				});
 			}
@@ -731,7 +731,7 @@ module.exports = class UTILS {
 						let answer = stdout.split("\n");
 						answer.splice(0, 1);//remove first line
 						answer.splice(answer.length - 1, 1);//remove last line
-						resolve(answer);
+						resolve(answer.join("\n"));
 					}
 				});
 			}
