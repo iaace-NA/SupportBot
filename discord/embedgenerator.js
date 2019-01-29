@@ -151,7 +151,7 @@ const MMR_JOKES = [
 	"Party like a former pro League rock star!"]
 ];
 const RANK_ORDER = ["IRON", "BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "MASTER", "GRANDMASTER", "CHALLENGER"];
-const RANK_COLOR = [[69, 69, 69], [153, 51, 0], [179, 179, 179], [255, 214, 51], [0, 255, 152], [179, 240, 255], [203, 0, 255], [224, 0, 62], [0, 136, 216]];
+const RANK_COLOR = [[69, 69, 69], [153, 51, 0], [179, 179, 179], [255, 214, 51], [0, 255, 152], [159, 197, 232], [203, 0, 255], [224, 0, 62], [0, 136, 216]];
 const IMMR_THRESHOLD = [100, 500, 900, 1300, 1700, 2100, 2500, 2600, 2700];
 const MMR_THRESHOLD = [400, 1150, 1400, 1650, 1900, 2150, 2400];//starting MMRs for each tier
 const PREMADE_EMOJIS = ["", "\\💙", "\\💛", "\\💚"];
