@@ -320,12 +320,12 @@ module.exports = class EmbedGenerator {
 				const win = UTILS.determineWin(summoner.id, most_recent_match);
 				const teamParticipant = UTILS.teamParticipant(summoner.id, most_recent_match);
 				let summoner_spells = "";
-				const lane = UTILS.inferLane(match_meta[0].role, match_meta[0].lane, teamParticipant.spell1Id, teamParticipant.spell2Id);
+				const lane = UTILS.inferLane(match_meta.matches[0].role, match_meta.matches[0].lane, teamParticipant.spell1Id, teamParticipant.spell2Id);
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell1Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell1Id];
 				else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id];
 				else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell2Id].name + "`";
-				mrg_description = "\nMost recent game: " + (win ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[0].champion].emoji + CONFIG.EMOJIS.lanes[lane] + " " + summoner_spells + " `" + UTILS.standardTimestamp(most_recent_match.gameDuration) + "` " + queues[most_recent_match.queueId + ""] + " " + UTILS.ago(new Date(most_recent_match.timestamp + (most_recent_match.gameDuration * 1000)));
+				mrg_description = "\nMost recent game: " + (win ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta.matches[0].champion].emoji + CONFIG.EMOJIS.lanes[lane] + " " + summoner_spells + " `" + UTILS.standardTimestamp(most_recent_match.gameDuration) + "` " + queues[most_recent_match.queueId + ""] + " " + UTILS.ago(new Date(most_recent_match.timestamp + (most_recent_match.gameDuration * 1000)));
 			}
 			newEmbed.setDescription("Level " + summoner.summonerLevel + mrg_description);
 		}
