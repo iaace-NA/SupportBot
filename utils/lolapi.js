@@ -329,7 +329,13 @@ module.exports = class LOLAPI {
 					Promise.all(result2.map(r => that.getChallengerRanks(region, r.queueType, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHALLENGERS))).then(result5 => {
 						that.getChampionMastery(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHAMPION_MASTERY).then(result3 => {
 							that.getLiveMatch(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.LIVE_MATCH).then(result4 => {
-								resolve([null, result2, result3, result4, result5, result6]);
+								that.getRecentGames(region, result6.accountId, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RECENT_GAMES).then(result7 => {
+									that.getMatchInformation(region, result[7].matches[0].gameId, this.CONFIG.API_MAXAGE.SUMMONER_CARD.MATCH_INFORMATION).then(result8 => {
+										resolve([null, result2, result3, result4, result5, result6, result7, result8]);
+									}).catch(e => {
+										resolve([null, result2, result3, result4, result5, result6, result7, null]);
+									});
+								}).catch(reject);
 							}).catch(reject);
 						}).catch(reject);
 					}).catch(reject);

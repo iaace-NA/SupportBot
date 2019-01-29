@@ -303,7 +303,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.setFooter("Last change detected at ");
 		return newEmbed;
 	}
-	detailedSummoner(CONFIG, summoner, ranks, championmastery, region, match, challengers, verified) {//region username command
+	detailedSummoner(CONFIG, summoner, ranks, championmastery, region, live_match, challengers, match_meta, most_recent_match, verified) {//region username command
 		let newEmbed = new Discord.RichEmbed();
 		if (!UTILS.exists(summoner.id)) {
 			newEmbed.setAuthor(summoner.guess);
@@ -314,11 +314,25 @@ module.exports = class EmbedGenerator {
 		}
 		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), undefined, UTILS.opgg(region, summoner.name));
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
-		if (UTILS.exists(match.status)) newEmbed.setDescription("Level " + summoner.summonerLevel);
+		if (UTILS.exists(live_match.status)) {//no live game found
+			let mrg_description = "";
+			if (UTILS.exists(match_meta) && UTILS.exists(match_meta.matches[0])) {
+				const win = UTILS.determineWin(summoner.id, most_recent_match);
+				const lane = UTILS.inferLane(match_meta[0].role, match_meta[0].lane, teamParticipant.spell1Id, teamParticipant.spell2Id);
+				const teamParticipant = UTILS.teamParticipant(summoner.id, most_recent_match);
+				let summoner_spells = "";
+				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell1Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell1Id];
+				else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell1Id].name + "`";
+				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id];
+				else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell2Id].name + "`";
+				mrg_description = "\nMost recent game: " + (win ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[0].champion].emoji + CONFIG.EMOJIS.lanes[lane] + " " + summoner_spells + " `" + UTILS.standardTimestamp(most_recent_match.gameDuration) + "` " + queues[most_recent_match.queueId + ""] + " " + UTILS.ago(new Date(most_recent_match.timestamp + (most_recent_match.gameDuration * 1000)));
+			}
+			newEmbed.setDescription("Level " + summoner.summonerLevel + mrg_description);
+		}
 		else {
-			const game_type = match.gameType == "CUSTOM_GAME" ? "Custom" : queues[match.gameQueueConfigId];
-			if (match.gameStartTime != 0) newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Playing:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => p.summonerName === summoner.name).championId].emoji + "** on " + game_type + " for `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
-			else newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Game Loading:**__ **" + CONFIG.STATIC.CHAMPIONS[match.participants.find(p => p.summonerName === summoner.name).championId].emoji + "** on " + game_type);
+			const game_type = live_match.gameType == "CUSTOM_GAME" ? "Custom" : queues[live_match.gameQueueConfigId];
+			if (live_match.gameStartTime != 0) newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Playing:**__ **" + CONFIG.STATIC.CHAMPIONS[live_match.participants.find(p => p.summonerName === summoner.name).championId].emoji + "** on " + game_type + " for `" + UTILS.standardTimestamp((new Date().getTime() - live_match.gameStartTime) / 1000) + "`");
+			else newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Game Loading:**__ **" + CONFIG.STATIC.CHAMPIONS[live_match.participants.find(p => p.summonerName === summoner.name).championId].emoji + "** on " + game_type);
 		}
 		const will = (region === "NA" && summoner.id == 50714503) ? true : false;
 		let highest_rank = -1;
@@ -357,11 +371,11 @@ module.exports = class EmbedGenerator {
 		let cm_description = [];
 		let cm_total = 0;
 		for (let i = 0; i < championmastery.length; ++i) {
-			if (i < 3) cm_description.push("`M" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + " `" + UTILS.numberWithCommas(championmastery[i].championPoints) + "`pts");
+			if (i < 3) cm_description.push("`M" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + " `" + UTILS.masteryPoints(championmastery[i].championPoints) + "`pts");
 			cm_total += championmastery[i].championLevel;
 		}
 		const tpl = "[op.gg](" + UTILS.opgg(region, summoner.name) + ") [moba](https://lol.mobalytics.gg/summoner/" + region + "/" + encodeURIComponent(summoner.name) + ") [quickfind](https://quickfind.kassad.in/profile/" + region + "/" + encodeURIComponent(summoner.name) + ") [lolprofile](https://lolprofile.net/summoner/" + region + "/" + encodeURIComponent(summoner.name) + "#update) [wol](https://wol.gg/stats/" + region + "/" + encodeURIComponent(summoner.name) + "/) [mmr?](https://" + region + ".whatismymmr.com/" + encodeURIComponent(summoner.name) + ") [legends.ai](https://legends.ai/" + region.toLowerCase() + "/summoner/" + summoner.name.replaceAll(" ", "").toLowerCase() + ")";//third party links
-		if (cm_description.length > 0) newEmbed.addField("Champion Mastery: " + cm_total, cm_description.join("\t") + "\n" + tpl);
+		if (cm_description.length > 0) newEmbed.addField("Champion Mastery: " + cm_total, cm_description.join(TAB) + "\n" + tpl);
 		else newEmbed.addField("Champion Mastery: 0", tpl);
 		newEmbed.setTimestamp(new Date(summoner.revisionDate));
 		newEmbed.setFooter("Last change detected at ");
