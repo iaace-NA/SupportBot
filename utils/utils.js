@@ -177,6 +177,9 @@ module.exports = class UTILS {
 		else if (lane == "MIDDLE" || lane == "MID") return 3;
 		else return 0;
 	}
+	positionToLane(position) {
+		return ["NONE", "TOP", "JUNGLE", "MIDDLE", "UTILITY", "BOTTOM"].indexOf(position);
+	}
 	opgg(region, username) {
 		this.assert(this.exists(username), "opgg link generator: username doesn't exist");
 		this.assert(this.exists(region), "opgg link generator: region doesn't exist");

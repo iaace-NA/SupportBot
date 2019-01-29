@@ -354,7 +354,7 @@ module.exports = class EmbedGenerator {
 				if (candidate != -1) title += "#" + (candidate + 1) + " ";//add placing if index found
 			}
 			title += ranks[i].leaguePoints + "LP";
-			newEmbed.addField((will ? "~~" : "") + title + (will ? "~~" : ""), (will ? "~~" : "") + description + (will ? "~~" : ""), true);
+			newEmbed.addField((will ? "~~" : "") + (ranks[i].position !== "NONE" ? CONFIG.EMOJIS.lanes[UTILS.positionToLane(ranks[i].position)] : "") + title + (will ? "~~" : ""), (will ? "~~" : "") + description + (will ? "~~" : ""), true);
 			if (RANK_ORDER.indexOf(ranks[i].tier) > highest_rank) highest_rank = RANK_ORDER.indexOf(ranks[i].tier);
 		}
 		if (highest_rank > -1) newEmbed.setColor(RANK_COLOR[highest_rank]);
