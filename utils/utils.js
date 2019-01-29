@@ -710,7 +710,7 @@ module.exports = class UTILS {
 		let that = this;
 		return new Promise((resolve, reject) => {
 			const wincmd = "powershell.exe -Command \"\\\"" + array_of_points.map(p => p.x + " " + p.y).join("`n") + "\\\" | gnuplot -e \\\"set terminal dumb " + x_size + " " + y_size + "; set xlabel 'Minutes'; set tics scale 0; plot '-' with filledcurves y=0 notitle\\\"\"";
-			const linuxcmd = "printf \"" + array_of_points.map(p => p.x + " " + p.y).join("\\n") + "\" | gnuplot -e \"set terminal dumb " + x_size + " " + y_size + "; set xlabel 'Minutes'; set tics scale 0; plot '-' with filledcurves y=0 notitle\"";
+			const linuxcmd = "printf \"" + array_of_points.map(p => p.x + " " + p.y).join("\\n") + "\\\" | gnuplot -e \"set terminal dumb " + x_size + " " + y_size + "; set xlabel 'Minutes'; set tics scale 0; plot '-' with filledcurves y=0 notitle\"";
 			if (process.platform === "win32") {
 				child_process.exec(wincmd, { timeout: 1000 }, (err, stdout, stderr) => {
 					if (err) reject(err);
