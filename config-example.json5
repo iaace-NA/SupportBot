@@ -220,5 +220,5 @@
 	"TPV_KEY": "random string here",//third party verification code HMAC key
 	"AUDIT_TTL": 31536000,//time in seconds to keep logs of command use (default: 1 year)
 	"PATCH_LOCK": "latest",//locks the patch. set to "latest" for latest
-	"ACKNOWLEDGEMENTS": "**SupportBot would not be possible without contributions from:**\n- `iaace` Lead discord developer\n- `routuro` Head of staffing and public relations\n- `WastedYourTimeReadingThis` Quality Assurance\n- `uded2me`/`K-den` Former Quality Assurance\n- `HiKomodo` Former Quality Assurance\n- `CajunDragon` Source contributor\n- Many open source libraries\n\n__Supporters:__\n- `billupillu`, `Turnipgreen`"//supports discord markdown
+	"ACKNOWLEDGEMENTS": "**SupportBot would not be possible without contributions from:**\n- `iaace` Lead discord developer\n- `routuro` Head of staffing and public relations\n- `WastedYourTimeReadingThis` QA\n- `uded2me`/`K-den` Former QA\n- `HiKomodo` Former QA\n- `CajunDragon` Source contributor\n- Many open source libraries\n\n__Supporters:__\n`BilluPillu`, `Turnipgreen`"//supports discord markdown
 }
