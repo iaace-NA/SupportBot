@@ -706,7 +706,7 @@ module.exports = class UTILS {
 		}
 		return parseInt(ans);
 	}
-	gnuPlotGoldAdvantageGraph(array_of_points, x_size = 50, y_size = 18) {//[{x, y}, ...]
+	gnuPlotGoldAdvantageGraph(array_of_points, x_size = 52, y_size = 18) {//[{x, y}, ...]
 		let that = this;
 		return new Promise((resolve, reject) => {
 			const wincmd = "powershell.exe -Command \"\\\"" + array_of_points.map(p => p.x + " " + p.y).join("`n") + "\\\" | gnuplot -e \\\"set terminal dumb " + x_size + " " + y_size + "; set xlabel 'Minutes'; set tics scale 0; plot '-' with filledcurves y=0 notitle\\\"\"";
@@ -715,14 +715,24 @@ module.exports = class UTILS {
 				child_process.exec(wincmd, { timeout: 1000 }, (err, stdout, stderr) => {
 					if (err) reject(err);
 					if (that.exists(stderr) && stderr != "") reject(stderr);
-					else resolve(stdout);
+					else {
+						let answer = stdout.split("\n");
+						answer.splice(0, 1);//remove first line
+						answer.splice(answer.length - 1, 1);//remove last line
+						resolve(answer);
+					}
 				});
 			}
 			else {
 				child_process.exec(linuxcmd, { timeout: 1000 }, (err, stdout, stderr) => {
 					if (err) reject(err);
 					if (that.exists(stderr) && stderr != "") reject(stderr);
-					else resolve(stdout);
+					else {
+						let answer = stdout.split("\n");
+						answer.splice(0, 1);//remove first line
+						answer.splice(answer.length - 1, 1);//remove last line
+						resolve(answer);
+					}
 				});
 			}
 		});
