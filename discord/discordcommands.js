@@ -534,19 +534,22 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 						if (UTILS.exists(pI.player.summonerId)) return pI.player.summonerId;
 						else return null;//bot account
 					});//participant (summoner) ID array
-					lolapi.getMultipleRanks(region, pIDA, CONFIG.API_MAXAGE.DMH.MULTIPLE_RANKS).then(ranks => {
-						lolapi.getMultipleChampionMastery(region, pIDA, CONFIG.API_MAXAGE.DMH.MULTIPLE_MASTERIES).then(masteries => {
-							lolapi.getMultipleSummonerFromSummonerID(region, pIDA, CONFIG.API_MAXAGE.DMH.OTHER_SUMMONER_ID).then(pSA => {
-								lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region).then(verified => {
-									request_profiler.begin("generating embed");
-									const answer = embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match, ranks, masteries, pSA, verified);
-									request_profiler.end("generating embed");
-									UTILS.debug(request_profiler.endAll());
-									replyEmbed(answer);
+					lolapi.getMatchTimeline(region, matchhistory.matches[number - 1].gameId, CONFIG.API_MAXAGE.DMH.MATCH_TIMELINE).then(timeline => {
+						lolapi.getMultipleRanks(region, pIDA, CONFIG.API_MAXAGE.DMH.MULTIPLE_RANKS).then(ranks => {
+							lolapi.getMultipleChampionMastery(region, pIDA, CONFIG.API_MAXAGE.DMH.MULTIPLE_MASTERIES).then(masteries => {
+								lolapi.getMultipleSummonerFromSummonerID(region, pIDA, CONFIG.API_MAXAGE.DMH.OTHER_SUMMONER_ID).then(pSA => {
+									lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region).then(verified => {
+										request_profiler.begin("generating embed");
+										embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match, timeline, ranks, masteries, pSA, verified).then(answer => {
+											replyEmbed(answer);
+											request_profiler.end("generating embed");
+											UTILS.debug(request_profiler.endAll());
+										}).catch(console.error);
+									}).catch(console.error);
 								}).catch(console.error);
-							});
-						});
-					}).catch();
+							}).catch(console.error);
+						}).catch(console.error);
+					}).catch(console.error);
 				}).catch(console.error);
 			}).catch(console.error);
 		}).catch(console.error);

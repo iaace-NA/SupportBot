@@ -243,6 +243,19 @@ function getMatchTags(summonerID, match, mastery) {//returns array
 	if (match.teams[0].inhibitorKills > 0 && match.teams[1].inhibitorKills > 0) answer.push("Close");
 	return answer;
 }
+function transformTimelineToArray(match, timeline) {
+	let teams = {};
+	for (let b in match.participants) teams[match.participants[b].participantId + ""] = match.participants[b].teamId + "";
+	let answer = [];
+	for (let i = 0; i < timeline.frames.length; ++i) {
+		let team_total_gold = { "100": 0, "200": 0 };
+		for (let j = 0; j < Object.keys(timeline.frames[i].participantFrames).length; ++j) {//for each participant frame
+			team_total_gold[teams[j + ""]] += timeline.frames[i].participantFrames[j + ""].totalGold;
+		}
+		answer.push({ x: i, y: team_total_gold["200"] - team_total_gold["100"] });
+	}
+	return answer;
+}
 module.exports = class EmbedGenerator {
 	constructor() { }
 	test() {
@@ -469,77 +482,74 @@ module.exports = class EmbedGenerator {
 		newEmbed.addField("Top 10 Recently Played With", rpws.slice(0, 10).join("\n"));
 		return newEmbed;
 	}
-	detailedMatch(CONFIG, summoner, match_meta, match, ranks, masteries, summoner_participants, verified) {//should show detailed information about 1 game
-		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
-		if (UTILS.exists(match.status)) {
-			newEmbed.setAuthor(summoner.guess);
-			newEmbed.setTitle("This summoner has no recent matches.");
-			newEmbed.setColor([255, 0, 0]);
-			return newEmbed;
-		}
-		const avg_iMMR = UTILS.averageMatchMMR(ranks);
-		for (let i = 0; i < IMMR_THRESHOLD.length; ++i) if (avg_iMMR >= IMMR_THRESHOLD[i]) newEmbed.setColor(RANK_COLOR[i]);
-		UTILS.output("average iMMR is " + Math.round(avg_iMMR) + " or " + UTILS.iMMRtoEnglish(avg_iMMR));
-		newEmbed.setTitle(queues[match.queueId] + " `" + UTILS.standardTimestamp(match.gameDuration) + "`");
-		newEmbed.setTimestamp(new Date(match_meta.timestamp + (match.gameDuration * 1000)));
-		newEmbed.setFooter("Match played " + UTILS.ago(new Date(match_meta.timestamp + (match.gameDuration * 1000))) + " at: ");
-		let teams = {};
-		for (let b in match.participantIdentities) {
-			const pI = match.participantIdentities[b];
-			const flex_5 = ranks[b].find(r => r.queueType === "RANKED_FLEX_SR");
-			const flex_3 = ranks[b].find(r => r.queueType === "RANKED_FLEX_TT");
-			const solo = ranks[b].find(r => r.queueType === "RANKED_SOLO_5x5");
-			pI.flex5 = "`" + UTILS.shortRank(flex_5) + "`";
-			pI.flex3 = "`" + UTILS.shortRank(flex_3) + "`";
-			pI.solo = "`" + UTILS.shortRank(solo) + "`";
-			pI.mastery = UTILS.getSingleChampionMastery(masteries[b], match.participants.find(p => p.participantId == pI.participantId).championId);
-		}
-		for (let b in match.participants) {
-			if (!UTILS.exists(teams[match.participants[b].teamId])) teams[match.participants[b].teamId] = [];
-			teams[match.participants[b].teamId].push(match.participants[b]);
-		}
-		let team_count = 0;
-		for (let b in teams) {
-			++team_count;
-			const tK = teams[b].reduce((total, increment) => total + increment.stats.kills, 0);
-			const tD = teams[b].reduce((total, increment) => total + increment.stats.deaths, 0);
-			const tA = teams[b].reduce((total, increment) => total + increment.stats.assists, 0);
-			const tKP = UTILS.round(100 * (tK + tA) / (tK * teams[b].length), 0);
-			newEmbed.addField((match.teams.find(t => teams[b][0].teamId == t.teamId).win == "Win" ? CONFIG.EMOJIS["win"] : CONFIG.EMOJIS["loss"]) + "Team " + team_count + " Bans: " + match.teams.find(t => t.teamId == b).bans.map(b => b.championId == -1 ? ":x:" : CONFIG.STATIC.CHAMPIONS[b.championId].emoji).join(""), "__Σlv.__ `" + teams[b].reduce((total, increment) => total + increment.stats.champLevel, 0) + "`\t`" + tK + "/" + tD + "/" + tA + "`\t__KDR:__`" + UTILS.KDAFormat(tK / tD) + "`\t__KDA:__`" + UTILS.KDAFormat((tK + tA) / tD) + "` `" + tKP + "%`\t__Σcs:__`" + teams[b].reduce((total, increment) => total + increment.stats.totalMinionsKilled + increment.stats.neutralMinionsKilled, 0) + "`\t__Σg:__`" + UTILS.gold(teams[b].reduce((total, increment) => total + increment.stats.goldEarned, 0)) + "`");
-			teams[b].sort((a, b) => UTILS.inferLane(a.timeline.role, a.timeline.lane, a.spell1Id, a.spell2Id) - UTILS.inferLane(b.timeline.role, b.timeline.lane, b.spell1Id, b.spell2Id));
-			for (let c in teams[b]) {
-				let p = teams[b][c];
-				let pI = match.participantIdentities.find(pI => pI.participantId == p.participantId);
-				let summoner_spells = "";
-				if (UTILS.exists(pI.player.summonerId)) {//not a bot
-					if (UTILS.exists(CONFIG.SPELL_EMOJIS[p.spell1Id])) summoner_spells += CONFIG.SPELL_EMOJIS[p.spell1Id];
-					else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[p.spell1Id].name + "`";
-					if (UTILS.exists(CONFIG.SPELL_EMOJIS[p.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[p.spell2Id];
-					else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[p.spell2Id].name + "`";
-				}
-				else summoner_spells = ":x::x:";//bot
-				const username = pI.player.summonerName;
-				const lane = CONFIG.EMOJIS.lanes[UTILS.inferLane(p.timeline.role, p.timeline.lane, p.spell1Id, p.spell2Id)];
-				newEmbed.addField(CONFIG.STATIC.CHAMPIONS[p.championId].emoji + lane + summoner_spells + " " + pI.solo + " ¦ " + pI.flex5 + " ¦ " + pI.flex3 + " ¦ `M" + pI.mastery + "` lv. `" + (UTILS.exists(pI.player.summonerId) ? summoner_participants.find(p => p.id == pI.player.summonerId).summonerLevel : 0) + "` __" + (pI.player.summonerId == summoner.id ? "**" + username + "**" : username) + "__" + (pI.player.summonerId == summoner.id && verified ? "\\" + VERIFIED_ICON : ""), "[opgg](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ") " + "__lv.__ `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\t__KDR:__`" + UTILS.KDAFormat(p.stats.kills / p.stats.deaths) + "`\t__KDA:__`" + UTILS.KDAFormat((p.stats.kills + p.stats.assists) / p.stats.deaths) + "` `" + UTILS.KPFormat((100 * (p.stats.assists + p.stats.kills)) / tK) + "%`\t__cs:__`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "` `(" + ((p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) / (match.gameDuration / 60)).round(1) + ")`\t__g:__`" + UTILS.gold(p.stats.goldEarned) + "`\n__items:__ " + getItemTags([p.stats.item0, p.stats.item1, p.stats.item2, p.stats.item3, p.stats.item4, p.stats.item5, p.stats.item6]).map(i => "`" + i + "`").join(TAB + " ") + "\n" + getMatchTags(pI.player.summonerId, match).map(s => "`" + s + "`").join(TAB + " "));
+	detailedMatch(CONFIG, summoner, match_meta, match, timeline, ranks, masteries, summoner_participants, verified) {//should show detailed information about 1 game
+		return new Promise((resolve, reject) => {
+			let newEmbed = new Discord.RichEmbed();
+			newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
+			if (UTILS.exists(match.status)) {
+				newEmbed.setAuthor(summoner.guess);
+				newEmbed.setTitle("This summoner has no recent matches.");
+				newEmbed.setColor([255, 0, 0]);
+				return newEmbed;
 			}
-		}
-		// champion
-		// match result
-		// queue
-		// level
-		//[items]
-		// KDA
-		// cs
-		// gold
-		// length
-		// time
-		// lane
-		// role
-		// team KDA
-		// team CS
-		// KP
-		return newEmbed;
+			const avg_iMMR = UTILS.averageMatchMMR(ranks);
+			for (let i = 0; i < IMMR_THRESHOLD.length; ++i) if (avg_iMMR >= IMMR_THRESHOLD[i]) newEmbed.setColor(RANK_COLOR[i]);
+			UTILS.output("average iMMR is " + Math.round(avg_iMMR) + " or " + UTILS.iMMRtoEnglish(avg_iMMR));
+			newEmbed.setTitle(queues[match.queueId] + " `" + UTILS.standardTimestamp(match.gameDuration) + "`");
+			newEmbed.setTimestamp(new Date(match_meta.timestamp + (match.gameDuration * 1000)));
+			newEmbed.setFooter("Match played " + UTILS.ago(new Date(match_meta.timestamp + (match.gameDuration * 1000))) + " at: ");
+			let teams = {};
+			for (let b in match.participantIdentities) {
+				const pI = match.participantIdentities[b];
+				const flex_5 = ranks[b].find(r => r.queueType === "RANKED_FLEX_SR");
+				const flex_3 = ranks[b].find(r => r.queueType === "RANKED_FLEX_TT");
+				const solo = ranks[b].find(r => r.queueType === "RANKED_SOLO_5x5");
+				pI.flex5 = "`" + UTILS.shortRank(flex_5) + "`";
+				pI.flex3 = "`" + UTILS.shortRank(flex_3) + "`";
+				pI.solo = "`" + UTILS.shortRank(solo) + "`";
+				pI.mastery = UTILS.getSingleChampionMastery(masteries[b], match.participants.find(p => p.participantId == pI.participantId).championId);
+			}
+			for (let b in match.participants) {
+				if (!UTILS.exists(teams[match.participants[b].teamId])) teams[match.participants[b].teamId] = [];
+				teams[match.participants[b].teamId].push(match.participants[b]);
+			}
+			let team_count = 0;
+			for (let b in teams) {
+				++team_count;
+				const tK = teams[b].reduce((total, increment) => total + increment.stats.kills, 0);
+				const tD = teams[b].reduce((total, increment) => total + increment.stats.deaths, 0);
+				const tA = teams[b].reduce((total, increment) => total + increment.stats.assists, 0);
+				const tKP = UTILS.round(100 * (tK + tA) / (tK * teams[b].length), 0);
+				newEmbed.addField((match.teams.find(t => teams[b][0].teamId == t.teamId).win == "Win" ? CONFIG.EMOJIS["win"] : CONFIG.EMOJIS["loss"]) + "Team " + team_count + " Bans: " + match.teams.find(t => t.teamId == b).bans.map(b => b.championId == -1 ? ":x:" : CONFIG.STATIC.CHAMPIONS[b.championId].emoji).join(""), "__Σlv.__ `" + teams[b].reduce((total, increment) => total + increment.stats.champLevel, 0) + "`\t`" + tK + "/" + tD + "/" + tA + "`\t__KDR:__`" + UTILS.KDAFormat(tK / tD) + "`\t__KDA:__`" + UTILS.KDAFormat((tK + tA) / tD) + "` `" + tKP + "%`\t__Σcs:__`" + teams[b].reduce((total, increment) => total + increment.stats.totalMinionsKilled + increment.stats.neutralMinionsKilled, 0) + "`\t__Σg:__`" + UTILS.gold(teams[b].reduce((total, increment) => total + increment.stats.goldEarned, 0)) + "`");
+				teams[b].sort((a, b) => UTILS.inferLane(a.timeline.role, a.timeline.lane, a.spell1Id, a.spell2Id) - UTILS.inferLane(b.timeline.role, b.timeline.lane, b.spell1Id, b.spell2Id));
+				for (let c in teams[b]) {
+					let p = teams[b][c];
+					let pI = match.participantIdentities.find(pI => pI.participantId == p.participantId);
+					let summoner_spells = "";
+					if (UTILS.exists(pI.player.summonerId)) {//not a bot
+						if (UTILS.exists(CONFIG.SPELL_EMOJIS[p.spell1Id])) summoner_spells += CONFIG.SPELL_EMOJIS[p.spell1Id];
+						else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[p.spell1Id].name + "`";
+						if (UTILS.exists(CONFIG.SPELL_EMOJIS[p.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[p.spell2Id];
+						else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[p.spell2Id].name + "`";
+					}
+					else summoner_spells = ":x::x:";//bot
+					const username = pI.player.summonerName;
+					const lane = CONFIG.EMOJIS.lanes[UTILS.inferLane(p.timeline.role, p.timeline.lane, p.spell1Id, p.spell2Id)];
+					newEmbed.addField(CONFIG.STATIC.CHAMPIONS[p.championId].emoji + lane + summoner_spells + " " + pI.solo + " ¦ " + pI.flex5 + " ¦ " + pI.flex3 + " ¦ `M" + pI.mastery + "` lv. `" + (UTILS.exists(pI.player.summonerId) ? summoner_participants.find(p => p.id == pI.player.summonerId).summonerLevel : 0) + "` __" + (pI.player.summonerId == summoner.id ? "**" + username + "**" : username) + "__" + (pI.player.summonerId == summoner.id && verified ? "\\" + VERIFIED_ICON : ""), "[opgg](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ") " + "__lv.__ `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\t__KDR:__`" + UTILS.KDAFormat(p.stats.kills / p.stats.deaths) + "`\t__KDA:__`" + UTILS.KDAFormat((p.stats.kills + p.stats.assists) / p.stats.deaths) + "` `" + UTILS.KPFormat((100 * (p.stats.assists + p.stats.kills)) / tK) + "%`\t__cs:__`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "` `(" + ((p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) / (match.gameDuration / 60)).round(1) + ")`\t__g:__`" + UTILS.gold(p.stats.goldEarned) + "`\n__items:__ " + getItemTags([p.stats.item0, p.stats.item1, p.stats.item2, p.stats.item3, p.stats.item4, p.stats.item5, p.stats.item6]).map(i => "`" + i + "`").join(TAB + " ") + "\n" + getMatchTags(pI.player.summonerId, match).map(s => "`" + s + "`").join(TAB + " "));
+				}
+			}
+			if (match.gameDuration > 240) {//game longer than 4 minutes
+				UTILS.gnuPlotGoldAdvantageGraph(transformTimelineToArray(match, timeline)).then(ascii_graph => {
+					newEmbed.addField("Gold Advantage (Purple/Red advantage is `+`)", "```" + ascii_graph + "```");
+					resolve(newEmbed);
+				}).catch(e => {
+					console.error(e);
+					resolve(newEmbed);
+				});
+			}
+			else resolve(newEmbed);
+			// champion, match result, queue, level, [items], KDA, cs, gold, length, time, lane, role, team KDA, team CS, KP
+		});
 	}
 	liveMatchPremade(CONFIG, summoner, match, matches, ranks, masteries, summoner_participants, verified, trim = true, newlogic = true) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
