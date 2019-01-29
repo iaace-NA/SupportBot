@@ -325,7 +325,7 @@ module.exports = class EmbedGenerator {
 				else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id];
 				else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell2Id].name + "`";
-				mrg_description = "\nMost recent game: " + (win ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta.matches[0].champion].emoji + CONFIG.EMOJIS.lanes[lane] + " " + summoner_spells + "\n`" + UTILS.standardTimestamp(most_recent_match.gameDuration) + "` **" + queues[most_recent_match.queueId + ""] + " " + UTILS.ago(new Date(match_meta.matches[0].timestamp + (most_recent_match.gameDuration * 1000))) + "**";
+				mrg_description = "\nMost recent game: " + (win ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta.matches[0].champion].emoji + CONFIG.EMOJIS.lanes[lane] + " " + summoner_spells + "\n" + TAB + TAB + TAB + "`" + UTILS.standardTimestamp(most_recent_match.gameDuration) + "` **" + queues[most_recent_match.queueId + ""] + " " + UTILS.ago(new Date(match_meta.matches[0].timestamp + (most_recent_match.gameDuration * 1000))) + "**";
 			}
 			newEmbed.setDescription("Level " + summoner.summonerLevel + mrg_description);
 		}
