@@ -132,7 +132,7 @@ module.exports = class UTILS {
 	}
 	masteryPoints(number) {
 		number /= 1000;
-		return Math.round(number) + "k";
+		return this.numberWithCommas(Math.round(number)) + "k";
 	}
 	level(summonerID, match) {
 		return this.stats(summonerID, match).championLevel;
