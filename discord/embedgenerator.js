@@ -318,9 +318,9 @@ module.exports = class EmbedGenerator {
 			let mrg_description = "";
 			if (UTILS.exists(match_meta) && UTILS.exists(match_meta.matches[0])) {
 				const win = UTILS.determineWin(summoner.id, most_recent_match);
-				const lane = UTILS.inferLane(match_meta[0].role, match_meta[0].lane, teamParticipant.spell1Id, teamParticipant.spell2Id);
 				const teamParticipant = UTILS.teamParticipant(summoner.id, most_recent_match);
 				let summoner_spells = "";
+				const lane = UTILS.inferLane(match_meta[0].role, match_meta[0].lane, teamParticipant.spell1Id, teamParticipant.spell2Id);
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell1Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell1Id];
 				else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id];
