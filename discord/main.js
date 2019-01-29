@@ -5,7 +5,7 @@ const argv_options = new (require("getopts"))(process.argv.slice(2), {
 	default: { c: "config.json5" }
 });
 
-const UTILS = new (require("../utils.js"))();
+const UTILS = new (require("../utils/utils.js"))();
 const { ShardingManager } = require('discord.js');
 
 let CONFIG;

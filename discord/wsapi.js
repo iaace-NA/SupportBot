@@ -1,12 +1,12 @@
 "use strict";
-const UTILS = new (require("../utils.js"))();
+const UTILS = new (require("../utils/utils.js"))();
 const REQUEST = require("request");
 const ws = require("ws");
 const fs = require("fs");
 const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt") };
 let embedgenerator = new (require("./embedgenerator.js"))();
 let Preferences = require("./preferences.js");
-let LOLAPI = require("./lolapi.js");
+let LOLAPI = require("../utils/lolapi.js");
 module.exports = class WSAPI {
 	/*
 	Used for internal communication between shards and IAPI.

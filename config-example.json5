@@ -124,7 +124,8 @@
 		"STATIC_CHAMPIONS": 10800,//3H
 		"STATIC_SPELLS": 10800,//3H
 		"GET_CHALLENGERS": 14400,//4H
-		"THIRD_PARTY_CODE": 30
+		"THIRD_PARTY_CODE": 30,
+		"GET_MATCH_TIMELINE": 15552000,//180D
 	},
 	"API_MAXAGE": {//maximum acceptable age (in seconds) of api data for a command. set to 0 to never use cached responses
 		"SD": 60,
@@ -134,12 +135,15 @@
 			"RANKS": 180,
 			"CHAMPION_MASTERY": 600,
 			"LIVE_MATCH": 90,
-			"CHALLENGERS": 3600
+			"CHALLENGERS": 3600,
+			"RECENT_GAMES": 120,
+			"MATCH_INFORMATION": 15552000
 		},
 		"MH": {
 			"SUMMONER_ID": 3600,
 			"RECENT_GAMES": 120,
-			"MULTIPLE_MATCH": 15552000
+			"MULTIPLE_MATCH": 15552000,
+			"CHAMPION_MASTERY": 86400
 		},
 		"LG": {
 			"SUMMONER_ID": 3600,
@@ -156,7 +160,8 @@
 			"MATCH_INFORMATION": 15552000,
 			"MULTIPLE_RANKS": 86400,
 			"MULTIPLE_MASTERIES": 86400,
-			"OTHER_SUMMONER_ID": 86400
+			"OTHER_SUMMONER_ID": 86400,
+			"MATCH_TIMELINE": 15552000
 		},
 		"MULTI": {
 			"MULTIPLE_SUMMONER_ID": 86400,
@@ -216,5 +221,6 @@
 	},
 	"TPV_KEY": "random string here",//third party verification code HMAC key
 	"AUDIT_TTL": 31536000,//time in seconds to keep logs of command use (default: 1 year)
-	"PATCH_LOCK": "latest"//locks the patch. set to "latest" for latest
+	"PATCH_LOCK": "latest",//locks the patch. set to "latest" for latest
+	"ACKNOWLEDGEMENTS": "**SupportBot would not be possible without contributions from:**\n- `iaace` Lead discord developer\n- `routuro` Head of staffing and public relations\n- `WastedYourTimeReadingThis` QA\n- `uded2me`/`K-den` Former QA\n- `HiKomodo` Former QA\n- `CajunDragon` Source contributor\n- Many open source libraries\n\n__Supporters:__\n`BilluPillu`, `Turnipgreen`"//supports discord markdown
 }

@@ -1,5 +1,5 @@
 "use strict";
-const UTILS = new (require("../utils.js"))();
+const UTILS = new (require("../utils/utils.js"))();
 module.exports = class TextGenerator {
 	constructor() { }
 	ping_callback(msg, nMsg) {

@@ -1,5 +1,5 @@
 "use strict";
-const UTILS = new (require("../utils.js"))();
+const UTILS = new (require("../utils/utils.js"))();
 module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load_average, disciplinary_model, shortcut_doc_model, getBans, shardBroadcast, sendExpectReply, sendExpectReplyBroadcast, sendToShard, server_preferences_model, dc_load_average) {
 	serveWebRequest("/createshortcut/:uid", function(req, res, next) {
 		findShortcut(req.params.uid, res, doc => {
@@ -97,7 +97,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 					if (e) console.error(e);
 				});
 			}
-			else res.send({ verifiedAccounts: {} });
+			else res.json({ verifiedAccounts: {} });
 		});
 	}, true);
 	serveWebRequest("/setverified/:uid", function(req, res, next) {
@@ -349,7 +349,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 	serveWebRequest("/existspreferences", (req, res, next) => {
 		findPreferences(req.query.id, res, doc => {
 			let answer = false;
-			if (!UTILS.exists(doc) || apicache.Types.ObjectId(doc._id).getTimestamp().getTime() > new Date().getTime() - 10000) answer = true;
+			if (!UTILS.exists(doc) || apicache.Types.ObjectId(doc._id).getTimestamp().getTime() > new Date().getTime() - 20000) answer = true;
 			res.json({ new: answer });
 		});
 	}, true);

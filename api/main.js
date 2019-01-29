@@ -7,13 +7,14 @@ let CONFIG;
 const JSON5 = require("json5");
 try {
 	CONFIG = JSON5.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.6.3";//b for non-release (in development)
+	CONFIG.VERSION = "v1.7.0";//b for non-release (in development)
 }
 catch (e) {
 	console.log("something's wrong with config.json");
 	console.error(e);
 	process.exit(1);
 }
+const lolapi = new (require("../utils/lolapi.js"))(CONFIG, "0", true, rawAPIRequest);
 function endpointToURL(region, endpoint) {
 	let options = UTILS.parseQuery(endpoint.substring(endpoint.indexOf("?")));
 	let maxage = parseInt(options.iapimaxage);
@@ -24,9 +25,16 @@ function endpointToURL(region, endpoint) {
 	let newEndpoint = path;
 	let paramcount = 0;
 	for (let i in options) {
-		if (paramcount == 0) newEndpoint += "?" + i + "=" + encodeURIComponent(options[i]);
-		else newEndpoint += "&" + i + "=" + encodeURIComponent(options[i]);
-		++paramcount;
+		if (typeof(options[i]) === "object") {
+			for (let j in options[i]) {
+				newEndpoint += (paramcount == 0 ? "?" : "&") + i + "=" + encodeURIComponent(options[i][j]);
+				++paramcount;
+			}
+		}
+		else {
+			newEndpoint += (paramcount == 0 ? "?" : "&") + i + "=" + encodeURIComponent(options[i]);
+			++paramcount;
+		}
 	}
 	let query = endpoint.substring(endpoint.indexOf("?") + 1);//?date=0&iapi
 	let url = "https://" + region + ".api.riotgames.com" + path + "?api_key=";
@@ -62,14 +70,14 @@ let riotRequest = new (require("riot-lol-api"))(CONFIG.RIOT_API_KEY, 12000, {
 	}
 });
 
-let LoadAverage = require("../loadaverage.js");
+let LoadAverage = require("../utils/loadaverage.js");
 const response_type = ["Total", "Uncachable", "Cache hit", "Cache hit expired", "Cache miss"];
 const load_average = [new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60), new LoadAverage(60)];
 const dc_load_average = new LoadAverage(60);//discord command load average
 const express = require("express");
 const website = express();
 
-const UTILS = new (require("../utils.js"))();
+const UTILS = new (require("../utils/utils.js"))();
 let Profiler = require("../timeprofiler.js");
 let request = require("request");
 let wsRoutes = require("./websockets.js");
@@ -282,20 +290,11 @@ serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/", function (req, r
 serveWebRequest("/lol/:region/:cachetime/:maxage/:request_id/:tag/", (req, res, next) => {
 	if (!UTILS.exists(irs[req.params.request_id])) irs[req.params.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
 	++irs[req.params.request_id][0];
-	const cachetime = parseInt(req.params.cachetime);
-	riotRequest.request(req.params.region, req.params.tag, req.query.endpoint, { maxage: parseInt(req.params.maxage), cachetime }, (err, data) => {
-		if (err) {
-			if (!err.riotInternal || !UTILS.exists(err.response)) {//real error
-				res.status(500).end();
-				console.error(err);
-			}
-			else {
-				res.status(err.status).type('application/json').send(err.response.res.text).end();
-				const oldFormat = endpointToURL(req.params.region, req.query.endpoint);
-				if (cachetime != 0) addCache(oldFormat.url, err.response.res.text, cachetime);
-			}
-		}
-		else res.status(200).type('application/json').send(data).end();
+	rawAPIRequest(req.params.region, req.params.tag, req.query.endpoint, parseInt(req.params.maxage), parseInt(req.params.cachetime)).then(data => {
+		res.status(200).type('application/json').send(data).end();
+	}).catch(err => {
+		if (err === 500) res.status(500).end();
+		else res.status(err.status).type('application/json').send(err.response.res.text).end();
 	});
 }, true);
 serveWebRequest("/terminate_request/:request_id", function (req, res, next) {
@@ -371,6 +370,23 @@ function serveWebRequest(branch, callback, validate = false) {
 			});
 		}
 	}
+}
+function rawAPIRequest(region, tag, endpoint, maxage, cachetime) {
+	return new Promise((resolve, reject) => {
+		riotRequest.request(region, tag, endpoint, { maxage, cachetime }, (err, data) => {
+			if (err) {
+				if (!err.riotInternal || !UTILS.exists(err.response)) {//real error
+					reject(500);
+				}
+				else {
+					const oldFormat = endpointToURL(region, endpoint);
+					if (cachetime != 0) addCache(oldFormat.url, err.response.res.text, cachetime);
+					reject(err);
+				}
+			}
+			else resolve(data);
+		});
+	});
 }
 function checkCache(url, maxage, request_id) {
 	return new Promise((resolve, reject) => {

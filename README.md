@@ -1,4 +1,4 @@
-# SupportBot v1.6.3
+# SupportBot v1.7.0
 League of Legends Statistics for Discord
 (c) 2018; source available, all rights reserved
 
@@ -51,14 +51,17 @@ League of Legends Statistics for Discord
 - api: internal api files
 - data: TLS certs and other local data
 - discord: discord bot files
+- example-api-docs: example responses from the riot API
 - install: bash installation files for 1 time use only, Ubuntu OS
 - releasenotes: release notes for supportbot
 - start: startup configs for pm2
 - tests: manual test cases
+- utils: utility classes and functions
 
 
 ## Dependencies
 - mongodb 3.x
+- gnuplot
 ## npm Dependencies
 - pm2 (global)
 - getopts 2.2.3

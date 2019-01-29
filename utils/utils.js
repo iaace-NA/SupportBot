@@ -1,6 +1,7 @@
 "use strict";
 let ta = require("./timeago.js");
 let seq = require("./promise-sequential.js");
+let child_process = require("child_process");
 String.prototype.replaceAll = function(search, replacement) {
 	let target = this;
 	return target.replace(new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replacement);
@@ -24,7 +25,7 @@ Number.prototype.pad = function(size) {
 	return s;
 }
 Number.prototype.round = function(decimal = 0) {
-	return Math.round(this * Math.pow(10, decimal)) / Math.pow(10, decimal);
+	return decimal < 0 ? Math.round(this * Math.pow(10, decimal)) / Math.pow(10, decimal) : this.toFixed(decimal);
 }
 module.exports = class UTILS {
 	output(t) {//general utility function
@@ -52,7 +53,7 @@ module.exports = class UTILS {
 		else return "";
 	}
 	round(num, decimal = 0) {
-		return Math.round(num * Math.pow(10, decimal)) / Math.pow(10, decimal);
+		return decimal < 0 ? Math.round(num * Math.pow(10, decimal)) / Math.pow(10, decimal) : num.toFixed(decimal);
 	}
 	assert(condition, message) {
 		if (typeof (condition) != "boolean") {
@@ -176,6 +177,9 @@ module.exports = class UTILS {
 		else if (lane == "MIDDLE" || lane == "MID") return 3;
 		else return 0;
 	}
+	positionToLane(position) {
+		return ["NONE", "TOP", "JUNGLE", "MIDDLE", "UTILITY", "BOTTOM"].indexOf(position);
+	}
 	opgg(region, username) {
 		this.assert(this.exists(username), "opgg link generator: username doesn't exist");
 		this.assert(this.exists(region), "opgg link generator: region doesn't exist");
@@ -226,7 +230,7 @@ module.exports = class UTILS {
 			}
 			else {
 				answer += { "I": "1", "II": "2", "III": "3", "IV": "4" }[info.rank];
-				if (info.wins + info.losses >= 10) answer += " ";
+				if (info.wins + info.losses >= 8) answer += " ";
 				else answer += "P";//placements, less than 10 games
 				if (LP < 0) answer += "-";//negative
 				else if (LP < 100) answer += "+";//less than 100
@@ -273,6 +277,7 @@ module.exports = class UTILS {
 	}
 	iMMRtoEnglish(mmr) {
 		//6-char representation
+		mmr = parseInt(mmr);
 		if (mmr < 100) return "******";
 		let answer = "";
 		if (mmr < 500) answer += "I";
@@ -287,7 +292,7 @@ module.exports = class UTILS {
 		let LP;
 		if (mmr < 2500) {//4 div tiers
 			answer += ["4", "3", "2", "1"][Math.floor(((mmr - 100) % 400) / 100)];
-			LP = " +" + this.round(mmr % 100).pad(2);
+			LP = " +" + Math.round(mmr % 100).pad(2);
 			answer += LP;
 		}
 		else {
@@ -401,7 +406,7 @@ module.exports = class UTILS {
 				++deleted;
 			}
 		}
-		return deleted;
+		return deleted;//number of deleted items
 	}
 	defaultChannelNames() {
 		return ["general", "bot", "bots", "bot-commands", "botcommands", "commands", "league", "lol", "supportbot", "support-bot", "games", "spam"];
@@ -452,12 +457,17 @@ module.exports = class UTILS {
 	map(x, in_min, in_max, out_min, out_max) {
 		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 	}
+	constrain(x, min, max) {
+		if (x <= min) return min;
+		else if (x >= max) return max;
+		return x;
+	}
 	conditionalFormat(text, surrounds, condition = true) {
 		return condition ? surrounds + text + surrounds : text;
 	}
-	accessLevel(CONFIG, msg, uid) {
+	accessLevel(CONFIG, msg, uid) {//uid optional
 		if (!this.exists(uid)) uid = msg.author.id;
-		if (this.exists(CONFIG.OWNER_DISCORD_IDS[uid]) && CONFIG.OWNER_DISCORD_IDS[uid].active) return CONFIG.CONSTANTS.BOTOWNERS;
+		if (this.exists(CONFIG.OWNER_DISCORD_IDS[uid]) && CONFIG.OWNER_DISCORD_IDS[uid].active) return CONFIG.CONSTANTS.BOTOWNERS;//if it's an owner id
 		const MEMBER = uid === msg.author.id ? msg.member : msg.guild.members.get(uid);
 		if (!this.exists(MEMBER)) return CONFIG.CONSTANTS.NORMALMEMBERS;//PM
 		else if (MEMBER.id === msg.guild.ownerID) return CONFIG.CONSTANTS.SERVEROWNERS;
@@ -622,7 +632,13 @@ module.exports = class UTILS {
 		var pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&');
 		for (var i = 0; i < pairs.length; i++) {
 			var pair = pairs[i].split('=');
-			query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+			if (this.exists(query[decodeURIComponent(pair[0])])) {//already exists, so must be a set
+				if (typeof(query[decodeURIComponent(pair[0])]) !== "object") {//is not an array yet
+					query[decodeURIComponent(pair[0])] = [query[decodeURIComponent(pair[0])]];//make array
+				}
+				query[decodeURIComponent(pair[0])].push(pair[1]);//put at end of array
+			}
+			else query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
 		}
 		return query;
 	}
@@ -683,5 +699,45 @@ module.exports = class UTILS {
 			else if (r === height - 1) answer += y_min;
 		}
 		return "```" + answer + "```";
+	}
+	strictParseInt(str) {
+		let ans = ""
+		for (let i = 0; i < str.length; ++i) {
+			const temp = parseInt(str[i]);
+			if (!isNaN(temp)) ans += temp;
+			else return NaN;
+		}
+		return parseInt(ans);
+	}
+	gnuPlotGoldAdvantageGraph(array_of_points, x_size = 52, y_size = 18) {//[{x, y}, ...]
+		let that = this;
+		return new Promise((resolve, reject) => {
+			const wincmd = "powershell.exe -Command \"\\\"" + array_of_points.map(p => p.x + " " + p.y).join("`n") + "\\\" | gnuplot -e \\\"set terminal dumb nofeed " + x_size + " " + y_size + "; set xlabel 'Minutes'; set tics scale 0; plot '-' with filledcurves y=0 notitle\\\"\"";
+			const linuxcmd = "printf \"" + array_of_points.map(p => p.x + " " + p.y).join("\\n") + "\\\" | gnuplot -e \"set terminal dumb nofeed " + x_size + " " + y_size + "; set xlabel 'Minutes'; set tics scale 0; plot '-' with filledcurves y=0 notitle\"";
+			if (process.platform === "win32") {
+				child_process.exec(wincmd, { timeout: 1000 }, (err, stdout, stderr) => {
+					if (err) reject(err);
+					if (that.exists(stderr) && stderr != "") reject(stderr);
+					else {
+						let answer = stdout.split("\n");
+						answer.splice(0, 1);//remove first line
+						answer.splice(answer.length - 1, 1);//remove last line
+						resolve(answer.join("\n"));
+					}
+				});
+			}
+			else {
+				child_process.exec(linuxcmd, { timeout: 1000 }, (err, stdout, stderr) => {
+					if (err) reject(err);
+					if (that.exists(stderr) && stderr != "") reject(stderr);
+					else {
+						let answer = stdout.split("\n");
+						answer.splice(0, 1);//remove first line
+						answer.splice(answer.length - 1, 1);//remove last line
+						resolve(answer.join("\n"));
+					}
+				});
+			}
+		});
 	}
 }

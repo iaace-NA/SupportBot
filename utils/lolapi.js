@@ -1,5 +1,5 @@
 "use strict";
-const UTILS = new (require("../utils.js"))();
+const UTILS = new (require("./utils.js"))();
 const fs = require("fs");
 const REQUEST = require("request");
 const XRegExp = require("xregexp");
@@ -18,7 +18,7 @@ const tags = {
 	tpv: "tpv"
 };
 module.exports = class LOLAPI {
-	constructor(INIT_CONFIG, request_id) {
+	constructor(INIT_CONFIG, request_id, internal = false, customGet) {
 		this.CONFIG = INIT_CONFIG;
 		this.request_id = request_id;
 		if (!UTILS.exists(this.CONFIG)) throw new Error("config.json required to access riot api.");
@@ -28,6 +28,10 @@ module.exports = class LOLAPI {
 		this.port = this.CONFIG.API_PORT;
 		this.created = new Date().getTime();
 		this.calls = 0;
+		this.internal = internal;
+		if (this.internal) {
+			this.customGet = customGet;
+		}
 	}
 	ping() {
 		return new Promise((resolve, reject) => {
@@ -48,32 +52,47 @@ module.exports = class LOLAPI {
 			UTILS.assert(UTILS.exists(tag), "API get: tag not specified");
 			let endpoint = "/lol/" + path + "?iapimaxage=" + maxage + "&iapirequest_id=" + this.request_id;
 			for (let i in options) {
-				endpoint += "&" + i + "=" + encodeURIComponent(options[i]);
+				if (typeof(options[i]) === "object") endpoint += options[i].map(e => "&" + i + "=" + encodeURIComponent(e)).join("");//array type
+				else endpoint += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
 			const iurl = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/" + tag + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&endpoint=" + encodeURIComponent(endpoint);
 			++that.calls;
-			this.request({ url: iurl, agentOptions }, (error, response, body) => {
-				if (UTILS.exists(error)) {
-					reject(error);
-				}
-				else {
-					try {
-						if (parseJSON) {
-							const answer = JSON.parse(body);
-							if (UTILS.exists(answer.status)) UTILS.output(iurl + " : " + body);
-							UTILS.assert(typeof(answer) === "object");
-							resolve(answer);
+			if (!this.internal) {
+				this.request({ url: iurl, agentOptions }, (error, response, body) => {
+					if (UTILS.exists(error)) {
+						reject(error);
+					}
+					else {
+						try {
+							if (parseJSON) {
+								const answer = JSON.parse(body);
+								if (UTILS.exists(answer.status)) UTILS.output(iurl + " : " + body);
+								UTILS.assert(typeof(answer) === "object");
+								resolve(answer);
+							}
+							else resolve(body);
 						}
-						else resolve(body);
+						catch (e) {
+							reject(e);
+						}
 					}
-					catch (e) {
-						reject(e);
+				});
+			}
+			else {
+				this.customGet(region, tag, endpoint, maxage, cachetime).then(body => {
+					if (parseJSON) {
+						const answer = JSON.parse(body);
+						if (UTILS.exists(answer.status)) UTILS.output(iurl + " : " + body);
+						UTILS.assert(typeof(answer) === "object");
+						resolve(answer);
 					}
-				}
-			});
+					else resolve(body);
+				}).catch(reject);
+			}
 		});
 	}
 	getIAPI(path, options, response_expected = true, json_expected = true) {//get internal API
+		if (this.internal) throw new Error("Can't call LOLAPI.getIAPI() in internal mode");
 		let that = this;
 		options.k = this.CONFIG.API_KEY;
 		return new Promise((resolve, reject) => {
@@ -166,18 +185,6 @@ module.exports = class LOLAPI {
 			}).catch(reject);
 		});
 	}
-	getSummonerIDFromNameOld(region, username, maxage) {
-		return new Promise((resolve, reject) => {
-			if(!(new XRegExp("^[0-9\\p{L} _\\.]+$").test(username))) {
-				UTILS.debug("username " + username + " didn't pass regex filter");
-				return resolve({ status: "username didn't pass regex filter" });
-			}
-			username = username.toLowerCase();
-			this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), tags.summoner, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage).then(answer => {
-				resolve(answer.name === ("rtbf" + answer.id) ? { status: "GDPR right to be forgotten" } : answer);
-			}).catch(reject);
-		});
-	}
 	getSummonerIDFromName(region, username, maxage) {
 		return new Promise((resolve, reject) => {
 			if(!(new XRegExp("^[0-9\\p{L} _\\.]+$").test(username))) {
@@ -242,9 +249,12 @@ module.exports = class LOLAPI {
 		for (let i in summonerIDs) requests.push(that.getChampionMastery(region, summonerIDs[i], maxage));
 		return Promise.all(requests);
 	}
-	getRecentGames(region, accountID, maxage, limit = 20) {
+	getRecentGames(region, accountID, maxage, limit = 20, ranked = false) {
+		const ranked_queues = [420, 440, 470];
 		return new Promise((resolve, reject) => {
-			this.get(region, "match/v4/matchlists/by-account/" + accountID, tags.matchhistory, { endIndex: 100 }, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage).then(matchlist => {
+			let opts = { endIndex: 100 };
+			if (ranked) opts.queue = ranked_queues;
+			this.get(region, "match/v4/matchlists/by-account/" + accountID, tags.matchhistory, opts, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage).then(matchlist => {
 				matchlist.matches = matchlist.matches.slice(0, limit);
 				matchlist.endIndex = matchlist.matches.length;
 				resolve(matchlist);
@@ -266,6 +276,9 @@ module.exports = class LOLAPI {
 	getMatchInformation(region, gameID, maxage) {
 		return this.get(region, "match/v4/matches/" + gameID, tags.match, {}, this.CONFIG.API_CACHETIME.GET_MATCH_INFORMATION, maxage);
 	}
+	getMatchTimeline(region, gameID, maxage) {
+		return this.get(region, "match/v4/timelines/by-match/" + gameID, tags.match, {}, this.CONFIG.API_CACHETIME.GET_MATCH_TIMELINE, maxage);
+	}
 	getMultipleMatchInformation(region, gameIDs, maxage) {
 		let that = this;
 		let requests = [];
@@ -275,6 +288,18 @@ module.exports = class LOLAPI {
 		}
 		else {
 			for (let i in gameIDs) requests.push(that.getMatchInformation(region, gameIDs[i], maxage));
+			return Promise.all(requests);
+		}
+	}
+	getMultipleMatchTimelines(region, gameIDs, maxage) {
+		let that = this;
+		let requests = [];
+		if (this.CONFIG.API_SEQUENTIAL) {
+			for (let i in gameIDs) requests.push(function () { return that.getMatchTimeline(region, gameIDs[i], maxage); });
+			return UTILS.sequential(requests);
+		}
+		else {
+			for (let i in gameIDs) requests.push(that.getMatchTimeline(region, gameIDs[i], maxage));
 			return Promise.all(requests);
 		}
 	}
@@ -296,16 +321,20 @@ module.exports = class LOLAPI {
 	getSummonerCard(region, username) {
 		const that = this;
 		return new Promise((resolve, reject) => {
-			that.getSummonerIDFromNameOld(region, username, this.CONFIG.API_MAXAGE.SUMMONER_CARD.SUMMONER_ID).then(result => {
-				that.getSummonerIDFromName(region, username, this.CONFIG.API_MAXAGE.SUMMONER_CARD.SUMMONER_ID).then(result6 => {
-					result.region = region;
-					result.guess = username;
-					if (!UTILS.exists(result.id)) reject();
-					that.getRanks(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RANKS).then(result2 => {
-						Promise.all(result2.map(r => that.getChallengerRanks(region, r.queueType, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHALLENGERS))).then(result5 => {
-							that.getChampionMastery(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHAMPION_MASTERY).then(result3 => {
-								that.getLiveMatch(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.LIVE_MATCH).then(result4 => {
-									resolve([result, result2, result3, result4, result5, result6]);
+			that.getSummonerIDFromName(region, username, this.CONFIG.API_MAXAGE.SUMMONER_CARD.SUMMONER_ID).then(result6 => {
+				result6.region = region;
+				result6.guess = username;
+				if (!UTILS.exists(result6.id)) reject();
+				that.getRanks(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RANKS).then(result2 => {
+					Promise.all(result2.map(r => that.getChallengerRanks(region, r.queueType, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHALLENGERS))).then(result5 => {
+						that.getChampionMastery(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHAMPION_MASTERY).then(result3 => {
+							that.getLiveMatch(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.LIVE_MATCH).then(result4 => {
+								that.getRecentGames(region, result6.accountId, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RECENT_GAMES).then(result7 => {
+									that.getMatchInformation(region, result7.matches[0].gameId, this.CONFIG.API_MAXAGE.SUMMONER_CARD.MATCH_INFORMATION).then(result8 => {
+										resolve([null, result2, result3, result4, result5, result6, result7, result8]);
+									}).catch(e => {
+										resolve([null, result2, result3, result4, result5, result6, result7, null]);
+									});
 								}).catch(reject);
 							}).catch(reject);
 						}).catch(reject);
