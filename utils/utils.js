@@ -709,17 +709,17 @@ module.exports = class UTILS {
 	gnuPlotGoldAdvantageGraph(array_of_points, x_size = 50, y_size = 18) {//[{x, y}, ...]
 		let that = this;
 		return new Promise((resolve, reject) => {
-			const wincmd = "\"" + array_of_points.map(p => p.x + " " + p.y).join("`n") + "\" | gnuplot -e \"set terminal dumb " + x_size + " " + y_size + "; set xlabel 'Minutes'; set tics scale 0; plot '-' with filledcurves y=0 notitle\"";
+			const wincmd = "-Command \"\\\"" + array_of_points.map(p => p.x + " " + p.y).join("`n") + "\\\" | gnuplot -e \\\"set terminal dumb " + x_size + " " + y_size + "; set xlabel 'Minutes'; set tics scale 0; plot '-' with filledcurves y=0 notitle\\\"\"";
 			const linuxcmd = "printf \"" + array_of_points.map(p => p.x + " " + p.y).join("\\n") + "\" | gnuplot -e \"set terminal dumb " + x_size + " " + y_size + "; set xlabel 'Minutes'; set tics scale 0; plot '-' with filledcurves y=0 notitle\"";
 			if (process.platform === "win32") {
-				child_process.exec(wincmd, { timeout: 1000, shell: "powershell.exe" }, (err, stdout, stderr) => {
+				child_process.exec("powershell.exe", [wincmd], { timeout: 1000, shell: "powershell.exe" }, (err, stdout, stderr) => {
 					if (err) reject(err);
 					if (that.exists(stderr) && stderr != "") reject(stderr);
 					else resolve(stdout);
 				});
 			}
 			else {
-				child_process.exec(linux, { timeout: 1000 }, (err, stdout, stderr) => {
+				child_process.exec(linuxcmd, { timeout: 1000 }, (err, stdout, stderr) => {
 					if (err) reject(err);
 					if (that.exists(stderr) && stderr != "") reject(stderr);
 					else resolve(stdout);
