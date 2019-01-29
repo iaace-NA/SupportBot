@@ -378,7 +378,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			reply(":x: No results for `" + username + "`." + suggestLink(guess_method));
 		});
 	});
-	commandGuessUsername(forcePrefix(["mh ", "matchhistory ", "rmh", "rankedmatchhistory"]), false, (index, region, username, parameter, guess_method) => {
+	commandGuessUsername(forcePrefix(["mh ", "matchhistory ", "rmh ", "rankedmatchhistory "]), false, (index, region, username, parameter, guess_method) => {
 		request_profiler.mark("mh command recognized");
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.MH.SUMMONER_ID).then(result => {
 			result.region = region;
