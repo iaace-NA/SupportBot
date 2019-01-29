@@ -1,6 +1,7 @@
 "use strict";
 let ta = require("./timeago.js");
 let seq = require("./promise-sequential.js");
+let child_process = require("child_process");
 String.prototype.replaceAll = function(search, replacement) {
 	let target = this;
 	return target.replace(new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replacement);
@@ -704,5 +705,14 @@ module.exports = class UTILS {
 			else return NaN;
 		}
 		return parseInt(ans);
+	}
+	gnuPlotGoldAdvantageGraph(array_of_points, x_size = 50, y_size = 18) {//[{x, y}, ...]
+		return new Promise((resolve, reject) => {
+			child_process.exec("printf \"" + array_of_points.map(p => p.x + " " + p.y).join("\\n") + "\" | gnuplot -e \"set terminal dumb " + x_size + " " + y_size + "; set xlabel 'Minutes'; set tics scale 0; plot '-' with filledcurves y=0 notitle\"", { timeout: 1000 }, (err, stdout, stderr) => {
+				if (err) reject(err);
+				if (UTILS.exists(stderr) && stderr != "") reject(stderr);
+				else resolve(stdout);
+			});
+		});
 	}
 }
