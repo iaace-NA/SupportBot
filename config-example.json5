@@ -124,7 +124,8 @@
 		"STATIC_CHAMPIONS": 10800,//3H
 		"STATIC_SPELLS": 10800,//3H
 		"GET_CHALLENGERS": 14400,//4H
-		"THIRD_PARTY_CODE": 30
+		"THIRD_PARTY_CODE": 30,
+		"GET_MATCH_TIMELINE": 15552000,//180D
 	},
 	"API_MAXAGE": {//maximum acceptable age (in seconds) of api data for a command. set to 0 to never use cached responses
 		"SD": 60,
@@ -157,7 +158,8 @@
 			"MATCH_INFORMATION": 15552000,
 			"MULTIPLE_RANKS": 86400,
 			"MULTIPLE_MASTERIES": 86400,
-			"OTHER_SUMMONER_ID": 86400
+			"OTHER_SUMMONER_ID": 86400,
+			"MATCH_TIMELINE": 15552000
 		},
 		"MULTI": {
 			"MULTIPLE_SUMMONER_ID": 86400,

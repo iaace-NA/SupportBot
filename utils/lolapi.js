@@ -276,6 +276,9 @@ module.exports = class LOLAPI {
 	getMatchInformation(region, gameID, maxage) {
 		return this.get(region, "match/v4/matches/" + gameID, tags.match, {}, this.CONFIG.API_CACHETIME.GET_MATCH_INFORMATION, maxage);
 	}
+	getMatchTimeline(region, gameID, maxage) {
+		return this.get(region, "match/v4/timelines/by-match/" + gameID, tags.match, {}, this.CONFIG.API_CACHETIME.GET_MATCH_TIMELINE, maxage);
+	}
 	getMultipleMatchInformation(region, gameIDs, maxage) {
 		let that = this;
 		let requests = [];
@@ -285,6 +288,18 @@ module.exports = class LOLAPI {
 		}
 		else {
 			for (let i in gameIDs) requests.push(that.getMatchInformation(region, gameIDs[i], maxage));
+			return Promise.all(requests);
+		}
+	}
+	getMultipleMatchTimelines(region, gameIDs, maxage) {
+		let that = this;
+		let requests = [];
+		if (this.CONFIG.API_SEQUENTIAL) {
+			for (let i in gameIDs) requests.push(function () { return that.getMatchTimeline(region, gameIDs[i], maxage); });
+			return UTILS.sequential(requests);
+		}
+		else {
+			for (let i in gameIDs) requests.push(that.getMatchTimeline(region, gameIDs[i], maxage));
 			return Promise.all(requests);
 		}
 	}
