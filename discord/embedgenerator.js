@@ -249,7 +249,7 @@ function transformTimelineToArray(match, timeline) {
 	let answer = [];
 	for (let i = 0; i < timeline.frames.length; ++i) {
 		let team_total_gold = { "100": 0, "200": 0 };
-		for (let j = 0; j < Object.keys(timeline.frames[i].participantFrames).length; ++j) {//for each participant frame
+		for (let j = 1; j <= Object.keys(timeline.frames[i].participantFrames).length; ++j) {//for each participant frame
 			team_total_gold[teams[j + ""]] += timeline.frames[i].participantFrames[j + ""].totalGold;
 		}
 		answer.push({ x: i, y: team_total_gold["200"] - team_total_gold["100"] });
