@@ -368,7 +368,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			replyEmbed(embedgenerator.status(status_object));
 		}).catch(console.error);
 	});
-	commandGuessUsername(forcePrefix([""]), false, (region, username, parameter, guess_method) => {
+	commandGuessUsername(forcePrefix([""]), false, (index, region, username, parameter, guess_method) => {
 		lolapi.getSummonerCard(region, username).then(result => {
 			lolapi.checkVerifiedAccount(msg.author.id, result[5].puuid, region).then(verified => {
 				replyEmbed(embedgenerator.detailedSummoner(CONFIG, result[5], result[1], result[2], CONFIG.REGIONS_REVERSE[region], result[3], result[4], verified));
@@ -378,12 +378,12 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			reply(":x: No results for `" + username + "`." + suggestLink(guess_method));
 		});
 	});
-	commandGuessUsername(forcePrefix(["mh ", "matchhistory "]), false, (region, username, parameter, guess_method) => {
+	commandGuessUsername(forcePrefix(["mh ", "matchhistory ", "rmh", "rankedmatchhistory"]), false, (index, region, username, parameter, guess_method) => {
 		request_profiler.mark("mh command recognized");
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.MH.SUMMONER_ID).then(result => {
 			result.region = region;
 			if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
-			lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.MH.RECENT_GAMES).then(matchhistory => {
+			lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.MH.RECENT_GAMES, undefined, index >= 2).then(matchhistory => {
 				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply("No recent matches found for `" + username + "`." + suggestLink(guess_method));
 				lolapi.getMultipleMatchInformation(region, matchhistory.matches.map(m => m.gameId), CONFIG.API_MAXAGE.MH.MULTIPLE_MATCH).then(matches => {
 					lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region).then(verified => {
@@ -486,7 +486,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	commandGuessUsername(forcePrefix(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "]), false, (region, username, parameter, guess_method) => {//new
+	commandGuessUsername(forcePrefix(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "]), false, (index, region, username, parameter, guess_method) => {//new
 		request_profiler.mark("lg command recognized");
 		//reply(":warning:We are processing the latest information for your command: if this message does not update within 5 minutes, try the same command again. Thank you for your patience.", nMsg => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.LG.SUMMONER_ID).then(result => {
@@ -520,13 +520,13 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 		}).catch(console.error);
 		//});
 	});
-	commandGuessUsernameNumber(forcePrefix(["mh", "matchhistory"]), false, (region, username, number, guess_method) => {
+	commandGuessUsernameNumber(forcePrefix(["mh", "matchhistory", "rmh", "rankedmatchhistory"]), false, (index, region, username, number, guess_method) => {
 		request_profiler.mark("dmh command recognized");
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.DMH.SUMMONER_ID).then(result => {
 			result.region = region;
 			result.guess = username;
 			if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
-			lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.DMH.RECENT_GAMES, 100).then(matchhistory => {
+			lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.DMH.RECENT_GAMES, 100, index >= 2).then(matchhistory => {
 				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
 				if (number < 1 || number > 100 || !UTILS.exists(matchhistory.matches[number - 1])) return reply(":x: This number is out of range.");
 				lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId, CONFIG.API_MAXAGE.DMH.MATCH_INFORMATION).then(match => {
@@ -554,7 +554,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	commandGuessUsername(forcePrefix(["championmastery ", "mastery "]), false, (region, username, parameter) => {
+	commandGuessUsername(forcePrefix(["championmastery ", "mastery "]), false, (index, region, username, parameter) => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.CM.SUMMONER_ID).then(result => {
 			Promise.all([lolapi.getChampionMastery(region, result.id, CONFIG.API_MAXAGE.CM.CHAMPION_MASTERY), lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region)]).then(parallel => {
 				let cm = parallel[0];
@@ -563,7 +563,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	commandGuessUsername(forcePrefix(["mmr "]), false, (region, username, parameter) => {
+	commandGuessUsername(forcePrefix(["mmr "]), false, (index, region, username, parameter) => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.MMR_JOKE.SUMMONER_ID).then(result => {
 			lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region).then(verified => {
 				result.region = region;
@@ -718,12 +718,12 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 						lolapi.getLink(msg.mentions.users.first().id).then(result => {
 							let username = msg.mentions.users.first().username;//suppose the link doesn't exist in the database
 							if (UTILS.exists(result.username) && result.username != "") username = result.username;//link exists
-							callback(region, username, parameter, 4);
+							callback(index, region, username, parameter, 4);
 						}).catch(console.error);
 					}
 					else if (parameter.substring(parameter.indexOf(" ") + 1)[0] == "$") {
 						lolapi.getShortcut(msg.author.id, parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)).then(result => {
-							callback(region, result[parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)], parameter.substring(0, parameter.indexOf(" ")), 1);
+							callback(index, region, result[parameter.substring(parameter.indexOf(" ") + 1).toLowerCase().substring(1)], parameter.substring(0, parameter.indexOf(" ")), 1);
 						}).catch(e => {
 							if (e) reply(":x: An error has occurred. The shortcut may not exist.");
 						});
@@ -743,10 +743,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 								}
 							}
 							if (!UTILS.exists(username)) reply(":x: Could not find a recent username queried.");
-							else callback(region, username, parameter.substring(0, parameter.indexOf(" ")), 5);
+							else callback(index, region, username, parameter.substring(0, parameter.indexOf(" ")), 5);
 						}).catch(console.error);
 					}
-					else callback(region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")), 0);
+					else callback(index, region, parameter.substring(parameter.indexOf(" ") + 1), parameter.substring(0, parameter.indexOf(" ")), 0);
 					return true;
 				}
 			}
@@ -758,9 +758,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 						let username = msg.author.username;//suppose the link doesn't exist in the database
 						if (UTILS.exists(result.username) && result.username != "") {
 							username = result.username;//link exists
-							callback(region, username, parameter, 2);
+							callback(index, region, username, parameter, 2);
 						}
-						else callback(region, username, parameter, 3);
+						else callback(index, region, username, parameter, 3);
 					}).catch(console.error);
 					return true;
 				}
@@ -791,12 +791,12 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 						lolapi.getLink(msg.mentions.users.first().id).then(result => {
 							let username = msg.mentions.users.first().username;//suppose the link doesn't exist in the database
 							if (UTILS.exists(result.username) && result.username != "") username = result.username;//link exists
-							callback(region, username, number, 4);
+							callback(index, region, username, number, 4);
 						}).catch(console.error);
 					}
 					else if (parameter.substring(parameter.indexOfInstance(" ", 2) + 1)[0] == "$") {
 						lolapi.getShortcut(msg.author.id, parameter.substring(parameter.indexOfInstance(" ", 2) + 1).toLowerCase().substring(1)).then(result => {
-							callback(region, result[parameter.substring(parameter.indexOfInstance(" ", 2) + 1).toLowerCase().substring(1)], number, 1);
+							callback(index, region, result[parameter.substring(parameter.indexOfInstance(" ", 2) + 1).toLowerCase().substring(1)], number, 1);
 						}).catch(e => {
 							if (e) reply(":x: An error has occurred. The shortcut may not exist.");
 						});
@@ -816,10 +816,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 								}
 							}
 							if (!UTILS.exists(username)) reply(":x: Could not find a recent username queried.");
-							else callback(region, username, number, 5);
+							else callback(index, region, username, number, 5);
 						}).catch(console.error);
 					}
-					else callback(region, parameter.substring(parameter.indexOfInstance(" ", 2) + 1), number, 0);
+					else callback(index, region, parameter.substring(parameter.indexOfInstance(" ", 2) + 1), number, 0);
 					return true;
 				}
 			}
@@ -831,9 +831,9 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 						let username = msg.author.username;//suppose the link doesn't exist in the database
 						if (UTILS.exists(result.username) && result.username != "") {
 							username = result.username;//link exists
-							callback(region, username, number, 2);
+							callback(index, region, username, number, 2);
 						}
-						else callback(region, username, number, 3);
+						else callback(index, region, username, number, 3);
 						return true;
 					}).catch(console.error);
 				}
