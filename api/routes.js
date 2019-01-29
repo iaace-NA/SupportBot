@@ -349,7 +349,7 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 	serveWebRequest("/existspreferences", (req, res, next) => {
 		findPreferences(req.query.id, res, doc => {
 			let answer = false;
-			if (!UTILS.exists(doc) || apicache.Types.ObjectId(doc._id).getTimestamp().getTime() > new Date().getTime() - 10000) answer = true;
+			if (!UTILS.exists(doc) || apicache.Types.ObjectId(doc._id).getTimestamp().getTime() > new Date().getTime() - 20000) answer = true;
 			res.json({ new: answer });
 		});
 	}, true);
