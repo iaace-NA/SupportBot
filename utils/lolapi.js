@@ -185,18 +185,6 @@ module.exports = class LOLAPI {
 			}).catch(reject);
 		});
 	}
-	getSummonerIDFromNameOld(region, username, maxage) {
-		return new Promise((resolve, reject) => {
-			if(!(new XRegExp("^[0-9\\p{L} _\\.]+$").test(username))) {
-				UTILS.debug("username " + username + " didn't pass regex filter");
-				return resolve({ status: "username didn't pass regex filter" });
-			}
-			username = username.toLowerCase();
-			this.get(region, "summoner/v3/summoners/by-name/" + encodeURIComponent(username), tags.summoner, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage).then(answer => {
-				resolve(answer.name === ("rtbf" + answer.id) ? { status: "GDPR right to be forgotten" } : answer);
-			}).catch(reject);
-		});
-	}
 	getSummonerIDFromName(region, username, maxage) {
 		return new Promise((resolve, reject) => {
 			if(!(new XRegExp("^[0-9\\p{L} _\\.]+$").test(username))) {
@@ -318,17 +306,15 @@ module.exports = class LOLAPI {
 	getSummonerCard(region, username) {
 		const that = this;
 		return new Promise((resolve, reject) => {
-			that.getSummonerIDFromNameOld(region, username, this.CONFIG.API_MAXAGE.SUMMONER_CARD.SUMMONER_ID).then(result => {
-				that.getSummonerIDFromName(region, username, this.CONFIG.API_MAXAGE.SUMMONER_CARD.SUMMONER_ID).then(result6 => {
-					result.region = region;
-					result.guess = username;
-					if (!UTILS.exists(result.id)) reject();
-					that.getRanks(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RANKS).then(result2 => {
-						Promise.all(result2.map(r => that.getChallengerRanks(region, r.queueType, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHALLENGERS))).then(result5 => {
-							that.getChampionMastery(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHAMPION_MASTERY).then(result3 => {
-								that.getLiveMatch(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.LIVE_MATCH).then(result4 => {
-									resolve([result, result2, result3, result4, result5, result6]);
-								}).catch(reject);
+			that.getSummonerIDFromName(region, username, this.CONFIG.API_MAXAGE.SUMMONER_CARD.SUMMONER_ID).then(result6 => {
+				result.region = region;
+				result.guess = username;
+				if (!UTILS.exists(result.id)) reject();
+				that.getRanks(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RANKS).then(result2 => {
+					Promise.all(result2.map(r => that.getChallengerRanks(region, r.queueType, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHALLENGERS))).then(result5 => {
+						that.getChampionMastery(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHAMPION_MASTERY).then(result3 => {
+							that.getLiveMatch(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.LIVE_MATCH).then(result4 => {
+								resolve([null, result2, result3, result4, result5, result6]);
 							}).catch(reject);
 						}).catch(reject);
 					}).catch(reject);
