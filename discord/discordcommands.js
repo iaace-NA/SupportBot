@@ -216,8 +216,15 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	command([preferences.get("prefix") + "releasenotify "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		wsapi.lnotify(msg.author.username, msg.author.displayAvatarURL, parameter, true);
 	});
-	command([preferences.get("prefix") + "testembed"], false, false, () => {
-		replyEmbed(embedgenerator.test());
+	command([preferences.get("prefix") + "testembed"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
+		replyEmbed(embedgenerator.test("Original behavior"));
+		replyEmbed([{ r: embedgenerator.test("t=0 only"), t: 0 }]);
+		replyEmbed([{ r: embedgenerator.test("t=0"), t: 0 }, { r: embedgenerator.test("t=5000"), t: 5000 }, { r: embedgenerator.test("t=10000"), t: 10000 }, { r: embedgenerator.test("t=15000"), t: 15000 }]);
+	});
+	command([preferences.get("prefix") + "testreply"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
+		reply("Original behavior");
+		reply([{ r: "t=0 only", t: 0 }]);
+		reply([{ r: "t=0", t: 0 }, { r: "t=5000", t: 5000 }, { r: "t=10000", t: 10000 }, { r: "t=15000", t: 15000 }]);
 	});
 	command([preferences.get("prefix") + "sd ", preferences.get("prefix") + "summonerdebug "], true, false, (original, index, parameter) => {
 		lolapi.getSummonerIDFromName(assertRegion(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.SD).then(result => {
@@ -868,36 +875,25 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 		return answer;
 	}
 	function reply(reply_text, callback, errorCallback) {
-		printMessage("reply (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
-		lolapi.terminate(msg, ACCESS_LEVEL, reply_text);
-		msg.channel.send(reply_text, { split: true }).then((nMsg) => {
-			if (UTILS.exists(callback)) callback(nMsg);
-		}).catch((e) => {
-			console.error(e);
-			if (UTILS.exists(errorCallback)) errorCallback(e);
-		});
-	}
-
-	function replyToAuthor(reply_text, callback, errorCallback) {
-		printMessage("reply to author (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
-		lolapi.terminate(msg, ACCESS_LEVEL, reply_text);
-		msg.author.send(reply_text, { split: true }).then((nMsg) => {
-			if (UTILS.exists(callback)) callback(nMsg);
-		}).catch((e) => {
-			console.error(e);
-			if (UTILS.exists(errorCallback)) errorCallback(e);
-		});
-	}
-
-	function replyEmbed(reply_embed, callback, errorCallback) {
-		if (!msg.PM && !msg.channel.permissionsFor(client.user).has(["EMBED_LINKS"])) {//doesn't have permission to embed links in server
-			lolapi.terminate(msg, ACCESS_LEVEL, ":x: I cannot respond to your request without the \"embed links\" permission.");
-			reply(":x: I cannot respond to your request without the \"embed links\" permission.");
+		if (Array.isArray(reply_text)) {//[{r: string, t: 0}, {}]
+			printMessage("reply (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text[0].r + "\n");
+			lolapi.terminate(msg, ACCESS_LEVEL, reply_text[0].r);
+			msg.channel.send(reply_text[0].r, { split: true }).then((nMsg) => {
+				if (UTILS.exists(callback)) callback(nMsg);
+				for (let i = 1; i < reply_text.length; ++i) {
+					setTimeout(() => {
+						nMsg.edit(reply_text[i].r).catch(e => UTILS.debug(e));
+					}, reply_text[i].t)
+				}
+			}).catch((e) => {
+				console.error(e);
+				if (UTILS.exists(errorCallback)) errorCallback(e);
+			});
 		}
-		else {//has permission to embed links, or is a DM/PM
-			printMessage("reply embedded (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
-			lolapi.terminate(msg, ACCESS_LEVEL, undefined, reply_embed);
-			msg.channel.send("", { embed: reply_embed }).then((nMsg) => {
+		else {//just a string
+			printMessage("reply (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
+			lolapi.terminate(msg, ACCESS_LEVEL, reply_text);
+			msg.channel.send(reply_text, { split: true }).then((nMsg) => {
 				if (UTILS.exists(callback)) callback(nMsg);
 			}).catch((e) => {
 				console.error(e);
@@ -906,15 +902,94 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 		}
 	}
 
+	function replyToAuthor(reply_text, callback, errorCallback) {
+		if (Array.isArray(reply_text)) {//[{r: string, t: 0}, {}]
+			printMessage("reply to author (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text[0].r + "\n");
+			lolapi.terminate(msg, ACCESS_LEVEL, reply_text[0].r);
+			msg.author.send(reply_text[0].r, { split: true }).then((nMsg) => {
+				if (UTILS.exists(callback)) callback(nMsg);
+				for (let i = 1; i < reply_text.length; ++i) {
+					setTimeout(() => {
+						nMsg.edit(reply_text[i].r).catch(e => UTILS.debug(e));
+					}, reply_text[i].t)
+				}
+			}).catch((e) => {
+				console.error(e);
+				if (UTILS.exists(errorCallback)) errorCallback(e);
+			});
+		}
+		else {
+			printMessage("reply to author (" + (new Date().getTime() - msg_receive_time) + "ms): " + reply_text + "\n");
+			lolapi.terminate(msg, ACCESS_LEVEL, reply_text);
+			msg.author.send(reply_text, { split: true }).then((nMsg) => {
+				if (UTILS.exists(callback)) callback(nMsg);
+			}).catch((e) => {
+				console.error(e);
+				if (UTILS.exists(errorCallback)) errorCallback(e);
+			});
+		}
+	}
+
+	function replyEmbed(reply_embed, callback, errorCallback) {
+		if (!msg.PM && !msg.channel.permissionsFor(client.user).has(["EMBED_LINKS"])) {//doesn't have permission to embed links in server
+			lolapi.terminate(msg, ACCESS_LEVEL, ":x: I cannot respond to your request without the \"embed links\" permission.");
+			reply(":x: I cannot respond to your request without the \"embed links\" permission.");
+		}
+		else {//has permission to embed links, or is a DM/PM
+			if (Array.isArray(reply_embed)) {//[{r: embed_object, t: 0}, {}]
+				printMessage("reply embedded (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
+				lolapi.terminate(msg, ACCESS_LEVEL, undefined, reply_embed[0].r);
+				msg.channel.send("", { embed: reply_embed[0].r }).then((nMsg) => {
+					if (UTILS.exists(callback)) callback(nMsg);
+					for (let i = 1; i < reply_embed.length; ++i) {
+						setTimeout(() => {
+							nMsg.edit("", { embed: reply_embed[i].r }).catch(e => UTILS.debug(e));
+						}, reply_embed[i].t);
+					}
+				}).catch((e) => {
+					console.error(e);
+					if (UTILS.exists(errorCallback)) errorCallback(e);
+				});
+			}
+			else {
+				printMessage("reply embedded (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
+				lolapi.terminate(msg, ACCESS_LEVEL, undefined, reply_embed);
+				msg.channel.send("", { embed: reply_embed }).then((nMsg) => {
+					if (UTILS.exists(callback)) callback(nMsg);
+				}).catch((e) => {
+					console.error(e);
+					if (UTILS.exists(errorCallback)) errorCallback(e);
+				});
+			}
+		}
+	}
+
 	function replyEmbedToAuthor(reply_embed, callback, errorCallback) {
-		printMessage("reply embedded to author (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
-		lolapi.terminate(msg, ACCESS_LEVEL, undefined, reply_embed);
-		msg.author.send("", { embed: reply_embed }).then((nMsg) => {
-			if (UTILS.exists(callback)) callback(nMsg);
-		}).catch((e) => {
-			console.error(e);
-			if (UTILS.exists(errorCallback)) errorCallback(e);
-		});
+		if (Array.isArray(reply_embed)) {
+			printMessage("reply embedded to author (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
+			lolapi.terminate(msg, ACCESS_LEVEL, undefined, reply_embed[0].r);
+			msg.author.send("", { embed: reply_embed[0].r }).then((nMsg) => {
+				if (UTILS.exists(callback)) callback(nMsg);
+				for (let i = 1; i < reply_embed.length; ++i) {
+					setTimeout(() => {
+						nMsg.edit("", { embed: reply_embed[i].r }).catch(e => UTILS.debug(e));
+					}, reply_embed[i].t);
+				}
+			}).catch((e) => {
+				console.error(e);
+				if (UTILS.exists(errorCallback)) errorCallback(e);
+			});
+		}
+		else {
+			printMessage("reply embedded to author (" + (new Date().getTime() - msg_receive_time) + "ms)\n");
+			lolapi.terminate(msg, ACCESS_LEVEL, undefined, reply_embed);
+			msg.author.send("", { embed: reply_embed }).then((nMsg) => {
+				if (UTILS.exists(callback)) callback(nMsg);
+			}).catch((e) => {
+				console.error(e);
+				if (UTILS.exists(errorCallback)) errorCallback(e);
+			});
+		}
 	}
 
 	function printMessage(x = "") {

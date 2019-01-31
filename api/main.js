@@ -7,7 +7,7 @@ let CONFIG;
 const JSON5 = require("json5");
 try {
 	CONFIG = JSON5.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.7.1";//b for non-release (in development)
+	CONFIG.VERSION = "v1.7.2";//b for non-release (in development)
 }
 catch (e) {
 	console.log("something's wrong with config.json");
@@ -78,7 +78,7 @@ const express = require("express");
 const website = express();
 
 const UTILS = new (require("../utils/utils.js"))();
-let Profiler = require("../timeprofiler.js");
+let Profiler = require("../utils/timeprofiler.js");
 let request = require("request");
 let wsRoutes = require("./websockets.js");
 let routes = require("./routes.js");

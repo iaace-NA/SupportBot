@@ -258,10 +258,10 @@ function transformTimelineToArray(match, timeline) {
 }
 module.exports = class EmbedGenerator {
 	constructor() { }
-	test() {
+	test(x = "") {
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor("Author \\🇺🇸");
-		newEmbed.setTitle("Test 🇺🇸");
+		newEmbed.setTitle("Test 🇺🇸: " + x);
 		newEmbed.setDescription("description 🇺🇸");
 		newEmbed.addField("field title 🇺🇸", "field desc 🇺🇸");
 		newEmbed.setFooter("Footer 🇺🇸");
