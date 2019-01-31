@@ -216,12 +216,12 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	command([preferences.get("prefix") + "releasenotify "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		wsapi.lnotify(msg.author.username, msg.author.displayAvatarURL, parameter, true);
 	});
-	command([preferences.get("prefix") + "testembed"], false, false, () => {
+	command([preferences.get("prefix") + "testembed"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 		replyEmbed(embedgenerator.test("Original behavior"));
 		replyEmbed([{ r: embedgenerator.test("t=0 only"), t: 0 }]);
 		replyEmbed([{ r: embedgenerator.test("t=0"), t: 0 }, { r: embedgenerator.test("t=5000"), t: 5000 }, { r: embedgenerator.test("t=10000"), t: 10000 }, { r: embedgenerator.test("t=15000"), t: 15000 }]);
 	});
-	command([preferences.get("prefix") + "testreply"], false, false, () => {
+	command([preferences.get("prefix") + "testreply"], false, CONFIG.CONSTANTS.BOTOWNERS, () => {
 		reply("Original behavior");
 		reply([{ r: "t=0 only", t: 0 }]);
 		reply([{ r: "t=0", t: 0 }, { r: "t=5000", t: 5000 }, { r: "t=10000", t: 10000 }, { r: "t=15000", t: 15000 }]);
