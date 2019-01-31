@@ -78,7 +78,7 @@ const express = require("express");
 const website = express();
 
 const UTILS = new (require("../utils/utils.js"))();
-let Profiler = require("../timeprofiler.js");
+let Profiler = require("../utils/timeprofiler.js");
 let request = require("request");
 let wsRoutes = require("./websockets.js");
 let routes = require("./routes.js");
