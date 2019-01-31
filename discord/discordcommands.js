@@ -938,8 +938,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 					if (UTILS.exists(callback)) callback(nMsg);
 					for (let i = 1; i < reply_embed.length; ++i) {
 						setTimeout(() => {
-							nMsg.edit("", { embed: reply_text[i].r }).catch(e => UTILS.debug(e));
-						}, reply_text[i].t);
+							nMsg.edit("", { embed: reply_embed[i].r }).catch(e => UTILS.debug(e));
+						}, reply_embed[i].t);
 					}
 				}).catch((e) => {
 					console.error(e);
@@ -967,8 +967,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 				if (UTILS.exists(callback)) callback(nMsg);
 				for (let i = 1; i < reply_embed.length; ++i) {
 					setTimeout(() => {
-						nMsg.edit("", { embed: reply_text[i].r }).catch(e => UTILS.debug(e));
-					}, reply_text[i].t);
+						nMsg.edit("", { embed: reply_embed[i].r }).catch(e => UTILS.debug(e));
+					}, reply_embed[i].t);
 				}
 			}).catch((e) => {
 				console.error(e);
