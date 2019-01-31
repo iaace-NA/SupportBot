@@ -221,6 +221,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 		replyEmbed([{ r: embedgenerator.test("t=0 only"), t: 0 }]);
 		replyEmbed([{ r: embedgenerator.test("t=0"), t: 0 }, { r: embedgenerator.test("t=5000"), t: 5000 }, { r: embedgenerator.test("t=10000"), t: 10000 }, { r: embedgenerator.test("t=15000"), t: 15000 }]);
 	});
+	command([preferences.get("prefix") + "testreply"], false, false, () => {
+		reply("Original behavior");
+		reply([{ r: "t=0 only", t: 0 }]);
+		reply([{ r: "t=0", t: 0 }, { r: "t=5000", t: 5000 }, { r: "t=10000", t: 10000 }, { r: "t=15000", t: 15000 }]);
+	});
 	command([preferences.get("prefix") + "sd ", preferences.get("prefix") + "summonerdebug "], true, false, (original, index, parameter) => {
 		lolapi.getSummonerIDFromName(assertRegion(parameter.substring(0, parameter.indexOf(" "))), parameter.substring(parameter.indexOf(" ") + 1), CONFIG.API_MAXAGE.SD).then(result => {
 			result.guess = parameter.substring(parameter.indexOf(" ") + 1);
