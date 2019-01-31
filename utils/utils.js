@@ -178,7 +178,7 @@ module.exports = class UTILS {
 		else return 0;
 	}
 	positionToLane(position) {
-		return ["NONE", "TOP", "JUNGLE", "MIDDLE", "UTILITY", "BOTTOM"].indexOf(position);
+		return ["APEX", "TOP", "JUNGLE", "MIDDLE", "UTILITY", "BOTTOM"].indexOf(position);
 	}
 	opgg(region, username) {
 		this.assert(this.exists(username), "opgg link generator: username doesn't exist");
