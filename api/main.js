@@ -168,7 +168,8 @@ let server_preferences_doc = new apicache.Schema({
 	//region: { type: String, required: true, default: "" },//default server region, LoL ("" = disabled)
 	auto_opgg: { type: Boolean, required: true, default: true },//automatically embed respond to op.gg links
 	force_prefix: { type: Boolean, required: true, default: false },
-	release_notifications: { type: Boolean, required: true, default: true }
+	release_notifications: { type: Boolean, required: true, default: true },
+	feedback_enabled: { type: Boolean, required: true, default: true}
 	//music
 	/*
 	max_music_length: { type: Number, required: true, default: 360 },//in seconds
