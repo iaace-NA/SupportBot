@@ -41,6 +41,11 @@ League of Legends Statistics for Discord
   - Server moderators
   - Server bot commanders
   - Normal members
+- Records of all commands used
+  - Time to respond
+  - Cache hit rate
+  - All related IDs
+  - Audit logs automatically remove entries older than 1 year (default)
 ## Format of Repository
 ### Branches:
 - major: unstable, next major revision v+.0.0 : we removed a feature
