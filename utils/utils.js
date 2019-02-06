@@ -25,7 +25,7 @@ Number.prototype.pad = function(size) {
 	return s;
 }
 Number.prototype.round = function(decimal = 0) {
-	return decimal < 0 ? Math.round(this * Math.pow(10, decimal)) / Math.pow(10, decimal) : this.toFixed(decimal);
+	return Math.round(this * Math.pow(10, decimal)) / Math.pow(10, decimal);
 }
 module.exports = class UTILS {
 	output(t) {//general utility function
@@ -53,7 +53,7 @@ module.exports = class UTILS {
 		else return "";
 	}
 	round(num, decimal = 0) {
-		return decimal < 0 ? Math.round(num * Math.pow(10, decimal)) / Math.pow(10, decimal) : num.toFixed(decimal);
+		return Math.round(num * Math.pow(10, decimal)) / Math.pow(10, decimal);
 	}
 	assert(condition, message) {
 		if (typeof (condition) != "boolean") {
