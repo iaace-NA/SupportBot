@@ -73,6 +73,7 @@ module.exports = class LOLAPI {
 							else resolve(body);
 						}
 						catch (e) {
+							UTILS.output("Failed to parse JSON for:\n" + iurl + "\n" + body);
 							reject(e);
 						}
 					}
