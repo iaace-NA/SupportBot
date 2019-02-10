@@ -51,7 +51,10 @@ const queues = {
 	"1050": "OE Crewmember",
 	"1060": "OE Captain",
 	"1070": "OE Onslaught",
-	"1200": "NB Nexus Blitz"
+	"1200": "NB Nexus Blitz",
+	"2000": "SR Tutorial 1",
+	"2010": "SR Tutorial 2",
+	"2020": "SR Tutorial 3"
 };
 const MMR_JOKES = [
 	["We recommend using a mouse and keyboard when playing League of Legends.",//below bronze
