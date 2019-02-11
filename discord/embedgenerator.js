@@ -518,12 +518,13 @@ module.exports = class EmbedGenerator {
 			let teams = {};
 			for (let b in match.participantIdentities) {
 				const pI = match.participantIdentities[b];
+				const p = match.participants.find(p => pI.participantId == p.participantId);
 				const flex_5 = ranks[b].find(r => r.queueType === "RANKED_FLEX_SR");
 				const flex_3 = ranks[b].find(r => r.queueType === "RANKED_FLEX_TT");
 				const solo = ranks[b].find(r => r.queueType === "RANKED_SOLO_5x5");
-				pI.flex5 = "`" + UTILS.shortRank(flex_5) + "`";
-				pI.flex3 = "`" + UTILS.shortRank(flex_3) + "`";
-				pI.solo = "`" + UTILS.shortRank(solo) + "`";
+				pI.flex5 = "`" + UTILS.shortRank(flex_5, match.mapId, p.highestAchievedSeasonTier) + "`";
+				pI.flex3 = "`" + UTILS.shortRank(flex_3, match.mapId, p.highestAchievedSeasonTier) + "`";
+				pI.solo = "`" + UTILS.shortRank(solo, match.mapId, p.highestAchievedSeasonTier) + "`";
 				pI.mastery = UTILS.getSingleChampionMastery(masteries[b], match.participants.find(p => p.participantId == pI.participantId).championId);
 			}
 			for (let b in match.participants) {

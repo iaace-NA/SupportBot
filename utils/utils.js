@@ -186,7 +186,8 @@ module.exports = class UTILS {
 		if (region == "KR") region = "www";//account for kr region special www opgg link
 		return "http://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
 	}
-	shortRank(info) {
+	shortRank(info, mapId, lsr) {
+		//lsr = last season's rank
 		//****** unranked
 		//XXXXXX unranked
 		//██████ unranked
@@ -197,7 +198,21 @@ module.exports = class UTILS {
 		//G2↑ L- Gold 2 promotion, 1 loss
 		//C +256 Challenger, 256LP
 		//C+1256 Challenger 1256 LP
-		if (!this.exists(info)) return "******";
+		if (!this.exists(info)) {
+			/*
+			LSR:
+			S8BRON
+			S8SILV
+			S8GOLD
+			S8PLAT
+			S8DIAM
+			S8MAST
+			S8CHAL
+			*/
+			if (mapId == 11 && (info.queueType == "RANKED_FLEX_SR" || info.queueType == "RANKED_SOLO_5x5") && lsr != "UNRANKED") return "S8" + lsr.substring(0, 4).toUpperCase();
+			else if (mapId == 4 && info.queueType == "RANKED_FLEX_TT" && lsr != "UNRANKED") return "S8" + lsr.substring(0, 4).toUpperCase();
+			return "******";
+		}
 		let answer = "";
 		answer += info.tier[0];
 		if (this.exists(info.miniSeries)) {//series
