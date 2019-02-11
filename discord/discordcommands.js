@@ -151,26 +151,28 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			replyEmbed(embedgenerator.actionReport(CONFIG, parameter, results[parameter]));
 		}).catch();
 	});
-	command([preferences.get("prefix") + "complain ", preferences.get("prefix") + "praise ", preferences.get("prefix") + "suggest "], true, false, (original, index) => {
-		lolapi.userHistory(msg.author.id).then(uH => {
-			if (!msg.PM) lolapi.serverHistory(msg.guild.id).then(gH => step2(gH[msg.guild.id])).catch(console.error);
-			else step2(null);
-			function step2(gH) {
-				sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, index + 1, 1, msg, uH[msg.author.id], gH), true);
-				reply(":white_check_mark: Thank you for your feedback!");
-			}
-		}).catch(console.error);
-	});
-	command([preferences.get("prefix") + "question ", preferences.get("prefix") + "ask "], true, false, (original, index) => {
-		lolapi.userHistory(msg.author.id).then(uH => {
-			if (!msg.PM) lolapi.serverHistory(msg.guild.id).then(gH => step2(gH[msg.guild.id]));
-			else step2(null);
-			function step2(gH) {
-				sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, 4, 1, msg, uH[msg.author.id], gH));
-				reply(":white_check_mark: Thank you for your question! Someone from our staff will respond by SupportBot PM as soon as possible.");
-			}
+	if (preferences.get("feedback_enabled")) {
+		command([preferences.get("prefix") + "complain ", preferences.get("prefix") + "praise ", preferences.get("prefix") + "suggest "], true, false, (original, index) => {
+			lolapi.userHistory(msg.author.id).then(uH => {
+				if (!msg.PM) lolapi.serverHistory(msg.guild.id).then(gH => step2(gH[msg.guild.id])).catch(console.error);
+				else step2(null);
+				function step2(gH) {
+					sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, index + 1, 1, msg, uH[msg.author.id], gH), true);
+					reply(":white_check_mark: Thank you for your feedback!");
+				}
+			}).catch(console.error);
 		});
-	});
+		command([preferences.get("prefix") + "question ", preferences.get("prefix") + "ask "], true, false, (original, index) => {
+			lolapi.userHistory(msg.author.id).then(uH => {
+				if (!msg.PM) lolapi.serverHistory(msg.guild.id).then(gH => step2(gH[msg.guild.id]));
+				else step2(null);
+				function step2(gH) {
+					sendEmbedToChannel(CONFIG.FEEDBACK.EXTERNAL_CID, embedgenerator.feedback(CONFIG, 4, 1, msg, uH[msg.author.id], gH));
+					reply(":white_check_mark: Thank you for your question! Someone from our staff will respond by SupportBot PM as soon as possible.");
+				}
+			});
+		});
+	}
 	command([preferences.get("prefix") + "permissionstest", preferences.get("prefix") + "pt"], false, false, () => {
 		reply("You have " + ["normal", "bot commander", "moderator", "server admin", "server owner", "bot owner"][ACCESS_LEVEL] + " permissions.");
 	});
@@ -606,6 +608,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 		command([preferences.get("prefix") + "setting release-notifications on", preferences.get("prefix") + "setting release-notifications off"], false, CONFIG.CONSTANTS.ADMINISTRATORS, (original, index) => {
 			const new_setting = index === 0 ? true : false;
 			preferences.set("release_notifications", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will show new release notifications." : "SupportBot will not show new release notifications."))).catch(reply);
+		});
+		command([preferences.get("prefix") + "setting global-feedback on", preferences.get("prefix") + "setting global-feedback off"], false, CONFIG.CONSTANTS.MODERATORS, (original, index) => {
+			const new_setting = index === 0 ? true : false;
+			preferences.set("feedback_enabled", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will allow the use of global feedback commands in this server." : "SupportBot will not allow the use of global feedback commands in this server."))).catch(reply);
 		});
 		command(["supportbot settings reset all"], false, CONFIG.CONSTANTS.ADMINISTRATORS, () => reply(":warning: You are about to reset all the preferences associated with this server. To confirm this action, please send the command: `supportbot settings reset all confirm`"));
 		command(["supportbot settings reset all confirm"], false, CONFIG.CONSTANTS.ADMINISTRATORS, () => {

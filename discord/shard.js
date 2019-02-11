@@ -17,7 +17,7 @@ let CONFIG;
 const JSON5 = require("json5");
 try {
 	CONFIG = JSON5.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.7.2";//b for non-release (in development)
+	CONFIG.VERSION = "v1.7.3";//b for non-release (in development)
 	CONFIG.BANS = {};
 }
 catch (e) {
@@ -39,10 +39,8 @@ loadAllStaticResources(() => {
 let initial_start = true;
 client.on("ready", function () {
 	UTILS.output(initial_start ? "discord user login success" : "discord reconnected");
-	if (process.env.SHARD_ID == 0) {
-		client.user.setStatus("idle").catch(console.error);
-		client.user.setActivity("Starting Up").catch(console.error);
-	}
+	client.user.setStatus("idle").catch(console.error);
+	client.user.setActivity("Starting Up").catch(console.error);
 	sendToChannel(CONFIG.LOG_CHANNEL_ID, initial_start ? ":repeat:`$" + process.env.SHARD_ID + "`Bot started in " + UTILS.round((new Date().getTime() - start_time) / 1000, 0) + "s: version: " + CONFIG.VERSION + " mode: " + mode + " servers: " + client.guilds.size : ":repeat:`$" + process.env.SHARD_ID + "`Bot reconnected");
 	wsapi.sendEmojis(allEmojis());
 	wsapi.getUserBans();

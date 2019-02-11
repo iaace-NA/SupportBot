@@ -22,7 +22,8 @@ const newPreferences = {
 	slow: 0,//self slow mode
 	auto_opgg: true, //automatically embed respond to op.gg links
 	force_prefix: false,//force commands that don't require a prefix to use a prefix
-	release_notifications: true//accept Lnotifys for new releases
+	release_notifications: true,//accept Lnotifys for new releases
+	feedback_enabled: true//allow use of global feedback commands
 };
 const preferencesFormat = {
 	id: "string",//id of server
@@ -31,7 +32,8 @@ const preferencesFormat = {
 	slow: "number",//self slow mode
 	auto_opgg: "boolean",//automatically embed respond to op.gg links
 	force_prefix: "boolean",//
-	release_notifications: "boolean"//
+	release_notifications: "boolean",//
+	feedback_enabled: "boolean"
 };
 module.exports = class Preferences {
 	constructor(lolapi, guild, callback) {

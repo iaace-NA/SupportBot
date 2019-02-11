@@ -51,7 +51,10 @@ const queues = {
 	"1050": "OE Crewmember",
 	"1060": "OE Captain",
 	"1070": "OE Onslaught",
-	"1200": "NB Nexus Blitz"
+	"1200": "NB Nexus Blitz",
+	"2000": "SR Tutorial 1",
+	"2010": "SR Tutorial 2",
+	"2020": "SR Tutorial 3"
 };
 const MMR_JOKES = [
 	["We recommend using a mouse and keyboard when playing League of Legends.",//below bronze
@@ -1267,7 +1270,7 @@ module.exports = class EmbedGenerator {
 			public_e.setAuthor(username, public_e.author.icon_url);
 			edit.setFooter("Approved by " + approver.username, approver.displayAvatarURL);
 			edit.fields = [];
-			edit.addField("Responses", "Send message response: `" + CONFIG.DISCORD_COMMAND_PREFIX + "mail <text>" + uid + "`\nNote: `" + CONFIG.DISCORD_COMMAND_PREFIX + "noteuser " + uid + " <reason>`");
+			edit.addField("Responses", "Send message response: `" + CONFIG.DISCORD_COMMAND_PREFIX + "mail " + uid + " <text>`\nNote: `" + CONFIG.DISCORD_COMMAND_PREFIX + "noteuser " + uid + " <reason>`");
 			user.setAuthor(username, msg.embeds[0].author.icon, msg.embeds[0].author.url);
 			user.setFooter("Approved by " + approver.username, approver.displayAvatarURL);
 			user.fields = [];
@@ -1283,7 +1286,7 @@ module.exports = class EmbedGenerator {
 			const username = msg.embeds[0].footer.text.substring(c_location2 + 1);
 			edit.setFooter("Denied by " + approver.username, approver.displayAvatarURL);
 			edit.fields = [];
-			edit.addField("Responses", "Send message response: `" + CONFIG.DISCORD_COMMAND_PREFIX + "mail <text>" + uid + "`\nNote: `" + CONFIG.DISCORD_COMMAND_PREFIX + "noteuser " + uid + " <reason>`");
+			edit.addField("Responses", "Send message response: `" + CONFIG.DISCORD_COMMAND_PREFIX + "mail " + uid + " <text>`\nNote: `" + CONFIG.DISCORD_COMMAND_PREFIX + "noteuser " + uid + " <reason>`");
 			edit.setColor("#010101");
 			return { edit };
 		}

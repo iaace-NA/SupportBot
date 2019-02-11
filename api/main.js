@@ -7,7 +7,7 @@ let CONFIG;
 const JSON5 = require("json5");
 try {
 	CONFIG = JSON5.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.7.2";//b for non-release (in development)
+	CONFIG.VERSION = "v1.7.3";//b for non-release (in development)
 }
 catch (e) {
 	console.log("something's wrong with config.json");
@@ -65,7 +65,7 @@ let riotRequest = new (require("riot-lol-api"))(CONFIG.RIOT_API_KEY, 12000, {
 	},
 	set: function(region, endpoint, cacheStrategy, data) {
 		const oldFormat = endpointToURL(region, endpoint);
-		if (cacheStrategy.cachetime != 0) addCache(oldFormat.url, JSON.stringify(data), cacheStrategy.cachetime);
+		if (cacheStrategy.cachetime != 0 && !(UTILS.exists(data.status) && data.status.status_code >= 500)) addCache(oldFormat.url, JSON.stringify(data), cacheStrategy.cachetime);
 		else;
 	}
 });
@@ -168,7 +168,8 @@ let server_preferences_doc = new apicache.Schema({
 	//region: { type: String, required: true, default: "" },//default server region, LoL ("" = disabled)
 	auto_opgg: { type: Boolean, required: true, default: true },//automatically embed respond to op.gg links
 	force_prefix: { type: Boolean, required: true, default: false },
-	release_notifications: { type: Boolean, required: true, default: true }
+	release_notifications: { type: Boolean, required: true, default: true },
+	feedback_enabled: { type: Boolean, required: true, default: true}
 	//music
 	/*
 	max_music_length: { type: Number, required: true, default: 360 },//in seconds

@@ -73,6 +73,7 @@ module.exports = class LOLAPI {
 							else resolve(body);
 						}
 						catch (e) {
+							UTILS.output("Failed to parse JSON for:\n" + iurl + "\n" + body);
 							reject(e);
 						}
 					}
@@ -324,7 +325,7 @@ module.exports = class LOLAPI {
 			that.getSummonerIDFromName(region, username, this.CONFIG.API_MAXAGE.SUMMONER_CARD.SUMMONER_ID).then(result6 => {
 				result6.region = region;
 				result6.guess = username;
-				if (!UTILS.exists(result6.id)) reject();
+				if (!UTILS.exists(result6.id)) return reject();
 				that.getRanks(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RANKS).then(result2 => {
 					Promise.all(result2.map(r => that.getChallengerRanks(region, r.queueType, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHALLENGERS))).then(result5 => {
 						that.getChampionMastery(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHAMPION_MASTERY).then(result3 => {
