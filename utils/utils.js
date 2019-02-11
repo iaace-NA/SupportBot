@@ -210,8 +210,7 @@ module.exports = class UTILS {
 			S8MAST
 			S8CHAL
 			*/
-			if (mapId && lsr != "UNRANKED") return "S8" + lsr.substring(0, 4).toUpperCase();
-			else if (mapId && lsr != "UNRANKED") return "S8" + lsr.substring(0, 4).toUpperCase();
+			if (mapId && this.exists(lsr) && lsr != "UNRANKED") return "S8" + lsr.substring(0, 4).toUpperCase();
 			return "******";
 		}
 		let answer = "";
