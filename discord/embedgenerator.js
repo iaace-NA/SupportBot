@@ -523,7 +523,7 @@ module.exports = class EmbedGenerator {
 				const flex_3 = ranks[b].find(r => r.queueType === "RANKED_FLEX_TT");
 				const solo = ranks[b].find(r => r.queueType === "RANKED_SOLO_5x5");
 				pI.flex5 = "`" + UTILS.shortRank(flex_5, match.mapId == 11, p.highestAchievedSeasonTier) + "`";
-				pI.flex3 = "`" + UTILS.shortRank(flex_3, match.mapId == 4, p.highestAchievedSeasonTier) + "`";
+				pI.flex3 = "`" + UTILS.shortRank(flex_3, match.mapId == 10, p.highestAchievedSeasonTier) + "`";
 				pI.solo = "`" + UTILS.shortRank(solo, match.mapId == 11, p.highestAchievedSeasonTier) + "`";
 				pI.mastery = UTILS.getSingleChampionMastery(masteries[b], match.participants.find(p => p.participantId == pI.participantId).championId);
 			}
