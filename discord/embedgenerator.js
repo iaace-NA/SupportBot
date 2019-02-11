@@ -598,9 +598,12 @@ module.exports = class EmbedGenerator {
 			const solo = ranks[b].find(r => r.queueType === "RANKED_SOLO_5x5");
 			let lsr_sr, lsr_tt;
 			for (let c in matches[b]) {
+				UTILS.debug("iterating through matches for " + b + " m#: " + c);
 				if (matches[b][c].mapId == 11 || matches[b][c].mapId == 10) {//SR
 					const p = UTILS.teamParticipant(match.participants[b].summonerId, matches[b]);
+					if (UTILS.exists(p)) UTILS.debug("tp found");
 					if (UTILS.exists(p.highestAchievedSeasonTier)) {
+						UTILS.debug("hAST found");
 						if (matches[b][c].mapId == 11 && !UTILS.exists(lsr_sr)) lsr_sr = p.highestAchievedSeasonTier;
 						else if (matches[b][c].mapId == 10 && !UTILS.exists(lsr_tt)) lsr_tt = p.highestAchievedSeasonTier;
 					}
