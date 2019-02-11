@@ -188,6 +188,7 @@ module.exports = class UTILS {
 	}
 	shortRank(info, mapId, lsr) {
 		//lsr = last season's rank
+		//mapId = boolean if map type is correct, display LSR if info is undefined
 		//****** unranked
 		//XXXXXX unranked
 		//██████ unranked
@@ -209,8 +210,8 @@ module.exports = class UTILS {
 			S8MAST
 			S8CHAL
 			*/
-			if (mapId == 11 && (info.queueType == "RANKED_FLEX_SR" || info.queueType == "RANKED_SOLO_5x5") && lsr != "UNRANKED") return "S8" + lsr.substring(0, 4).toUpperCase();
-			else if (mapId == 4 && info.queueType == "RANKED_FLEX_TT" && lsr != "UNRANKED") return "S8" + lsr.substring(0, 4).toUpperCase();
+			if (mapId && lsr != "UNRANKED") return "S8" + lsr.substring(0, 4).toUpperCase();
+			else if (mapId && lsr != "UNRANKED") return "S8" + lsr.substring(0, 4).toUpperCase();
 			return "******";
 		}
 		let answer = "";
