@@ -597,15 +597,15 @@ module.exports = class EmbedGenerator {
 			const flex_3 = ranks[b].find(r => r.queueType === "RANKED_FLEX_TT");
 			const solo = ranks[b].find(r => r.queueType === "RANKED_SOLO_5x5");
 			let lsr_sr, lsr_tt;
-			for (let c in matches[b]) {
+			for (let c in matches) {
 				UTILS.debug("iterating through matches for " + b + " m#: " + c);
-				if (matches[b][c].mapId == 11 || matches[b][c].mapId == 10) {//SR
-					const p = UTILS.teamParticipant(match.participants[b].summonerId, matches[b]);
+				if (matches[c].mapId == 11 || matches[c].mapId == 10) {//SR
+					const p = UTILS.teamParticipant(match.participants[b].summonerId, matches[c]);
 					if (UTILS.exists(p)) UTILS.debug("tp found");
-					if (UTILS.exists(p.highestAchievedSeasonTier)) {
+					if (UTILS.exists(p) && UTILS.exists(p.highestAchievedSeasonTier)) {
 						UTILS.debug("hAST found");
-						if (matches[b][c].mapId == 11 && !UTILS.exists(lsr_sr)) lsr_sr = p.highestAchievedSeasonTier;
-						else if (matches[b][c].mapId == 10 && !UTILS.exists(lsr_tt)) lsr_tt = p.highestAchievedSeasonTier;
+						if (matches[c].mapId == 11 && !UTILS.exists(lsr_sr)) lsr_sr = p.highestAchievedSeasonTier;
+						else if (matches[c].mapId == 10 && !UTILS.exists(lsr_tt)) lsr_tt = p.highestAchievedSeasonTier;
 					}
 				}
 			}
