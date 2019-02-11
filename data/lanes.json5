@@ -1,5 +1,5 @@
 {
-	"ex": ["top", "jg", "mid", "support", "adc"],
+	//"example": ["top%", "jg%", "mid%", "support%", "adc%"],
 	"266": [30, 0, 60, 0, 10],//aatrox
 	"103": [5, 0, 80, 10, 5],//ahri
 	"84": [20, 0, 80, 0, 0],//akali
