@@ -82,7 +82,9 @@ module.exports = class UTILS {
 		return answer;
 	}
 	teamParticipant(summonerID, match) {
-		const participantID = match.participantIdentities.find(pI => pI.player.summonerId == summonerID).participantId;
+		const participant = match.participantIdentities.find(pI => pI.player.summonerId == summonerID);
+		if (!this.exists(participant)) return undefined;
+		const participantID = participant.participantId;
 		const stats = match.participants.find(p => p.participantId == participantID);
 		return stats;
 	}
