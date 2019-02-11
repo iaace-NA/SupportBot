@@ -552,7 +552,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 										embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match, timeline, ranks, masteries, pSA, verified).then(answer => {
 											replyEmbed(answer);
 											request_profiler.end("generating embed");
-											UTILS.debug(request_profiler.endAll());
+											UTILS.debug("\n" + ctable.getTable(request_profiler.endAllCtable()));
 										}).catch(console.error);
 									}).catch(console.error);
 								}).catch(console.error);
