@@ -596,9 +596,19 @@ module.exports = class EmbedGenerator {
 			const flex_5 = ranks[b].find(r => r.queueType === "RANKED_FLEX_SR");
 			const flex_3 = ranks[b].find(r => r.queueType === "RANKED_FLEX_TT");
 			const solo = ranks[b].find(r => r.queueType === "RANKED_SOLO_5x5");
-			match.participants[b].flex5 = UTILS.shortRank(flex_5);
-			match.participants[b].flex3 = UTILS.shortRank(flex_3);
-			match.participants[b].solo = UTILS.shortRank(solo);
+			let lsr_sr, lsr_tt;
+			for (let c in matches[b]) {
+				if (matches[b][c].mapId == 11 || matches[b][c].mapId == 10) {//SR
+					const p = UTILS.teamParticipant(match.participants[b].summonerId);
+					if (UTILS.exists(p.highestAchievedSeasonTier)) {
+						if (matches[b][c].mapId == 11 && !UTILS.exists(lsr_sr)) lsr_sr = p.highestAchievedSeasonTier;
+						else if (matches[b][c].mapId == 10 && !UTILS.exists(lsr_tt)) lsr_tt = p.highestAchievedSeasonTier;
+					}
+				}
+			}
+			match.participants[b].flex5 = UTILS.shortRank(flex_5, true, lsr_sr);
+			match.participants[b].flex3 = UTILS.shortRank(flex_3, true, lsr_tt);
+			match.participants[b].solo = UTILS.shortRank(solo, true, lsr_sr);
 			match.participants[b].mastery = UTILS.getSingleChampionMastery(masteries[b], match.participants[b].championId);
 			teams[match.participants[b].teamId].push(match.participants[b]);
 			common_teammates[match.participants[b].summonerName] = {};
