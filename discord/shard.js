@@ -17,7 +17,7 @@ let CONFIG;
 const JSON5 = require("json5");
 try {
 	CONFIG = JSON5.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.7.3";//b for non-release (in development)
+	CONFIG.VERSION = "v1.7.4";//b for non-release (in development)
 	CONFIG.BANS = {};
 }
 catch (e) {
