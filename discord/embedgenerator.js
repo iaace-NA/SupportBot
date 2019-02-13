@@ -1,6 +1,7 @@
 "use strict";
 const Discord = require("discord.js");
 const UTILS = new (require("../utils/utils.js"))();
+const JSON5 = require("json5");
 const mathjs = require("mathjs");
 const crypto = require("crypto");
 const fs = require("fs");
@@ -162,6 +163,7 @@ const HORIZONTAL_SEPARATOR = "------------------------------";
 const VERIFIED_ICON = "✅";
 const TAB = " ";
 const ITEMS = JSON.parse(fs.readFileSync("../data/items.json", "utf-8"));
+const LANE_PCT = JSON5.parse(fs.readFileSync("../data/lanes.json5", "utf-8"));
 const BLUE_SMITE_ITEMS = [1416, 1401, 1402, 1400];
 const BLUE_SMITE = 3706;
 const RED_SMITE_ITEMS = [1419, 1413, 1414, 1412];
