@@ -36,6 +36,11 @@
 			"name": "HiKomodo",
 			"active": true,
 			"flags": "🇺🇸"
+		},
+		"295662044953444352": {
+			"name": "morryz",
+			"active": true,
+			"flags": "🇬🇧🇬🇷🇦🇱"
 		}
 	},
 	"DISCORD_COMMAND_PREFIX": "l",//not case sensitive
