@@ -330,7 +330,7 @@ module.exports = class UTILS {
 		function internal_calc() {
 			text.replaceAll(" ", "");//remove spaces
 			text = text.toLowerCase();//all lowercase
-			const TIERS = ["b", "s", "g", "p", "d", "m", "c"];
+			const TIERS = ["i", "b", "s", "g", "p", "d", "m", "c"];
 			const T_IMMR = [300, 800, 1300, 1800, 2300, 2600, 2800];
 			const tier_index = TIERS.indexOf(text[0]);
 			if (tier_index === -1) return null;//tier not detected
