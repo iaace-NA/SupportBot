@@ -267,7 +267,7 @@ function getLikelyLanes(CONFIG, champion_ids) {
 	let probabilities = lane_permutations.map((lane_assignments => {
 		let sum = 0;
 		for (let i = 0; i < lane_assignments.length; ++i) {
-			sum += LANE_PCT[champion_ids[i]][lane_permutations[i]];
+			sum += LANE_PCT[champion_ids[i]][lane_assignments[i]];
 		}
 		return sum;
 	}));
