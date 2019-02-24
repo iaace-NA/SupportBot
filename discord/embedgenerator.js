@@ -266,7 +266,7 @@ function getLikelyLanes(CONFIG, champion_ids) {
 	let lane_permutations = UTILS.permute([0, 1, 2, 3, 4]);
 	let probabilities = lane_permutations.map((lane_assignments => {
 		let sum = 0;
-		for (let i = 0; i < lane_assignments.length; ++i) {
+		for (let i = 0; i < lane_assignments.length; ++i) {//use specific lane assignment element from lane_permutations array
 			sum += LANE_PCT[champion_ids[i]][lane_assignments[i]];
 		}
 		return sum;
@@ -681,6 +681,10 @@ module.exports = class EmbedGenerator {
 		let player_count = 0;
 		for (let b in teams) {//team
 			let lane_assignments = getLikelyLanes(CONFIG, teams[b].map(match_participant => match_participant.championId));
+			for (let c = 0; c < teams[b].length; ++c) {
+				teams[b][c].lanePrediction = lane_assignments[c];
+			}
+			teams[b].sort((a, b) => a.lanePrediction - b.lanePrediction);
 			let team_description_c1 = "";
 			let team_description_c2 = "";
 			let ban_description = [];
