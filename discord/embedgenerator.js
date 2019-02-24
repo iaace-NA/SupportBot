@@ -261,7 +261,7 @@ function transformTimelineToArray(match, timeline) {
 	}
 	return answer;
 }
-function getLikelyLanes(champion_ids) {
+function getLikelyLanes(CONFIG, champion_ids) {
 	UTILS.assert(champion_ids.length === 5);
 	let lane_permutations = UTILS.permute([0, 1, 2, 3, 4]);
 	let probabilities = lane_permutations.map((lane_assignments => {
@@ -680,7 +680,7 @@ module.exports = class EmbedGenerator {
 		let team_count = 1;
 		let player_count = 0;
 		for (let b in teams) {//team
-			let lane_assignments = getLikelyLanes(teams[b].map(match_participant => match_participant.championId));
+			let lane_assignments = getLikelyLanes(CONFIG, teams[b].map(match_participant => match_participant.championId));
 			let team_description_c1 = "";
 			let team_description_c2 = "";
 			let ban_description = [];
