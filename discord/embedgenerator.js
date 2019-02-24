@@ -267,7 +267,7 @@ function getLikelyLanes(champion_ids) {
 	let probabilities = lane_permutations.map((lane_assignments => {
 		let sum = 0;
 		for (let i = 0; i < lane_assignments.length; ++i) {
-			sum += lanes[champion_ids[i]][lane_permutations[i]];
+			sum += LANE_PCT[champion_ids[i]][lane_permutations[i]];
 		}
 		return sum;
 	}));
@@ -280,7 +280,7 @@ function getLikelyLanes(champion_ids) {
 		}
 	}
 	const answer = lane_permutations[index_of_max].map(lane_number => lane_number + 1);
-	UTILS.debug("highest probability lane assignments are:\n" + answer.map((lane_number, index) => CONFIG.STATIC.CHAMPIONS[champion_ids[index]].name + ": " + ["Top", "Jungle", "Mid", "Support", "Bot"][lane_number] + " : " + lanes[champion_ids[index]][lane_number] + "%") + "\nwith total probability: " + (max / 5) + "%");
+	UTILS.debug("highest probability lane assignments are:\n" + answer.map((lane_number, index) => CONFIG.STATIC.CHAMPIONS[champion_ids[index]].name + ": " + ["Top", "Jungle", "Mid", "Support", "Bot"][lane_number] + " : " + LANE_PCT[champion_ids[index]][lane_number] + "%") + "\nwith total probability: " + (max / 5) + "%");
 	return answer;
 }
 module.exports = class EmbedGenerator {
