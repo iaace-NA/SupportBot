@@ -261,6 +261,28 @@ function transformTimelineToArray(match, timeline) {
 	}
 	return answer;
 }
+function getLikelyLanes(champion_ids) {
+	UTILS.assert(champion_ids.length === 5);
+	let lane_permutations = UTILS.permute([0, 1, 2, 3, 4]);
+	let probabilities = lane_permutations.map((lane_assignments => {
+		let sum = 0;
+		for (let i = 0; i < lane_assignments.length; ++i) {
+			sum += lanes[champion_ids[i]][lane_permutations[i]];
+		}
+		return sum;
+	}));
+	let max = probabilities[0];//highest probability seen so far
+	let index_of_max = 0;//index of the above
+	for (let i = 1; i < probabilities.length; ++i) {
+		if (probabilities[i] > max) {
+			max = probabilities[i];
+			index_of_max = i;
+		}
+	}
+	const answer = lane_permutations[index_of_max].map(lane_number => lane_number + 1);
+	UTILS.debug("highest probability lane assignments are:\n" + answer.map((lane_number, index) => CONFIG.STATIC.CHAMPIONS[champion_ids[index]].name + ": " + ["Top", "Jungle", "Mid", "Support", "Bot"][lane_number] + " : " + lanes[champion_ids[index]][lane_number] + "%") + "\nwith total probability: " + (max / 5) + "%");
+	return answer;
+}
 module.exports = class EmbedGenerator {
 	constructor() { }
 	test(x = "") {
@@ -658,6 +680,7 @@ module.exports = class EmbedGenerator {
 		let team_count = 1;
 		let player_count = 0;
 		for (let b in teams) {//team
+			let lane_assignments = getLikelyLanes(teams[b].map(match_participant => match_participant.championId));
 			let team_description_c1 = "";
 			let team_description_c2 = "";
 			let ban_description = [];
@@ -681,7 +704,7 @@ module.exports = class EmbedGenerator {
 				else team_description_c1 += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
 				else team_description_c1 += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
-				team_description_c1 += " `" + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3 + "`\n";
+				team_description_c1 += " `" + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3 + "`" + CONFIG.EMOJIS.lanes[lane_assignments[c]] +"\n";
 				team_description_c2 += "`M" + teams[b][c].mastery + "`" + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
 				team_description_c2 += "`" + summoner_participants.find(p => p.id == teams[b][c].summonerId).summonerLevel + "`";
 				team_description_c2 += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
