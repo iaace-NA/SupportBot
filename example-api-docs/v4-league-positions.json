@@ -1,0 +1,36 @@
+[
+	{
+		"tier": "SILVER",
+		"summonerName": "iaace",
+		"hotStreak": false,
+		"wins": 6,
+		"veteran": false,
+		"losses": 2,
+		"rank": "II",
+		"leagueName": "",
+		"inactive": false,
+		"freshBlood": false,
+		"position": "MIDDLE",
+		"leagueId": "00000000-0000-0000-0000-000000000000",
+		"queueType": "RANKED_SOLO_5x5",
+		"summonerId": "inuEZASCmDDI1doYEs6S-s6maBUPeVbR6ySZKTRLRUjlYVI",
+		"leaguePoints": 48
+	},
+	{
+		"tier": "GOLD",
+		"summonerName": "iaace",
+		"hotStreak": true,
+		"wins": 36,
+		"veteran": false,
+		"losses": 32,
+		"rank": "IV",
+		"leagueName": "",
+		"inactive": false,
+		"freshBlood": true,
+		"position": "UTILITY",
+		"leagueId": "00000000-0000-0000-0000-000000000000",
+		"queueType": "RANKED_SOLO_5x5",
+		"summonerId": "inuEZASCmDDI1doYEs6S-s6maBUPeVbR6ySZKTRLRUjlYVI",
+		"leaguePoints": 23
+	}
+]
