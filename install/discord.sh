@@ -5,7 +5,7 @@ sudo apt dist-upgrade -y
 sudo apt install build-essential -y
 sudo apt install apt-transport-https -y
 echo "================Finished dist-upgrading================"
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 sudo apt install -y nodejs
 sudo apt install -y npm
 echo "================NodeJS & npm installed================"

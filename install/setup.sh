@@ -15,7 +15,7 @@ sudo apt install -y mongodb-org
 echo "================Finished installing mongodb 3.6================"
 sudo service mongod start
 echo "================MongoDB started================"
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 sudo apt install -y nodejs
 sudo apt install -y npm
 echo "================NodeJS & npm installed================"
