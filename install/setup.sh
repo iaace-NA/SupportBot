@@ -37,6 +37,9 @@ echo "================Finished installing IAPI deps================"
 cd ../discord
 npm install
 echo "================Finished installing discord deps================"
+cd ../utils
+npm install
+echo "================Finished installing utils deps================"
 cd ../
 sudo apt autoremove -y
 echo "================Finished Apt Autoremove================"

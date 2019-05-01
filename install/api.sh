@@ -28,6 +28,8 @@ sudo npm install pm2 -g
 echo "================Finished installing pm2 via npm global================"
 cd api
 npm install
+cd ../utils
+npm install
 echo "================Finished installing IAPI deps================"
 cd ../
 sudo apt autoremove -y

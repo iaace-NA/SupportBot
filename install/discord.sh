@@ -23,6 +23,8 @@ sudo npm install pm2 -g
 echo "================Finished installing pm2 via npm global================"
 cd discord
 npm install
+cd ../utils
+npm install
 echo "================Finished installing discord deps================"
 cd ../
 sudo apt autoremove -y
