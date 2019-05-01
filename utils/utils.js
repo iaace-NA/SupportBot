@@ -810,4 +810,10 @@ module.exports = class UTILS {
 		}
 		return permArr;
 	};
+	defaultObjectValues(template, original) {
+		template = this.copy(template);
+		for (let i in template) {
+			if (!this.exists(original[i])) original[i] = template[i];
+		}
+	}
 }

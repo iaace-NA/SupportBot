@@ -679,7 +679,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			external: true,
 			immediatePRL: true
 		}) {//external call means not inside commandGuessUsername & commandGuessUsernameNumber
-		UTILS.defaultObjectParameters({external: true, immediatePRL: true}, options);
+		UTILS.defaultObjectValues({external: true, immediatePRL: true}, options);
 		for (let i = 0; i < trigger_array.length; ++i) {
 			if (parameters_expected && msg.content.trim().toLowerCase().substring(0, trigger_array[i].length) === trigger_array[i].toLowerCase()) {
 				if (options.external && immediatePRL && !processRateLimit()) return false;
