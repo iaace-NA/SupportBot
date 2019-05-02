@@ -394,7 +394,7 @@ module.exports = class UTILS {
 				const div = parseInt(text[1]);
 				if (text.length === 2) {//tier, div
 					if (tier_index < 6) {//below master
-						if (div > 5 || div < 1) return null;
+						if (div > 4 || div < 1) return null;
 						else return T_IMMR[tier_index] + ((4 - div) * 100);
 					}
 					else return null;
