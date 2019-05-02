@@ -279,7 +279,9 @@ function getLikelyLanes(CONFIG, champion_ids) {
 			index_of_max = i;
 		}
 	}
-	const answer = lane_permutations[index_of_max].map(lane_number => lane_number + 1);
+	let answer = {};
+	answer.assignments = lane_permutations[index_of_max].map(lane_number => lane_number + 1);
+	answer.confidence = max / 5;
 	UTILS.debug("highest probability lane assignments are:\n" + answer.map((lane_number, index) => CONFIG.STATIC.CHAMPIONS[champion_ids[index]].name + ": " + ["Top", "Jungle", "Mid", "Support", "Bot"][lane_number - 1] + " : " + LANE_PCT[champion_ids[index]][lane_number - 1] + "%").join("\n") + "\nwith total probability: " + (max / 5) + "%");
 	return answer;
 }
@@ -680,11 +682,13 @@ module.exports = class EmbedGenerator {
 		if (trim) UTILS.debug(UTILS.trim(common_teammates) + " premade entries trimmed.");
 		let team_count = 1;
 		let player_count = 0;
+		let role_confidence = [];
 		for (let b in teams) {//team
 			if (teams[b].length === 5 && match.mapId === 11) {
 				let lane_assignments = getLikelyLanes(CONFIG, teams[b].map(match_participant => match_participant.championId));//could break non-SR games
+				role_confidence.push(lane_assignments.confidence);
 				for (let c = 0; c < teams[b].length; ++c) {
-					teams[b][c].lanePrediction = lane_assignments[c];
+					teams[b][c].lanePrediction = lane_assignments.assignments[c];
 				}
 				teams[b].sort((a, b) => a.lanePrediction - b.lanePrediction);
 			}
@@ -730,6 +734,7 @@ module.exports = class EmbedGenerator {
 			UTILS.debug("team_description_c2 length: " + team_description_c2.length);
 			newEmbed.addField(":x::x: `SOLOQ ¦FLEX5 ¦FLEX3`", team_description_c1, true);
 			newEmbed.addField("Bans: " + ban_description.join(""), team_description_c2, true);
+			if (role_confidence.length === 2) newEmbed.setFooter("Role Confidence: Blue: " + role_confidence[0] + "% Purple: " + role_confidence[1] + "%");
 			++team_count;
 		}
 		return newEmbed;
