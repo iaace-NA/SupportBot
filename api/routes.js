@@ -186,30 +186,32 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 				res.status(500).end();
 			}
 			else res.json({ success: true });
-			if (req.query.user != "true") shardBroadcast({ type: 18,
-				sid: req.query.id,
-				reason: req.query.reason,
-				date: parseInt(req.query.date),
-				issuer_tag: req.query.issuer_tag,
-				issuer_avatarURL: req.query.issuer_avatarURL });
-			else sendExpectReplyBroadcast({ type: 20,
-				uid: req.query.id,
-				reason: req.query.reason,
-				issuer_tag: req.query.issuer_tag,
-				issuer_avatarURL: req.query.issuer_avatarURL,
-				date: parseInt(req.query.date) }).then(results => {
-					for (let i = 0; i < results.length; ++i) {
-						if (results[i].connected) {
-							sendToShard({ type: 22,
-								uid: req.query.id,
-								reason: req.query.reason,
-								issuer_tag: req.query.issuer_tag,
-								issuer_avatarURL: req.query.issuer_avatarURL,
-								date: parseInt(req.query.date) }, i);
-							break;
+			if (req.query.notify == "true") {
+				if (req.query.user != "true") shardBroadcast({ type: 18,
+					sid: req.query.id,
+					reason: req.query.reason,
+					date: parseInt(req.query.date),
+					issuer_tag: req.query.issuer_tag,
+					issuer_avatarURL: req.query.issuer_avatarURL });
+				else sendExpectReplyBroadcast({ type: 20,
+					uid: req.query.id,
+					reason: req.query.reason,
+					issuer_tag: req.query.issuer_tag,
+					issuer_avatarURL: req.query.issuer_avatarURL,
+					date: parseInt(req.query.date) }).then(results => {
+						for (let i = 0; i < results.length; ++i) {
+							if (results[i].connected) {
+								sendToShard({ type: 22,
+									uid: req.query.id,
+									reason: req.query.reason,
+									issuer_tag: req.query.issuer_tag,
+									issuer_avatarURL: req.query.issuer_avatarURL,
+									date: parseInt(req.query.date) }, i);
+								break;
+							}
 						}
-					}
-				}).catch(console.error);
+					}).catch(console.error);
+			}
 			getBans(req.query.user == "true", bans => {
 				shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });//updates all shards with new ban information
 			});

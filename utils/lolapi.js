@@ -414,11 +414,11 @@ module.exports = class LOLAPI {
 	setLink(uid, username) {
 		return this.getIAPI("setlink/" + uid, { link: username });
 	}
-	banUser(uid, reason, date, issuer, issuer_tag, issuer_avatarURL) {
-		return this.getIAPI("ban", { id: uid, user: true, date, reason, issuer, issuer_tag, issuer_avatarURL });
+	banUser(uid, reason, date, issuer, issuer_tag, issuer_avatarURL, notify = true) {
+		return this.getIAPI("ban", { id: uid, user: true, date, reason, issuer, issuer_tag, issuer_avatarURL, notify });
 	}
-	banServer(sid, reason, date, issuer, issuer_tag, issuer_avatarURL) {
-		return this.getIAPI("ban", { id: sid, user: false, date, reason, issuer, issuer_tag, issuer_avatarURL });
+	banServer(sid, reason, date, issuer, issuer_tag, issuer_avatarURL, notify = true) {
+		return this.getIAPI("ban", { id: sid, user: false, date, reason, issuer, issuer_tag, issuer_avatarURL, notify });
 	}
 	warnUser(uid, reason, issuer, issuer_tag, issuer_avatarURL) {
 		return this.getIAPI("warn", { id: uid, user: true, reason, issuer, issuer_tag, issuer_avatarURL, notify: true });
