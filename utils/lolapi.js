@@ -59,7 +59,7 @@ module.exports = class LOLAPI {
 			const iurl = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/" + tag + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&endpoint=" + encodeURIComponent(endpoint);
 			++that.calls;
 			if (!this.internal) {
-				this.wsapi.iapiLoLRequest(region, tag, endpoint, maxage, cachetime, request_id).then(body => {
+				this.wsapi.iapiLoLRequest(region, tag, endpoint, maxage, cachetime, this.request_id).then(body => {
 					try {
 						if (parseJSON) {
 							UTILS.debug("attempting to parse type: " + typeof(body));
