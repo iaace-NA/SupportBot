@@ -60,6 +60,7 @@ module.exports = class LOLAPI {
 			++that.calls;
 			if (!this.internal) {
 				this.wsapi.iapiLoLRequest(region, tag, endpoint, maxage, cachetime, this.request_id).then(body => {
+					UTILS.debug("response received for iurl " + iurl);
 					if (parseJSON) {
 						try {
 							if (typeof(body) === "object") resolve(body);
