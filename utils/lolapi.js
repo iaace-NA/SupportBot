@@ -63,9 +63,12 @@ module.exports = class LOLAPI {
 					try {
 						if (parseJSON) {
 							UTILS.debug("attempting to parse type: " + typeof(body));
+							UTILS.debug("response body is: " + body);
 							const answer = JSON.parse(body);
 							if (UTILS.exists(answer.status)) UTILS.output(iurl + " : " + body);
-							UTILS.assert(typeof(answer) === "object");
+							if (typeof(answer) !== "object") {
+								console.log(answer);
+							}
 							resolve(answer);
 						}
 						else resolve(body);
