@@ -619,7 +619,7 @@ module.exports = class EmbedGenerator {
 			if (!UTILS.exists(teams[match.participants[b].teamId])) teams[match.participants[b].teamId] = [];
 			const flex_5 = ranks[b].find(r => r.queueType === "RANKED_FLEX_SR");
 			const flex_3 = ranks[b].find(r => r.queueType === "RANKED_FLEX_TT");
-			//const solo = ranks[b];
+			const solo = ranks[b].find(r => r.queueType === "RANKED_SOLO_5x5");
 			let lsr_sr, lsr_tt;
 			for (let c in matches) {
 				//UTILS.debug("iterating through matches for " + b + " m#: " + c);
@@ -635,7 +635,7 @@ module.exports = class EmbedGenerator {
 			}
 			match.participants[b].flex5 = "`" + UTILS.shortRank(flex_5, true, lsr_sr) + "`";
 			match.participants[b].flex3 = "`" + UTILS.shortRank(flex_3, true, lsr_tt) + "`";
-			match.participants[b].solo = ranks[b];
+			match.participants[b].solo = "`" + UTILS.shortRank(solo, true, lsr_sr) + "`";
 			match.participants[b].lsr_sr = lsr_sr;
 			match.participants[b].mastery = UTILS.getSingleChampionMastery(masteries[b], match.participants[b].championId);
 			teams[match.participants[b].teamId].push(match.participants[b]);
@@ -707,13 +707,11 @@ module.exports = class EmbedGenerator {
 				}
 			}
 			for (let c in teams[b]) {//player on team
-				let solo_rank = teams[b][c].solo;
-				solo_rank = "`" + UTILS.shortRank(solo_rank, true, teams[b][c].lsr_sr) + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id];
 				else team_description_c1 += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
 				else team_description_c1 += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
-				team_description_c1 += " " + solo_rank + " " + teams[b][c].flex5 + " " + teams[b][c].flex3;
+				team_description_c1 += " " + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3;
 				team_description_c1 += UTILS.fstr(teams[b].length === 5, CONFIG.EMOJIS.lanes[teams[b][c].lanePrediction]) + "\n";
 				team_description_c2 += "`M" + teams[b][c].mastery + "`" + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
 				team_description_c2 += "`" + summoner_participants.find(p => p.id == teams[b][c].summonerId).summonerLevel + "`";
