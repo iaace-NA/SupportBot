@@ -232,7 +232,7 @@ module.exports = class LOLAPI {
 	}
 	getRanks(region, summonerID, maxage) {
 		if (summonerID === null) return new Promise((resolve, reject) => { resolve([]); });
-		return this.get(region, "league/v4/positions/by-summoner/" + summonerID, tags.ranks, {}, this.CONFIG.API_CACHETIME.GET_RANKS, maxage);
+		return this.get(region, "league/v4/entries/by-summoner/" + summonerID, tags.ranks, {}, this.CONFIG.API_CACHETIME.GET_RANKS, maxage);
 	}
 	getMultipleRanks(region, summonerIDs, maxage) {
 		let that = this;
