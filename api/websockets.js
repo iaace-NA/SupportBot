@@ -1,7 +1,7 @@
 "use strict";
 const UTILS = new (require("../utils/utils.js"))();
 let champ_emojis = {};
-module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans, sendExpectReplyBroadcast, rawAPIRequest) {
+module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans, sendExpectReplyBroadcast, rawAPIRequest, irs) {
 	switch (data.type) {
 		case 1:
 			break;
@@ -52,6 +52,8 @@ module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShar
 			sendToShard({ type: 36 }, data.id);
 			break;
 		case 39:
+			if (!UTILS.exists(irs[data.request_id])) irs[data.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
+			++irs[data.request_id][0];
 			rawAPIRequest(data.region, data.tag, data.endpoint, data.maxage, data.cachetime).then(body => {
 				sendToShard({ type: 38, code: 200, response: body, wsm_ID: data.wsm_ID }, data.id);
 			}).catch(err => {

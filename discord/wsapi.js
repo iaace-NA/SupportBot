@@ -294,9 +294,9 @@ module.exports = class WSAPI {
 	getServerBans() {
 		this.send({ type: 17 });
 	}
-	iapiLoLRequest(region, tag, endpoint, maxage, cachetime) {
+	iapiLoLRequest(region, tag, endpoint, maxage, cachetime, request_id) {
 		let p = this.wsmm.get();
-		this.send({ type: 39, wsm_ID: p.request_ID, region, tag, endpoint, maxage, cachetime });
+		this.send({ type: 39, wsm_ID: p.request_ID, region, tag, endpoint, maxage, cachetime, request_id });
 		return p.promise;
 	}
 	send(raw_object) {
