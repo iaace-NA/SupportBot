@@ -62,6 +62,7 @@ module.exports = class LOLAPI {
 				this.wsapi.iapiLoLRequest(region, tag, endpoint, maxage, cachetime).then(body => {
 					try {
 						if (parseJSON) {
+							UTILS.debug("attempting to parse type: " + typeof(body));
 							const answer = JSON.parse(body);
 							if (UTILS.exists(answer.status)) UTILS.output(iurl + " : " + body);
 							UTILS.assert(typeof(answer) === "object");
