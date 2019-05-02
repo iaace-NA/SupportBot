@@ -399,15 +399,15 @@ module.exports = class UTILS {
 					}
 					else return null;
 				}
-				else if (tier_index >= 6 && tier_index != 8) {//tier, LP master/grandmaster
+				else if (tier_index >= 6 && tier_index < 8) {//tier, LP master/grandmaster
 					let LP = parseInt(text.substring(2));//must be >= 0
 					if (LP < 0) return null;
-					else return T_IMMR[tier_index] + (LP / 5);
+					else return T_IMMR[tier_index] + (LP / 5) - ((tier_index - 6) * 100);
 				}
 				else if (tier_index == 8) {//tier, LP challenger
 					let LP = parseInt(text.substring(1));//must be >= 0
 					if (LP < 0) return null;
-					else return T_IMMR[tier_index] + (LP / 5);
+					else return T_IMMR[tier_index] + (LP / 5) - ((tier_index - 6) * 100);
 				}
 				else {//tier, div, LP
 					let LP = parseInt(text.substring(2));
