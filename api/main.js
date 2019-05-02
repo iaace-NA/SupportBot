@@ -217,7 +217,7 @@ website.ws("/shard", (ws, req) => {
 	ws.on("message", data => {
 		data = JSON.parse(data);
 		UTILS.debug("ws message received: $" + data.id + " type: " + data.type);
-		wsRoutes(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans, sendExpectReplyBroadcast, rawAPIRequest);
+		wsRoutes(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans, sendExpectReplyBroadcast, rawAPIRequest, irs);
 		if (UTILS.exists(data.request_id) && UTILS.exists(message_handlers[data.request_id])) {
 			let nMsg = UTILS.copy(data);
 			delete nMsg.request_id;
