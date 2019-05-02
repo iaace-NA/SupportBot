@@ -31,7 +31,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	const msg_receive_time = new Date().getTime();
 	let RL_activated = false;
 	let request_profiler = new Profiler("r#" + msg.id)
-	let lolapi = new LOLAPI(CONFIG, msg.id);
+	let lolapi = new LOLAPI(CONFIG, msg.id, wsapi);
 	request_profiler.mark("lolapi instantiated");
 
 	command(["supportbotprefix "], true, CONFIG.CONSTANTS.ADMINISTRATORS, (original, index, parameter) => {
