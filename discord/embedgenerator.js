@@ -681,7 +681,7 @@ module.exports = class EmbedGenerator {
 		let team_count = 1;
 		let player_count = 0;
 		for (let b in teams) {//team
-			if (teams[b].length === 5) {
+			if (teams[b].length === 5 && match.mapId === 11) {
 				let lane_assignments = getLikelyLanes(CONFIG, teams[b].map(match_participant => match_participant.championId));//could break non-SR games
 				for (let c = 0; c < teams[b].length; ++c) {
 					teams[b][c].lanePrediction = lane_assignments[c];
@@ -712,7 +712,7 @@ module.exports = class EmbedGenerator {
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
 				else team_description_c1 += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
 				team_description_c1 += " " + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3;
-				team_description_c1 += UTILS.fstr(teams[b].length === 5, CONFIG.EMOJIS.lanes[teams[b][c].lanePrediction]) + "\n";
+				team_description_c1 += UTILS.fstr(teams[b].length === 5 && match.mapId === 11, CONFIG.EMOJIS.lanes[teams[b][c].lanePrediction]) + "\n";
 				team_description_c2 += "`M" + teams[b][c].mastery + "`" + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
 				team_description_c2 += "`" + summoner_participants.find(p => p.id == teams[b][c].summonerId).summonerLevel + "`";
 				team_description_c2 += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
