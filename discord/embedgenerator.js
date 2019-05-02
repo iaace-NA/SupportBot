@@ -844,8 +844,8 @@ module.exports = class EmbedGenerator {
 					//if (UTILS.exists(p)) UTILS.debug("tp found");
 					if (UTILS.exists(p) && UTILS.exists(p.highestAchievedSeasonTier)) {
 						//UTILS.debug("hAST found");
-						if (matches[c].mapId == 11 && !UTILS.exists(lsr_sr)) lsr_sr = p.highestAchievedSeasonTier;
-						else if (matches[c].mapId == 10 && !UTILS.exists(lsr_tt)) lsr_tt = p.highestAchievedSeasonTier;
+						if (m.mapId == 11 && !UTILS.exists(lsr_sr)) lsr_sr = p.highestAchievedSeasonTier;
+						else if (m.mapId == 10 && !UTILS.exists(lsr_tt)) lsr_tt = p.highestAchievedSeasonTier;
 					}
 				}
 			}
