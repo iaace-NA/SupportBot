@@ -22,7 +22,7 @@ module.exports = class WSMessageManager {
 	}
 	wsMessageCallback(raw_message) {
 		if (UTILS.exists(this.collector[raw_message.wsm_ID])) {
-			if (raw_message.code == 200) {
+			if (raw_message.code != 500) {
 				this.collector[raw_message.wsm_ID].resolve(raw_message.response);
 			}
 			else {
