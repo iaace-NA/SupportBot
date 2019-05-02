@@ -682,7 +682,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 		UTILS.defaultObjectValues({external: true, immediatePRL: true}, options);
 		for (let i = 0; i < trigger_array.length; ++i) {
 			if (parameters_expected && msg.content.trim().toLowerCase().substring(0, trigger_array[i].length) === trigger_array[i].toLowerCase()) {
-				if (options.external && immediatePRL && !processRateLimit()) return false;
+				if (options.external && options.immediatePRL && !processRateLimit()) return false;
 				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
 					if (elevated_permissions === CONFIG.CONSTANTS.BOTOWNERS) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
@@ -698,7 +698,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 				}
 			}
 			else if (!parameters_expected && msg.content.trim().toLowerCase() === trigger_array[i].toLowerCase()) {
-				if (options.external && immediatePRL && !processRateLimit()) return false;
+				if (options.external && options.immediatePRL && !processRateLimit()) return false;
 				if (elevated_permissions && !is(elevated_permissions)) return false;
 				else {
 					if (elevated_permissions === CONFIG.CONSTANTS.BOTOWNERS) sendToChannel(CONFIG.LOG_CHANNEL_ID, msg.author.tag + " used " + msg.cleanContent);
