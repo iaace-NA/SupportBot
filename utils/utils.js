@@ -389,32 +389,30 @@ module.exports = class UTILS {
 				tier_index = TIERS.indexOf(text[0]);
 				if (tier_index === -1) return null;//tier not detected
 			}
-			if (text.length === 1 || text.length === 2) return T_IMMR[tier_index];//tier only
+			if (text.length === 1 || (text.length === 2 && tier_index >= 6 && tier_index <= 7)) return T_IMMR[tier_index];//tier only
 			else {//tier, div, [LP]
 				const div = parseInt(text[1]);
 				if (text.length === 2) {//tier, div
 					if (tier_index < 5) {//below master
 						if (div > 5 || div < 1) return null;
-						else return T_IMMR[tier_index] + ((3 - div) * 100);
+						else return T_IMMR[tier_index] + ((4 - div) * 100);
 					}
 					else return null;
 				}
 				else if (tier_index >= 5 && tier_index != 8) {//tier, LP master/grandmaster
 					let LP = parseInt(text.substring(2));//must be >= 0
 					if (LP < 0) return null;
-					else if (tier_index == 5) return T_IMMR[tier_index] + (LP / 5);
 					else return T_IMMR[tier_index] + (LP / 5);
 				}
-				else if (tier_index == 8) {//tier, LP master/grandmaster
+				else if (tier_index == 8) {//tier, LP challenger
 					let LP = parseInt(text.substring(1));//must be >= 0
 					if (LP < 0) return null;
-					else if (tier_index == 5) return T_IMMR[tier_index] + (LP / 5);
 					else return T_IMMR[tier_index] + (LP / 5);
 				}
 				else {//tier, div, LP
 					let LP = parseInt(text.substring(2));
 					if (LP > 100 || LP < 0) return null;//must be between 0 and 100
-					return T_IMMR[tier_index] + ((3 - div) * 100) + LP;
+					return T_IMMR[tier_index] + ((4 - div) * 100) + LP;
 				}
 			}
 		}
