@@ -55,7 +55,7 @@ module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShar
 			if (!UTILS.exists(irs[data.request_id])) irs[data.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
 			++irs[data.request_id][0];
 			rawAPIRequest(data.region, data.tag, data.endpoint, data.maxage, data.cachetime).then(body => {
-				UTILS.debug("body type is " + typeof(body));
+				//UTILS.debug("body type is " + typeof(body));
 				sendToShard({ type: 38, code: 200, response: body, wsm_ID: data.wsm_ID }, data.id);
 			}).catch(err => {
 				if (err === 500) {
