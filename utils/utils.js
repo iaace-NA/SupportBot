@@ -359,16 +359,37 @@ module.exports = class UTILS {
 		return answer;
 	}
 	decodeEnglishToIMMR(text) {
+		/*valids:
+		C
+		c+1000
+		GM
+		gm+500
+		MA
+		i
+		i+2
+		i2
+		i4
+		*/
+		/*invalid:
+		C2
+		gm2
+		ma2
+		d5
+		d5+1
+		*/
 		const answer = internal_calc();
 		return (isNaN(answer) || !this.exists(answer)) ? null : answer;
 		function internal_calc() {
 			text.replaceAll(" ", "");//remove spaces
 			text = text.toLowerCase();//all lowercase
-			const TIERS = ["i", "b", "s", "g", "p", "d", "m", "c"];
-			const T_IMMR = [300, 800, 1300, 1800, 2300, 2600, 2800];
-			const tier_index = TIERS.indexOf(text[0]);
-			if (tier_index === -1) return null;//tier not detected
-			if (text.length === 1) return T_IMMR[TIERS.indexOf(text[0])];//tier only
+			const TIERS = ["i", "b", "s", "g", "p", "d", "ma", "gm", "c"];
+			const T_IMMR = [100, 500, 900, 1300, 1700, 2100, 2500, 2600, 2700];
+			let tier_index = TIERS.indexOf(text.substring(0, 2));
+			if (tier_index === -1) {
+				tier_index = TIERS.indexOf(text[0]);
+				if (tier_index === -1) return null;//tier not detected
+			}
+			if (text.length === 1 || text.length === 2) return T_IMMR[tier_index];//tier only
 			else {//tier, div, [LP]
 				const div = parseInt(text[1]);
 				if (text.length === 2) {//tier, div
@@ -378,11 +399,17 @@ module.exports = class UTILS {
 					}
 					else return null;
 				}
-				else if (tier_index >= 5) {//tier, LP master/challenger
+				else if (tier_index >= 5 && tier_index != 8) {//tier, LP master/grandmaster
+					let LP = parseInt(text.substring(2));//must be >= 0
+					if (LP < 0) return null;
+					else if (tier_index == 5) return T_IMMR[tier_index] + (LP / 5);
+					else return T_IMMR[tier_index] + (LP / 5);
+				}
+				else if (tier_index == 8) {//tier, LP master/grandmaster
 					let LP = parseInt(text.substring(1));//must be >= 0
 					if (LP < 0) return null;
 					else if (tier_index == 5) return T_IMMR[tier_index] + (LP / 5);
-					else return T_IMMR[tier_index] - 200 + (LP / 5);
+					else return T_IMMR[tier_index] + (LP / 5);
 				}
 				else {//tier, div, LP
 					let LP = parseInt(text.substring(2));
