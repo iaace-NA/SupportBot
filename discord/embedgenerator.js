@@ -708,7 +708,7 @@ module.exports = class EmbedGenerator {
 			}
 			for (let c in teams[b]) {//player on team
 				let solo_rank = teams[b][c].solo;
-				solo_rank = "`" + UTILS.shortRank(solo_rank.ans, true, teams[b][c].lsr_sr) + "`";
+				solo_rank = "`" + UTILS.shortRank(solo_rank, true, teams[b][c].lsr_sr) + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[teams[b][c].spell1Id];
 				else team_description_c1 += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
