@@ -835,10 +835,24 @@ module.exports = class EmbedGenerator {
 				response_str.push("The requested summoner does not exist.");
 				continue;
 			}
+			let lsr_sr, lsr_tt;
+			for (let b in match_metas[i].matches) {
+				//UTILS.debug("iterating through matches for " + b + " m#: " + c);
+				let m = matches.find(m => match_metas[i].matches[b].gameId == m.gameId);
+				if (m.mapId == 11 || m.mapId == 10) {//SR
+					const p = UTILS.teamParticipant(summoners[i].id, m);
+					//if (UTILS.exists(p)) UTILS.debug("tp found");
+					if (UTILS.exists(p) && UTILS.exists(p.highestAchievedSeasonTier)) {
+						//UTILS.debug("hAST found");
+						if (matches[c].mapId == 11 && !UTILS.exists(lsr_sr)) lsr_sr = p.highestAchievedSeasonTier;
+						else if (matches[c].mapId == 10 && !UTILS.exists(lsr_tt)) lsr_tt = p.highestAchievedSeasonTier;
+					}
+				}
+			}
 			let individual_description = "`";
-			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_SOLO_5x5")) + " ";
-			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_FLEX_SR")) + " ";
-			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_FLEX_TT")) + " ";
+			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_SOLO_5x5"), true, lsr_sr) + " ";
+			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_FLEX_SR"), true, lsr_sr) + " ";
+			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_FLEX_TT"), true, lsr_tt) + " ";
 			let results = [];
 			let all_KDA = {
 				K: 0,
