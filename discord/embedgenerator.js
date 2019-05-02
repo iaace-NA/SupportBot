@@ -282,7 +282,7 @@ function getLikelyLanes(CONFIG, champion_ids) {
 	let answer = {};
 	answer.assignments = lane_permutations[index_of_max].map(lane_number => lane_number + 1);
 	answer.confidence = max / 5;
-	UTILS.debug("highest probability lane assignments are:\n" + answer.map((lane_number, index) => CONFIG.STATIC.CHAMPIONS[champion_ids[index]].name + ": " + ["Top", "Jungle", "Mid", "Support", "Bot"][lane_number - 1] + " : " + LANE_PCT[champion_ids[index]][lane_number - 1] + "%").join("\n") + "\nwith total probability: " + (max / 5) + "%");
+	UTILS.debug("highest probability lane assignments are:\n" + answer.assignments.map((lane_number, index) => CONFIG.STATIC.CHAMPIONS[champion_ids[index]].name + ": " + ["Top", "Jungle", "Mid", "Support", "Bot"][lane_number - 1] + " : " + LANE_PCT[champion_ids[index]][lane_number - 1] + "%").join("\n") + "\nwith total probability: " + (max / 5) + "%");
 	return answer;
 }
 module.exports = class EmbedGenerator {
