@@ -686,7 +686,7 @@ module.exports = class EmbedGenerator {
 		for (let b in teams) {//team
 			if (teams[b].length === 5 && match.mapId === 11) {
 				let lane_assignments = getLikelyLanes(CONFIG, teams[b].map(match_participant => match_participant.championId));//could break non-SR games
-				role_confidence.push(lane_assignments.confidence);
+				role_confidence.push(lane_assignments.confidence.round(1));
 				for (let c = 0; c < teams[b].length; ++c) {
 					teams[b][c].lanePrediction = lane_assignments.assignments[c];
 				}
