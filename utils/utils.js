@@ -182,11 +182,45 @@ module.exports = class UTILS {
 	positionToLane(position) {
 		return ["APEX", "TOP", "JUNGLE", "MIDDLE", "UTILITY", "BOTTOM"].indexOf(position);
 	}
+	laneToPosition(lane) {
+		return ["APEX", "TOP", "JUNGLE", "MIDDLE", "UTILITY", "BOTTOM"][position];
+	}
 	opgg(region, username) {
 		this.assert(this.exists(username), "opgg link generator: username doesn't exist");
 		this.assert(this.exists(region), "opgg link generator: region doesn't exist");
 		if (region == "KR") region = "www";//account for kr region special www opgg link
-		return "http://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
+		return "https://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
+	}
+	preferredRank(ranks, mode, role) {
+		let candidates = [];
+		for (let b in ranks) {
+			if (ranks[b].queueType === mode) {
+				candidates.push(ranks[b]);
+			}
+		}
+		if (candidates.length == 0) return undefined;
+		if (candidates.length == 1) {
+			return {
+				ans: candidates[0],
+				precise: candidates[0].position == this.laneToPosition(role)
+			}
+		}
+		else {
+			const final_candidate = candidates.find(r => r.position === this.laneToPosition(role));
+			if (this.exists(final_candidate)) {
+				return {
+					ans: final_candidate,
+					precise: true
+				};
+			}
+			else {
+				candidates.sort((a, b) => this.iMMR(b) - this.iMMR(a));
+				return {
+					ans: candidates[0],
+					precise: false
+				}
+			}
+		}
 	}
 	shortRank(info, mapId, lsr) {
 		//lsr = last season's rank
@@ -479,6 +513,9 @@ module.exports = class UTILS {
 	}
 	conditionalFormat(text, surrounds, condition = true) {
 		return condition ? surrounds + text + surrounds : text;
+	}
+	fstr(condition, tstr = "", fstr = "") {
+		return condition ? tstr : fstr;
 	}
 	accessLevel(CONFIG, msg, uid) {//uid optional
 		if (!this.exists(uid)) uid = msg.author.id;
@@ -773,4 +810,10 @@ module.exports = class UTILS {
 		}
 		return permArr;
 	};
+	defaultObjectValues(template, original) {
+		template = this.copy(template);
+		for (let i in template) {
+			if (!this.exists(original[i])) original[i] = template[i];
+		}
+	}
 }
