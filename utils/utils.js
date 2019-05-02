@@ -393,13 +393,13 @@ module.exports = class UTILS {
 			else {//tier, div, [LP]
 				const div = parseInt(text[1]);
 				if (text.length === 2) {//tier, div
-					if (tier_index < 5) {//below master
+					if (tier_index < 6) {//below master
 						if (div > 5 || div < 1) return null;
 						else return T_IMMR[tier_index] + ((4 - div) * 100);
 					}
 					else return null;
 				}
-				else if (tier_index >= 5 && tier_index != 8) {//tier, LP master/grandmaster
+				else if (tier_index >= 6 && tier_index != 8) {//tier, LP master/grandmaster
 					let LP = parseInt(text.substring(2));//must be >= 0
 					if (LP < 0) return null;
 					else return T_IMMR[tier_index] + (LP / 5);
