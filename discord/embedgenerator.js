@@ -481,12 +481,11 @@ module.exports = class EmbedGenerator {
 				if (!UTILS.exists(teams[matches[i].participants[b].teamId])) teams[matches[i].participants[b].teamId] = [];
 				teams[matches[i].participants[b].teamId].push(matches[i].participants[b]);
 			}
-			let premade_game = false;
+			let premade_game = 0;
 			for (let b in teams[teamParticipant.teamId]) {
 				const teamPID = UTILS.findParticipantIdentityFromPID(matches[i], teams[teamParticipant.teamId][b].participantId);
 				if (UTILS.exists(common_teammates[teamPID.player.summonerName]) && common_teammates[teamPID.player.summonerName].w + common_teammates[teamPID.player.summonerName].l > 1) {
-					premade_game = true;
-					break;
+					++premade_game;
 				}
 			}
 			if (i < 5) {//printing limit
@@ -498,7 +497,7 @@ module.exports = class EmbedGenerator {
 				else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id];
 				else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell2Id].name + "`";
-				individual_match_description.push([(win ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].emoji + CONFIG.EMOJIS.lanes[lane] + " " + summoner_spells + " `" + UTILS.standardTimestamp(matches[i].gameDuration) + "` " + queues[matches[i].queueId + ""] + " " + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))) + TAB + UTILS.fstr(premade_game, PREMADE_EMOJIS[1]), "__lv.__ `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\t__KDR:__`" + UTILS.KDAFormat(KDA.KD) + "`\t__KDA:__`" + UTILS.KDAFormat(KDA.KDA) + "` `" + UTILS.KPFormat((100 * (KDA.A + KDA.K)) / tK) + "%`\t__cs:__`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "` `(" + ((stats.totalMinionsKilled + stats.neutralMinionsKilled) / (matches[i].gameDuration / 60)).round(1) + ")`\t__g:__`" + UTILS.gold(stats.goldEarned) + "`\n__items:__ " + getItemTags([stats.item0, stats.item1, stats.item2, stats.item3, stats.item4, stats.item5, stats.item6]).map(s => "`" + s + "`").join(TAB + " ") + "\n" + getMatchTags(summoner.id, matches[i], stats.mastery).map(s => "`" + s + "`").join(TAB + " ")]);
+				individual_match_description.push([(win ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].emoji + CONFIG.EMOJIS.lanes[lane] + " " + summoner_spells + " `" + UTILS.standardTimestamp(matches[i].gameDuration) + "` " + queues[matches[i].queueId + ""] + " " + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))) + TAB + UTILS.fstr(premade_game > 0, PREMADE_EMOJIS[1] + premade_game), "__lv.__ `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\t__KDR:__`" + UTILS.KDAFormat(KDA.KD) + "`\t__KDA:__`" + UTILS.KDAFormat(KDA.KDA) + "` `" + UTILS.KPFormat((100 * (KDA.A + KDA.K)) / tK) + "%`\t__cs:__`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "` `(" + ((stats.totalMinionsKilled + stats.neutralMinionsKilled) / (matches[i].gameDuration / 60)).round(1) + ")`\t__g:__`" + UTILS.gold(stats.goldEarned) + "`\n__items:__ " + getItemTags([stats.item0, stats.item1, stats.item2, stats.item3, stats.item4, stats.item5, stats.item6]).map(s => "`" + s + "`").join(TAB + " ") + "\n" + getMatchTags(summoner.id, matches[i], stats.mastery).map(s => "`" + s + "`").join(TAB + " ")]);
 			}
 			// champion
 			// match result
