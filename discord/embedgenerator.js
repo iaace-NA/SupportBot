@@ -484,8 +484,7 @@ module.exports = class EmbedGenerator {
 			let premade_game = false;
 			for (let b in teams[teamParticipant.teamId]) {
 				const teamPID = UTILS.findParticipantIdentityFromPID(matches[i], teams[teamParticipant.teamId][b].participantId);
-				const candidate = common_teammates.find(ct => ct[0] === teamPID.summonerName);
-				if (UTILS.exists(candidate) && candidate.w + candidate.l > 1) {
+				if (UTILS.exists(common_teammates[teamPID.summonerName]) && common_teammates[teamPID.summonerName].w + common_teammates[teamPID.summonerName].l > 1) {
 					premade_game = true;
 					break;
 				}
