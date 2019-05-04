@@ -7,7 +7,7 @@ let CONFIG;
 const JSON5 = require("json5");
 try {
 	CONFIG = JSON5.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.7.4";//b for non-release (in development)
+	CONFIG.VERSION = "v1.8.0";//b for non-release (in development)
 }
 catch (e) {
 	console.log("something's wrong with config.json");
@@ -217,7 +217,7 @@ website.ws("/shard", (ws, req) => {
 	ws.on("message", data => {
 		data = JSON.parse(data);
 		UTILS.debug("ws message received: $" + data.id + " type: " + data.type);
-		wsRoutes(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans, sendExpectReplyBroadcast);
+		wsRoutes(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans, sendExpectReplyBroadcast, rawAPIRequest, irs);
 		if (UTILS.exists(data.request_id) && UTILS.exists(message_handlers[data.request_id])) {
 			let nMsg = UTILS.copy(data);
 			delete nMsg.request_id;

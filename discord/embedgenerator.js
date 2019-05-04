@@ -1,6 +1,7 @@
 "use strict";
 const Discord = require("discord.js");
 const UTILS = new (require("../utils/utils.js"))();
+const JSON5 = require("json5");
 const mathjs = require("mathjs");
 const crypto = require("crypto");
 const fs = require("fs");
@@ -158,10 +159,13 @@ const RANK_COLOR = [[69, 69, 69], [153, 51, 0], [179, 179, 179], [255, 214, 51],
 const IMMR_THRESHOLD = [100, 500, 900, 1300, 1700, 2100, 2500, 2600, 2700];
 const MMR_THRESHOLD = [400, 1150, 1400, 1650, 1900, 2150, 2400];//starting MMRs for each tier
 const PREMADE_EMOJIS = ["", "\\💙", "\\💛", "\\💚"];
+const ALLY = "\\💚";
+const ENEMY = "\\❤️";
 const HORIZONTAL_SEPARATOR = "------------------------------";
 const VERIFIED_ICON = "✅";
 const TAB = " ";
 const ITEMS = JSON.parse(fs.readFileSync("../data/items.json", "utf-8"));
+const LANE_PCT = JSON5.parse(fs.readFileSync("../data/lanes.json5", "utf-8"));
 const BLUE_SMITE_ITEMS = [1416, 1401, 1402, 1400];
 const BLUE_SMITE = 3706;
 const RED_SMITE_ITEMS = [1419, 1413, 1414, 1412];
@@ -259,6 +263,30 @@ function transformTimelineToArray(match, timeline) {
 	}
 	return answer;
 }
+function getLikelyLanes(CONFIG, champion_ids) {
+	UTILS.assert(champion_ids.length === 5);
+	let lane_permutations = UTILS.permute([0, 1, 2, 3, 4]);
+	let probabilities = lane_permutations.map((lane_assignments => {
+		let sum = 0;
+		for (let i = 0; i < lane_assignments.length; ++i) {//use specific lane assignment element from lane_permutations array
+			sum += LANE_PCT[champion_ids[i]][lane_assignments[i]];
+		}
+		return sum;
+	}));
+	let max = probabilities[0];//highest probability seen so far
+	let index_of_max = 0;//index of the above
+	for (let i = 1; i < probabilities.length; ++i) {
+		if (probabilities[i] > max) {
+			max = probabilities[i];
+			index_of_max = i;
+		}
+	}
+	let answer = {};
+	answer.assignments = lane_permutations[index_of_max].map(lane_number => lane_number + 1);
+	answer.confidence = max / 5;
+	UTILS.debug("highest probability lane assignments are:\n" + answer.assignments.map((lane_number, index) => CONFIG.STATIC.CHAMPIONS[champion_ids[index]].name + ": " + ["Top", "Jungle", "Mid", "Support", "Bot"][lane_number - 1] + " : " + LANE_PCT[champion_ids[index]][lane_number - 1] + "%").join("\n") + "\nwith total probability: " + (max / 5) + "%");
+	return answer;
+}
 module.exports = class EmbedGenerator {
 	constructor() { }
 	test(x = "") {
@@ -281,12 +309,13 @@ module.exports = class EmbedGenerator {
 		newEmbed.addField("`<region> [username]`", "Aliases:\n`<op.gg link>`\n\nDisplays summoner information.\n" + HORIZONTAL_SEPARATOR);
 		newEmbed.addField("`matchhistory <region> [username]`", "Aliases:\n`mh <region> [username]`\n\nDisplays basic information about the 5 most recent games played.\n" + HORIZONTAL_SEPARATOR);
 		newEmbed.addField("`matchhistory<number> <region> [username]`", "Aliases:\n`mh<number> <region> [username]`\n\nDisplays detailed information about one of your most recently played games.\n" + HORIZONTAL_SEPARATOR);
-		newEmbed.addField("`livegame <region> [username]`", "Aliases:\n`lg <region> [username]`\n`currentgame <region> [username]`\n`cg <region> [username]`\n`livematch <region> [username]`\n`lm <region> [username]`\n`currentmatch <region> [username]`\n`cm <region> [username]`\n\nShows information about a game currently being played.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`livegame <region> [username]`", "Aliases:\n`lg <region> [username]`\n\nShows information about a game currently being played.\n" + HORIZONTAL_SEPARATOR);
 		newEmbed.addField("`service status <region>`", "Aliases:\n`servicestatus <region>`\n`status <region>`\n`ss <region>`\n\nShows information on the uptime of LoL services in a region.\n" + HORIZONTAL_SEPARATOR);
 		newEmbed.addField("`multi <region> <comma separated list of usernames/lobby text>`", "Aliases:\n`m <region> <list of usernames or lobby text>`\n\nCompares multiple summoners in a region against each other.\n" + HORIZONTAL_SEPARATOR);
 		newEmbed.addField("`fairteamgenerator <region> <comma separated list of usernames/lobby text>`", "Aliases:\n`ftg <region> <list of usernames or lobby text>`\n\nGenerates fair teams from a list of summoners.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`fromlastgame <region> [username]`", "Aliases:\n`flg <region> [username]`\n\nShows people you've recently played with, which teams they were on, and which champions were played.\n" + HORIZONTAL_SEPARATOR);
 		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "shortcuts`", "Displays a list of nicknames you've set for friends with hard to spell names. Visit https://supportbot.tk/ for more information on this family of commands.\n" + HORIZONTAL_SEPARATOR);
-		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "setting <setting name> <value>`", "Set server preferences for: prefix, auto-opgg, force-prefix, release-notifications. See our website for more details.");
+		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "setting <setting name> <value>`", "Set server preferences for: prefix, auto-opgg, force-prefix, release-notifications, global-feedback. See our website for more details.");
 		newEmbed.setFooter("SupportBot " + CONFIG.VERSION);
 		return newEmbed;
 	}
@@ -353,11 +382,11 @@ module.exports = class EmbedGenerator {
 			else if (ranks[i].tier == "GRANDMASTER") { }
 			else {//
 				challengers[i].entries.sort((a, b) => b.leaguePoints - a.leaguePoints);//sort by LP
-				const candidate = challengers[i].entries.findIndex(cr => summoner.id == cr.playerOrTeamId);//find placing
+				const candidate = challengers[i].entries.findIndex(cr => summoner.id == cr.summonerId);//find placing
 				if (candidate != -1) title += "#" + (candidate + 1) + " ";//add placing if index found
 			}
 			title += ranks[i].leaguePoints + "LP";
-			newEmbed.addField((will ? "~~" : "") + (ranks[i].position !== "NONE" ? CONFIG.EMOJIS.lanes[UTILS.positionToLane(ranks[i].position)] : "") + title + (will ? "~~" : ""), (will ? "~~" : "") + description + (will ? "~~" : ""), true);
+			newEmbed.addField((will ? "~~" : "") + title + (will ? "~~" : ""), (will ? "~~" : "") + description + (will ? "~~" : ""), true);
 			if (RANK_ORDER.indexOf(ranks[i].tier) > highest_rank) highest_rank = RANK_ORDER.indexOf(ranks[i].tier);
 		}
 		if (highest_rank > -1) newEmbed.setColor(RANK_COLOR[highest_rank]);
@@ -415,6 +444,22 @@ module.exports = class EmbedGenerator {
 		let individual_match_description = [];
 		let lane_record = [];//ordered, sequential
 		let champion_record = [];//ordered, sequential
+		for (let i = 0; i < match_meta.length && i < 20; ++i) {//calculates all recently played with
+			const teamParticipant = UTILS.teamParticipant(summoner.id, matches[i]);
+			const win = UTILS.determineWin(summoner.id, matches[i]);
+			let teams = {};
+			for (let b in matches[i].participants) {
+				if (!UTILS.exists(teams[matches[i].participants[b].teamId])) teams[matches[i].participants[b].teamId] = [];
+				teams[matches[i].participants[b].teamId].push(matches[i].participants[b]);
+			}
+			for (let b in teams[teamParticipant.teamId]) {
+				const tmPI = UTILS.findParticipantIdentityFromPID(matches[i], teams[teamParticipant.teamId][b].participantId);
+				if (tmPI.player.summonerId === summoner.id) continue;
+				if (!UTILS.exists(common_teammates[tmPI.player.summonerName])) common_teammates[tmPI.player.summonerName] = { w: 0, l: 0 };
+				if (win) common_teammates[tmPI.player.summonerName].w += 1;
+				else common_teammates[tmPI.player.summonerName].l += 1;
+			}
+		}
 		for (let i = 0; i < match_meta.length && i < 20; ++i) {
 			const KDA = UTILS.KDA(summoner.id, matches[i]);
 			const stats = UTILS.stats(summoner.id, matches[i]);
@@ -439,12 +484,12 @@ module.exports = class EmbedGenerator {
 				if (!UTILS.exists(teams[matches[i].participants[b].teamId])) teams[matches[i].participants[b].teamId] = [];
 				teams[matches[i].participants[b].teamId].push(matches[i].participants[b]);
 			}
+			let premade_game = 0;
 			for (let b in teams[teamParticipant.teamId]) {
-				const tmPI = UTILS.findParticipantIdentityFromPID(matches[i], teams[teamParticipant.teamId][b].participantId);
-				if (tmPI.player.summonerId === summoner.id) continue;
-				if (!UTILS.exists(common_teammates[tmPI.player.summonerName])) common_teammates[tmPI.player.summonerName] = { w: 0, l: 0 };
-				if (win) common_teammates[tmPI.player.summonerName].w += 1;
-				else common_teammates[tmPI.player.summonerName].l += 1;
+				const teamPID = UTILS.findParticipantIdentityFromPID(matches[i], teams[teamParticipant.teamId][b].participantId);
+				if (UTILS.exists(common_teammates[teamPID.player.summonerName]) && common_teammates[teamPID.player.summonerName].w + common_teammates[teamPID.player.summonerName].l > 1) {
+					++premade_game;
+				}
 			}
 			if (i < 5) {//printing limit
 				const tK = teams[teamParticipant.teamId].reduce((total, increment) => total + increment.stats.kills, 0);
@@ -455,7 +500,7 @@ module.exports = class EmbedGenerator {
 				else summoner_spells += "`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id])) summoner_spells += CONFIG.SPELL_EMOJIS[teamParticipant.spell2Id];
 				else summoner_spells += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teamParticipant.spell2Id].name + "`";
-				individual_match_description.push([(win ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].emoji + CONFIG.EMOJIS.lanes[lane] + " " + summoner_spells + " `" + UTILS.standardTimestamp(matches[i].gameDuration) + "` " + queues[matches[i].queueId + ""] + " " + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))), "__lv.__ `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\t__KDR:__`" + UTILS.KDAFormat(KDA.KD) + "`\t__KDA:__`" + UTILS.KDAFormat(KDA.KDA) + "` `" + UTILS.KPFormat((100 * (KDA.A + KDA.K)) / tK) + "%`\t__cs:__`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "` `(" + ((stats.totalMinionsKilled + stats.neutralMinionsKilled) / (matches[i].gameDuration / 60)).round(1) + ")`\t__g:__`" + UTILS.gold(stats.goldEarned) + "`\n__items:__ " + getItemTags([stats.item0, stats.item1, stats.item2, stats.item3, stats.item4, stats.item5, stats.item6]).map(s => "`" + s + "`").join(TAB + " ") + "\n" + getMatchTags(summoner.id, matches[i], stats.mastery).map(s => "`" + s + "`").join(TAB + " ")]);
+				individual_match_description.push([(win ? "<:win:409617613161758741>" : "<:loss:409618158165688320>") + " " + CONFIG.STATIC.CHAMPIONS[match_meta[i].champion].emoji + CONFIG.EMOJIS.lanes[lane] + " " + summoner_spells + " `" + UTILS.standardTimestamp(matches[i].gameDuration) + "` " + queues[matches[i].queueId + ""] + " " + UTILS.ago(new Date(match_meta[i].timestamp + (matches[i].gameDuration * 1000))) + UTILS.fstr(premade_game > 0, TAB + "+" + premade_game + PREMADE_EMOJIS[1]), "__lv.__ `" + stats.champLevel + "`\t`" + KDA.K + "/" + KDA.D + "/" + KDA.A + "`\t__KDR:__`" + UTILS.KDAFormat(KDA.KD) + "`\t__KDA:__`" + UTILS.KDAFormat(KDA.KDA) + "` `" + UTILS.KPFormat((100 * (KDA.A + KDA.K)) / tK) + "%`\t__cs:__`" + (stats.totalMinionsKilled + stats.neutralMinionsKilled) + "` `(" + ((stats.totalMinionsKilled + stats.neutralMinionsKilled) / (matches[i].gameDuration / 60)).round(1) + ")`\t__g:__`" + UTILS.gold(stats.goldEarned) + "`\n__items:__ " + getItemTags([stats.item0, stats.item1, stats.item2, stats.item3, stats.item4, stats.item5, stats.item6]).map(s => "`" + s + "`").join(TAB + " ") + "\n" + getMatchTags(summoner.id, matches[i], stats.mastery).map(s => "`" + s + "`").join(TAB + " ")]);
 			}
 			// champion
 			// match result
@@ -499,6 +544,76 @@ module.exports = class EmbedGenerator {
 		newEmbed.addField("Top 10 Recently Played With", rpws.slice(0, 10).join("\n"));
 		return newEmbed;
 	}
+	fromLastGame(CONFIG, summoner, match, matches, summoner_participants, verified) {//should show 5 most recent games
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
+		let common_teammates = {};
+		for (let i = 0; i < matches.length; ++i) common_teammates[i + ""] = {};
+		/*
+		{
+			"0": {//game 1
+				"summonerName": {
+					win: true,
+					same_team: false,
+					championID: "123",
+					lane: ""
+				},
+				"summonerName2": {
+					...
+				}
+			},
+			"1": ...
+		}
+		*/
+		for (let i = 0; i < matches.length; ++i) {//for my 5 most recent games
+			const teamParticipant = UTILS.teamParticipant(summoner.id, matches[i]);//current user
+			const win = UTILS.determineWin(summoner.id, matches[i]);
+			let teams = {};
+			for (let b in matches[i].participants) {//sort into teams
+				if (!UTILS.exists(teams[matches[i].participants[b].teamId])) teams[matches[i].participants[b].teamId] = [];
+				teams[matches[i].participants[b].teamId].push(matches[i].participants[b]);
+			}
+			for (let b in teams) {//for each team,
+				for (let c in teams[b]) {//for each participant in team b,
+					const tmPI = UTILS.findParticipantIdentityFromPID(matches[i], teams[b][c].participantId);
+					if (tmPI.player.summonerId === summoner.id) continue;
+					common_teammates[i + ""][tmPI.player.summonerName] = {
+						win: win,
+						same_team: b == teamParticipant.teamId,
+						championID: teams[b][c].championId,
+						lane: UTILS.inferLane(teams[b][c].timeline.role, teams[b][c].timeline.lane, teams[b][c].spell1Id, teams[b][c].spell2Id)
+					};
+				}
+			}
+		}
+		let current_participant = match.participants.find(p => p.summonerId === summoner.id);
+		for (let b in match.participants) {
+			if (match.participants[b].summonerId === summoner.id) continue;
+			let num_recent_games = 0;
+			let field_title = (match.participants[b].teamId === current_participant.teamId ? ALLY : ENEMY) + CONFIG.STATIC.CHAMPIONS[match.participants[b].championId].emoji + " " + match.participants[b].summonerName;
+			let field_desc = [];
+			for (let i = 0; i < matches.length; ++i) {
+				if (UTILS.exists(common_teammates[i + ""][match.participants[b].summonerName])) {
+					const history_info = common_teammates[i + ""][match.participants[b].summonerName];
+					const p = UTILS.teamParticipant(summoner.id, matches[i]);
+					field_desc.push("was " + (history_info.same_team ? ALLY : ENEMY) + CONFIG.STATIC.CHAMPIONS[history_info.championID].emoji + CONFIG.EMOJIS.lanes[history_info.lane] + " from **" + (i + 1) + "** game(s) ago. You " + (history_info.win ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss) + " as " + CONFIG.STATIC.CHAMPIONS[p.championId].emoji + CONFIG.EMOJIS.lanes[UTILS.inferLane(p.timeline.role, p.timeline.lane, p.spell1Id, p.spell2Id)]);
+					++num_recent_games;
+				}
+			}
+			if (num_recent_games === 0) {
+				newEmbed.addField(field_title, "You have not recently played with.");
+			}
+			else {
+				newEmbed.addField(field_title, field_desc.join("\n"));
+			}
+		}
+		//newEmbed.setFooter("Previous match results (W/L) shown from your perspective.");
+		/*
+		Field Title: "%team% %champion_name% %summoner_name%"
+		Field Description: "was %team% %champion_name%%lane% from %i% games ago, You %result% as %champion_name%%lane%"
+		*/
+		return newEmbed;
+	}
 	detailedMatch(CONFIG, summoner, match_meta, match, timeline, ranks, masteries, summoner_participants, verified) {//should show detailed information about 1 game
 		return new Promise((resolve, reject) => {
 			let newEmbed = new Discord.RichEmbed();
@@ -518,12 +633,13 @@ module.exports = class EmbedGenerator {
 			let teams = {};
 			for (let b in match.participantIdentities) {
 				const pI = match.participantIdentities[b];
+				const p = match.participants.find(p => pI.participantId == p.participantId);
 				const flex_5 = ranks[b].find(r => r.queueType === "RANKED_FLEX_SR");
 				const flex_3 = ranks[b].find(r => r.queueType === "RANKED_FLEX_TT");
 				const solo = ranks[b].find(r => r.queueType === "RANKED_SOLO_5x5");
-				pI.flex5 = "`" + UTILS.shortRank(flex_5) + "`";
-				pI.flex3 = "`" + UTILS.shortRank(flex_3) + "`";
-				pI.solo = "`" + UTILS.shortRank(solo) + "`";
+				pI.flex5 = "`" + UTILS.shortRank(flex_5, match.mapId == 11, p.highestAchievedSeasonTier) + "`";
+				pI.flex3 = "`" + UTILS.shortRank(flex_3, match.mapId == 10, p.highestAchievedSeasonTier) + "`";
+				pI.solo = "`" + UTILS.shortRank(solo, match.mapId == 11, p.highestAchievedSeasonTier) + "`";
 				pI.mastery = UTILS.getSingleChampionMastery(masteries[b], match.participants.find(p => p.participantId == pI.participantId).championId);
 			}
 			for (let b in match.participants) {
@@ -595,9 +711,23 @@ module.exports = class EmbedGenerator {
 			const flex_5 = ranks[b].find(r => r.queueType === "RANKED_FLEX_SR");
 			const flex_3 = ranks[b].find(r => r.queueType === "RANKED_FLEX_TT");
 			const solo = ranks[b].find(r => r.queueType === "RANKED_SOLO_5x5");
-			match.participants[b].flex5 = UTILS.shortRank(flex_5);
-			match.participants[b].flex3 = UTILS.shortRank(flex_3);
-			match.participants[b].solo = UTILS.shortRank(solo);
+			let lsr_sr, lsr_tt;
+			for (let c in matches) {
+				//UTILS.debug("iterating through matches for " + b + " m#: " + c);
+				if (matches[c].mapId == 11 || matches[c].mapId == 10) {//SR
+					const p = UTILS.teamParticipant(match.participants[b].summonerId, matches[c]);
+					//if (UTILS.exists(p)) UTILS.debug("tp found");
+					if (UTILS.exists(p) && UTILS.exists(p.highestAchievedSeasonTier)) {
+						//UTILS.debug("hAST found");
+						if (matches[c].mapId == 11 && !UTILS.exists(lsr_sr)) lsr_sr = p.highestAchievedSeasonTier;
+						else if (matches[c].mapId == 10 && !UTILS.exists(lsr_tt)) lsr_tt = p.highestAchievedSeasonTier;
+					}
+				}
+			}
+			match.participants[b].flex5 = "`" + UTILS.shortRank(flex_5, true, lsr_sr) + "`";
+			match.participants[b].flex3 = "`" + UTILS.shortRank(flex_3, true, lsr_tt) + "`";
+			match.participants[b].solo = "`" + UTILS.shortRank(solo, true, lsr_sr) + "`";
+			match.participants[b].lsr_sr = lsr_sr;
 			match.participants[b].mastery = UTILS.getSingleChampionMastery(masteries[b], match.participants[b].championId);
 			teams[match.participants[b].teamId].push(match.participants[b]);
 			common_teammates[match.participants[b].summonerName] = {};
@@ -641,7 +771,16 @@ module.exports = class EmbedGenerator {
 		if (trim) UTILS.debug(UTILS.trim(common_teammates) + " premade entries trimmed.");
 		let team_count = 1;
 		let player_count = 0;
+		let role_confidence = [];
 		for (let b in teams) {//team
+			if (teams[b].length === 5 && match.mapId === 11) {
+				let lane_assignments = getLikelyLanes(CONFIG, teams[b].map(match_participant => match_participant.championId));//could break non-SR games
+				role_confidence.push(lane_assignments.confidence.round(1));
+				for (let c = 0; c < teams[b].length; ++c) {
+					teams[b][c].lanePrediction = lane_assignments.assignments[c];
+				}
+				teams[b].sort((a, b) => a.lanePrediction - b.lanePrediction);
+			}
 			let team_description_c1 = "";
 			let team_description_c2 = "";
 			let ban_description = [];
@@ -665,7 +804,8 @@ module.exports = class EmbedGenerator {
 				else team_description_c1 += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
 				else team_description_c1 += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
-				team_description_c1 += " `" + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3 + "`\n";
+				team_description_c1 += " " + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3;
+				team_description_c1 += UTILS.fstr(teams[b].length === 5 && match.mapId === 11, CONFIG.EMOJIS.lanes[teams[b][c].lanePrediction]) + "\n";
 				team_description_c2 += "`M" + teams[b][c].mastery + "`" + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
 				team_description_c2 += "`" + summoner_participants.find(p => p.id == teams[b][c].summonerId).summonerLevel + "`";
 				team_description_c2 += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
@@ -683,6 +823,7 @@ module.exports = class EmbedGenerator {
 			UTILS.debug("team_description_c2 length: " + team_description_c2.length);
 			newEmbed.addField(":x::x: `SOLOQ ¦FLEX5 ¦FLEX3`", team_description_c1, true);
 			newEmbed.addField("Bans: " + ban_description.join(""), team_description_c2, true);
+			if (role_confidence.length === 2) newEmbed.setFooter("Role Confidence: Blue: " + role_confidence[0] + "% Purple: " + role_confidence[1] + "%");
 			++team_count;
 		}
 		return newEmbed;
@@ -783,10 +924,24 @@ module.exports = class EmbedGenerator {
 				response_str.push("The requested summoner does not exist.");
 				continue;
 			}
+			let lsr_sr, lsr_tt;
+			for (let b in match_metas[i].matches) {
+				//UTILS.debug("iterating through matches for " + b + " m#: " + c);
+				let m = matches.find(m => match_metas[i].matches[b].gameId == m.gameId);
+				if (m.mapId == 11 || m.mapId == 10) {//SR
+					const p = UTILS.teamParticipant(summoners[i].id, m);
+					//if (UTILS.exists(p)) UTILS.debug("tp found");
+					if (UTILS.exists(p) && UTILS.exists(p.highestAchievedSeasonTier)) {
+						//UTILS.debug("hAST found");
+						if (m.mapId == 11 && !UTILS.exists(lsr_sr)) lsr_sr = p.highestAchievedSeasonTier;
+						else if (m.mapId == 10 && !UTILS.exists(lsr_tt)) lsr_tt = p.highestAchievedSeasonTier;
+					}
+				}
+			}
 			let individual_description = "`";
-			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_SOLO_5x5")) + " ";
-			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_FLEX_SR")) + " ";
-			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_FLEX_TT")) + " ";
+			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_SOLO_5x5"), true, lsr_sr) + " ";
+			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_FLEX_SR"), true, lsr_sr) + " ";
+			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_FLEX_TT"), true, lsr_tt) + " ";
 			let results = [];
 			let all_KDA = {
 				K: 0,

@@ -82,7 +82,9 @@ module.exports = class UTILS {
 		return answer;
 	}
 	teamParticipant(summonerID, match) {
-		const participantID = match.participantIdentities.find(pI => pI.player.summonerId == summonerID).participantId;
+		const participant = match.participantIdentities.find(pI => pI.player.summonerId == summonerID);
+		if (!this.exists(participant)) return undefined;
+		const participantID = participant.participantId;
 		const stats = match.participants.find(p => p.participantId == participantID);
 		return stats;
 	}
@@ -180,13 +182,49 @@ module.exports = class UTILS {
 	positionToLane(position) {
 		return ["APEX", "TOP", "JUNGLE", "MIDDLE", "UTILITY", "BOTTOM"].indexOf(position);
 	}
+	laneToPosition(lane) {
+		return ["APEX", "TOP", "JUNGLE", "MIDDLE", "UTILITY", "BOTTOM"][position];
+	}
 	opgg(region, username) {
 		this.assert(this.exists(username), "opgg link generator: username doesn't exist");
 		this.assert(this.exists(region), "opgg link generator: region doesn't exist");
 		if (region == "KR") region = "www";//account for kr region special www opgg link
-		return "http://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
+		return "https://" + region + ".op.gg/summoner/userName=" + encodeURIComponent(username);
 	}
-	shortRank(info) {
+	preferredRank(ranks, mode, role) {
+		let candidates = [];
+		for (let b in ranks) {
+			if (ranks[b].queueType === mode) {
+				candidates.push(ranks[b]);
+			}
+		}
+		if (candidates.length == 0) return undefined;
+		if (candidates.length == 1) {
+			return {
+				ans: candidates[0],
+				precise: candidates[0].position == this.laneToPosition(role)
+			}
+		}
+		else {
+			const final_candidate = candidates.find(r => r.position === this.laneToPosition(role));
+			if (this.exists(final_candidate)) {
+				return {
+					ans: final_candidate,
+					precise: true
+				};
+			}
+			else {
+				candidates.sort((a, b) => this.iMMR(b) - this.iMMR(a));
+				return {
+					ans: candidates[0],
+					precise: false
+				}
+			}
+		}
+	}
+	shortRank(info, mapId, lsr) {
+		//lsr = last season's rank
+		//mapId = boolean if map type is correct, display LSR if info is undefined
 		//****** unranked
 		//XXXXXX unranked
 		//██████ unranked
@@ -197,7 +235,20 @@ module.exports = class UTILS {
 		//G2↑ L- Gold 2 promotion, 1 loss
 		//C +256 Challenger, 256LP
 		//C+1256 Challenger 1256 LP
-		if (!this.exists(info)) return "******";
+		if (!this.exists(info)) {
+			/*
+			LSR:
+			S8BRON
+			S8SILV
+			S8GOLD
+			S8PLAT
+			S8DIAM
+			S8MAST
+			S8CHAL
+			*/
+			if (mapId && this.exists(lsr) && lsr != "UNRANKED") return "S8" + lsr.substring(0, 4).toUpperCase();
+			return "******";
+		}
 		let answer = "";
 		answer += info.tier[0];
 		if (this.exists(info.miniSeries)) {//series
@@ -308,35 +359,60 @@ module.exports = class UTILS {
 		return answer;
 	}
 	decodeEnglishToIMMR(text) {
+		/*valids:
+		C
+		c+1000
+		GM
+		gm+500
+		MA
+		i
+		i+2
+		i2
+		i4
+		*/
+		/*invalid:
+		C2
+		gm2
+		ma2
+		d5
+		d5+1
+		*/
 		const answer = internal_calc();
 		return (isNaN(answer) || !this.exists(answer)) ? null : answer;
 		function internal_calc() {
 			text.replaceAll(" ", "");//remove spaces
 			text = text.toLowerCase();//all lowercase
-			const TIERS = ["b", "s", "g", "p", "d", "m", "c"];
-			const T_IMMR = [300, 800, 1300, 1800, 2300, 2600, 2800];
-			const tier_index = TIERS.indexOf(text[0]);
-			if (tier_index === -1) return null;//tier not detected
-			if (text.length === 1) return T_IMMR[TIERS.indexOf(text[0])];//tier only
+			const TIERS = ["i", "b", "s", "g", "p", "d", "ma", "gm", "c"];
+			const T_IMMR = [100, 500, 900, 1300, 1700, 2100, 2500, 2600, 2700];
+			let tier_index = TIERS.indexOf(text.substring(0, 2));
+			if (tier_index === -1) {
+				tier_index = TIERS.indexOf(text[0]);
+				if (tier_index === -1) return null;//tier not detected
+			}
+			if (text.length === 1 || (text.length === 2 && tier_index >= 6 && tier_index <= 7)) return T_IMMR[tier_index];//tier only
 			else {//tier, div, [LP]
 				const div = parseInt(text[1]);
 				if (text.length === 2) {//tier, div
-					if (tier_index < 5) {//below master
-						if (div > 5 || div < 1) return null;
-						else return T_IMMR[tier_index] + ((3 - div) * 100);
+					if (tier_index < 6) {//below master
+						if (div > 4 || div < 1) return null;
+						else return T_IMMR[tier_index] + ((4 - div) * 100);
 					}
 					else return null;
 				}
-				else if (tier_index >= 5) {//tier, LP master/challenger
+				else if (tier_index >= 6 && tier_index < 8) {//tier, LP master/grandmaster
+					let LP = parseInt(text.substring(2));//must be >= 0
+					if (LP < 0) return null;
+					else return T_IMMR[tier_index] + (LP / 5) - ((tier_index - 6) * 100);
+				}
+				else if (tier_index == 8) {//tier, LP challenger
 					let LP = parseInt(text.substring(1));//must be >= 0
 					if (LP < 0) return null;
-					else if (tier_index == 5) return T_IMMR[tier_index] + (LP / 5);
-					else return T_IMMR[tier_index] - 200 + (LP / 5);
+					else return T_IMMR[tier_index] + (LP / 5) - ((tier_index - 6) * 100);
 				}
 				else {//tier, div, LP
 					let LP = parseInt(text.substring(2));
 					if (LP > 100 || LP < 0) return null;//must be between 0 and 100
-					return T_IMMR[tier_index] + ((3 - div) * 100) + LP;
+					return T_IMMR[tier_index] + ((4 - div) * 100) + LP;
 				}
 			}
 		}
@@ -462,6 +538,9 @@ module.exports = class UTILS {
 	}
 	conditionalFormat(text, surrounds, condition = true) {
 		return condition ? surrounds + text + surrounds : text;
+	}
+	fstr(condition, tstr = "", fstr = "") {
+		return condition ? tstr : fstr;
 	}
 	accessLevel(CONFIG, msg, uid) {//uid optional
 		if (!this.exists(uid)) uid = msg.author.id;
@@ -737,5 +816,29 @@ module.exports = class UTILS {
 				});
 			}
 		});
+	}
+	permute(ext_input) {
+		let permArr = [];
+		let usedChars = [];
+		internal_permute(ext_input);
+		function internal_permute(input) {
+			for (let i = 0; i < input.length; i++) {
+				let ch = input.splice(i, 1)[0];
+				usedChars.push(ch);
+				if (input.length == 0) {
+				permArr.push(usedChars.slice());
+				}
+				internal_permute(input);
+				input.splice(i, 0, ch);
+				usedChars.pop();
+			}
+		}
+		return permArr;
+	};
+	defaultObjectValues(template, original) {
+		template = this.copy(template);
+		for (let i in template) {
+			if (!this.exists(original[i])) original[i] = template[i];
+		}
 	}
 }

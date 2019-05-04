@@ -24,7 +24,7 @@
 		},
 		"250698693982945282": {
 			"name": "K-den",
-			"active": true,
+			"active": false,
 			"flags": "us"
 		},
 		"175003640111693824": {
@@ -34,8 +34,13 @@
 		},
 		"66336882170015744": {
 			"name": "HiKomodo",
-			"active": true,
+			"active": false,
 			"flags": "🇺🇸"
+		},
+		"295662044953444352": {
+			"name": "morryz",
+			"active": true,
+			"flags": "🇬🇧🇬🇷🇦🇱"
 		}
 	},
 	"DISCORD_COMMAND_PREFIX": "l",//not case sensitive
@@ -149,7 +154,7 @@
 			"SUMMONER_ID": 3600,
 			"LIVE_MATCH": 60,
 			"OTHER_SUMMONER_ID": 86400,
-			"RECENT_GAMES": 1800,
+			"RECENT_GAMES": 600,
 			"MULTIPLE_MATCH": 15552000,
 			"MULTIPLE_RANKS": 14400,
 			"MULTIPLE_MASTERIES": 86400
@@ -185,6 +190,13 @@
 		"VERIFY": {
 			"SUMMONER_ID": 3600,
 			"THIRD_PARTY_CODE": 30
+		},
+		"FLG": {
+			"SUMMONER_ID": 3600,
+			"LIVE_MATCH": 60,
+			"OTHER_SUMMONER_ID": 86400,
+			"RECENT_GAMES": 120,
+			"MULTIPLE_MATCH": 15552000
 		}
 	},
 	"CHAMP_EMOJI_SERVERS": ["437263625980215316", "437271022560083968"],//servers that hold champion emojis

@@ -7,6 +7,7 @@ const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt") };
 let embedgenerator = new (require("./embedgenerator.js"))();
 let Preferences = require("./preferences.js");
 let LOLAPI = require("../utils/lolapi.js");
+let WSMM = require("../utils/wsmessagemanager.js");
 module.exports = class WSAPI {
 	/*
 	Used for internal communication between shards and IAPI.
@@ -75,12 +76,15 @@ module.exports = class WSAPI {
 
 		36: IAPI response to shard ping
 		37: shard wants to ping IAPI
+
+		38: IAPI wants to respond to shard LoL api request
+		39: shard LoL API request via ws
 	*/
 	constructor(INIT_CONFIG, discord_client, INIT_STATUS) {
 		this.client = discord_client;
+		this.wsmm = new WSMM();
 		this.STATUS = INIT_STATUS;
 		this.CONFIG = INIT_CONFIG;
-		this.lolapi = new LOLAPI(this.CONFIG, 0);
 		if (!UTILS.exists(this.CONFIG)) throw new Error("config.json required.");
 		this.request = REQUEST;
 		this.address = "wss://" + this.CONFIG.API_ADDRESS;
@@ -131,7 +135,7 @@ module.exports = class WSAPI {
 					this.client.guilds.forEach(g => {
 						let candidate = UTILS.preferredTextChannel(that.client, g.channels, "text", UTILS.defaultChannelNames(), ["VIEW_CHANNEL", "SEND_MESSAGES", "EMBED_LINKS"]);
 						if (UTILS.exists(candidate)) {
-							new Preferences(this.lolapi, g, preferences => {
+							new Preferences(new LOLAPI(this.CONFIG, 0, this), g, preferences => {
 								if (!data.release || (data.release && preferences.get("release_notifications"))) candidate.send("", { embed: notification }).catch(console.error);
 							});
 						}
@@ -254,6 +258,9 @@ module.exports = class WSAPI {
 					this.end_time = new Date().getTime();
 					this.pingcb({ started: this.start_time, ended: this.end_time });
 					break;
+				case 38:
+					this.wsmm.wsMessageCallback(data);
+					break;
 				default:
 					UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));
 			}
@@ -286,6 +293,11 @@ module.exports = class WSAPI {
 	}
 	getServerBans() {
 		this.send({ type: 17 });
+	}
+	iapiLoLRequest(region, tag, endpoint, maxage, cachetime, request_id) {
+		let p = this.wsmm.get();
+		this.send({ type: 39, wsm_ID: p.request_ID, region, tag, endpoint, maxage, cachetime, request_id });
+		return p.promise;
 	}
 	send(raw_object) {
 		let that = this;

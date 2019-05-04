@@ -1,7 +1,7 @@
 "use strict";
 const UTILS = new (require("../utils/utils.js"))();
 let champ_emojis = {};
-module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans, sendExpectReplyBroadcast) {
+module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShard, getBans, sendExpectReplyBroadcast, rawAPIRequest, irs) {
 	switch (data.type) {
 		case 1:
 			break;
@@ -50,6 +50,21 @@ module.exports = function(CONFIG, ws, shard_ws, data, shardBroadcast, sendToShar
 			break;
 		case 37:
 			sendToShard({ type: 36 }, data.id);
+			break;
+		case 39:
+			if (!UTILS.exists(irs[data.request_id])) irs[data.request_id] = [0, 0, 0, 0, 0, new Date().getTime()];
+			++irs[data.request_id][0];
+			rawAPIRequest(data.region, data.tag, data.endpoint, data.maxage, data.cachetime).then(body => {
+				//UTILS.debug("body type is " + typeof(body));
+				sendToShard({ type: 38, code: 200, response: body, wsm_ID: data.wsm_ID }, data.id);
+			}).catch(err => {
+				if (err === 500) {
+					sendToShard({ type: 38, code: 500, response: "", wsm_ID: data.wsm_ID }, data.id);
+				}
+				else {
+					sendToShard({ type: 38, code: err.status, response: err.response.res.text, wsm_ID: data.wsm_ID }, data.id);
+				}
+			});
 			break;
 		default:
 			UTILS.output("ws encountered unexpected message type: " + data.type + "\ncontents: " + JSON.stringify(data, null, "\t"));

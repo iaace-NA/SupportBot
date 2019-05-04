@@ -186,34 +186,35 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 				res.status(500).end();
 			}
 			else res.json({ success: true });
-			if (req.query.user != "true") shardBroadcast({ type: 18,
-				sid: req.query.id,
-				reason: req.query.reason,
-				date: parseInt(req.query.date),
-				issuer_tag: req.query.issuer_tag,
-				issuer_avatarURL: req.query.issuer_avatarURL });
-			else sendExpectReplyBroadcast({ type: 20,
-				uid: req.query.id,
-				reason: req.query.reason,
-				issuer_tag: req.query.issuer_tag,
-				issuer_avatarURL: req.query.issuer_avatarURL,
-				date: parseInt(req.query.date) }).then(results => {
-					for (let i = 0; i < results.length; ++i) {
-						if (results[i].connected) {
-							sendToShard({ type: 22,
-								uid: req.query.id,
-								reason: req.query.reason,
-								issuer_tag: req.query.issuer_tag,
-								issuer_avatarURL: req.query.issuer_avatarURL,
-								date: parseInt(req.query.date) }, i);
-							break;
+			if (req.query.notify == "true") {
+				if (req.query.user != "true") shardBroadcast({ type: 18,
+					sid: req.query.id,
+					reason: req.query.reason,
+					date: parseInt(req.query.date),
+					issuer_tag: req.query.issuer_tag,
+					issuer_avatarURL: req.query.issuer_avatarURL });
+				else sendExpectReplyBroadcast({ type: 20,
+					uid: req.query.id,
+					reason: req.query.reason,
+					issuer_tag: req.query.issuer_tag,
+					issuer_avatarURL: req.query.issuer_avatarURL,
+					date: parseInt(req.query.date) }).then(results => {
+						for (let i = 0; i < results.length; ++i) {
+							if (results[i].connected) {
+								sendToShard({ type: 22,
+									uid: req.query.id,
+									reason: req.query.reason,
+									issuer_tag: req.query.issuer_tag,
+									issuer_avatarURL: req.query.issuer_avatarURL,
+									date: parseInt(req.query.date) }, i);
+								break;
+							}
 						}
-					}
-				}).catch(console.error);
+					}).catch(console.error);
+			}
 			getBans(req.query.user == "true", bans => {
 				shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });//updates all shards with new ban information
 			});
-
 		});
 	}, true);
 	serveWebRequest("/warn", (req, res, next) => {//boolean-user, string-id, string-reason, string-issuer, boolean-notify, string-issuer_tag, string-issuer_avatarURL
@@ -275,40 +276,41 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 		});//save a note that the user was unbanned
 		disciplinary_model.find({ user: req.query.user == "true", target_id: req.query.id, active: true }, (err, docs) => {
 			let errored = false;
-			docs.forEach(doc => {
+			Promise.all(docs.map(doc => new Promise((resolve, reject) => {
 				doc.active = false;
 				doc.save(e => {
 					if (e) {
 						console.error(e);
+						reject(e);
 						errored = true;
 					}
+					else resolve();
 				});
-			});
-			errored ? res.status(500).end() : res.json({ success: true });
-			getBans(req.query.user == "true", bans => {
-				shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });
-			});//update shards with new ban list
-			if (req.query.user != "true") shardBroadcast({ type: 30,
-				sid: req.query.id,
-				issuer_tag: req.query.issuer_tag,
-				issuer_avatarURL: req.query.issuer_avatarURL });
-			else sendExpectReplyBroadcast({ type: 20,
-				uid: req.query.id,
-				issuer_tag: req.query.issuer_tag,
-				issuer_avatarURL: req.query.issuer_avatarURL }).then(results => {
-					for (let i = 0; i < results.length; ++i) {
-						if (results[i].connected) {
-							sendToShard({ type: 28,
-								uid: req.query.id,
-								issuer_tag: req.query.issuer_tag,
-								issuer_avatarURL: req.query.issuer_avatarURL }, i);
-							break;
+			}))).then(step2).catch(step2);
+			function step2() {
+				getBans(req.query.user == "true", bans => {
+					shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });
+				});//update shards with new ban list
+				errored ? res.status(500).end() : res.json({ success: true });
+				if (req.query.user != "true") shardBroadcast({ type: 30,
+					sid: req.query.id,
+					issuer_tag: req.query.issuer_tag,
+					issuer_avatarURL: req.query.issuer_avatarURL });
+				else sendExpectReplyBroadcast({ type: 20,
+					uid: req.query.id,
+					issuer_tag: req.query.issuer_tag,
+					issuer_avatarURL: req.query.issuer_avatarURL }).then(results => {
+						for (let i = 0; i < results.length; ++i) {
+							if (results[i].connected) {
+								sendToShard({ type: 28,
+									uid: req.query.id,
+									issuer_tag: req.query.issuer_tag,
+									issuer_avatarURL: req.query.issuer_avatarURL }, i);
+								break;
+							}
 						}
-					}
-				}).catch(console.error);
-			getBans(req.query.user == "true", bans => {
-				shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });//updates all shards with new ban information
-			});
+					}).catch(console.error);
+			}
 		});
 	}, true);
 	serveWebRequest("/gethistory", (req, res, next) => {//boolean-user, string-id, number-limit (optional)

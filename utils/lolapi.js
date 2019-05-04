@@ -18,7 +18,7 @@ const tags = {
 	tpv: "tpv"
 };
 module.exports = class LOLAPI {
-	constructor(INIT_CONFIG, request_id, internal = false, customGet) {
+	constructor(INIT_CONFIG, request_id, wsapi, internal = false, customGet) {
 		this.CONFIG = INIT_CONFIG;
 		this.request_id = request_id;
 		if (!UTILS.exists(this.CONFIG)) throw new Error("config.json required to access riot api.");
@@ -29,6 +29,7 @@ module.exports = class LOLAPI {
 		this.created = new Date().getTime();
 		this.calls = 0;
 		this.internal = internal;
+		this.wsapi = wsapi;
 		if (this.internal) {
 			this.customGet = customGet;
 		}
@@ -58,6 +59,24 @@ module.exports = class LOLAPI {
 			const iurl = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/" + tag + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&endpoint=" + encodeURIComponent(endpoint);
 			++that.calls;
 			if (!this.internal) {
+				this.wsapi.iapiLoLRequest(region, tag, endpoint, maxage, cachetime, this.request_id).then(body => {
+					UTILS.debug("response received for iurl " + iurl);
+					if (parseJSON) {
+						try {
+							if (typeof(body) === "object") resolve(body);
+							else resolve(JSON.parse(body));
+						}
+						catch (e) {
+							UTILS.output("Failed to parse JSON for:\n" + iurl + "\n" + body);
+							reject(e);
+						}
+					}
+					else {
+						if (typeof(body) === "string") resolve(body);
+						else resolve(JSON.stringify(body));
+					}
+				}).catch(reject);
+				/*
 				this.request({ url: iurl, agentOptions }, (error, response, body) => {
 					if (UTILS.exists(error)) {
 						reject(error);
@@ -77,7 +96,7 @@ module.exports = class LOLAPI {
 							reject(e);
 						}
 					}
-				});
+				});*/
 			}
 			else {
 				this.customGet(region, tag, endpoint, maxage, cachetime).then(body => {
@@ -232,7 +251,7 @@ module.exports = class LOLAPI {
 	}
 	getRanks(region, summonerID, maxage) {
 		if (summonerID === null) return new Promise((resolve, reject) => { resolve([]); });
-		return this.get(region, "league/v4/positions/by-summoner/" + summonerID, tags.ranks, {}, this.CONFIG.API_CACHETIME.GET_RANKS, maxage);
+		return this.get(region, "league/v4/entries/by-summoner/" + summonerID, tags.ranks, {}, this.CONFIG.API_CACHETIME.GET_RANKS, maxage);
 	}
 	getMultipleRanks(region, summonerIDs, maxage) {
 		let that = this;
@@ -262,15 +281,15 @@ module.exports = class LOLAPI {
 			}).catch(reject);
 		});
 	}
-	getMultipleRecentGames(region, accountIDs, maxage) {
+	getMultipleRecentGames(region, accountIDs, maxage, limit) {
 		let that = this;
 		let requests = [];
 		if (this.CONFIG.API_SEQUENTIAL) {
-			for (let i in accountIDs) requests.push(function () { return that.getRecentGames(region, accountIDs[i], maxage); });
+			for (let i in accountIDs) requests.push(function () { return that.getRecentGames(region, accountIDs[i], maxage, limit); });
 			return UTILS.sequential(requests);
 		}
 		else {
-			for (let i in accountIDs) requests.push(that.getRecentGames(region, accountIDs[i], maxage));
+			for (let i in accountIDs) requests.push(that.getRecentGames(region, accountIDs[i], maxage, limit));
 			return Promise.all(requests);
 		}
 	}
@@ -414,11 +433,11 @@ module.exports = class LOLAPI {
 	setLink(uid, username) {
 		return this.getIAPI("setlink/" + uid, { link: username });
 	}
-	banUser(uid, reason, date, issuer, issuer_tag, issuer_avatarURL) {
-		return this.getIAPI("ban", { id: uid, user: true, date, reason, issuer, issuer_tag, issuer_avatarURL });
+	banUser(uid, reason, date, issuer, issuer_tag, issuer_avatarURL, notify = true) {
+		return this.getIAPI("ban", { id: uid, user: true, date, reason, issuer, issuer_tag, issuer_avatarURL, notify });
 	}
-	banServer(sid, reason, date, issuer, issuer_tag, issuer_avatarURL) {
-		return this.getIAPI("ban", { id: sid, user: false, date, reason, issuer, issuer_tag, issuer_avatarURL });
+	banServer(sid, reason, date, issuer, issuer_tag, issuer_avatarURL, notify = true) {
+		return this.getIAPI("ban", { id: sid, user: false, date, reason, issuer, issuer_tag, issuer_avatarURL, notify });
 	}
 	warnUser(uid, reason, issuer, issuer_tag, issuer_avatarURL) {
 		return this.getIAPI("warn", { id: uid, user: true, reason, issuer, issuer_tag, issuer_avatarURL, notify: true });
