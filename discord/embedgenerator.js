@@ -546,13 +546,8 @@ module.exports = class EmbedGenerator {
 	fromLastGame(CONFIG, summoner, match, matches, summoner_participants, verified) {//should show 5 most recent games
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
-		let common_teammates = {
-			"0": {},
-			"1": {},
-			"2": {},
-			"3": {},
-			"4": {}
-		};
+		let common_teammates = {};
+		for (let i = 0; i < matches.length; ++i) common_teammates[i + ""] = {};
 		/*
 		{
 			"0": {//game 1
@@ -581,7 +576,7 @@ module.exports = class EmbedGenerator {
 				for (let c in teams[b]) {//for each participant in team b,
 					const tmPI = UTILS.findParticipantIdentityFromPID(matches[i], teams[b][c].participantId);
 					if (tmPI.player.summonerId === summoner.id) continue;
-					common_teammates[i + ""] = {
+					common_teammates[i + ""][tmPI.player.summonerName] = {
 						win: (b === teamParticipant.teamId ? win : !win),
 						same_team: b === teamParticipant.teamId,
 						championID: teams[b][c].championId,
