@@ -382,7 +382,7 @@ module.exports = class EmbedGenerator {
 			else if (ranks[i].tier == "GRANDMASTER") { }
 			else {//
 				challengers[i].entries.sort((a, b) => b.leaguePoints - a.leaguePoints);//sort by LP
-				const candidate = challengers[i].entries.findIndex(cr => summoner.id == cr.playerOrTeamId);//find placing
+				const candidate = challengers[i].entries.findIndex(cr => summoner.id == cr.summonerId);//find placing
 				if (candidate != -1) title += "#" + (candidate + 1) + " ";//add placing if index found
 			}
 			title += ranks[i].leaguePoints + "LP";
