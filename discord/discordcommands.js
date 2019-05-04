@@ -541,7 +541,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			lolapi.getLiveMatch(region, result.id, CONFIG.API_MAXAGE.FLG.LIVE_MATCH).then(match => {
 				if (UTILS.exists(match.status)) return reply(":x: No current matches found for `" + username + "`." + suggestLink(guess_method));
 				lolapi.getMultipleSummonerFromSummonerID(region, match.participants.map(p => p.summonerId), CONFIG.API_MAXAGE.FLG.OTHER_SUMMONER_ID).then(pSA => {//participant summoner array
-					lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.FLG.RECENT_GAMES, 20).then(mhA => {//matchhistory array
+					lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.FLG.RECENT_GAMES, 10).then(mhA => {//matchhistory array
 						Promise.all([lolapi.getMultipleMatchInformation(region, mhA.matches.map(m => m.gameId), CONFIG.API_MAXAGE.FLG.MULTIPLE_MATCH), lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region)]).then(parallel => {
 							let matches = parallel[0];
 							let verified = parallel[1];
