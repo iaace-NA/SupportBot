@@ -577,7 +577,7 @@ module.exports = class EmbedGenerator {
 					const tmPI = UTILS.findParticipantIdentityFromPID(matches[i], teams[b][c].participantId);
 					if (tmPI.player.summonerId === summoner.id) continue;
 					common_teammates[i + ""][tmPI.player.summonerName] = {
-						win: (b == teamParticipant.teamId ? win : !win),
+						win: win,
 						same_team: b == teamParticipant.teamId,
 						championID: teams[b][c].championId,
 						lane: UTILS.inferLane(teams[b][c].timeline.role, teams[b][c].timeline.lane, teams[b][c].spell1Id, teams[b][c].spell2Id)
