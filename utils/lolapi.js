@@ -281,15 +281,15 @@ module.exports = class LOLAPI {
 			}).catch(reject);
 		});
 	}
-	getMultipleRecentGames(region, accountIDs, maxage) {
+	getMultipleRecentGames(region, accountIDs, maxage, limit) {
 		let that = this;
 		let requests = [];
 		if (this.CONFIG.API_SEQUENTIAL) {
-			for (let i in accountIDs) requests.push(function () { return that.getRecentGames(region, accountIDs[i], maxage); });
+			for (let i in accountIDs) requests.push(function () { return that.getRecentGames(region, accountIDs[i], maxage, limit); });
 			return UTILS.sequential(requests);
 		}
 		else {
-			for (let i in accountIDs) requests.push(that.getRecentGames(region, accountIDs[i], maxage));
+			for (let i in accountIDs) requests.push(that.getRecentGames(region, accountIDs[i], maxage, limit));
 			return Promise.all(requests);
 		}
 	}

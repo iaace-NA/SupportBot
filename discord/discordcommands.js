@@ -501,7 +501,6 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	});
 	commandGuessUsername(forcePrefix(["lg ", "livegame ", "cg ", "currentgame ", "livematch ", "lm ", "currentmatch ", "cm "]), false, (index, region, username, parameter, guess_method) => {//new
 		request_profiler.mark("lg command recognized");
-		//reply(":warning:We are processing the latest information for your command: if this message does not update within 5 minutes, try the same command again. Thank you for your patience.", nMsg => {
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.LG.SUMMONER_ID).then(result => {
 			result.region = region;
 			result.guess = username;
@@ -526,6 +525,33 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 								//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false, true));
 							});
 								//replyEmbed(embedgenerator.liveMatchPremade(CONFIG, result, match, matches, ranks, masteries, pSA, false));//untrimmed output
+						}).catch(console.error);
+					}).catch(console.error);
+				}).catch(console.error);
+			}).catch(console.error);
+		}).catch(console.error);
+		//});
+	});
+	commandGuessUsername(forcePrefix(["fromlastgame ", "flg "]), false, (index, region, username, parameter, guess_method) => {//new
+		request_profiler.mark("flg command recognized");
+		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.FLG.SUMMONER_ID).then(result => {
+			result.region = region;
+			result.guess = username;
+			if (!UTILS.exists(result.id)) return reply(":x: No username found for `" + username + "`." + suggestLink(guess_method));
+			lolapi.getLiveMatch(region, result.id, CONFIG.API_MAXAGE.FLG.LIVE_MATCH).then(match => {
+				if (UTILS.exists(match.status)) return reply(":x: No current matches found for `" + username + "`." + suggestLink(guess_method));
+				lolapi.getMultipleSummonerFromSummonerID(region, match.participants.map(p => p.summonerId), CONFIG.API_MAXAGE.FLG.OTHER_SUMMONER_ID).then(pSA => {//participant summoner array
+					lolapi.getMultipleRecentGames(region, pSA.map(pS => pS.accountId), CONFIG.API_MAXAGE.FLG.RECENT_GAMES, 5).then(mhA => {//matchhistory array
+						let mIDA = [];//match id array;
+						for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
+						Promise.all([lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.FLG.MULTIPLE_MATCH), lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region)]).then(parallel => {
+							let matches = parallel[0];
+							let verified = parallel[1];
+							request_profiler.begin("generating embed");
+							const newEmbed = embedgenerator.fromLastGame(CONFIG, result, match, matches, pSA, verified);
+							request_profiler.end("generating embed");
+							UTILS.debug("\n" + ctable.getTable(request_profiler.endAllCtable()));
+							replyEmbed(newEmbed);
 						}).catch(console.error);
 					}).catch(console.error);
 				}).catch(console.error);

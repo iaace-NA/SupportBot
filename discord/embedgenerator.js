@@ -541,6 +541,79 @@ module.exports = class EmbedGenerator {
 		newEmbed.addField("Top 10 Recently Played With", rpws.slice(0, 10).join("\n"));
 		return newEmbed;
 	}
+	fromLastGame(CONFIG, summoner, match, matches, summoner_participants, verified) {//should show 5 most recent games
+		let newEmbed = new Discord.RichEmbed();
+		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
+		let common_teammates = {
+			"0": {},
+			"1": {},
+			"2": {},
+			"3": {},
+			"4": {}
+		};
+		/*
+		{
+			"0": {//game 1
+				"summonerName": {
+					win: true,
+					same_team: false,
+					championID: "123",
+					lane: ""
+				},
+				"summonerName2": {
+					...
+				}
+			},
+			"1": ...
+		}
+		*/
+		for (let i = 0; i < match_meta.length && i < 5; ++i) {//for my 5 most recent games
+			const teamParticipant = UTILS.teamParticipant(summoner.id, matches[i]);
+			const win = UTILS.determineWin(summoner.id, matches[i]);
+			let teams = {};
+			for (let b in matches[i].participants) {//sort into teams
+				if (!UTILS.exists(teams[matches[i].participants[b].teamId])) teams[matches[i].participants[b].teamId] = [];
+				teams[matches[i].participants[b].teamId].push(matches[i].participants[b]);
+			}
+			for (let b in teams) {//for each team,
+				for (let c in teams[b]) {//for each participant in team b,
+					const tmPI = UTILS.findParticipantIdentityFromPID(matches[i], teams[b][c].participantId);
+					if (tmPI.player.summonerId === summoner.id) continue;
+					common_teammates[i + ""] = {
+						win: (b === teamParticipant.teamId ? win : !win),
+						same_team: b === teamParticipant.teamId,
+						championID: teams[b][c].championId,
+						lane: UTILS.inferLane(teams[b][c].timeline.role, teams[b][c].timeline.lane, teams[b][c].spell1Id, teams[b][c].spell2Id)
+					};
+				}
+			}
+		}
+		let current_participant = match.participants.find(p => p.summonerId === summoner.id);
+		for (let b in match.participants) {
+			if (match.participants[b].summonerId === summoner.id) continue;
+			let num_recent_games = 0;
+			let field_title = (match.participants.teamId === current_participant.teamId ? "ALLY" : "ENEMY") + " " + CONFIG.STATIC.CHAMPIONS[match.participants.championId].emoji + " " + match.participants[b].summonerName;
+			let field_desc = [];
+			for (let i = 0; i < 5; ++i) {
+				if (UTILS.exists(common_teammates[i + ""][match.participants[b].summonerName])) {
+					const history_info = common_teammates[i + ""][match.participants[b].summonerName];
+					field_desc.push("was " + (history_info.same_team ? "ALLY" : "ENEMY") + " " + CONFIG.STATIC.CHAMPIONS[history_info.championID].emoji + CONFIG.EMOJIS.lanes[history_info.lane] + " from " + (i + 1) + " games ago (" + history_info.win + ")");
+				}
+			}
+			if (num_recent_games === 0) {
+				newEmbed.addField(field_title, "You have not recently played with.");
+			}
+			else {
+				newEmbed.addField(field_title, field_desc.join("\n"));
+			}
+		}
+		newEmbed.setFooter("Previous match results (W/L) shown from your perspective.");
+		/*
+		Field Title: "%team% %champion_name% %summoner_name%"
+		Field Description: "was %team% %champion_name%%lane% from %i% games ago (%result%)"
+		*/
+		return newEmbed;
+	}
 	detailedMatch(CONFIG, summoner, match_meta, match, timeline, ranks, masteries, summoner_participants, verified) {//should show detailed information about 1 game
 		return new Promise((resolve, reject) => {
 			let newEmbed = new Discord.RichEmbed();
