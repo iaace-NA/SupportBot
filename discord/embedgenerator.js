@@ -569,7 +569,7 @@ module.exports = class EmbedGenerator {
 			"1": ...
 		}
 		*/
-		for (let i = 0; i < 5; ++i) {//for my 5 most recent games
+		for (let i = 0; i < matches.length; ++i) {//for my 5 most recent games
 			const teamParticipant = UTILS.teamParticipant(summoner.id, matches[i]);
 			const win = UTILS.determineWin(summoner.id, matches[i]);
 			let teams = {};
@@ -596,7 +596,7 @@ module.exports = class EmbedGenerator {
 			let num_recent_games = 0;
 			let field_title = (match.participants[b].teamId === current_participant.teamId ? ALLY : ENEMY) + " " + CONFIG.STATIC.CHAMPIONS[match.participants[b].championId].emoji + " " + match.participants[b].summonerName;
 			let field_desc = [];
-			for (let i = 0; i < 5; ++i) {
+			for (let i = 0; i < matches.length; ++i) {
 				if (UTILS.exists(common_teammates[i + ""][match.participants[b].summonerName])) {
 					const history_info = common_teammates[i + ""][match.participants[b].summonerName];
 					field_desc.push("was " + (history_info.same_team ? ALLY : ENEMY) + " " + CONFIG.STATIC.CHAMPIONS[history_info.championID].emoji + CONFIG.EMOJIS.lanes[history_info.lane] + " from " + (i + 1) + " games ago (" + history_info.win + ")");
