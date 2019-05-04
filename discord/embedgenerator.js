@@ -309,12 +309,13 @@ module.exports = class EmbedGenerator {
 		newEmbed.addField("`<region> [username]`", "Aliases:\n`<op.gg link>`\n\nDisplays summoner information.\n" + HORIZONTAL_SEPARATOR);
 		newEmbed.addField("`matchhistory <region> [username]`", "Aliases:\n`mh <region> [username]`\n\nDisplays basic information about the 5 most recent games played.\n" + HORIZONTAL_SEPARATOR);
 		newEmbed.addField("`matchhistory<number> <region> [username]`", "Aliases:\n`mh<number> <region> [username]`\n\nDisplays detailed information about one of your most recently played games.\n" + HORIZONTAL_SEPARATOR);
-		newEmbed.addField("`livegame <region> [username]`", "Aliases:\n`lg <region> [username]`\n`currentgame <region> [username]`\n`cg <region> [username]`\n`livematch <region> [username]`\n`lm <region> [username]`\n`currentmatch <region> [username]`\n`cm <region> [username]`\n\nShows information about a game currently being played.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`livegame <region> [username]`", "Aliases:\n`lg <region> [username]`\n\nShows information about a game currently being played.\n" + HORIZONTAL_SEPARATOR);
 		newEmbed.addField("`service status <region>`", "Aliases:\n`servicestatus <region>`\n`status <region>`\n`ss <region>`\n\nShows information on the uptime of LoL services in a region.\n" + HORIZONTAL_SEPARATOR);
 		newEmbed.addField("`multi <region> <comma separated list of usernames/lobby text>`", "Aliases:\n`m <region> <list of usernames or lobby text>`\n\nCompares multiple summoners in a region against each other.\n" + HORIZONTAL_SEPARATOR);
 		newEmbed.addField("`fairteamgenerator <region> <comma separated list of usernames/lobby text>`", "Aliases:\n`ftg <region> <list of usernames or lobby text>`\n\nGenerates fair teams from a list of summoners.\n" + HORIZONTAL_SEPARATOR);
+		newEmbed.addField("`fromlastgame <region> [username]`", "Aliases:\n`flg <region> [username]`\n\nShows people you've recently played with, which teams they were on, and which champions were played.\n" + HORIZONTAL_SEPARATOR);
 		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "shortcuts`", "Displays a list of nicknames you've set for friends with hard to spell names. Visit https://supportbot.tk/ for more information on this family of commands.\n" + HORIZONTAL_SEPARATOR);
-		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "setting <setting name> <value>`", "Set server preferences for: prefix, auto-opgg, force-prefix, release-notifications. See our website for more details.");
+		newEmbed.addField("`" + CONFIG.DISCORD_COMMAND_PREFIX + "setting <setting name> <value>`", "Set server preferences for: prefix, auto-opgg, force-prefix, release-notifications, global-feedback. See our website for more details.");
 		newEmbed.setFooter("SupportBot " + CONFIG.VERSION);
 		return newEmbed;
 	}
