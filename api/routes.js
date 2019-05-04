@@ -215,7 +215,6 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			getBans(req.query.user == "true", bans => {
 				shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });//updates all shards with new ban information
 			});
-
 		});
 	}, true);
 	serveWebRequest("/warn", (req, res, next) => {//boolean-user, string-id, string-reason, string-issuer, boolean-notify, string-issuer_tag, string-issuer_avatarURL
