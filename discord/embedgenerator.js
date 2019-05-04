@@ -594,7 +594,8 @@ module.exports = class EmbedGenerator {
 			for (let i = 0; i < matches.length; ++i) {
 				if (UTILS.exists(common_teammates[i + ""][match.participants[b].summonerName])) {
 					const history_info = common_teammates[i + ""][match.participants[b].summonerName];
-					field_desc.push("was " + (history_info.same_team ? ALLY : ENEMY) + CONFIG.STATIC.CHAMPIONS[history_info.championID].emoji + CONFIG.EMOJIS.lanes[history_info.lane] + " from **" + (i + 1) + "** games ago " + (history_info.win ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss));
+					const p = UTILS.teamParticipant(summoner.id, matches[i]);
+					field_desc.push("was " + (history_info.same_team ? ALLY : ENEMY) + CONFIG.STATIC.CHAMPIONS[history_info.championID].emoji + CONFIG.EMOJIS.lanes[history_info.lane] + " from **" + (i + 1) + "** games ago. You " + (history_info.win ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss) + " as " + CONFIG.STATIC.CHAMPIONS[p.championId].emoji + CONFIG.EMOJIS.lanes[UTILS.inferLane(p.timeline.role, p.timeline.lane, p.spell1Id, p.spell2Id)]);
 					++num_recent_games;
 				}
 			}
@@ -605,10 +606,10 @@ module.exports = class EmbedGenerator {
 				newEmbed.addField(field_title, field_desc.join("\n"));
 			}
 		}
-		newEmbed.setFooter("Previous match results (W/L) shown from your perspective.");
+		//newEmbed.setFooter("Previous match results (W/L) shown from your perspective.");
 		/*
 		Field Title: "%team% %champion_name% %summoner_name%"
-		Field Description: "was %team% %champion_name%%lane% from %i% games ago (%result%)"
+		Field Description: "was %team% %champion_name%%lane% from %i% games ago, You %result% as %champion_name%%lane%"
 		*/
 		return newEmbed;
 	}
