@@ -567,7 +567,7 @@ module.exports = class EmbedGenerator {
 			"1": ...
 		}
 		*/
-		for (let i = 0; i < match_meta.length && i < 5; ++i) {//for my 5 most recent games
+		for (let i = 0; i < 5; ++i) {//for my 5 most recent games
 			const teamParticipant = UTILS.teamParticipant(summoner.id, matches[i]);
 			const win = UTILS.determineWin(summoner.id, matches[i]);
 			let teams = {};
