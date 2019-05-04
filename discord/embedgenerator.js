@@ -592,7 +592,7 @@ module.exports = class EmbedGenerator {
 		for (let b in match.participants) {
 			if (match.participants[b].summonerId === summoner.id) continue;
 			let num_recent_games = 0;
-			let field_title = (match.participants.teamId === current_participant.teamId ? "ALLY" : "ENEMY") + " " + CONFIG.STATIC.CHAMPIONS[match.participants.championId].emoji + " " + match.participants[b].summonerName;
+			let field_title = (match.participants[b].teamId === current_participant.teamId ? "ALLY" : "ENEMY") + " " + CONFIG.STATIC.CHAMPIONS[match.participants[b].championId].emoji + " " + match.participants[b].summonerName;
 			let field_desc = [];
 			for (let i = 0; i < 5; ++i) {
 				if (UTILS.exists(common_teammates[i + ""][match.participants[b].summonerName])) {
