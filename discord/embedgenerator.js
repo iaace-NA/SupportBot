@@ -589,12 +589,12 @@ module.exports = class EmbedGenerator {
 		for (let b in match.participants) {
 			if (match.participants[b].summonerId === summoner.id) continue;
 			let num_recent_games = 0;
-			let field_title = (match.participants[b].teamId === current_participant.teamId ? ALLY : ENEMY) + " " + CONFIG.STATIC.CHAMPIONS[match.participants[b].championId].emoji + " " + match.participants[b].summonerName;
+			let field_title = (match.participants[b].teamId === current_participant.teamId ? ALLY : ENEMY) + CONFIG.STATIC.CHAMPIONS[match.participants[b].championId].emoji + " " + match.participants[b].summonerName;
 			let field_desc = [];
 			for (let i = 0; i < matches.length; ++i) {
 				if (UTILS.exists(common_teammates[i + ""][match.participants[b].summonerName])) {
 					const history_info = common_teammates[i + ""][match.participants[b].summonerName];
-					field_desc.push("was " + (history_info.same_team ? ALLY : ENEMY) + " " + CONFIG.STATIC.CHAMPIONS[history_info.championID].emoji + CONFIG.EMOJIS.lanes[history_info.lane] + " from **" + (i + 1) + "** games ago (" + (history_info.win ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss) + ")");
+					field_desc.push("was " + (history_info.same_team ? ALLY : ENEMY) + CONFIG.STATIC.CHAMPIONS[history_info.championID].emoji + CONFIG.EMOJIS.lanes[history_info.lane] + " from **" + (i + 1) + "** games ago (" + (history_info.win ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss) + ")");
 					++num_recent_games;
 				}
 			}
