@@ -277,37 +277,41 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 		});//save a note that the user was unbanned
 		disciplinary_model.find({ user: req.query.user == "true", target_id: req.query.id, active: true }, (err, docs) => {
 			let errored = false;
-			docs.forEach(doc => {
+			Promise.all(docs.map(doc => new Promise((resolve, reject) => {
 				doc.active = false;
 				doc.save(e => {
-					getBans(req.query.user == "true", bans => {
-						shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });
-					});//update shards with new ban list
 					if (e) {
 						console.error(e);
+						reject(e);
 						errored = true;
 					}
+					else resolve();
 				});
-			});
-			errored ? res.status(500).end() : res.json({ success: true });
-			if (req.query.user != "true") shardBroadcast({ type: 30,
-				sid: req.query.id,
-				issuer_tag: req.query.issuer_tag,
-				issuer_avatarURL: req.query.issuer_avatarURL });
-			else sendExpectReplyBroadcast({ type: 20,
-				uid: req.query.id,
-				issuer_tag: req.query.issuer_tag,
-				issuer_avatarURL: req.query.issuer_avatarURL }).then(results => {
-					for (let i = 0; i < results.length; ++i) {
-						if (results[i].connected) {
-							sendToShard({ type: 28,
-								uid: req.query.id,
-								issuer_tag: req.query.issuer_tag,
-								issuer_avatarURL: req.query.issuer_avatarURL }, i);
-							break;
+			}))).then(step2).catch(step2);
+			function step2() {
+				getBans(req.query.user == "true", bans => {
+					shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });
+				});//update shards with new ban list
+				errored ? res.status(500).end() : res.json({ success: true });
+				if (req.query.user != "true") shardBroadcast({ type: 30,
+					sid: req.query.id,
+					issuer_tag: req.query.issuer_tag,
+					issuer_avatarURL: req.query.issuer_avatarURL });
+				else sendExpectReplyBroadcast({ type: 20,
+					uid: req.query.id,
+					issuer_tag: req.query.issuer_tag,
+					issuer_avatarURL: req.query.issuer_avatarURL }).then(results => {
+						for (let i = 0; i < results.length; ++i) {
+							if (results[i].connected) {
+								sendToShard({ type: 28,
+									uid: req.query.id,
+									issuer_tag: req.query.issuer_tag,
+									issuer_avatarURL: req.query.issuer_avatarURL }, i);
+								break;
+							}
 						}
-					}
-				}).catch(console.error);
+					}).catch(console.error);
+			}
 		});
 	}, true);
 	serveWebRequest("/gethistory", (req, res, next) => {//boolean-user, string-id, number-limit (optional)
