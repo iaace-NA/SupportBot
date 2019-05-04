@@ -596,7 +596,7 @@ module.exports = class EmbedGenerator {
 				if (UTILS.exists(common_teammates[i + ""][match.participants[b].summonerName])) {
 					const history_info = common_teammates[i + ""][match.participants[b].summonerName];
 					const p = UTILS.teamParticipant(summoner.id, matches[i]);
-					field_desc.push("was " + (history_info.same_team ? ALLY : ENEMY) + CONFIG.STATIC.CHAMPIONS[history_info.championID].emoji + CONFIG.EMOJIS.lanes[history_info.lane] + " from **" + (i + 1) + "** games ago. You " + (history_info.win ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss) + " as " + CONFIG.STATIC.CHAMPIONS[p.championId].emoji + CONFIG.EMOJIS.lanes[UTILS.inferLane(p.timeline.role, p.timeline.lane, p.spell1Id, p.spell2Id)]);
+					field_desc.push("was " + (history_info.same_team ? ALLY : ENEMY) + CONFIG.STATIC.CHAMPIONS[history_info.championID].emoji + CONFIG.EMOJIS.lanes[history_info.lane] + " from **" + (i + 1) + "** game(s) ago. You " + (history_info.win ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss) + " as " + CONFIG.STATIC.CHAMPIONS[p.championId].emoji + CONFIG.EMOJIS.lanes[UTILS.inferLane(p.timeline.role, p.timeline.lane, p.spell1Id, p.spell2Id)]);
 					++num_recent_games;
 				}
 			}
