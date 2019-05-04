@@ -159,6 +159,8 @@ const RANK_COLOR = [[69, 69, 69], [153, 51, 0], [179, 179, 179], [255, 214, 51],
 const IMMR_THRESHOLD = [100, 500, 900, 1300, 1700, 2100, 2500, 2600, 2700];
 const MMR_THRESHOLD = [400, 1150, 1400, 1650, 1900, 2150, 2400];//starting MMRs for each tier
 const PREMADE_EMOJIS = ["", "\\💙", "\\💛", "\\💚"];
+const ALLY = "\\💚";
+const ENEMY = "\\❤️";
 const HORIZONTAL_SEPARATOR = "------------------------------";
 const VERIFIED_ICON = "✅";
 const TAB = " ";
@@ -592,12 +594,12 @@ module.exports = class EmbedGenerator {
 		for (let b in match.participants) {
 			if (match.participants[b].summonerId === summoner.id) continue;
 			let num_recent_games = 0;
-			let field_title = (match.participants[b].teamId === current_participant.teamId ? "ALLY" : "ENEMY") + " " + CONFIG.STATIC.CHAMPIONS[match.participants[b].championId].emoji + " " + match.participants[b].summonerName;
+			let field_title = (match.participants[b].teamId === current_participant.teamId ? ALLY : ENEMY) + " " + CONFIG.STATIC.CHAMPIONS[match.participants[b].championId].emoji + " " + match.participants[b].summonerName;
 			let field_desc = [];
 			for (let i = 0; i < 5; ++i) {
 				if (UTILS.exists(common_teammates[i + ""][match.participants[b].summonerName])) {
 					const history_info = common_teammates[i + ""][match.participants[b].summonerName];
-					field_desc.push("was " + (history_info.same_team ? "ALLY" : "ENEMY") + " " + CONFIG.STATIC.CHAMPIONS[history_info.championID].emoji + CONFIG.EMOJIS.lanes[history_info.lane] + " from " + (i + 1) + " games ago (" + history_info.win + ")");
+					field_desc.push("was " + (history_info.same_team ? ALLY : ENEMY) + " " + CONFIG.STATIC.CHAMPIONS[history_info.championID].emoji + CONFIG.EMOJIS.lanes[history_info.lane] + " from " + (i + 1) + " games ago (" + history_info.win + ")");
 				}
 			}
 			if (num_recent_games === 0) {
