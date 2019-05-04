@@ -541,10 +541,8 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			lolapi.getLiveMatch(region, result.id, CONFIG.API_MAXAGE.FLG.LIVE_MATCH).then(match => {
 				if (UTILS.exists(match.status)) return reply(":x: No current matches found for `" + username + "`." + suggestLink(guess_method));
 				lolapi.getMultipleSummonerFromSummonerID(region, match.participants.map(p => p.summonerId), CONFIG.API_MAXAGE.FLG.OTHER_SUMMONER_ID).then(pSA => {//participant summoner array
-					lolapi.getMultipleRecentGames(region, pSA.map(pS => pS.accountId), CONFIG.API_MAXAGE.FLG.RECENT_GAMES, 5).then(mhA => {//matchhistory array
-						let mIDA = [];//match id array;
-						for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
-						Promise.all([lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.FLG.MULTIPLE_MATCH), lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region)]).then(parallel => {
+					lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.FLG.RECENT_GAMES, 5).then(mhA => {//matchhistory array
+						Promise.all([lolapi.getMultipleMatchInformation(region, mhA.matches.map(m => m.gameId), CONFIG.API_MAXAGE.FLG.MULTIPLE_MATCH), lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region)]).then(parallel => {
 							let matches = parallel[0];
 							let verified = parallel[1];
 							request_profiler.begin("generating embed");
