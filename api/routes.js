@@ -280,6 +280,9 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 			docs.forEach(doc => {
 				doc.active = false;
 				doc.save(e => {
+					getBans(req.query.user == "true", bans => {
+						shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });
+					});//update shards with new ban list
 					if (e) {
 						console.error(e);
 						errored = true;
@@ -287,9 +290,6 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 				});
 			});
 			errored ? res.status(500).end() : res.json({ success: true });
-			getBans(req.query.user == "true", bans => {
-				shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });
-			});//update shards with new ban list
 			if (req.query.user != "true") shardBroadcast({ type: 30,
 				sid: req.query.id,
 				issuer_tag: req.query.issuer_tag,
@@ -308,9 +308,6 @@ module.exports = function(CONFIG, apicache, serveWebRequest, response_type, load
 						}
 					}
 				}).catch(console.error);
-			getBans(req.query.user == "true", bans => {
-				shardBroadcast({ type: req.query.user == "true" ? 14 : 16, bans });//updates all shards with new ban information
-			});
 		});
 	}, true);
 	serveWebRequest("/gethistory", (req, res, next) => {//boolean-user, string-id, number-limit (optional)
