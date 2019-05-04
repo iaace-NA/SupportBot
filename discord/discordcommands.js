@@ -532,7 +532,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 		}).catch(console.error);
 		//});
 	});
-	commandGuessUsername(forcePrefix(["fromlastgame ", "flg "]), false, (index, region, username, parameter, guess_method) => {//new
+	commandGuessUsername(forcePrefix(["fromlastgame ", "flg ", "fromrecentgames ", "fromrecentgame ", "frg "]), false, (index, region, username, parameter, guess_method) => {//new
 		request_profiler.mark("flg command recognized");
 		lolapi.getSummonerIDFromName(region, username, CONFIG.API_MAXAGE.FLG.SUMMONER_ID).then(result => {
 			result.region = region;
