@@ -565,7 +565,7 @@ module.exports = class EmbedGenerator {
 		}
 		*/
 		for (let i = 0; i < matches.length; ++i) {//for my 5 most recent games
-			const teamParticipant = UTILS.teamParticipant(summoner.id, matches[i]);
+			const teamParticipant = UTILS.teamParticipant(summoner.id, matches[i]);//current user
 			const win = UTILS.determineWin(summoner.id, matches[i]);
 			let teams = {};
 			for (let b in matches[i].participants) {//sort into teams
@@ -577,8 +577,8 @@ module.exports = class EmbedGenerator {
 					const tmPI = UTILS.findParticipantIdentityFromPID(matches[i], teams[b][c].participantId);
 					if (tmPI.player.summonerId === summoner.id) continue;
 					common_teammates[i + ""][tmPI.player.summonerName] = {
-						win: (b === teamParticipant.teamId ? win : !win),
-						same_team: b === teamParticipant.teamId,
+						win: (b == teamParticipant.teamId ? win : !win),
+						same_team: b == teamParticipant.teamId,
 						championID: teams[b][c].championId,
 						lane: UTILS.inferLane(teams[b][c].timeline.role, teams[b][c].timeline.lane, teams[b][c].spell1Id, teams[b][c].spell2Id)
 					};
@@ -594,7 +594,7 @@ module.exports = class EmbedGenerator {
 			for (let i = 0; i < matches.length; ++i) {
 				if (UTILS.exists(common_teammates[i + ""][match.participants[b].summonerName])) {
 					const history_info = common_teammates[i + ""][match.participants[b].summonerName];
-					field_desc.push("was " + (history_info.same_team ? ALLY : ENEMY) + " " + CONFIG.STATIC.CHAMPIONS[history_info.championID].emoji + CONFIG.EMOJIS.lanes[history_info.lane] + " from " + (i + 1) + " games ago (" + history_info.win + ")");
+					field_desc.push("was " + (history_info.same_team ? ALLY : ENEMY) + " " + CONFIG.STATIC.CHAMPIONS[history_info.championID].emoji + CONFIG.EMOJIS.lanes[history_info.lane] + " from **" + (i + 1) + "** games ago (" + (history_info.win ? CONFIG.EMOJIS.win : CONFIG.EMOJIS.loss) + ")");
 					++num_recent_games;
 				}
 			}
