@@ -604,7 +604,7 @@ module.exports = class EmbedGenerator {
 				newEmbed.addField(field_title, "You have not recently played with.");
 			}
 			else {
-				newEmbed.addField(field_title, field_desc.join("\n"));
+				newEmbed.addField(field_title, field_desc.slice(0, 5).join("\n"));
 			}
 		}
 		//newEmbed.setFooter("Previous match results (W/L) shown from your perspective.");
