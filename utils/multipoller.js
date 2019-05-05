@@ -78,8 +78,11 @@ module.exports = class MultiPoller {
 			return this.update_queue.length - 1;
 		}
 	}
-	forceUpdateNow(id, options) {//force no matter what, right now
+	forceUpdateASAP(id, options) {//add to front of queue. public access
 		this.update_queue.unshift({ id, options });//adds to front of queue
+	}
+	updateNow(id, options) {//force no matter what, right now.
+		return this.checkForUpdates(id, options);
 	}
 	remove(id) {//remove from polling queue if it is in the queue. returns true if in queue, returns false if not in queue.
 		const iiq = this.update_queue.findIndex(e => e.id === id);//index in question
