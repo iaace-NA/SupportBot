@@ -8,12 +8,12 @@ module.exports = class MultiPoller {
 		/*
 		this.updatesDue() is called when a new list of retrievables is needed. returns a promise that resolves an in-order array of updatable { id, options }
 		this.checkForUpdates(id, options) is called on an id and state information. returns a promise with most recent information.
-		this.checkReadyForUpdates(id) verifies that something can be updated. returns a promise that resolves a boolean.
+		this.checkReadyForUpdate(id) verifies that something can be updated. returns a promise that resolves a boolean.
 		this.justUpdated(id, results, error) is called when a job finishes in the queue.
 
 		options {
 			min_queue_length: 0,
-			max_queue_length: 100,
+			max_queue_length: 100,//not a hard maximum. used to determine update interval
 			slow_update_interval: 2000,
 			fast_update_interval: 100,
 			status_check_interval: 10000
@@ -61,11 +61,14 @@ module.exports = class MultiPoller {
 		return this.checkReadyForUpdate(id, options);
 	}
 	checkUpdatesDue() {
-		let ud = this.updatesDue();//updates due
-		for (let i = 0; i < ud.length; ++i) {
-			this.add(ud[i].id, ud[i].options);
-		}
-		return ud.length;
+		return new Promise((resolve, reject) => {
+			this.updatesDue().then(ud => {
+				for (let i = 0; i < ud.length; ++i) {
+					this.add(ud[i].id, ud[i].options);
+				}
+				resolve(ud.length);
+			});//updates due
+		});
 	}
 	add(id, options) {//force update in next update cycle. returns 0-indexed place in queue
 		const iiq = this.update_queue.findIndex(e => e.id === id);
@@ -116,10 +119,14 @@ module.exports = class MultiPoller {
 		this.last_job_time = new Date().getTime();
 		try {
 			let uqo = this.update_queue[0];//update queue object
-			if (this.update_queue.length <= 1) this.checkUpdatesDue();//update list of things needed to be updated soon
-			if (this.update_interval_mode !== -3 && UTILS.exists(uqo) && this.checkUpdate(uqo.id, uqo.options)) {
-				this.update_queue.shift();
-				this.forceUpdateNow(uqo.id, uqo.options).then(data => this.justUpdated(uqo.id, data, null)).catch(e => this.justUpdated(uqo.id, null, e));
+			if (this.update_queue.length <= 1) this.checkUpdatesDue().then(() => {});//update list of things needed to be updated soon
+			if (this.update_interval_mode !== -3 && UTILS.exists(uqo)) {
+				this.checkUpdate(uqo.id, uqo.options).then(cu => {
+					if (cu) {
+						this.update_queue.shift();
+					this.forceUpdateNow(uqo.id, uqo.options).then(data => this.justUpdated(uqo.id, data, null)).catch(e => this.justUpdated(uqo.id, null, e));
+					}
+				}).catch(e => this.justUpdated(ugo.id, null, e));
 			}
 		}
 		catch (e) { console.error(e); }
