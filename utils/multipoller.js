@@ -6,9 +6,9 @@ let UTILS = require("./utils.js");
 module.exports = class MultiPoller {
 	constructor (name, updatesDueFunction, checkForUpdatesFunction, checkReadyForUpdateFunction, justUpdatedFunction, stalledFunction, options) {
 		/*
-		this.updatesDue() is called when a new list of retrievables is needed. returns an in-order array of updatable { id, options }
+		this.updatesDue() is called when a new list of retrievables is needed. returns a promise that resolves an in-order array of updatable { id, options }
 		this.checkForUpdates(id, options) is called on an id and state information. returns a promise with most recent information.
-		this.checkReadyForUpdates(id) verifies that something can be updated. returns boolean.
+		this.checkReadyForUpdates(id) verifies that something can be updated. returns a promise that resolves a boolean.
 		this.justUpdated(id, results, error) is called when a job finishes in the queue.
 
 		options {

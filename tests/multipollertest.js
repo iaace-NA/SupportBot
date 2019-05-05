@@ -3,7 +3,7 @@ let UTILS = require("../utils/utils.js");
 let MultiPoller = require("../utils/multipoller.js");
 let sample_db = {};
 for (let i = 0; i < 50; ++i) {
-	sample_db[i + ""] = new Date().getTime() + UTILS.randomInt(1000, 60000);
+	sample_db[i + ""] = UTILS.now() + UTILS.randomInt(1000, 60000);
 }
 let test_system = new MultiPoller("Test");
 function updatesDue() {
@@ -14,4 +14,10 @@ function updatesDue() {
 	ans.sort((a, b) => a.order - b.order);
 	return ans;
 }
-function checkForUpdates() {}
+function checkForUpdates(id, options) {
+	return new Promise((resolve, reject) => {
+		sample_db[id] = UTILS.now() + UTILS.randomInt(1000, 60000);
+		resolve();
+	});
+}
+function checkReadyForUpdate(id)
