@@ -2,7 +2,7 @@
 /*
 meant for use with database systems
 */
-let UTILS = require("./utils.js");
+let UTILS = new (require("./utils.js"))();
 module.exports = class MultiPoller {
 	constructor (name, updatesDueFunction, checkForUpdatesFunction, checkReadyForUpdateFunction, justUpdatedFunction, stalledFunction, options) {
 		/*
@@ -41,6 +41,7 @@ module.exports = class MultiPoller {
 			}
 		}, this.options.status_check_interval);
 		this.recursiveStartNext();
+		//setTimeout(this.recursiveStartNext, 0);
 	}
 	setUpdateIntervalAuto() {
 		this.update_interval_mode = 0;
@@ -104,32 +105,37 @@ module.exports = class MultiPoller {
 	getUpdateInterval() {//returns the live update interval in ms
 		switch (this.update_interval_mode) {
 			case 0:
-				return UTILS.constrain(UTILS.map(this.update_queue.length, this.options.min_queue_length, this.options.max_queue_length, this.options.slow_update_interval, this.options.fast_update_interval), this.options.slow_update_interval, this.options.fast_update_interval);
+				return UTILS.constrain(UTILS.map(this.update_queue.length, this.options.min_queue_length, this.options.max_queue_length, this.options.slow_update_interval, this.options.fast_update_interval), this.options.fast_update_interval, this.options.slow_update_interval);
 			case -1:
 				return this.options.fast_update_interval;
 			case -2:
 				return this.options.slow_update_interval;
 			case -3:
-				return this.options.slow_update_interval;
+				return this.options.slow_update_interval;//not defined yet; should be stop mode
 			default:
 				return this.update_interval_mode;
 		}
 	}
-	recursiveStartNext() {
-		this.last_job_time = new Date().getTime();
+	recursiveStartNext(that = this) {
+		//let that = this;
+		that.last_job_time = new Date().getTime();
 		try {
-			let uqo = this.update_queue[0];//update queue object
-			if (this.update_queue.length <= 1) this.checkUpdatesDue().then(() => {});//update list of things needed to be updated soon
-			if (this.update_interval_mode !== -3 && UTILS.exists(uqo)) {
-				this.checkUpdate(uqo.id, uqo.options).then(cu => {
-					if (cu) {
-						this.update_queue.shift();
-					this.forceUpdateNow(uqo.id, uqo.options).then(data => this.justUpdated(uqo.id, data, null)).catch(e => this.justUpdated(uqo.id, null, e));
-					}
-				}).catch(e => this.justUpdated(ugo.id, null, e));
+			if (UTILS.exists(that.update_queue[0])) {
+				let uqo = UTILS.copy(that.update_queue[0]);//update queue object
+				if (that.update_interval_mode !== -3 && UTILS.exists(uqo)) {
+					that.checkUpdate(uqo.id, uqo.options).then(cu => {
+						if (cu) {
+							that.update_queue.shift();
+							that.updateNow(uqo.id, uqo.options).then(data => that.justUpdated(uqo.id, data, null)).catch(e => that.justUpdated(uqo.id, null, e));
+						}
+					}).catch(e => that.justUpdated(uqo.id, null, e));
+				}
 			}
+			if (that.update_queue.length <= 1) that.checkUpdatesDue().then(() => { });//update list of things needed to be updated soon
 		}
 		catch (e) { console.error(e); }
-		setTimeout(this.recursiveStartNext, this.getUpdateInterval());//does not wait for update to complete before starting the next job
+		//UTILS.assert(UTILS.exists(that.getUpdateInterval()));
+		//UTILS.assert(typeof(that.getUpdateInterval()) == "number");
+		setTimeout(that.recursiveStartNext, that.getUpdateInterval(), that);//does not wait for update to complete before starting the next job
 	}
 }
