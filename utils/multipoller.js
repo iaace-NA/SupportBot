@@ -16,7 +16,8 @@ module.exports = class MultiPoller {
 			max_queue_length: 100,//not a hard maximum. used to determine update interval
 			slow_update_interval: 2000,
 			fast_update_interval: 100,
-			status_check_interval: 10000
+			status_check_interval: 10000,
+			soft_update_interval: 10
 		}
 		*/
 		this.name = name;
@@ -28,12 +29,13 @@ module.exports = class MultiPoller {
 		this.checkReadyForUpdate = checkReadyForUpdateFunction;
 		UTILS.assert(typeof(justUpdatedFunction) === "function");
 		this.justUpdated = justUpdatedFunction;
-		UTILS.assert(typeof(stalledFunction) === "function");
+		UTILS.assert(typeof (stalledFunction) === "function");
 		this.stalled = stalledFunction;
 		UTILS.assert(typeof(options) === "object");
 		this.options = options;
 		this.update_queue = [];
 		this.last_job_time = new Date().getTime();
+		this.soft_update_counter = 0;
 		this.update_interval_mode = 0;//0 for auto, -1 for fast, -2 for slow, -3 for stop, any other value is update interval in ms
 		setInterval(() => {
 			if (new Date().getTime() - this.last_job_time > (this.options.slow_update_interval * 3)) {
@@ -119,29 +121,35 @@ module.exports = class MultiPoller {
 			}
 		}
 		const ans = internal();
-		UTILS.output("Update Interval: " + ans);
+		UTILS.debug("Update Interval: " + ans);
 		return ans;
+	}
+	softUpdate() {//internal function that checks if conditions are right for updating
+		++this.soft_update_counter;
+		if (this.soft_update_counter % this.options.soft_update_interval === 0) {
+			this.checkUpdatesDue().then(() => { });
+		}
 	}
 	recursiveStartNext(that = this) {
 		//let that = this;
 		that.last_job_time = new Date().getTime();
 		try {
-			//UTILS.output("update queue length: " + that.update_queue.length);
-			UTILS.output("update queue contents1: " + JSON.stringify(that.update_queue));
+			//UTILS.debug("update queue length: " + that.update_queue.length);
+			UTILS.debug("update queue contents1: " + JSON.stringify(that.update_queue));
 			if (UTILS.exists(that.update_queue[0])) {
 				let uqo = UTILS.copy(that.update_queue[0]);//update queue object
 				if (that.update_interval_mode !== -3 && UTILS.exists(uqo)) {
 					that.checkUpdate(uqo.id, uqo.options).then(cu => {
 						that.update_queue.shift();
 						if (cu) {
-							UTILS.output("update queue contents2: " + JSON.stringify(that.update_queue));
+							UTILS.debug("update queue contents2: " + JSON.stringify(that.update_queue));
 							that.updateNow(uqo.id, uqo.options).then(data => {
 								that.justUpdated(uqo.id, data, null).then(() => {
-									if (that.update_queue.length <= Math.max(1, that.options.max_queue_length / 10, that.options.min_queue_length)) that.checkUpdatesDue().then(() => { });//update list of things needed to be updated soon
+									that.softUpdate();//update list of things needed to be updated soon
 								});
 							}).catch(e => {
 								that.justUpdated(uqo.id, null, e).then(() => {
-									if (that.update_queue.length <= Math.max(1, that.options.max_queue_length / 10, that.options.min_queue_length)) that.checkUpdatesDue().then(() => { });//update list of things needed to be updated soon
+									that.softUpdate();//update list of things needed to be updated soon
 								});
 							});
 						}
@@ -151,7 +159,7 @@ module.exports = class MultiPoller {
 					}).catch(e => that.justUpdated(uqo.id, null, e));
 				}
 			}
-			else if (that.update_queue.length <= Math.max(1, that.options.max_queue_length / 10, that.options.min_queue_length)) that.checkUpdatesDue().then(() => { });//update list of things needed to be updated soon
+			else that.softUpdate();//update list of things needed to be updated soon
 		}
 		catch (e) { console.error(e); }
 		//UTILS.assert(UTILS.exists(that.getUpdateInterval()));
