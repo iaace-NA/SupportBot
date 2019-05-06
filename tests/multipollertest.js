@@ -14,7 +14,7 @@ let test_system = new MultiPoller("Test", updatesDue, checkForUpdates, checkRead
 	fast_update_interval: 100,
 	status_check_interval: 10000
 });
-test_system.setUpdateIntervalSlow();
+//test_system.setUpdateIntervalSlow();
 function updatesDue() {
 	return new Promise((resolve, reject) => {
 		let ans = [];//{id: "", options: {}, order: 0}
@@ -36,12 +36,17 @@ function checkForUpdates(id, options) {
 }
 function checkReadyForUpdate(id) {
 	return new Promise((resolve, reject) => {
-		resolve(sample_db[id + ""] < UTILS.now());
+		const ans = sample_db[id + ""] < UTILS.now();
+		//UTILS.output("checkReadyForUpdate result on id " + id + " was " + ans);
+		resolve(ans);
 	});
 }
 function justUpdated(id, results, error) {
-	UTILS.output("ID: " + id + " was just updated with result: " + results + " . error: " + error);
-	printDB();
+	return new Promise((resolve, reject) => {
+		UTILS.output("ID: " + id + " was just updated with result: " + results + " . error: " + error);
+		printDB();
+		resolve();
+	});
 }
 function stalled() {
 	console.error("Stalled");

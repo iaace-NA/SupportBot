@@ -103,35 +103,55 @@ module.exports = class MultiPoller {
 		return UTILS.copy(this.update_queue);
 	}
 	getUpdateInterval() {//returns the live update interval in ms
-		switch (this.update_interval_mode) {
-			case 0:
-				return UTILS.constrain(UTILS.map(this.update_queue.length, this.options.min_queue_length, this.options.max_queue_length, this.options.slow_update_interval, this.options.fast_update_interval), this.options.fast_update_interval, this.options.slow_update_interval);
-			case -1:
-				return this.options.fast_update_interval;
-			case -2:
-				return this.options.slow_update_interval;
-			case -3:
-				return this.options.slow_update_interval;//not defined yet; should be stop mode
-			default:
-				return this.update_interval_mode;
+		let that = this;
+		function internal() {
+			switch (that.update_interval_mode) {
+				case 0:
+					return UTILS.constrain(UTILS.map(that.update_queue.length, that.options.min_queue_length, that.options.max_queue_length, that.options.slow_update_interval, that.options.fast_update_interval), that.options.fast_update_interval, that.options.slow_update_interval);
+				case -1:
+					return that.options.fast_update_interval;
+				case -2:
+					return that.options.slow_update_interval;
+				case -3:
+					return that.options.slow_update_interval;//not defined yet; should be stop mode
+				default:
+					return that.update_interval_mode;
+			}
 		}
+		const ans = internal();
+		UTILS.output("Update Interval: " + ans);
+		return ans;
 	}
 	recursiveStartNext(that = this) {
 		//let that = this;
 		that.last_job_time = new Date().getTime();
 		try {
+			//UTILS.output("update queue length: " + that.update_queue.length);
+			UTILS.output("update queue contents1: " + JSON.stringify(that.update_queue));
 			if (UTILS.exists(that.update_queue[0])) {
 				let uqo = UTILS.copy(that.update_queue[0]);//update queue object
 				if (that.update_interval_mode !== -3 && UTILS.exists(uqo)) {
 					that.checkUpdate(uqo.id, uqo.options).then(cu => {
+						that.update_queue.shift();
 						if (cu) {
-							that.update_queue.shift();
-							that.updateNow(uqo.id, uqo.options).then(data => that.justUpdated(uqo.id, data, null)).catch(e => that.justUpdated(uqo.id, null, e));
+							UTILS.output("update queue contents2: " + JSON.stringify(that.update_queue));
+							that.updateNow(uqo.id, uqo.options).then(data => {
+								that.justUpdated(uqo.id, data, null).then(() => {
+									if (that.update_queue.length <= Math.max(1, that.options.max_queue_length / 10, that.options.min_queue_length)) that.checkUpdatesDue().then(() => { });//update list of things needed to be updated soon
+								});
+							}).catch(e => {
+								that.justUpdated(uqo.id, null, e).then(() => {
+									if (that.update_queue.length <= Math.max(1, that.options.max_queue_length / 10, that.options.min_queue_length)) that.checkUpdatesDue().then(() => { });//update list of things needed to be updated soon
+								});
+							});
+						}
+						else {
+							console.error("cu returned false");
 						}
 					}).catch(e => that.justUpdated(uqo.id, null, e));
 				}
 			}
-			if (that.update_queue.length <= 1) that.checkUpdatesDue().then(() => { });//update list of things needed to be updated soon
+			else if (that.update_queue.length <= Math.max(1, that.options.max_queue_length / 10, that.options.min_queue_length)) that.checkUpdatesDue().then(() => { });//update list of things needed to be updated soon
 		}
 		catch (e) { console.error(e); }
 		//UTILS.assert(UTILS.exists(that.getUpdateInterval()));
