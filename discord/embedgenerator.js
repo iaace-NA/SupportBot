@@ -547,6 +547,8 @@ module.exports = class EmbedGenerator {
 	fromLastGame(CONFIG, summoner, match, matches, summoner_participants, verified) {//should show 5 most recent games
 		let newEmbed = new Discord.RichEmbed();
 		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
+		if (match.gameStartTime != 0) newEmbed.setTitle(game_type + " `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
+		else newEmbed.setTitle(game_type + " `GAME LOADING`");
 		let common_teammates = {};
 		for (let i = 0; i < matches.length; ++i) common_teammates[i + ""] = {};
 		/*
