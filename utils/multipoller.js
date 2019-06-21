@@ -2,21 +2,22 @@
 /*
 meant for use with database systems
 */
-let UTILS = require("./utils.js");
+let UTILS = new (require("./utils.js"))();
 module.exports = class MultiPoller {
 	constructor (name, updatesDueFunction, checkForUpdatesFunction, checkReadyForUpdateFunction, justUpdatedFunction, stalledFunction, options) {
 		/*
-		this.updatesDue() is called when a new list of retrievables is needed. returns an in-order array of updatable { id, options }
+		this.updatesDue() is called when a new list of retrievables is needed. returns a promise that resolves an in-order array of updatable { id, options }
 		this.checkForUpdates(id, options) is called on an id and state information. returns a promise with most recent information.
-		this.checkReadyForUpdates(id) verifies that something can be updated. returns boolean.
+		this.checkReadyForUpdate(id) verifies that something can be updated. returns a promise that resolves a boolean.
 		this.justUpdated(id, results, error) is called when a job finishes in the queue.
 
 		options {
 			min_queue_length: 0,
-			max_queue_length: 100,
+			max_queue_length: 100,//not a hard maximum. used to determine update interval
 			slow_update_interval: 2000,
 			fast_update_interval: 100,
-			status_check_interval: 10000
+			status_check_interval: 10000,
+			soft_update_interval: 10
 		}
 		*/
 		this.name = name;
@@ -28,12 +29,13 @@ module.exports = class MultiPoller {
 		this.checkReadyForUpdate = checkReadyForUpdateFunction;
 		UTILS.assert(typeof(justUpdatedFunction) === "function");
 		this.justUpdated = justUpdatedFunction;
-		UTILS.assert(typeof(stalledFunction) === "function");
+		UTILS.assert(typeof (stalledFunction) === "function");
 		this.stalled = stalledFunction;
 		UTILS.assert(typeof(options) === "object");
 		this.options = options;
 		this.update_queue = [];
 		this.last_job_time = new Date().getTime();
+		this.soft_update_counter = 0;
 		this.update_interval_mode = 0;//0 for auto, -1 for fast, -2 for slow, -3 for stop, any other value is update interval in ms
 		setInterval(() => {
 			if (new Date().getTime() - this.last_job_time > (this.options.slow_update_interval * 3)) {
@@ -41,6 +43,7 @@ module.exports = class MultiPoller {
 			}
 		}, this.options.status_check_interval);
 		this.recursiveStartNext();
+		//setTimeout(this.recursiveStartNext, 0);
 	}
 	setUpdateIntervalAuto() {
 		this.update_interval_mode = 0;
@@ -61,11 +64,14 @@ module.exports = class MultiPoller {
 		return this.checkReadyForUpdate(id, options);
 	}
 	checkUpdatesDue() {
-		let ud = this.updatesDue();//updates due
-		for (let i = 0; i < ud.length; ++i) {
-			this.add(ud[i].id, ud[i].options);
-		}
-		return ud.length;
+		return new Promise((resolve, reject) => {
+			this.updatesDue().then(ud => {
+				for (let i = 0; i < ud.length; ++i) {
+					this.add(ud[i].id, ud[i].options);
+				}
+				resolve(ud.length);
+			});//updates due
+		});
 	}
 	add(id, options) {//force update in next update cycle. returns 0-indexed place in queue
 		const iiq = this.update_queue.findIndex(e => e.id === id);
@@ -78,8 +84,11 @@ module.exports = class MultiPoller {
 			return this.update_queue.length - 1;
 		}
 	}
-	forceUpdateNow(id, options) {//force no matter what, right now
+	forceUpdateASAP(id, options) {//add to front of queue. public access
 		this.update_queue.unshift({ id, options });//adds to front of queue
+	}
+	updateNow(id, options) {//force no matter what, right now.
+		return this.checkForUpdates(id, options);
 	}
 	remove(id) {//remove from polling queue if it is in the queue. returns true if in queue, returns false if not in queue.
 		const iiq = this.update_queue.findIndex(e => e.id === id);//index in question
@@ -96,30 +105,65 @@ module.exports = class MultiPoller {
 		return UTILS.copy(this.update_queue);
 	}
 	getUpdateInterval() {//returns the live update interval in ms
-		switch (this.update_interval_mode) {
-			case 0:
-				return UTILS.constrain(UTILS.map(this.update_queue.length, this.options.min_queue_length, this.options.max_queue_length, this.options.slow_update_interval, this.options.fast_update_interval), this.options.slow_update_interval, this.options.fast_update_interval);
-			case -1:
-				return this.options.fast_update_interval;
-			case -2:
-				return this.options.slow_update_interval;
-			case -3:
-				return this.options.slow_update_interval;
-			default:
-				return this.update_interval_mode;
-		}
-	}
-	recursiveStartNext() {
-		this.last_job_time = new Date().getTime();
-		try {
-			let uqo = this.update_queue[0];//update queue object
-			if (this.update_queue.length <= 1) this.checkUpdatesDue();//update list of things needed to be updated soon
-			if (this.update_interval_mode !== -3 && UTILS.exists(uqo) && this.checkUpdate(uqo.id, uqo.options)) {
-				this.update_queue.shift();
-				this.forceUpdateNow(uqo.id, uqo.options).then(data => this.justUpdated(uqo.id, data, null)).catch(e => this.justUpdated(uqo.id, null, e));
+		let that = this;
+		function internal() {
+			switch (that.update_interval_mode) {
+				case 0:
+					return UTILS.constrain(UTILS.map(that.update_queue.length, that.options.min_queue_length, that.options.max_queue_length, that.options.slow_update_interval, that.options.fast_update_interval), that.options.fast_update_interval, that.options.slow_update_interval);
+				case -1:
+					return that.options.fast_update_interval;
+				case -2:
+					return that.options.slow_update_interval;
+				case -3:
+					return that.options.slow_update_interval;//not defined yet; should be stop mode
+				default:
+					return that.update_interval_mode;
 			}
 		}
+		const ans = internal();
+		UTILS.debug("Update Interval: " + ans);
+		return ans;
+	}
+	softUpdate() {//internal function that checks if conditions are right for updating
+		++this.soft_update_counter;
+		if (this.soft_update_counter % this.options.soft_update_interval === 0) {
+			this.checkUpdatesDue().then(() => { });
+		}
+	}
+	recursiveStartNext(that = this) {
+		//let that = this;
+		that.last_job_time = new Date().getTime();
+		try {
+			//UTILS.debug("update queue length: " + that.update_queue.length);
+			UTILS.debug("update queue contents1: " + JSON.stringify(that.update_queue));
+			if (UTILS.exists(that.update_queue[0])) {
+				let uqo = UTILS.copy(that.update_queue[0]);//update queue object
+				if (that.update_interval_mode !== -3 && UTILS.exists(uqo)) {
+					that.checkUpdate(uqo.id, uqo.options).then(cu => {
+						that.update_queue.shift();
+						if (cu) {
+							UTILS.debug("update queue contents2: " + JSON.stringify(that.update_queue));
+							that.updateNow(uqo.id, uqo.options).then(data => {
+								that.justUpdated(uqo.id, data, null).then(() => {
+									that.softUpdate();//update list of things needed to be updated soon
+								});
+							}).catch(e => {
+								that.justUpdated(uqo.id, null, e).then(() => {
+									that.softUpdate();//update list of things needed to be updated soon
+								});
+							});
+						}
+						else {
+							console.error("cu returned false");
+						}
+					}).catch(e => that.justUpdated(uqo.id, null, e));
+				}
+			}
+			else that.softUpdate();//update list of things needed to be updated soon
+		}
 		catch (e) { console.error(e); }
-		setTimeout(this.recursiveStartNext, this.getUpdateInterval());//does not wait for update to complete before starting the next job
+		//UTILS.assert(UTILS.exists(that.getUpdateInterval()));
+		//UTILS.assert(typeof(that.getUpdateInterval()) == "number");
+		setTimeout(that.recursiveStartNext, that.getUpdateInterval(), that);//does not wait for update to complete before starting the next job
 	}
 }
