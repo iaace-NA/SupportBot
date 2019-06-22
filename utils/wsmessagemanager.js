@@ -5,7 +5,7 @@ module.exports = class WSMessageManager {
 	constructor() {
 		this.collector = {};
 	}
-	get() {
+	get() {//creates a promise for a new websocket request destined for IAPI. will return the promise and a unique request ID.
 		if (request_ID % 50 === 0) this.clean();
 		this.collector["" + request_ID] = {
 			timestamp: new Date().getTime()
@@ -20,7 +20,7 @@ module.exports = class WSMessageManager {
 			request_ID: "" + (request_ID++)
 		};
 	}
-	wsMessageCallback(raw_message) {
+	wsMessageCallback(raw_message) {//receives a raw websocket message from IAPI, checks the wsm_ID, and completes the associated promise
 		if (UTILS.exists(this.collector[raw_message.wsm_ID])) {
 			if (raw_message.code != 500) {
 				this.collector[raw_message.wsm_ID].resolve(raw_message.response);
