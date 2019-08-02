@@ -19,7 +19,7 @@ League of Legends Statistics for Discord
     - wss for bidirectional discord shard related communications
     - api key authentication
   - (Future, not implemented) 1 child process of the internal API to handle polling and tracking (blocking)
-  - (Future, not implemented) 1 website process, accessing the internal API via HTTPS requests
+  - (Future, not implemented) 1 website process, accessing the internal API via HTTPS requests (blocking)
 - Configurable API caching timeouts per endpoint, per command
 - Feedback commands
 - Configurable user and server rate limiting
@@ -33,7 +33,7 @@ League of Legends Statistics for Discord
   - Make internal note
 - Ability to set multiple owners
 - Ability to audit owner disciplinary actions
-- Ability to globally brodcast messages
+- Ability to globally broadcast messages
 - Tiered permissions system
   - Bot owners
   - Server owners
