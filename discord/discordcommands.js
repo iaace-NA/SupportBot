@@ -29,10 +29,32 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 	}//ignore messages from banned servers
 
 	const msg_receive_time = new Date().getTime();
-	let RL_activated = false;
+	let RL_activated = false;//rate limiter activated? prevents rate limit processing from acting on more than 1 reply
 	let request_profiler = new Profiler("r#" + msg.id)
 	let lolapi = new LOLAPI(CONFIG, msg.id, wsapi);
 	request_profiler.mark("lolapi instantiated");
+
+	if (!msg.PM) {//handles impersonate command
+		let cancel = false;
+		//Las <target uid> <full command to run under target uid>
+		command([preferences.get("prefix") + "as "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+			const target_uid = parameter.substring(0, parameter.indexOf(" "));
+			//ensure user object exists within the server
+			const candidate_member = msg.guild.members.get(target_uid);
+			if (!UTILS.exists(candidate_member)) {
+				reply("Unable to find UID " + target_uid);
+				cancel = true;
+			}
+			else {
+				msg.author = candidate_member.user;
+				msg.member = candidate_member;
+				msg.content = parameter.substring(parameter.indexOf(" ") + 1);
+				msg.cleanContent = msg.cleanContent.substring(msg.cleanContent.indexOf(`as ${target_uid}`) + `as ${target_uid}`.length + 1);
+				reply("Running command as " + candidate_member.user.tag);
+			}
+		});
+		if (cancel) return;//cancel processing execution of command (the rest of this file) if impersonate fails to find target uid
+	}
 
 	command(["supportbotprefix "], true, CONFIG.CONSTANTS.ADMINISTRATORS, (original, index, parameter) => {
 		const candidate = parameter.trim().toLowerCase();
