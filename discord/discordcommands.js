@@ -46,11 +46,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 				cancel = true;
 			}
 			else {
+				reply("Running command as " + candidate_member.user.tag);
 				msg.author = candidate_member.user;
 				msg.member = candidate_member;
 				msg.content = parameter.substring(parameter.indexOf(" ") + 1);
 				msg.cleanContent = msg.cleanContent.substring(msg.cleanContent.indexOf(`as ${target_uid}`) + `as ${target_uid}`.length + 1);
-				reply("Running command as " + candidate_member.user.tag);
 			}
 		});
 		if (cancel) return;//cancel processing execution of command (the rest of this file) if impersonate fails to find target uid
