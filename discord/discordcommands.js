@@ -51,6 +51,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 				msg.member = candidate_member;
 				msg.content = parameter.substring(parameter.indexOf(" ") + 1);
 				msg.cleanContent = msg.cleanContent.substring(msg.cleanContent.indexOf(`as ${target_uid}`) + `as ${target_uid}`.length + 1);
+				ACCESS_LEVEL = UTILS.accessLevel(CONFIG, msg);//recalculate access level
 			}
 		});
 		if (cancel) return;//cancel processing execution of command (the rest of this file) if impersonate fails to find target uid
