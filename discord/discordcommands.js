@@ -648,19 +648,19 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			}
 		});*/
 		command([preferences.get("prefix") + "setting auto-opgg on", preferences.get("prefix") + "setting auto-opgg off"], false, CONFIG.CONSTANTS.MODERATORS, (original, index) => {
-			const new_setting = index === 0 ? true : false;
+			const new_setting = index === 0;
 			preferences.set("auto_opgg", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will automatically show summoner information when an op.gg link is posted." : "SupportBot will not show summoner information when an op.gg link is posted."))).catch(reply);
 		});
 		command([preferences.get("prefix") + "setting force-prefix on", preferences.get("prefix") + "setting force-prefix off"], false, CONFIG.CONSTANTS.ADMINISTRATORS, (original, index) => {
-			const new_setting = index === 0 ? true : false;
+			const new_setting = index === 0;
 			preferences.set("force_prefix", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will require prefixes on all LoL commands." : "SupportBot will not require prefixes on all LoL commands."))).catch(reply);
 		});
 		command([preferences.get("prefix") + "setting release-notifications on", preferences.get("prefix") + "setting release-notifications off"], false, CONFIG.CONSTANTS.ADMINISTRATORS, (original, index) => {
-			const new_setting = index === 0 ? true : false;
+			const new_setting = index === 0;
 			preferences.set("release_notifications", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will show new release notifications." : "SupportBot will not show new release notifications."))).catch(reply);
 		});
 		command([preferences.get("prefix") + "setting global-feedback on", preferences.get("prefix") + "setting global-feedback off"], false, CONFIG.CONSTANTS.MODERATORS, (original, index) => {
-			const new_setting = index === 0 ? true : false;
+			const new_setting = index === 0;
 			preferences.set("feedback_enabled", new_setting).then(() => reply(":white_check_mark: " + (new_setting ? "SupportBot will allow the use of global feedback commands in this server." : "SupportBot will not allow the use of global feedback commands in this server."))).catch(reply);
 		});
 		command(["supportbot settings reset all"], false, CONFIG.CONSTANTS.ADMINISTRATORS, () => reply(":warning: You are about to reset all the preferences associated with this server. To confirm this action, please send the command: `supportbot settings reset all confirm`"));
