@@ -48,11 +48,12 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			}
 			else {
 				reply("Running command as " + candidate_member.user.tag);
+				cancel = true;
 				msg.author = candidate_member.user;
 				msg.member = candidate_member;
 				msg.content = parameter.substring(parameter.indexOf(" ") + 1);
-				msg.cleanContent = msg.cleanContent.substring(msg.cleanContent.indexOf(`as ${target_uid}`) + `as ${target_uid}`.length + 1);
 				ACCESS_LEVEL = UTILS.accessLevel(CONFIG, msg);//recalculate access level
+				cancel = false;
 			}
 		});
 		if (cancel) return;//cancel processing execution of command (the rest of this file) if impersonate fails to find target uid
@@ -383,7 +384,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			}).catch(console.error);
 		}).catch(console.error);
 	});
-	command(usePrefix(["about", "credits", "acknowledgements", "contributors", "contributions"], false, false, (original, index) => reply(CONFIG.ACKNOWLEDGEMENTS));
+	command(usePrefix(["about", "credits", "acknowledgements", "contributors", "contributions"]), false, false, (original, index) => reply(CONFIG.ACKNOWLEDGEMENTS));
 	if (preferences.get("auto_opgg")) {
 		command(["https://"], true, false, (original, index, parameter) => {
 			let r_copy = parameter.substring(0, parameter.indexOf("."));
