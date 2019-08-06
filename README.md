@@ -29,6 +29,7 @@ League of Legends Statistics for Discord
 - Global disciplinary commands for users and servers
   - Permaban
   - Temporary ban
+  - Shadow ban
   - Warn
   - Make internal note
 - Ability to set multiple owners
