@@ -43,11 +43,11 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			//ensure user object exists within the server
 			const candidate_member = msg.guild.members.get(target_uid);
 			if (!UTILS.exists(candidate_member)) {
-				reply("Unable to find UID " + target_uid);
+				reply(":x: Unable to find UID " + target_uid + ". Are they within the same server?");
 				cancel = true;
 			}
 			else {
-				reply("Running command as " + candidate_member.user.tag);
+				reply(":white_check_mark: Running command as " + candidate_member.user.tag);
 				cancel = true;
 				msg.author = candidate_member.user;
 				msg.member = candidate_member;
