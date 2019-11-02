@@ -14,7 +14,7 @@
     "getopts": "^2.2.4",
     "json5": "^2.1.0",
     "mathjs": "^5.9.0",
-    "mongoose": "^5.5.5",
+    "mongoose": "^5.7.5",
     "request": "^2.88.0",
     "riot-lol-api": "github:iaace-NA/riot-lol-api"
   }
