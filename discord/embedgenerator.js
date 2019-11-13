@@ -700,8 +700,6 @@ module.exports = class EmbedGenerator {
 		UTILS.output("average iMMR is " + UTILS.round(avg_iMMR) + " or " + UTILS.iMMRtoEnglish(avg_iMMR));
 		for (let i = 0; i < IMMR_THRESHOLD.length; ++i) if (avg_iMMR >= IMMR_THRESHOLD[i]) newEmbed.setColor(RANK_COLOR[i]);
 		const game_type = match.gameType == "CUSTOM_GAME" ? "Custom" : queues[match.gameQueueConfigId];
-		if (match.gameStartTime != 0) newEmbed.setTitle(game_type + " `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
-		else newEmbed.setTitle(game_type + " `GAME LOADING`");
 		let common_teammates = {};
 		/*{
 			"username1": {
@@ -775,7 +773,7 @@ module.exports = class EmbedGenerator {
 		let team_count = 1;
 		let player_count = 0;
 		let role_confidence = [];
-		let inline = [true, true, false, true];
+		let inline = [true, true, false, true, true];
 		let ic = 0;
 		for (let b in teams) {//team
 			if (teams[b].length === 5 && match.mapId === 11) {
@@ -828,7 +826,7 @@ module.exports = class EmbedGenerator {
 			UTILS.debug("team_description_c2 length: " + team_description_c2.length);
 			newEmbed.addField(":x::x: `SOLOQ ¦FLEX5 ¦FLEX3`", team_description_c1, inline[ic++]);
 			newEmbed.addField("Bans: " + ban_description.join(""), team_description_c2, inline[ic++]);
-			if (role_confidence.length === 2) newEmbed.setFooter("Role Confidence: Blue: " + role_confidence[0] + "% Purple: " + role_confidence[1] + "%");
+			if (ic === 2) newEmbed.addField(match.gameStartTime != 0 ? game_type + " `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`" : game_type + " `GAME LOADING`", role_confidence.length === 2 ? "Role Confidence: Blue: " + role_confidence[0] + "% Purple: " + role_confidence[1] + "%" : "Role Confidence: Unavailable", inline[ic++])
 			++team_count;
 		}
 		return newEmbed;
