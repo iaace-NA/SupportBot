@@ -824,8 +824,8 @@ module.exports = class EmbedGenerator {
 			}
 			UTILS.debug("team_description_c1 length: " + team_description_c1.length);
 			UTILS.debug("team_description_c2 length: " + team_description_c2.length);
-			newEmbed.addField(":x::x: `SOLOQ ¦FLEX5 ¦FLEX3`", team_description_c1, false);
-			newEmbed.addField("Bans: " + ban_description.join(""), team_description_c2, true);
+			newEmbed.addField(":x::x: `SOLOQ ¦FLEX5 ¦FLEX3`", team_description_c1, true);
+			newEmbed.addField("Bans: " + ban_description.join(""), team_description_c2, false);
 			if (role_confidence.length === 2) newEmbed.setFooter("Role Confidence: Blue: " + role_confidence[0] + "% Purple: " + role_confidence[1] + "%");
 			++team_count;
 		}
