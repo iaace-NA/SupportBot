@@ -824,14 +824,14 @@ module.exports = class EmbedGenerator {
 				team_description_c2 += "\n";
 				++player_count;
 			}
+			UTILS.debug("team_description_c1 length: " + team_description_c1.length);
+			UTILS.debug("team_description_c2 length: " + team_description_c2.length);
 			d_c1.push(team_description_c1);
 			d_c2.push(team_description_c2);
 			++team_count;
 		}
 
 		for (let i = 0; i < d_c1.length; ++i) {
-			UTILS.debug("team_description_c1 length: " + team_description_c1.length);
-			UTILS.debug("team_description_c2 length: " + team_description_c2.length);
 			newEmbed.addField(":x::x: `SOLOQ ¦FLEX5 ¦FLEX3`", d_c1[i], inline[ic++]);
 			newEmbed.addField("Bans: " + ban_description.join(""), d_c2[i], inline[ic++]);
 			if (ic === 2) newEmbed.addField(match.gameStartTime != 0 ? game_type + " `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`" : game_type + " `GAME LOADING`", role_confidence.length === 2 ? "Role Confidence: Blue: " + role_confidence[0] + "% Purple: " + role_confidence[1] + "%" : "Role Confidence: Unavailable (not 5v5 SR?)", inline[ic++])
