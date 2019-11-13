@@ -775,6 +775,8 @@ module.exports = class EmbedGenerator {
 		let team_count = 1;
 		let player_count = 0;
 		let role_confidence = [];
+		let inline = [true, true, false, true];
+		let ic = 0;
 		for (let b in teams) {//team
 			if (teams[b].length === 5 && match.mapId === 11) {
 				let lane_assignments = getLikelyLanes(CONFIG, teams[b].map(match_participant => match_participant.championId));//could break non-SR games
@@ -782,7 +784,7 @@ module.exports = class EmbedGenerator {
 				for (let c = 0; c < teams[b].length; ++c) {
 					teams[b][c].lanePrediction = lane_assignments.assignments[c];
 				}
-				teams[b].sort((a, b) => a.lanePrediction - b.lanePrediction);
+				teams[b].sort((a, c) => a.lanePrediction - c.lanePrediction);
 			}
 			let team_description_c1 = "";
 			let team_description_c2 = "";
@@ -824,8 +826,8 @@ module.exports = class EmbedGenerator {
 			}
 			UTILS.debug("team_description_c1 length: " + team_description_c1.length);
 			UTILS.debug("team_description_c2 length: " + team_description_c2.length);
-			newEmbed.addField(":x::x: `SOLOQ ¦FLEX5 ¦FLEX3`", team_description_c1, true);
-			newEmbed.addField("Bans: " + ban_description.join(""), team_description_c2, false);
+			newEmbed.addField(":x::x: `SOLOQ ¦FLEX5 ¦FLEX3`", team_description_c1, inline[ic++]);
+			newEmbed.addField("Bans: " + ban_description.join(""), team_description_c2, inline[ic++]);
 			if (role_confidence.length === 2) newEmbed.setFooter("Role Confidence: Blue: " + role_confidence[0] + "% Purple: " + role_confidence[1] + "%");
 			++team_count;
 		}
