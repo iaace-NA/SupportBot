@@ -822,12 +822,14 @@ module.exports = class EmbedGenerator {
 				team_description_c2 += "\n";
 				++player_count;
 			}
+			++team_count;
+		}
+		for (let b in teams) {
 			UTILS.debug("team_description_c1 length: " + team_description_c1.length);
 			UTILS.debug("team_description_c2 length: " + team_description_c2.length);
 			newEmbed.addField(":x::x: `SOLOQ ¦FLEX5 ¦FLEX3`", team_description_c1, inline[ic++]);
 			newEmbed.addField("Bans: " + ban_description.join(""), team_description_c2, inline[ic++]);
-			if (ic === 2) newEmbed.addField(match.gameStartTime != 0 ? game_type + " `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`" : game_type + " `GAME LOADING`", role_confidence.length === 2 ? "Role Confidence: Blue: " + role_confidence[0] + "% Purple: " + role_confidence[1] + "%" : "Role Confidence: Unavailable", inline[ic++])
-			++team_count;
+			if (ic === 2) newEmbed.addField(match.gameStartTime != 0 ? game_type + " `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`" : game_type + " `GAME LOADING`", role_confidence.length === 2 ? "Role Confidence: Blue: " + role_confidence[0] + "% Purple: " + role_confidence[1] + "%" : "Role Confidence: Unavailable (not 5v5 SR?)", inline[ic++])
 		}
 		return newEmbed;
 	}
