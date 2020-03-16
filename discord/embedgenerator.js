@@ -671,7 +671,7 @@ module.exports = class EmbedGenerator {
 					else summoner_spells = ":x::x:";//bot
 					const username = pI.player.summonerName;
 					const lane = CONFIG.EMOJIS.lanes[UTILS.inferLane(p.timeline.role, p.timeline.lane, p.spell1Id, p.spell2Id)];
-					newEmbed.addField(CONFIG.STATIC.CHAMPIONS[p.championId].emoji + lane + summoner_spells + " " + pI.solo + " ¦ " + pI.flex5 + " ¦ " + pI.flex3 + " ¦ `M" + pI.mastery + "` lv. `" + (UTILS.exists(pI.player.summonerId) ? summoner_participants.find(p => p.id == pI.player.summonerId).summonerLevel : 0) + "` __" + (pI.player.summonerId == summoner.id ? "**" + username + "**" : username) + "__" + (pI.player.summonerId == summoner.id && verified ? "\\" + VERIFIED_ICON : ""), "[opgg](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ") " + "__lv.__ `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\t__KDR:__`" + UTILS.KDAFormat(p.stats.kills / p.stats.deaths) + "`\t__KDA:__`" + UTILS.KDAFormat((p.stats.kills + p.stats.assists) / p.stats.deaths) + "` `" + UTILS.KPFormat((100 * (p.stats.assists + p.stats.kills)) / tK) + "%`\t__cs:__`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "` `(" + ((p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) / (match.gameDuration / 60)).round(1) + ")`\t__g:__`" + UTILS.gold(p.stats.goldEarned) + "`\n__items:__ " + getItemTags([p.stats.item0, p.stats.item1, p.stats.item2, p.stats.item3, p.stats.item4, p.stats.item5, p.stats.item6]).map(i => "`" + i + "`").join(TAB + " ") + "\n" + getMatchTags(pI.player.summonerId, match).map(s => "`" + s + "`").join(TAB + " "));
+					newEmbed.addField(CONFIG.STATIC.CHAMPIONS[p.championId].emoji + lane + summoner_spells + " " + pI.solo + " ¦ " + pI.flex5 + " ¦ `M" + pI.mastery + "` lv. `" + (UTILS.exists(pI.player.summonerId) ? summoner_participants.find(p => p.id == pI.player.summonerId).summonerLevel : 0) + "` __" + (pI.player.summonerId == summoner.id ? "**" + username + "**" : username) + "__" + (pI.player.summonerId == summoner.id && verified ? "\\" + VERIFIED_ICON : ""), "[opgg](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ") " + "__lv.__ `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\t__KDR:__`" + UTILS.KDAFormat(p.stats.kills / p.stats.deaths) + "`\t__KDA:__`" + UTILS.KDAFormat((p.stats.kills + p.stats.assists) / p.stats.deaths) + "` `" + UTILS.KPFormat((100 * (p.stats.assists + p.stats.kills)) / tK) + "%`\t__cs:__`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "` `(" + ((p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) / (match.gameDuration / 60)).round(1) + ")`\t__g:__`" + UTILS.gold(p.stats.goldEarned) + "`\n__items:__ " + getItemTags([p.stats.item0, p.stats.item1, p.stats.item2, p.stats.item3, p.stats.item4, p.stats.item5, p.stats.item6]).map(i => "`" + i + "`").join(TAB + " ") + "\n" + getMatchTags(pI.player.summonerId, match).map(s => "`" + s + "`").join(TAB + " "));
 				}
 			}
 			if (match.gameDuration > 240) {//game longer than 4 minutes
@@ -810,7 +810,7 @@ module.exports = class EmbedGenerator {
 				else team_description_c1 += "`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell1Id].name + "`";
 				if (UTILS.exists(CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id])) team_description_c1 += CONFIG.SPELL_EMOJIS[teams[b][c].spell2Id];
 				else team_description_c1 += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
-				team_description_c1 += " " + teams[b][c].solo + " " + teams[b][c].flex5 + " " + teams[b][c].flex3;
+				team_description_c1 += " " + teams[b][c].solo + " " + teams[b][c].flex5;// + " " + teams[b][c].flex3;
 				team_description_c1 += UTILS.fstr(teams[b].length === 5 && match.mapId === 11, CONFIG.EMOJIS.lanes[teams[b][c].lanePrediction]) + "\n";
 				team_description_c2 += "`M" + teams[b][c].mastery + "`" + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji;
 				team_description_c2 += "`" + summoner_participants.find(p => p.id == teams[b][c].summonerId).summonerLevel + "`";
@@ -834,7 +834,7 @@ module.exports = class EmbedGenerator {
 		}
 
 		for (let i = 0; i < d_c1.length; ++i) {
-			newEmbed.addField(":x::x: `SOLOQ ¦FLEX5 ¦FLEX3`", d_c1[i], inline[ic++]);
+			newEmbed.addField(":x::x: `SOLOQ ¦FLEX5`", d_c1[i], inline[ic++]);
 			newEmbed.addField("Bans: " + bd[i], d_c2[i], inline[ic++]);
 			if (ic === 2) newEmbed.addField(match.gameStartTime != 0 ? game_type + " `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`" : game_type + " `GAME LOADING`", role_confidence.length === 2 ? "Role Confidence: Blue: " + role_confidence[0] + "% Purple: " + role_confidence[1] + "%" : "Role Confidence: Unavailable (not 5v5 SR?)", inline[ic++])
 		}
@@ -953,7 +953,7 @@ module.exports = class EmbedGenerator {
 			let individual_description = "`";
 			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_SOLO_5x5"), true, lsr_sr) + " ";
 			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_FLEX_SR"), true, lsr_sr) + " ";
-			individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_FLEX_TT"), true, lsr_tt) + " ";
+			//individual_description += UTILS.shortRank(ranks[i].find(r => r.queueType === "RANKED_FLEX_TT"), true, lsr_tt) + " ";
 			let results = [];
 			let all_KDA = {
 				K: 0,
@@ -991,7 +991,7 @@ module.exports = class EmbedGenerator {
 				if (field_str.length + response_str[i].length < 1024) field_str += response_str[i] + "\n";
 				else break;
 			}
-			newEmbed.addField("`SOLOQ |FLEX5 |FLEX3` W/L-Streak, 20G W/L, 20G KDA, Best Champs", field_str.substring(0, field_str.length - 1));
+			newEmbed.addField("`SOLOQ |FLEX5` W/L-Streak, 20G W/L, 20G KDA, Best Champs", field_str.substring(0, field_str.length - 1));
 		}
 		return newEmbed;
 		//SOLO Q|FLEX 5|FLEX 3 [MH1][MH2][MH3][MH4][W]W/[L]L KDA: [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
