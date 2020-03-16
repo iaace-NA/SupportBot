@@ -88,8 +88,8 @@ client.on("guildCreate", function (guild) {
 
 });
 client.on("guildDelete", function(guild) {
-	UTILS.output("Server Left: " + guild.id + " :: " + guild.region + " :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
-	sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x:`$" + process.env.SHARD_ID + "`Server Left: `" + guild.id + "` :: " + guild.region + " :: " + guild.name + " :: :busts_in_silhouette:" + guild.memberCount + " :: " + guild.owner.user.tag);
+	UTILS.output("Server Left: " + guild.id + " :: " + guild.region + " :: " + guild.name + " :: Population=" + guild.memberCount);
+	sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x:`$" + process.env.SHARD_ID + "`Server Left: `" + guild.id + "` :: " + guild.region + " :: " + guild.name + " :: :busts_in_silhouette:" + guild.memberCount);
 });
 let server_rate_limiters = {};
 let user_rate_limiters = {};
