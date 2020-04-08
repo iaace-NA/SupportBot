@@ -1,0 +1,25 @@
+SupportBot is a statistics bot for League of Legends. We display and reformat data provided from the League of Legends API- specifically, player statistics and data. Some common uses of our bot would be to see recent matches played on League of Legends, current matches being played, and summoner information like level, mastery, and ranks. If you would like to see screenshots and examples of commands, please visit our documentation site at https://supportbot.tk/ .
+
+We collect and store: user IDs, user preferences, verified and unverified connections to league of legends accounts, message IDs and contents *for commands used only, channel and server IDs,   and role/user permissions on discord.
+
+We store data for the following reasons:
+For user preferences: user IDs, user preferences, verified and unverified connections to league of legends accounts
+For performance, quality, and abuse auditing: message IDs and contents *for commands used only, channel and server IDs, and role/user permissions on discord
+
+Data stored for user preferences: indefinite
+Data stored for performance, quality, and abuse auditing: 365 days, deleted afterward
+
+They should come to our server and begin their privacy/personal information related requests in our public help channel. We would then talk to them privately about their specific request.
+
+Our bot has 3 components:
+1. Documentation infrastructure for https://supportbot.tk/ : Serverless, hosted on github pages
+2. Internal API for managing preferences: 1 Virtual Private Server (VPS) instance, Ubuntu 16 LTS
+3. Shards for responding directly to discord messages: 1 Hardware Server with Physical Access, Windows 10
+
+1. Documentation infrastructure for https://supportbot.tk/ : 2 Factor Authentication, Time-Token based
+2. Internal API for managing preferences: SSH Key, Password Authentication Disabled
+3. Shards for responding directly to discord messages: Password Based Local Login, Remote Desktop Protocol disabled, Firewall policy in use, Remote Access enabled by Teamviewer Only
+
+They should come to our server and begin their security related requests in our public help channel. We would then talk to them privately about their specific request. They can also view our security.md policy on github at https://github.com/iaace-NA/SupportBot/blob/master/SECURITY.md ; they would also be free to email me or DM me on discord.
+
+No. All data accessed by our application uses publicly available data on all services (excluding discord).
