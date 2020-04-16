@@ -393,7 +393,7 @@ module.exports = class EmbedGenerator {
 		if (will) {
 			const challenger_rank = UTILS.randomInt(5, 300);
 			const fake_games = UTILS.randomInt(200, 700);
-			const fake_wins = UTILS.randomInt(fake_games / 2, fake_games);
+			const fake_wins = UTILS.randomInt(fake_games * .52, fake_games * .70);
 			const fake_losses = fake_games - fake_wins;
 			const fake_wr = UTILS.round(100 * fake_wins / (fake_wins + fake_losses), 2);
 			const challenger_LP = UTILS.round(UTILS.map(challenger_rank, 300, 5, 400, 1300));
