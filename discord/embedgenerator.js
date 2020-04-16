@@ -392,7 +392,7 @@ module.exports = class EmbedGenerator {
 		if (highest_rank > -1) newEmbed.setColor(RANK_COLOR[highest_rank]);
 		if (will) {
 			const challenger_rank = UTILS.randomInt(5, 300);
-			const fake_games = UTILS.randomInt(200, 700);
+			const fake_games = UTILS.randomInt(40, 200);
 			const fake_wins = UTILS.randomInt(fake_games * .52, fake_games * .70);
 			const fake_losses = fake_games - fake_wins;
 			const fake_wr = UTILS.round(100 * fake_wins / (fake_wins + fake_losses), 2);
