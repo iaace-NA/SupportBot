@@ -396,7 +396,8 @@ module.exports = class EmbedGenerator {
 			const fake_wins = UTILS.randomInt(fake_games * .52, fake_games * .70);
 			const fake_losses = fake_games - fake_wins;
 			const fake_wr = UTILS.round(100 * fake_wins / (fake_wins + fake_losses), 2);
-			const challenger_LP = UTILS.round(UTILS.map(challenger_rank, 300, 5, 400, 1300));
+			const power = 1.4;
+			const challenger_LP = UTILS.round(UTILS.map(Math.pow(challenger_rank, power), Math.pow(300, power), Math.pow(5, power), 400, 1300));
 			newEmbed.addField(CONFIG.EMOJIS.ranks[CONFIG.EMOJIS.ranks.length - 1] + " Challenger ~#" + challenger_rank + " " + challenger_LP + "LP", fake_games + "G (" + fake_wr + "%) = " + fake_wins + "W + " + fake_losses + "L", true);
 			newEmbed.setColor(RANK_COLOR[RANK_COLOR.length - 1]);
 		}
