@@ -366,7 +366,7 @@ module.exports = class EmbedGenerator {
 			if (live_match.gameStartTime != 0) newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Playing:**__ **" + CONFIG.STATIC.CHAMPIONS[live_match.participants.find(p => p.summonerName === summoner.name).championId].emoji + "** on " + game_type + " for `" + UTILS.standardTimestamp((new Date().getTime() - live_match.gameStartTime) / 1000) + "`");
 			else newEmbed.setDescription("Level " + summoner.summonerLevel + "\n__**Game Loading:**__ **" + CONFIG.STATIC.CHAMPIONS[live_match.participants.find(p => p.summonerName === summoner.name).championId].emoji + "** on " + game_type);
 		}
-		const will = (region === "NA" && summoner.id == 50714503) ? true : false;
+		const will = (region === "NA" && summoner.id == "cEVif3eyDKXnbjyTz7xU0V3rHF2A9XYlGunVkPdKcyyckYk") ? true : false;
 		let highest_rank = -1;
 		for (let i = 0; i < ranks.length; ++i) {
 			let description = (ranks[i].wins + ranks[i].losses) + "G (" + UTILS.round(100 * ranks[i].wins / (ranks[i].wins + ranks[i].losses), 2) + "%) = " + ranks[i].wins + "W + " + ranks[i].losses + "L";
