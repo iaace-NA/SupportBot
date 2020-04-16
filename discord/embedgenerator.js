@@ -391,12 +391,12 @@ module.exports = class EmbedGenerator {
 		}
 		if (highest_rank > -1) newEmbed.setColor(RANK_COLOR[highest_rank]);
 		if (will) {
-			const challenger_rank = UTILS.randomInt(5, 200);
+			const challenger_rank = UTILS.randomInt(5, 300);
 			const fake_games = UTILS.randomInt(200, 700);
 			const fake_wins = UTILS.randomInt(fake_games / 2, fake_games);
 			const fake_losses = fake_games - fake_wins;
 			const fake_wr = UTILS.round(100 * fake_wins / (fake_wins + fake_losses), 2);
-			const challenger_LP = UTILS.round(UTILS.map(fake_wr, 50, 100, 500, 1000));
+			const challenger_LP = UTILS.round(UTILS.map(challenger_rank, 300, 5, 400, 1300));
 			newEmbed.addField(CONFIG.EMOJIS.ranks[CONFIG.EMOJIS.ranks.length - 1] + " Challenger ~#" + challenger_rank + " " + challenger_LP + "LP", fake_games + "G (" + fake_wr + "%) = " + fake_wins + "W + " + fake_losses + "L", true);
 			newEmbed.setColor(RANK_COLOR[RANK_COLOR.length - 1]);
 		}
