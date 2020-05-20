@@ -110,7 +110,8 @@ function sendEmbedToChannel(cid, embed, approvable = false) {
 function loadAllStaticResources(callback = () => {}) {
 	LOLAPI.getStatic("api/versions.json").then(result => {//load static dd version
 		UTILS.output("DD STATIC RESOURCES LOADED");
-		CONFIG.STATIC = result;
+		CONFIG.STATIC = {};
+		CONFIG.STATIC.versions = result;
 		let temp_regions = [];
 		for (let i in CONFIG.REGIONS) temp_regions.push(CONFIG.REGIONS[i]);
 		let v = CONFIG.PATCH_LOCK === "latest" ? undefined : CONFIG.PATCH_LOCK;

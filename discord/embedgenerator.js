@@ -329,7 +329,7 @@ module.exports = class EmbedGenerator {
 			return newEmbed;
 		}
 		newEmbed.setAuthor(apiobj.name);
-		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + apiobj.profileIconId + ".png");
+		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.versions[0] + "/img/profileicon/" + apiobj.profileIconId + ".png");
 		newEmbed.setDescription("Level " + apiobj.summonerLevel + "\npuuid: `" + apiobj.puuid + "`\nSummoner ID: `" + apiobj.id + "`\nAccount ID: `" + apiobj.accountId + "`");
 		newEmbed.setTimestamp(new Date(apiobj.revisionDate));
 		newEmbed.setFooter("Last change detected at ");
@@ -345,7 +345,7 @@ module.exports = class EmbedGenerator {
 			return newEmbed;
 		}
 		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), undefined, UTILS.opgg(region, summoner.name));
-		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
+		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.versions[0] + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(live_match.status)) {//no live game found
 			let mrg_description = "";
 			if (UTILS.exists(match_meta) && UTILS.exists(match_meta.matches[0])) {
@@ -416,7 +416,7 @@ module.exports = class EmbedGenerator {
 	}
 	match(CONFIG, summoner, match_meta, matches, mastery, verified) {//should show 5 most recent games
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
+		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.versions[0] + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 		let common_teammates = {};
 		/*{
 			"name": {
@@ -547,7 +547,7 @@ module.exports = class EmbedGenerator {
 	}
 	fromLastGame(CONFIG, summoner, match, matches, summoner_participants, verified) {//should show 5 most recent games
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
+		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.versions[0] + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 		const game_type = match.gameType == "CUSTOM_GAME" ? "Custom" : queues[match.gameQueueConfigId];
 		if (match.gameStartTime != 0) newEmbed.setTitle(game_type + " `" + UTILS.standardTimestamp((new Date().getTime() - match.gameStartTime) / 1000) + "`");
 		else newEmbed.setTitle(game_type + " `GAME LOADING`");
@@ -621,7 +621,7 @@ module.exports = class EmbedGenerator {
 	detailedMatch(CONFIG, summoner, match_meta, match, timeline, ranks, masteries, summoner_participants, verified) {//should show detailed information about 1 game
 		return new Promise((resolve, reject) => {
 			let newEmbed = new Discord.RichEmbed();
-			newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
+			newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.versions[0] + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 			if (UTILS.exists(match.status)) {
 				newEmbed.setAuthor(summoner.guess);
 				newEmbed.setTitle("This summoner has no recent matches.");
@@ -690,7 +690,7 @@ module.exports = class EmbedGenerator {
 	}
 	liveMatchPremade(CONFIG, summoner, match, matches, ranks, masteries, summoner_participants, verified, trim = true, newlogic = true) {//show current match information
 		let newEmbed = new Discord.RichEmbed();
-		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
+		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.versions[0] + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
 		if (UTILS.exists(match.status)) {
 			newEmbed.setAuthor(summoner.guess);
 			newEmbed.setTitle("This summoner is currently not in a match.");
@@ -881,7 +881,7 @@ module.exports = class EmbedGenerator {
 		}
 		const analysis = UTILS.randomOf(MMR_JOKES[jokeNumber]);
 		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), null, UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], summoner.name));
-		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png");
+		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.versions[0] + "/img/profileicon/" + summoner.profileIconId + ".png");
 		newEmbed.setDescription("Level " + summoner.summonerLevel);
 		newEmbed.addField("MMR Data", "Tier: " + UTILS.english(tier) + "\nMMR: `" + mmr + "`\n" + analysis);
 		if (RANK_ORDER.indexOf(tier) != -1) newEmbed.setColor(RANK_COLOR[RANK_ORDER.indexOf(tier)]);
@@ -1337,7 +1337,7 @@ module.exports = class EmbedGenerator {
 			newEmbed.setColor([255, 0, 0]);
 			return newEmbed;
 		}
-		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.n.profileicon + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(region, summoner.name));
+		newEmbed.setAuthor(summoner.name + (verified ? VERIFIED_ICON : ""), "https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.versions[0] + "/img/profileicon/" + summoner.profileIconId + ".png", UTILS.opgg(region, summoner.name));
 		newEmbed.setTitle("Individual Champion Mastery");
 		let cm_description = [];
 		let cm_total = 0;
