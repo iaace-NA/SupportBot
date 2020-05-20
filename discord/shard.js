@@ -108,7 +108,7 @@ function sendEmbedToChannel(cid, embed, approvable = false) {
 	wsapi.sendEmbedToChannel(cid, embed, approvable);
 }
 function loadAllStaticResources(callback = () => {}) {
-	LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
+	LOLAPI.getStatic("api/versions.json").then(result => {//load static dd version
 		UTILS.output("DD STATIC RESOURCES LOADED");
 		CONFIG.STATIC = result;
 		let temp_regions = [];
