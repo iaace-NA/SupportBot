@@ -169,6 +169,7 @@ module.exports = class LOLAPI {
 						resolve(answer);
 					}
 					catch (e) {
+						console.error(url);
 						reject(e);
 					}
 				}
