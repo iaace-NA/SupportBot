@@ -30,3 +30,18 @@ db.getSiblingDB("apicache").getCollection("msg_audit_models").aggregate([
     },
     { $sort : { count : -1} }
 ]);
+
+db.getCollection('msg_audit_models').aggregate([
+    {
+        $match: {
+            uid: { $not: {$size: 0} }
+        }
+    },
+    {
+        $group: {
+            _id: {$toLower: '$uid'},
+            count: { $sum: 1 }
+        }
+    },
+    { $count : "unique_users" },
+]);
