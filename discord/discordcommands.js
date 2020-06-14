@@ -210,6 +210,10 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			reply("```" + e + "```");
 		}
 	});
+	command([preferences.get("prefix") + "echo "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+		reply(parameter);
+		msg.delete().catch(console.error);
+	});
 	command(["iapi eval "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		lolapi.IAPIEval(parameter).then(result => reply("```" + result.string + "```")).catch(console.error);
 	});
