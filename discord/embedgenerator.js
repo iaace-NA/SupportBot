@@ -53,6 +53,7 @@ const queues = {
 	"1060": "OE Captain",
 	"1070": "OE Onslaught",
 	"1200": "NB Nexus Blitz",
+	"1300": "NB Nexus Blitz",
 	"2000": "SR Tutorial 1",
 	"2010": "SR Tutorial 2",
 	"2020": "SR Tutorial 3"
