@@ -290,8 +290,18 @@ module.exports = class UTILS {
 		}
 		return answer;
 	}
-	getSingleChampionMastery(all, singleID) {
-		return this.exists(all.find(cmi => cmi.championId == singleID)) ? all.find(cmi => cmi.championId == singleID).championLevel : 0;
+	getSingleChampionMastery(all, singleID, formatted = true) {
+		if (formatted) {
+			if (this.exists(all.find(cmi => cmi.championId == singleID))) {
+				const candidate = all.find(cmi => cmi.championId == singleID);
+				if (candidate.championPoints > 1000000) {
+					return `${Math.floor(candidate.championPoints / 1000000)}M`;
+				}
+				else return `m${candidate.championLevel}`;
+			}
+			else return `m0`;
+		}
+		else return this.exists(all.find(cmi => cmi.championId == singleID)) ? all.find(cmi => cmi.championId == singleID).championLevel : 0;
 	}
 	KDAFormat(num) {
 		if (isNaN(num) || num == Infinity) return "Perfect";

@@ -405,7 +405,7 @@ module.exports = class EmbedGenerator {
 		let cm_description = [];
 		let cm_total = 0;
 		for (let i = 0; i < championmastery.length; ++i) {
-			if (i < 3) cm_description.push("`M" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + " `" + UTILS.masteryPoints(championmastery[i].championPoints) + "`pts");
+			if (i < 3) cm_description.push("`m" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + " `" + UTILS.masteryPoints(championmastery[i].championPoints) + "`pts");
 			cm_total += championmastery[i].championLevel;
 		}
 		const tpl = "[op.gg](" + UTILS.opgg(region, summoner.name) + ") [moba](https://lol.mobalytics.gg/summoner/" + region + "/" + encodeURIComponent(summoner.name) + ") [lolprofile](https://lolprofile.net/summoner/" + region + "/" + encodeURIComponent(summoner.name) + "#update) [rewind.lol](https://rewind.lol/lookup/" + region + "/" + encodeURIComponent(summoner.name) + ") [paz.yt](https://api.paz.yt/lol/profile/?summoner=" + encodeURIComponent(summoner.name) + "&region=" + region.toLowerCase() + ")\n[quickfind](https://quickfind.kassad.in/profile/" + region.toLowerCase() + "/" + encodeURIComponent(summoner.name) + ") [wol.gg](https://wol.gg/stats/" + region + "/" + encodeURIComponent(summoner.name) + "/) [mmr?](https://" + region + ".whatismymmr.com/" + encodeURIComponent(summoner.name) + ")";//third party links
@@ -465,7 +465,7 @@ module.exports = class EmbedGenerator {
 		for (let i = 0; i < match_meta.length && i < 20; ++i) {
 			const KDA = UTILS.KDA(summoner.id, matches[i]);
 			const stats = UTILS.stats(summoner.id, matches[i]);
-			stats.mastery = UTILS.getSingleChampionMastery(mastery, match_meta[i].champion);
+			stats.mastery = UTILS.getSingleChampionMastery(mastery, match_meta[i].champion, false);
 			const teamParticipant = UTILS.teamParticipant(summoner.id, matches[i]);
 			let teams = {};
 			let lane = UTILS.inferLane(match_meta[i].role, match_meta[i].lane, teamParticipant.spell1Id, teamParticipant.spell2Id);
@@ -673,7 +673,7 @@ module.exports = class EmbedGenerator {
 					else summoner_spells = ":x::x:";//bot
 					const username = pI.player.summonerName;
 					const lane = CONFIG.EMOJIS.lanes[UTILS.inferLane(p.timeline.role, p.timeline.lane, p.spell1Id, p.spell2Id)];
-					newEmbed.addField(CONFIG.STATIC.CHAMPIONS[p.championId].emoji + lane + summoner_spells + " " + pI.solo + " ¦ " + pI.flex5 + " ¦ `M" + pI.mastery + "` lv. `" + (UTILS.exists(pI.player.summonerId) ? summoner_participants.find(p => p.id == pI.player.summonerId).summonerLevel : 0) + "` __" + (pI.player.summonerId == summoner.id ? "**" + username + "**" : username) + "__" + (pI.player.summonerId == summoner.id && verified ? "\\" + VERIFIED_ICON : ""), "[opgg](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ") " + "__lv.__ `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\t__KDR:__`" + UTILS.KDAFormat(p.stats.kills / p.stats.deaths) + "`\t__KDA:__`" + UTILS.KDAFormat((p.stats.kills + p.stats.assists) / p.stats.deaths) + "` `" + UTILS.KPFormat((100 * (p.stats.assists + p.stats.kills)) / tK) + "%`\t__cs:__`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "` `(" + ((p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) / (match.gameDuration / 60)).round(1) + ")`\t__g:__`" + UTILS.gold(p.stats.goldEarned) + "`\n__items:__ " + getItemTags([p.stats.item0, p.stats.item1, p.stats.item2, p.stats.item3, p.stats.item4, p.stats.item5, p.stats.item6]).map(i => "`" + i + "`").join(TAB + " ") + "\n" + getMatchTags(pI.player.summonerId, match).map(s => "`" + s + "`").join(TAB + " "));
+					newEmbed.addField(CONFIG.STATIC.CHAMPIONS[p.championId].emoji + lane + summoner_spells + " " + pI.solo + " ¦ " + pI.flex5 + " ¦ `" + pI.mastery + "` lv. `" + (UTILS.exists(pI.player.summonerId) ? summoner_participants.find(p => p.id == pI.player.summonerId).summonerLevel : 0) + "` __" + (pI.player.summonerId == summoner.id ? "**" + username + "**" : username) + "__" + (pI.player.summonerId == summoner.id && verified ? "\\" + VERIFIED_ICON : ""), "[opgg](" + UTILS.opgg(CONFIG.REGIONS_REVERSE[summoner.region], username) + ") " + "__lv.__ `" + p.stats.champLevel + "`\t`" + p.stats.kills + "/" + p.stats.deaths + "/" + p.stats.assists + "`\t__KDR:__`" + UTILS.KDAFormat(p.stats.kills / p.stats.deaths) + "`\t__KDA:__`" + UTILS.KDAFormat((p.stats.kills + p.stats.assists) / p.stats.deaths) + "` `" + UTILS.KPFormat((100 * (p.stats.assists + p.stats.kills)) / tK) + "%`\t__cs:__`" + (p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) + "` `(" + ((p.stats.totalMinionsKilled + p.stats.neutralMinionsKilled) / (match.gameDuration / 60)).round(1) + ")`\t__g:__`" + UTILS.gold(p.stats.goldEarned) + "`\n__items:__ " + getItemTags([p.stats.item0, p.stats.item1, p.stats.item2, p.stats.item3, p.stats.item4, p.stats.item5, p.stats.item6]).map(i => "`" + i + "`").join(TAB + " ") + "\n" + getMatchTags(pI.player.summonerId, match).map(s => "`" + s + "`").join(TAB + " "));
 				}
 			}
 			if (match.gameDuration > 240) {//game longer than 4 minutes
@@ -814,7 +814,7 @@ module.exports = class EmbedGenerator {
 				else team_description_c1 += "\t`" + CONFIG.STATIC.SUMMONERSPELLS[teams[b][c].spell2Id].name + "`";
 				team_description_c1 += " " + teams[b][c].solo + " " + teams[b][c].flex5;// + " " + teams[b][c].flex3;
 				team_description_c1 += UTILS.fstr(teams[b].length === 5 && match.mapId === 11, CONFIG.EMOJIS.lanes[teams[b][c].lanePrediction]);
-				team_description_c1 += "`M" + teams[b][c].mastery + "`" + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji + "\n";
+				team_description_c1 += "`" + teams[b][c].mastery + "`" + CONFIG.STATIC.CHAMPIONS[teams[b][c].championId].emoji + "\n";
 				team_description_c2 += "`" + summoner_participants.find(p => p.id == teams[b][c].summonerId).summonerLevel + "`";
 				team_description_c2 += " " + PREMADE_EMOJIS[premade_letter[premade_str[c]]];
 				team_description_c2 += teams[b][c].summonerId == summoner.id ? "**" : "";//bolding
@@ -1344,7 +1344,7 @@ module.exports = class EmbedGenerator {
 		let cm_total = 0;
 		let cms_total = 0;
 		for (let i = 0; i < championmastery.length; ++i) {
-			cm_description.push("#`" + (i + 1).pad(2) + "`. `M" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + " `" + UTILS.masteryPoints(championmastery[i].championPoints) + "`pts");
+			cm_description.push("#`" + (i + 1).pad(2) + "`. `m" + championmastery[i].championLevel + "` " + CONFIG.STATIC.CHAMPIONS[championmastery[i].championId].emoji + " `" + UTILS.masteryPoints(championmastery[i].championPoints) + "`pts");
 			cm_total += championmastery[i].championLevel;
 			cms_total += championmastery[i].championPoints;
 		}
