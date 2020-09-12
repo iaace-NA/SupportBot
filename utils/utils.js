@@ -294,7 +294,7 @@ module.exports = class UTILS {
 		if (formatted) {
 			if (this.exists(all.find(cmi => cmi.championId == singleID))) {
 				const candidate = all.find(cmi => cmi.championId == singleID);
-				if (candidate.championPoints > 1000000) {
+				if (candidate.championPoints >= 1000000) {
 					return `${Math.floor(candidate.championPoints / 1000000)}M`;
 				}
 				else return `m${candidate.championLevel}`;
