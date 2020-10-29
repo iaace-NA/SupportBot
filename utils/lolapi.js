@@ -276,8 +276,14 @@ module.exports = class LOLAPI {
 			let opts = { endIndex: 100 };
 			if (ranked) opts.queue = ranked_queues;
 			this.get(region, "match/v4/matchlists/by-account/" + accountID, tags.matchhistory, opts, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage).then(matchlist => {
-				matchlist.matches = matchlist.matches.slice(0, limit);
-				matchlist.endIndex = matchlist.matches.length;
+				if (!UTILS.exists(matchlist.matches)) {
+					matchlist.matches = [];
+					matchlist.endIndex = 0;
+				}
+				else {
+					matchlist.matches = matchlist.matches.slice(0, limit);
+					matchlist.endIndex = matchlist.matches.length;
+				}
 				resolve(matchlist);
 			}).catch(reject);
 		});
