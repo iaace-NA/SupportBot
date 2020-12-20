@@ -271,7 +271,7 @@ function getLikelyLanes(CONFIG, champion_ids, smites) {
 		let sum = 0;
 		for (let i = 0; i < lane_assignments.length; ++i) {//use specific lane assignment element from lane_permutations array
 			if (smites[i]) {//if the player has smite
-				if (i == 1) sum += LANE_PCT[champion_ids[i]][lane_assignments[i]] + 20;//and playing jungle, add stolen 20% from other lane pcts
+				if (lane_assignments[i] == 1) sum += LANE_PCT[champion_ids[i]][lane_assignments[i]] + 20;//and playing jungle, add stolen 20% from other lane pcts
 				else sum += LANE_PCT[champion_ids[i]][lane_assignments[i]] - 5;//steal 5% from the other lanes
 			}
 			else sum += LANE_PCT[champion_ids[i]][lane_assignments[i]];
