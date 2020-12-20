@@ -264,13 +264,17 @@ function transformTimelineToArray(match, timeline) {
 	}
 	return answer;
 }
-function getLikelyLanes(CONFIG, champion_ids) {
+function getLikelyLanes(CONFIG, champion_ids, smites) {
 	UTILS.assert(champion_ids.length === 5);
 	let lane_permutations = UTILS.permute([0, 1, 2, 3, 4]);
 	let probabilities = lane_permutations.map((lane_assignments => {
 		let sum = 0;
 		for (let i = 0; i < lane_assignments.length; ++i) {//use specific lane assignment element from lane_permutations array
-			sum += LANE_PCT[champion_ids[i]][lane_assignments[i]];
+			if (smites[i]) {//if the player has smite
+				if (i == 1) sum += LANE_PCT[champion_ids[i]][lane_assignments[i]] + 20;//and playing jungle, add stolen 20% from other lane pcts
+				else sum += LANE_PCT[champion_ids[i]][lane_assignments[i]] - 5;//steal 5% from the other lanes
+			}
+			else sum += LANE_PCT[champion_ids[i]][lane_assignments[i]];
 		}
 		return sum;
 	}));
@@ -782,7 +786,7 @@ module.exports = class EmbedGenerator {
 		let bd = [];
 		for (let b in teams) {//team
 			if (teams[b].length === 5 && match.mapId === 11) {
-				let lane_assignments = getLikelyLanes(CONFIG, teams[b].map(match_participant => match_participant.championId));//could break non-SR games
+				let lane_assignments = getLikelyLanes(CONFIG, teams[b].map(match_participant => match_participant.championId), teams[b].map(match_participant => match_participant.spell1Id == 11 || match_participant.spell2Id == 11));//could break non-SR games
 				role_confidence.push(lane_assignments.confidence.round(1));
 				for (let c = 0; c < teams[b].length; ++c) {
 					teams[b][c].lanePrediction = lane_assignments.assignments[c];
