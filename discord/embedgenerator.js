@@ -1015,6 +1015,7 @@ module.exports = class EmbedGenerator {
 		//SOLO Q|FLEX 5|FLEX 3 [S#][R]s [W]W/[L]L [KDA][C1][C2][C3] lv. [lv.][username w/ op.gg]
 	}
 	fairTeam(CONFIG, region, summoners, ranks, masteries, debug_mode = false) {
+		const DEFAULT_MMR = 900;
 		function formatDescriptionString(team, side) {
 			return debug_mode ? "**Min:** `" + UTILS.numberWithCommas(team.min[side]) + "` **Med:** `" + UTILS.numberWithCommas(team.med[side]) + "` **Max:** `" + UTILS.numberWithCommas(team.max[side]) + "`\n**μ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side], 2)) + "` **Δμ:** `" + UTILS.numberWithCommas(UTILS.round(team.avg[side] - team.avg[1 - side], 2)) + "` **σ:** `" + UTILS.numberWithCommas(UTILS.round(team.stdev[side], 2)) + "`\n**Σ:** `" + UTILS.numberWithCommas(team.sum[side]) + "` **Δ:** `" + UTILS.numberWithCommas(team.sum[side] - team.sum[1 - side]) + "` **%Δ:** `" + UTILS.round((100 * (team.sum[side] - team.sum[1 - side])) / (team.sum[0] + team.sum[1]), 2) + "`" : "";
 		}
@@ -1092,7 +1093,7 @@ module.exports = class EmbedGenerator {
 			UTILS.assert(UTILS.exists(ranks[i]));
 			UTILS.debug("iMMR[" + i + "] is " + UTILS.averageUserMMR(ranks[i]));
 			UTILS.assert(UTILS.exists(UTILS.averageUserMMR(ranks[i])))
-			if (UTILS.averageUserMMR(ranks[i]) < 100) iMMR.push(600);
+			if (UTILS.averageUserMMR(ranks[i]) < 100) iMMR.push(DEFAULT_MMR);
 			else iMMR.push(UTILS.averageUserMMR(ranks[i]));
 		}
 		UTILS.debug(JSON.stringify(iMMR, null, "\t"));
@@ -1115,15 +1116,16 @@ module.exports = class EmbedGenerator {
 		newEmbed.addField("(All Ranks) id: " + team_by_all_ranks_best, team_by_all_ranks_description[1], true);
 		newEmbed.addBlankField(false);
 
+		//solo/duo ranks
 		let team_by_sr_ranks = [];//array of stats objects
 		let sr_iMMR = [];
 		for (let i = 0; i < ranks.length; ++i) {
 			UTILS.debug("ranks[" + i + "] is " + JSON.stringify(ranks[i], null, "\t"));
 			UTILS.assert(UTILS.exists(ranks[i]));
-			UTILS.debug("sr_iMMR[" + i + "] is " + UTILS.summonersRiftMMR(ranks[i]));
-			UTILS.assert(UTILS.exists(UTILS.summonersRiftMMR(ranks[i])))
-			if (UTILS.summonersRiftMMR(ranks[i]) < 100) sr_iMMR.push(600);
-			else sr_iMMR.push(UTILS.summonersRiftMMR(ranks[i]));
+			UTILS.debug("sr_iMMR[" + i + "] is " + UTILS.soloQueueMMR(ranks[i]));
+			UTILS.assert(UTILS.exists(UTILS.soloQueueMMR(ranks[i])))
+			if (UTILS.soloQueueMMR(ranks[i]) < 100) sr_iMMR.push(DEFAULT_MMR);
+			else sr_iMMR.push(UTILS.soloQueueMMR(ranks[i]));
 		}
 		UTILS.debug(JSON.stringify(sr_iMMR, null, "\t"));
 		for (let b in TEAM_COMBINATIONS) team_by_sr_ranks.push(UTILS.calculateTeamStatistics(mathjs, TEAM_COMBINATIONS[b], sr_iMMR));
@@ -1133,8 +1135,8 @@ module.exports = class EmbedGenerator {
 		UTILS.debug("rank lowest diff index is " + team_by_sr_ranks_best);
 		let team_by_sr_ranks_description = [[], []];
 		for (let i = 0; i < TEAM_COMBINATIONS[team_by_sr_ranks_best].length; ++i) {
-			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.summonersRiftMMR(ranks[i])) + "` " + summoners[i].name;
-			team_by_sr_ranks_description[TEAM_COMBINATIONS[team_by_sr_ranks_best][i] === "0" ? 0 : 1].push([UTILS.summonersRiftMMR(ranks[i]), individual_description]);
+			const individual_description = "`" + UTILS.iMMRtoEnglish(UTILS.soloQueueMMR(ranks[i])) + "` " + summoners[i].name;
+			team_by_sr_ranks_description[TEAM_COMBINATIONS[team_by_sr_ranks_best][i] === "0" ? 0 : 1].push([UTILS.soloQueueMMR(ranks[i]), individual_description]);
 		}
 		for (let i = 0; i < team_by_sr_ranks_description.length; ++i) {
 			team_by_sr_ranks_description[i].sort((a, b) => b[0] - a[0]);
@@ -1142,10 +1144,10 @@ module.exports = class EmbedGenerator {
 			team_by_sr_ranks_description[i] = team_by_sr_ranks_description[i].trim();
 		}
 		newEmbed.addField("By Skill", team_by_sr_ranks_description[0], true);
-		newEmbed.addField("(Summoner's Rift Ranks) id: " + team_by_sr_ranks_best, team_by_sr_ranks_description[1], true);
+		newEmbed.addField("(Solo/Duo Rank) id: " + team_by_sr_ranks_best, team_by_sr_ranks_description[1], true);
 		newEmbed.addBlankField(false);
 
-		if (summoners.length <= 6) {
+		if (false) {//summoners.length <= 6) {
 			let team_by_tt_ranks = [];//array of stats objects
 			let tt_iMMR = [];
 			for (let i = 0; i < ranks.length; ++i) {
@@ -1153,7 +1155,7 @@ module.exports = class EmbedGenerator {
 				UTILS.assert(UTILS.exists(ranks[i]));
 				UTILS.debug("tt_iMMR[" + i + "] is " + UTILS.twistedTreelineMMR(ranks[i]));
 				UTILS.assert(UTILS.exists(UTILS.twistedTreelineMMR(ranks[i])))
-				if (UTILS.twistedTreelineMMR(ranks[i]) < 100) tt_iMMR.push(600);
+				if (UTILS.twistedTreelineMMR(ranks[i]) < 100) tt_iMMR.push(DEFAULT_MMR);
 				else tt_iMMR.push(UTILS.twistedTreelineMMR(ranks[i]));
 			}
 			UTILS.debug(JSON.stringify(tt_iMMR, null, "\t"));
@@ -1185,7 +1187,7 @@ module.exports = class EmbedGenerator {
 			UTILS.assert(UTILS.exists(ranks[i]));
 			UTILS.debug("random_iMMR[" + i + "] is " + UTILS.averageUserMMR(ranks[i]));
 			UTILS.assert(UTILS.exists(UTILS.averageUserMMR(ranks[i])))
-			if (UTILS.averageUserMMR(ranks[i]) < 100) random_iMMR.push(600);
+			if (UTILS.averageUserMMR(ranks[i]) < 100) random_iMMR.push(DEFAULT_MMR);
 			else random_iMMR.push(UTILS.averageUserMMR(ranks[i]));
 		}
 		UTILS.debug(JSON.stringify(random_iMMR, null, "\t"));
