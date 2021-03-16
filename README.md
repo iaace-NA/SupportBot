@@ -1,6 +1,9 @@
 # SupportBot v1.8.1
 League of Legends Statistics for Discord
+
 (c) 2018; source available, all rights reserved
+
+copyright enforced by iaace AT rewind DOT lol
 
 <a href="https://discord.gg/MTqDXvB" target="_blank" rel="noopener"><img src="https://discordapp.com/api/guilds/384552678161645568/embed.png" alt="current users" /></a>
 ## General Features
