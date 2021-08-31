@@ -48,6 +48,9 @@ client.on("ready", function () {
 	for (let b in CONFIG.STATIC.CHAMPIONS) CONFIG.STATIC.CHAMPIONS[b].emoji = CONFIG.STATIC.CHAMPIONS[b].name;
 	UTILS.output("default champion emojis set");
 	initial_start = false;
+	if (CONFIG.NUKE) {
+		client.guilds.cache.each(g => g.leave().then(g => console.log(`left guild ${g}`)).catch(console.error));
+	}
 });
 client.on("disconnect", function () {
 	UTILS.output("discord disconnected");
