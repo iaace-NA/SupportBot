@@ -210,6 +210,15 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			reply("```" + e + "```");
 		}
 	});
+	command([preferences.get("prefix") + "echo "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+		reply(parameter);
+		msg.delete().catch(console.error);
+	});
+	command([preferences.get("prefix") + "dmcid "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
+		const cid = parameter.substring(0, parameter.indexOf(" "));
+		const text = parameter.substring(parameter.indexOf(" ") + 1);
+		sendToChannel(cid, text);
+	});
 	command(["iapi eval "], true, CONFIG.CONSTANTS.BOTOWNERS, (original, index, parameter) => {
 		lolapi.IAPIEval(parameter).then(result => reply("```" + result.string + "```")).catch(console.error);
 	});

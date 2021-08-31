@@ -169,6 +169,7 @@ module.exports = class LOLAPI {
 						resolve(answer);
 					}
 					catch (e) {
+						console.error(url);
 						reject(e);
 					}
 				}
@@ -178,8 +179,8 @@ module.exports = class LOLAPI {
 	getStaticChampions(region, version, locale = "en_US") {
 		UTILS.debug("STATIC CHAMPIONS: " + region);
 		return new Promise((resolve, reject) => {
-			this.getStatic("realms/" + this.CONFIG.REGIONS_REVERSE[region].toLowerCase() + ".json").then(realm => {
-				let v = UTILS.exists(version) ? version : realm.v;
+			this.getStatic("api/versions.json").then(realm => {
+				let v = UTILS.exists(version) ? version : realm[0];
 				this.getStatic("cdn/" + v + "/data/" + locale + "/champion.json").then(cd => {//champion data
 					for (let b in cd.data) {
 						cd.data[cd.data[b].key] = cd.data[b];//add key as duplicate of data
@@ -193,8 +194,8 @@ module.exports = class LOLAPI {
 	getStaticSummonerSpells(region, version, locale = "en_US") {
 		UTILS.output("STATIC SPELLS: " + region);
 		return new Promise((resolve, reject) => {
-			this.getStatic("realms/" + this.CONFIG.REGIONS_REVERSE[region].toLowerCase() + ".json").then(realm => {
-				let v = UTILS.exists(version) ? version : realm.v;
+			this.getStatic("api/versions.json").then(realm => {
+				let v = UTILS.exists(version) ? version : realm[0];
 				this.getStatic("cdn/" + v + "/data/" + locale + "/summoner.json").then(sd => {//spell data
 					for (let b in sd.data) {
 						sd.data[sd.data[b].key] = sd.data[b];//add key as duplicate of data
@@ -275,8 +276,14 @@ module.exports = class LOLAPI {
 			let opts = { endIndex: 100 };
 			if (ranked) opts.queue = ranked_queues;
 			this.get(region, "match/v4/matchlists/by-account/" + accountID, tags.matchhistory, opts, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage).then(matchlist => {
-				matchlist.matches = matchlist.matches.slice(0, limit);
-				matchlist.endIndex = matchlist.matches.length;
+				if (!UTILS.exists(matchlist.matches)) {
+					matchlist.matches = [];
+					matchlist.endIndex = 0;
+				}
+				else {
+					matchlist.matches = matchlist.matches.slice(0, limit);
+					matchlist.endIndex = matchlist.matches.length;
+				}
 				resolve(matchlist);
 			}).catch(reject);
 		});

@@ -17,7 +17,7 @@ let CONFIG;
 const JSON5 = require("json5");
 try {
 	CONFIG = JSON5.parse(fs.readFileSync("../" + argv_options.config, "utf-8"));
-	CONFIG.VERSION = "v1.8.1";//b for non-release (in development)
+	CONFIG.VERSION = "v1.8.2";//b for non-release (in development)
 	CONFIG.BANS = {};
 }
 catch (e) {
@@ -48,6 +48,9 @@ client.on("ready", function () {
 	for (let b in CONFIG.STATIC.CHAMPIONS) CONFIG.STATIC.CHAMPIONS[b].emoji = CONFIG.STATIC.CHAMPIONS[b].name;
 	UTILS.output("default champion emojis set");
 	initial_start = false;
+	if (CONFIG.NUKE) {
+		client.guilds.cache.each(g => g.leave().then(g => console.log(`left guild ${g}`)).catch(console.error));
+	}
 });
 client.on("disconnect", function () {
 	UTILS.output("discord disconnected");
@@ -88,8 +91,8 @@ client.on("guildCreate", function (guild) {
 
 });
 client.on("guildDelete", function(guild) {
-	UTILS.output("Server Left: " + guild.id + " :: " + guild.region + " :: " + guild.name + " :: Population=" + guild.memberCount + " :: " + guild.owner.user.tag);
-	sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x:`$" + process.env.SHARD_ID + "`Server Left: `" + guild.id + "` :: " + guild.region + " :: " + guild.name + " :: :busts_in_silhouette:" + guild.memberCount + " :: " + guild.owner.user.tag);
+	UTILS.output("Server Left: " + guild.id + " :: " + guild.region + " :: " + guild.name + " :: Population=" + guild.memberCount);
+	sendToChannel(CONFIG.LOG_CHANNEL_ID, ":x:`$" + process.env.SHARD_ID + "`Server Left: `" + guild.id + "` :: " + guild.region + " :: " + guild.name + " :: :busts_in_silhouette:" + guild.memberCount);
 });
 let server_rate_limiters = {};
 let user_rate_limiters = {};
@@ -108,9 +111,10 @@ function sendEmbedToChannel(cid, embed, approvable = false) {
 	wsapi.sendEmbedToChannel(cid, embed, approvable);
 }
 function loadAllStaticResources(callback = () => {}) {
-	LOLAPI.getStatic("realms/na.json").then(result => {//load static dd version
+	LOLAPI.getStatic("api/versions.json").then(result => {//load static dd version
 		UTILS.output("DD STATIC RESOURCES LOADED");
-		CONFIG.STATIC = result;
+		CONFIG.STATIC = {};
+		CONFIG.STATIC.versions = result;
 		let temp_regions = [];
 		for (let i in CONFIG.REGIONS) temp_regions.push(CONFIG.REGIONS[i]);
 		let v = CONFIG.PATCH_LOCK === "latest" ? undefined : CONFIG.PATCH_LOCK;

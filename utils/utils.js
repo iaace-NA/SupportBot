@@ -246,7 +246,7 @@ module.exports = class UTILS {
 			S8MAST
 			S8CHAL
 			*/
-			if (mapId && this.exists(lsr) && lsr != "UNRANKED") return "S8" + lsr.substring(0, 4).toUpperCase();
+			if (mapId && this.exists(lsr) && lsr != "UNRANKED") return "S9" + lsr.substring(0, 4).toUpperCase();
 			return "******";
 		}
 		let answer = "";
@@ -290,8 +290,18 @@ module.exports = class UTILS {
 		}
 		return answer;
 	}
-	getSingleChampionMastery(all, singleID) {
-		return this.exists(all.find(cmi => cmi.championId == singleID)) ? all.find(cmi => cmi.championId == singleID).championLevel : 0;
+	getSingleChampionMastery(all, singleID, formatted = true) {
+		if (formatted) {
+			if (this.exists(all.find(cmi => cmi.championId == singleID))) {
+				const candidate = all.find(cmi => cmi.championId == singleID);
+				if (candidate.championPoints >= 1000000) {
+					return `${Math.floor(candidate.championPoints / 1000000)}M`;
+				}
+				else return `m${candidate.championLevel}`;
+			}
+			else return `m0`;
+		}
+		else return this.exists(all.find(cmi => cmi.championId == singleID)) ? all.find(cmi => cmi.championId == singleID).championLevel : 0;
 	}
 	KDAFormat(num) {
 		if (isNaN(num) || num == Infinity) return "Perfect";
@@ -422,6 +432,17 @@ module.exports = class UTILS {
 		let individual_games = 0;
 		for (let c in rank) {//queue
 			if (rank[c].queueType !== "RANKED_FLEX_TT") {
+				individual_iMMR += this.iMMR(rank[c]) * (rank[c].wins + rank[c].losses);
+				individual_games += rank[c].wins + rank[c].losses;
+			}
+		}
+		return individual_games == 0 ? 0 : individual_iMMR / individual_games;
+	}
+	soloQueueMMR(rank) {
+		let individual_iMMR = 0;
+		let individual_games = 0;
+		for (let c in rank) {//queue
+			if (rank[c].queueType === "RANKED_SOLO_5x5") {
 				individual_iMMR += this.iMMR(rank[c]) * (rank[c].wins + rank[c].losses);
 				individual_games += rank[c].wins + rank[c].losses;
 			}
@@ -790,7 +811,7 @@ module.exports = class UTILS {
 		let that = this;
 		return new Promise((resolve, reject) => {
 			const wincmd = "powershell.exe -Command \"\\\"" + array_of_points.map(p => p.x + " " + p.y).join("`n") + "\\\" | gnuplot -e \\\"set terminal dumb nofeed " + x_size + " " + y_size + "; set xlabel 'Minutes'; set tics scale 0; plot '-' with filledcurves y=0 notitle\\\"\"";
-			const linuxcmd = "printf \"" + array_of_points.map(p => p.x + " " + p.y).join("\\n") + "\\\" | gnuplot -e \"set terminal dumb nofeed " + x_size + " " + y_size + "; set xlabel 'Minutes'; set tics scale 0; plot '-' with filledcurves y=0 notitle\"";
+			const linuxcmd = "printf \"" + array_of_points.map(p => p.x + " " + p.y).join("\\n") + "\\n\"" + " | gnuplot -e \"set terminal dumb nofeed " + x_size + " " + y_size + "; set xlabel 'Minutes'; set tics scale 0; plot '-' with filledcurves y=0 notitle\"";
 			if (process.platform === "win32") {
 				child_process.exec(wincmd, { timeout: 1000 }, (err, stdout, stderr) => {
 					if (err) reject(err);

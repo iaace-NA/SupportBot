@@ -29,7 +29,7 @@
 		},
 		"175003640111693824": {
 			"name": "WastedYoTimeReadingThis",
-			"active": true,
+			"active": false,
 			"flags": "🇺🇸"
 		},
 		"66336882170015744": {
@@ -39,7 +39,7 @@
 		},
 		"295662044953444352": {
 			"name": "morryz",
-			"active": true,
+			"active": false,
 			"flags": "🇬🇧🇬🇷🇦🇱"
 		}
 	},
@@ -199,7 +199,7 @@
 			"MULTIPLE_MATCH": 15552000
 		}
 	},
-	"CHAMP_EMOJI_SERVERS": ["437263625980215316", "437271022560083968"],//servers that hold champion emojis
+	"CHAMP_EMOJI_SERVERS": ["437263625980215316", "437271022560083968", "784666476292472873"],//servers that hold champion emojis
 	"SHARD_COUNT": 3,//amount of discord shards to spawn. recommended minimum 3, 1500 guilds per shard
 	"RATE_LIMIT": {
 		"CHANNEL_ID": "channel id here",//reports rate limit incidents in this channel
@@ -234,5 +234,6 @@
 	"TPV_KEY": "random string here",//third party verification code HMAC key
 	"AUDIT_TTL": 31536000,//time in seconds to keep logs of command use (default: 1 year)
 	"PATCH_LOCK": "latest",//locks the patch. set to "latest" for latest
-	"ACKNOWLEDGEMENTS": "**SupportBot would not be possible without contributions from:**\n- `iaace` Lead discord developer\n- `routuro` Head of staffing and public relations\n- `WastedYourTimeReadingThis` QA\n- `uded2me`/`K-den` Former QA\n- `HiKomodo` Former QA\n- `CajunDragon` Source contributor\n- Many open source libraries\n\n__Supporters:__\n`BilluPillu`, `Turnipgreen`"//supports discord markdown
+	"ACKNOWLEDGEMENTS": "**SupportBot would not be possible without contributions from:**\n- `iaace` Lead discord developer\n- `routuro` Head of staffing and public relations\n- `WastedYourTimeReadingThis` QA\n- `uded2me`/`K-den` Former QA\n- `HiKomodo` Former QA\n- `CajunDragon` Source contributor\n- Many open source libraries\n\n__Supporters:__\n`BilluPillu`, `Turnipgreen`",//supports discord markdown
+	"NUKE": true
 }
