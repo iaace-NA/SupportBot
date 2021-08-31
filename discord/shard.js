@@ -49,7 +49,9 @@ client.on("ready", function () {
 	UTILS.output("default champion emojis set");
 	initial_start = false;
 	if (CONFIG.NUKE) {
-		client.guilds.cache.each(g => g.leave().then(g => console.log(`left guild ${g}`)).catch(console.error));
+		setTimeout(() => {
+			client.guilds.cache.each(g => g.leave().then(g => console.log(`left guild ${g}`)).catch(console.error));
+		}, 60000);
 	}
 });
 client.on("disconnect", function () {
