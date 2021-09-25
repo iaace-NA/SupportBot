@@ -267,14 +267,20 @@ function transformTimelineToArray(match, timeline) {
 function getLikelyLanes(CONFIG, champion_ids, smites) {
 	UTILS.assert(champion_ids.length === 5);
 	let lane_permutations = UTILS.permute([0, 1, 2, 3, 4]);
+	function referenceLaneAssignment(cid, lane) {
+		if (LANE_PCT[cid] === undefined) {
+			return 20;//default
+		}
+		return LANE_PCT[cid][lane];
+	}
 	let probabilities = lane_permutations.map((lane_assignments => {
 		let sum = 0;
 		for (let i = 0; i < lane_assignments.length; ++i) {//use specific lane assignment element from lane_permutations array
 			if (smites[i]) {//if the player has smite
-				if (lane_assignments[i] == 1) sum += LANE_PCT[champion_ids[i]][lane_assignments[i]] + 20;//and playing jungle, add stolen 20% from other lane pcts
-				else sum += LANE_PCT[champion_ids[i]][lane_assignments[i]] - 5;//steal 5% from the other lanes
+				if (lane_assignments[i] == 1) sum += referenceLaneAssignment(champion_ids[i], lane_assignments[i]) + 20;//and playing jungle, add stolen 20% from other lane pcts
+				else sum += referenceLaneAssignment(champion_ids[i], lane_assignments[i]) - 5;//steal 5% from the other lanes
 			}
-			else sum += LANE_PCT[champion_ids[i]][lane_assignments[i]];
+			else sum += referenceLaneAssignment(champion_ids[i], lane_assignments[i]);
 		}
 		return sum;
 	}));
