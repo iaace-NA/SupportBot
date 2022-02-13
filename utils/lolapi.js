@@ -1,5 +1,6 @@
 "use strict";
-const UTILS = new(require("./utils.js"))();
+const UTILS = new (require("./utils.js"))();
+let Match = require("./match.js");
 const fs = require("fs");
 const REQUEST = require("request");
 const XRegExp = require("xregexp");
@@ -286,7 +287,9 @@ module.exports = class LOLAPI {
 		}
 	}
 	getMatchInformation(region, gameID, maxage) {
-		return this.get(this.CONFIG.PLATFORMS[region], "match/v5/matches/" + gameID, tags.match, {}, this.CONFIG.API_CACHETIME.GET_MATCH_INFORMATION, maxage);
+		return new Promise((resolve, reject) => {
+			this.get(this.CONFIG.PLATFORMS[region], "match/v5/matches/" + gameID, tags.match, {}, this.CONFIG.API_CACHETIME.GET_MATCH_INFORMATION, maxage).then(m => resolve(new Match(null, m, null, true))).catch(reject)
+		});
 	}
 	getMatchTimeline(region, gameID, maxage) {
 		return this.get(this.CONFIG.PLATFORMS[region], "match/v5/matches/" + gameID + "/timeline", tags.match, {}, this.CONFIG.API_CACHETIME.GET_MATCH_TIMELINE, maxage);
