@@ -335,7 +335,7 @@ module.exports = class LOLAPI {
 						that.getChampionMastery(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.CHAMPION_MASTERY).then(result3 => {
 							that.getLiveMatch(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.LIVE_MATCH).then(result4 => {
 								that.getRecentGames(region, result6.accountId, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RECENT_GAMES).then(result7 => {
-									that.getMatchInformation(region, result7.matches[0].gameId, this.CONFIG.API_MAXAGE.SUMMONER_CARD.MATCH_INFORMATION).then(result8 => {
+									that.getMatchInformation(region, result7[0], this.CONFIG.API_MAXAGE.SUMMONER_CARD.MATCH_INFORMATION).then(result8 => {
 										resolve([null, result2, result3, result4, result5, result6, result7, result8]);
 									}).catch(e => {
 										resolve([null, result2, result3, result4, result5, result6, result7, null]);

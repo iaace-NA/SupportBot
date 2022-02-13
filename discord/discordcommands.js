@@ -573,20 +573,20 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 			result.guess = username;
 			if (!UTILS.exists(result.accountId)) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
 			lolapi.getRecentGames(region, result.accountId, CONFIG.API_MAXAGE.DMH.RECENT_GAMES, 100, index >= 2).then(matchhistory => {
-				if (!UTILS.exists(matchhistory.matches) || matchhistory.matches.length == 0) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
-				if (number < 1 || number > 100 || !UTILS.exists(matchhistory.matches[number - 1])) return reply(":x: This number is out of range.");
-				lolapi.getMatchInformation(region, matchhistory.matches[number - 1].gameId, CONFIG.API_MAXAGE.DMH.MATCH_INFORMATION).then(match => {
+				if (!UTILS.exists(matchhistory) || matchhistory.length == 0) return reply(":x: No recent matches found for `" + username + "`." + suggestLink(guess_method));
+				if (number < 1 || number > 100 || !UTILS.exists(matchhistory[number - 1])) return reply(":x: This number is out of range.");
+				lolapi.getMatchInformation(region, matchhistory[number - 1], CONFIG.API_MAXAGE.DMH.MATCH_INFORMATION).then(match => {
 					const pIDA = match.participantIdentities.map(pI => {
 						if (UTILS.exists(pI.player.summonerId)) return pI.player.summonerId;
 						else return null;//bot account
 					});//participant (summoner) ID array
-					lolapi.getMatchTimeline(region, matchhistory.matches[number - 1].gameId, CONFIG.API_MAXAGE.DMH.MATCH_TIMELINE).then(timeline => {
+					lolapi.getMatchTimeline(region, matchhistory[number - 1], CONFIG.API_MAXAGE.DMH.MATCH_TIMELINE).then(timeline => {
 						lolapi.getMultipleRanks(region, pIDA, CONFIG.API_MAXAGE.DMH.MULTIPLE_RANKS).then(ranks => {
 							lolapi.getMultipleChampionMastery(region, pIDA, CONFIG.API_MAXAGE.DMH.MULTIPLE_MASTERIES).then(masteries => {
 								lolapi.getMultipleSummonerFromSummonerID(region, pIDA, CONFIG.API_MAXAGE.DMH.OTHER_SUMMONER_ID).then(pSA => {
 									lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region).then(verified => {
 										request_profiler.begin("generating embed");
-										embedgenerator.detailedMatch(CONFIG, result, matchhistory.matches[number - 1], match, timeline, ranks, masteries, pSA, verified).then(answer => {
+										embedgenerator.detailedMatch(CONFIG, result, matchhistory[number - 1], match, timeline, ranks, masteries, pSA, verified).then(answer => {
 											replyEmbed(answer);
 											request_profiler.end("generating embed");
 											UTILS.debug("\n" + ctable.getTable(request_profiler.endAllCtable()));
