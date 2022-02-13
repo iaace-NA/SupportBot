@@ -359,7 +359,7 @@ module.exports = class EmbedGenerator {
 		newEmbed.setThumbnail("https://ddragon.leagueoflegends.com/cdn/" + CONFIG.STATIC.versions[0] + "/img/profileicon/" + summoner.profileIconId + ".png");
 		if (UTILS.exists(live_match.status)) {//no live game found
 			let mrg_description = "";
-			if (UTILS.exists(match_meta) && UTILS.exists(match_meta.matches[0])) {
+			if (false && UTILS.exists(match_meta) && UTILS.exists(match_meta[0])) {
 				const win = UTILS.determineWin(summoner.id, most_recent_match);
 				const teamParticipant = UTILS.teamParticipant(summoner.id, most_recent_match);
 				let summoner_spells = "";
