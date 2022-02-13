@@ -519,7 +519,7 @@ module.exports = function (CONFIG, client, msg, wsapi, sendToChannel, sendEmbedT
 				lolapi.getMultipleSummonerFromSummonerID(region, match.participants.map(p => p.summonerId), CONFIG.API_MAXAGE.LG.OTHER_SUMMONER_ID).then(pSA => {//participant summoner array
 					lolapi.getMultipleRecentGames(region, pSA.map(pS => pS.puuid), CONFIG.API_MAXAGE.LG.RECENT_GAMES).then(mhA => {//matchhistory array
 						let mIDA = [];//match id array;
-						for (let b in mhA) for (let c in mhA[b].matches) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b].matches[c].gameId);
+						for (let b in mhA) for (let c in mhA[b]) if (mIDA.indexOf(mhA[b].matches[c].gameId) == -1) mIDA.push(mhA[b][c]);
 						Promise.all([lolapi.getMultipleMatchInformation(region, mIDA, CONFIG.API_MAXAGE.LG.MULTIPLE_MATCH), lolapi.getMultipleRanks(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_RANKS), lolapi.getMultipleChampionMastery(region, pSA.map(p => p.id), CONFIG.API_MAXAGE.LG.MULTIPLE_MASTERIES), lolapi.checkVerifiedAccount(msg.author.id, result.puuid, region)]).then(parallel => {
 							let matches = parallel[0];
 							let ranks = parallel[1];
