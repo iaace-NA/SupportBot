@@ -340,7 +340,7 @@ module.exports = class LOLAPI {
 							UTILS.output("e");
 							that.getLiveMatch(region, result6.id, this.CONFIG.API_MAXAGE.SUMMONER_CARD.LIVE_MATCH).then(result4 => {
 								UTILS.output("f");
-								that.getRecentGames(region, result6.accountId, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RECENT_GAMES).then(result7 => {
+								that.getRecentGames(region, result6.puuid, this.CONFIG.API_MAXAGE.SUMMONER_CARD.RECENT_GAMES).then(result7 => {
 									UTILS.output("g");
 									that.getMatchInformation(region, result7[0], this.CONFIG.API_MAXAGE.SUMMONER_CARD.MATCH_INFORMATION).then(result8 => {
 										UTILS.output("h");
