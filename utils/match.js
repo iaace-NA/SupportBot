@@ -1,5 +1,5 @@
 "use strict";
-class Match {
+module.exports = class Match {
 	/*
 	Data policy:
 	- If something is present in v5 but not in v4, make a method for it and see if it can be reconstructed. If something is present in v4 but not in v5, omit it.
