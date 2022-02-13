@@ -264,7 +264,12 @@ module.exports = class LOLAPI {
 			let opts = { count: 100 };
 			if (ranked) opts.queue = ranked_queues;
 			this.get(this.CONFIG.PLATFORMS[region], "match/v5/matches/by-puuid/" + puuid + "/ids", tags.matchhistory, opts, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage).then(matchlist => {
-				resolve(matchlist.slice(0, limit));
+				if (matchlist) {
+					resolve(matchlist.slice(0, limit));
+				}
+				else {
+					resolve([]);
+				}
 			}).catch(reject);
 		});
 	}
