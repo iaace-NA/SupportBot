@@ -1,24 +1,24 @@
 "use strict";
-const UTILS = new(require("./utils.js"))();
+const UTILS = new (require("./utils.js"))();
 const fs = require("fs");
 const REQUEST = require("request");
 const XRegExp = require("xregexp");
 const agentOptions = { ca: fs.readFileSync("../data/keys/ca.crt"), timeout: 120000 };
 const tags = {
-	match: "match", //matches, timelines
-	matchhistory: "match", //matchlists
-	cmr: "cmr", //champions, masteries, runes
-	leagues: "league", //leagues, challenger, master
-	ranks: "league", //by summoner id
-	summoner: "summoner", //summoners by name or id
-	account: "summoner", //summoners by account id
-	cm: "championmastery", //summoner champion mastery
+	match: "match",//matches, timelines
+	matchhistory: "match",//matchlists
+	cmr: "cmr",//champions, masteries, runes
+	leagues: "league",//leagues, challenger, master
+	ranks: "league",//by summoner id
+	summoner: "summoner",//summoners by name or id
+	account: "summoner",//summoners by account id
+	cm: "championmastery",//summoner champion mastery
 	spectator: "spectator",
 	status: "status",
 	tpv: "tpv"
 };
 module.exports = class LOLAPI {
-	constructor(INIT_CONFIG, request_id, wsapi, internal = false, customGet) {
+	constructor(INIT_CONFIG, request_id, internal = false, customGet) {
 		this.CONFIG = INIT_CONFIG;
 		this.request_id = request_id;
 		if (!UTILS.exists(this.CONFIG)) throw new Error("config.json required to access riot api.");
@@ -29,7 +29,6 @@ module.exports = class LOLAPI {
 		this.created = new Date().getTime();
 		this.calls = 0;
 		this.internal = internal;
-		this.wsapi = wsapi;
 		if (this.internal) {
 			this.customGet = customGet;
 		}
@@ -53,7 +52,7 @@ module.exports = class LOLAPI {
 			UTILS.assert(UTILS.exists(tag), "API get: tag not specified");
 			let endpoint = "/lol/" + path + "?iapimaxage=" + maxage + "&iapirequest_id=" + this.request_id;
 			for (let i in options) {
-				if (typeof(options[i]) === "object") endpoint += options[i].map(e => "&" + i + "=" + encodeURIComponent(e)).join(""); //array type
+				if (typeof(options[i]) === "object") endpoint += options[i].map(e => "&" + i + "=" + encodeURIComponent(e)).join("");//array type
 				else endpoint += "&" + i + "=" + encodeURIComponent(options[i]);
 			}
 			const iurl = this.address + ":" + this.port + "/lol/" + region + "/" + cachetime + "/" + maxage + "/" + this.request_id + "/" + tag + "/?k=" + encodeURIComponent(this.CONFIG.API_KEY) + "&endpoint=" + encodeURIComponent(endpoint);
@@ -65,11 +64,13 @@ module.exports = class LOLAPI {
 						try {
 							if (typeof(body) === "object") resolve(body);
 							else resolve(JSON.parse(body));
-						} catch (e) {
+						}
+						catch (e) {
 							UTILS.output("Failed to parse JSON for:\n" + iurl + "\n" + body);
 							reject(e);
 						}
-					} else {
+					}
+					else {
 						if (typeof(body) === "string") resolve(body);
 						else resolve(JSON.stringify(body));
 					}
@@ -95,19 +96,30 @@ module.exports = class LOLAPI {
 						}
 					}
 				});*/
-			} else {
+			}
+			else {
 				this.customGet(region, tag, endpoint, maxage, cachetime).then(body => {
 					if (parseJSON) {
-						const answer = JSON.parse(body);
-						if (UTILS.exists(answer.status)) UTILS.output(iurl + " : " + body);
-						UTILS.assert(typeof(answer) === "object");
-						resolve(answer);
-					} else resolve(body);
+						if (typeof(body) === "object") resolve(body);
+						else {
+							try {
+								const answer = JSON.parse(body);
+								if (UTILS.exists(answer.status)) UTILS.output(iurl + " : " + body);
+								UTILS.assert(typeof(answer) === "object");
+								resolve(answer);
+							}
+							catch(e) {
+								UTILS.output("Failed to parse JSON for:\n" + iurl + "\n" + body);
+								reject(e);
+							}
+						}
+					}
+					else resolve(body);
 				}).catch(reject);
 			}
 		});
 	}
-	getIAPI(path, options, response_expected = true, json_expected = true) { //get internal API
+	getIAPI(path, options, response_expected = true, json_expected = true) {//get internal API
 		if (this.internal) throw new Error("Can't call LOLAPI.getIAPI() in internal mode");
 		let that = this;
 		options.k = this.CONFIG.API_KEY;
@@ -120,46 +132,51 @@ module.exports = class LOLAPI {
 				++paramcount;
 			}
 			++that.calls;
-			this.request({ url, agentOptions }, (error, response, body) => {
+			this.request({ url , agentOptions }, (error, response, body) => {
 				if (!response_expected) {
 					resolve();
 					return;
 				}
 				if (UTILS.exists(error)) {
 					reject(error);
-				} else if (response.statusCode !== 200) {
+				}
+				else if (response.statusCode !== 200) {
 					reject(response.statusCode);
-				} else {
+				}
+				else {
 					try {
 						//UTILS.debug(body, true);
 						if (json_expected) {
 							const answer = JSON.parse(body);
 							UTILS.output("IAPI req: " + url);
 							resolve(answer);
-						} else {
+						}
+						else {
 							resolve(body);
 						}
-					} catch (e) {
+					}
+					catch (e) {
 						reject(e);
 					}
 				}
 			});
 		});
 	}
-	getStatic(path) { //data dragon
+	getStatic(path) {//data dragon
 		return new Promise((resolve, reject) => {
 			let url = "https://ddragon.leagueoflegends.com/" + path;
-			this.request(url, function(error, response, body) {
+			this.request(url, function (error, response, body) {
 				if (error != undefined && error != null) {
 					reject(error);
-				} else {
+				}
+				else {
 					try {
 						const answer = JSON.parse(body);
 						if (UTILS.exists(answer.status)) UTILS.output(url + " : " + body);
 						else UTILS.debug(url);
 						resolve(answer);
-					} catch (e) {
-						console.error(url);
+					}
+					catch (e) {
 						reject(e);
 					}
 				}
@@ -169,12 +186,12 @@ module.exports = class LOLAPI {
 	getStaticChampions(region, version, locale = "en_US") {
 		UTILS.debug("STATIC CHAMPIONS: " + region);
 		return new Promise((resolve, reject) => {
-			this.getStatic("api/versions.json").then(realm => {
-				let v = UTILS.exists(version) ? version : realm[0];
-				this.getStatic("cdn/" + v + "/data/" + locale + "/champion.json").then(cd => { //champion data
+			this.getStatic("realms/" + this.CONFIG.REGIONS_REVERSE[region].toLowerCase() + ".json").then(realm => {
+				let v = UTILS.exists(version) ? version : realm.v;
+				this.getStatic("cdn/" + v + "/data/" + locale + "/champion.json").then(cd => {//champion data
 					for (let b in cd.data) {
-						cd.data[cd.data[b].key] = cd.data[b]; //add key as duplicate of data
-						delete cd.data[b]; //delete original
+						cd.data[cd.data[b].key] = cd.data[b];//add key as duplicate of data
+						delete cd.data[b];//delete original
 					}
 					resolve(cd);
 				}).catch(reject);
@@ -184,12 +201,12 @@ module.exports = class LOLAPI {
 	getStaticSummonerSpells(region, version, locale = "en_US") {
 		UTILS.output("STATIC SPELLS: " + region);
 		return new Promise((resolve, reject) => {
-			this.getStatic("api/versions.json").then(realm => {
-				let v = UTILS.exists(version) ? version : realm[0];
-				this.getStatic("cdn/" + v + "/data/" + locale + "/summoner.json").then(sd => { //spell data
+			this.getStatic("realms/" + this.CONFIG.REGIONS_REVERSE[region].toLowerCase() + ".json").then(realm => {
+				let v = UTILS.exists(version) ? version : realm.v;
+				this.getStatic("cdn/" + v + "/data/" + locale + "/summoner.json").then(sd => {//spell data
 					for (let b in sd.data) {
-						sd.data[sd.data[b].key] = sd.data[b]; //add key as duplicate of data
-						delete sd.data[b]; //delete original
+						sd.data[sd.data[b].key] = sd.data[b];//add key as duplicate of data
+						delete sd.data[b];//delete original
 					}
 					resolve(sd);
 				}).catch(reject);
@@ -198,11 +215,11 @@ module.exports = class LOLAPI {
 	}
 	getSummonerIDFromName(region, username, maxage) {
 		return new Promise((resolve, reject) => {
-			if (!(new XRegExp("^[0-9\\p{L} _\\.]+$").test(username))) {
+			if(!UTILS.lolUsernameValid(username)) {
 				UTILS.debug("username " + username + " didn't pass regex filter");
 				return resolve({ status: "username didn't pass regex filter" });
 			}
-			username = username.toLowerCase();
+			//username = username.toLowerCase();
 			this.get(region, "summoner/v4/summoners/by-name/" + encodeURIComponent(username), tags.summoner, {}, this.CONFIG.API_CACHETIME.GET_SUMMONER_ID_FROM_NAME, maxage).then(answer => {
 				resolve(answer);
 			}).catch(reject);
@@ -212,9 +229,10 @@ module.exports = class LOLAPI {
 		let that = this;
 		let requests = [];
 		if (this.CONFIG.API_SEQUENTIAL) {
-			for (let i in usernames) requests.push(function() { return that.getSummonerIDFromName(region, usernames[i], maxage); });
+			for (let i in usernames) requests.push(function () { return that.getSummonerIDFromName(region, usernames[i], maxage); });
 			return UTILS.sequential(requests);
-		} else {
+		}
+		else {
 			for (let i in usernames) requests.push(that.getSummonerIDFromName(region, usernames[i], maxage));
 			return Promise.all(requests);
 		}
@@ -231,9 +249,10 @@ module.exports = class LOLAPI {
 		let that = this;
 		let requests = [];
 		if (this.CONFIG.API_SEQUENTIAL) {
-			for (let i in ids) requests.push(function() { return that.getSummonerFromSummonerID(region, ids[i], maxage); });
+			for (let i in ids) requests.push(function () { return that.getSummonerFromSummonerID(region, ids[i], maxage); });
 			return UTILS.sequential(requests);
-		} else {
+		}
+		else {
 			for (let i in ids) requests.push(that.getSummonerFromSummonerID(region, ids[i], maxage));
 			return Promise.all(requests);
 		}
@@ -261,10 +280,10 @@ module.exports = class LOLAPI {
 	getRecentGames(region, puuid, maxage, limit = 20, ranked = false) {
 		const ranked_queues = [420, 440, 470];
 		return new Promise((resolve, reject) => {
-			let opts = { count: 100 };
+			let opts = { endIndex: 100 };
 			if (ranked) opts.queue = ranked_queues;
 			this.get(this.CONFIG.PLATFORMS[region], "match/v5/matches/by-puuid/" + puuid + "/ids", tags.matchhistory, opts, this.CONFIG.API_CACHETIME.GET_RECENT_GAMES, maxage).then(matchlist => {
-				resolve(matchlist.slice(0, limit));
+				resolve(matchlist);
 			}).catch(reject);
 		});
 	}
@@ -290,9 +309,10 @@ module.exports = class LOLAPI {
 		let that = this;
 		let requests = [];
 		if (this.CONFIG.API_SEQUENTIAL) {
-			for (let i in gameIDs) requests.push(function() { return that.getMatchInformation(region, gameIDs[i], maxage); });
+			for (let i in gameIDs) requests.push(function () { return that.getMatchInformation(region, gameIDs[i], maxage); });
 			return UTILS.sequential(requests);
-		} else {
+		}
+		else {
 			for (let i in gameIDs) requests.push(that.getMatchInformation(region, gameIDs[i], maxage));
 			return Promise.all(requests);
 		}
@@ -301,9 +321,10 @@ module.exports = class LOLAPI {
 		let that = this;
 		let requests = [];
 		if (this.CONFIG.API_SEQUENTIAL) {
-			for (let i in gameIDs) requests.push(function() { return that.getMatchTimeline(region, gameIDs[i], maxage); });
+			for (let i in gameIDs) requests.push(function () { return that.getMatchTimeline(region, gameIDs[i], maxage); });
 			return UTILS.sequential(requests);
-		} else {
+		}
+		else {
 			for (let i in gameIDs) requests.push(that.getMatchTimeline(region, gameIDs[i], maxage));
 			return Promise.all(requests);
 		}
@@ -398,8 +419,8 @@ module.exports = class LOLAPI {
 		};
 		if (!msg.PM) {
 			opts.sid = msg.guild.id,
-				opts.guild_name = msg.guild.name,
-				opts.channel_name = msg.channel.name
+			opts.guild_name = msg.guild.name,
+			opts.channel_name = msg.channel.name
 		}
 		if (UTILS.exists(msg.content)) {
 			opts.content = msg.content;
