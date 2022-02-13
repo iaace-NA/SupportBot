@@ -48,7 +48,7 @@ let https = require('https');
 let riotRequest = new (require("riot-lol-api"))(CONFIG.RIOT_API_KEY, 12000, {
 	get: function(region, endpoint, callback) {
 		const oldFormat = endpointToURL(region, endpoint);
-		UTILS.output(oldFormat.url);
+		//UTILS.output(oldFormat.url);
 		if (oldFormat.maxage != 0) {
 			checkCache(oldFormat.url, oldFormat.maxage, oldFormat.request_id).then(data => {
 				callback(null, data);
