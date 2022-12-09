@@ -9,7 +9,7 @@
   "author": "iaace",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "express-ws": "^4.0.0",
     "getopts": "^2.2.4",
     "json5": "^2.1.0",
