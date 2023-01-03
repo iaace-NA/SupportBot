@@ -12,7 +12,7 @@
     "express": "^4.16.4",
     "express-ws": "^4.0.0",
     "getopts": "^2.2.4",
-    "json5": "^2.1.0",
+    "json5": "^2.2.2",
     "mathjs": "^5.9.0",
     "mongoose": "^5.7.5",
     "request": "^2.88.0",
